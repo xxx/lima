@@ -18,11 +18,41 @@ string *adverbs = ({});
 #define CMD_REMOVE_EMOTE "/cmds/wiz/rmemote"
 #define CMD_MOVE_EMOTE "/cmds/wiz/mvemote"
 
+private int rule_priority(string rule)
+{
+   int priority = 1;
+
+   foreach (string token in explode(rule, " "))
+   {
+      switch (token)
+      {
+      case "": break;
+      case "LIV": priority += 4; break;
+      case "OBJ": case "LVS": case "LIV:v": priority += 3; break;
+      case "OBS": case "OBJ:v": case "LVS:v": priority += 2; break;
+      default: priority++; break;
+      }
+   }
+   return priority;
+}
+
+private void register_emote(string verb)
+{
+   parse_remove(verb);
+   if (!emotes[verb])
+      return;
+
+   foreach (string rule in sort_array(filter(keys(emotes[verb]), stringp),
+      (: rule_priority($2) - rule_priority($1) :)))
+   {
+      catch (parse_add_rule(verb, rule));
+   }
+}
+
 void create()
 {
-   string verb, rule;
+   string verb;
    mapping value;
-   mixed ignore;
 
    unguarded(1, (: restore_object(SAVE_FILE) :));
 
@@ -41,10 +71,7 @@ void create()
          m_delete(value, 1);
       }
 
-      foreach (rule, ignore in value)
-      {
-         catch (parse_add_rule(verb, rule));
-      }
+      register_emote(verb);
    }
 
    if (!adverbs)
@@ -73,6 +100,7 @@ int add_emote(string verb, mixed rule, string *parts)
    else
       emotes[verb][rule] = parts[0];
 
+   register_emote(verb);
    unguarded(1, (: save_object(SAVE_FILE) :));
 
    return 1;
@@ -95,7 +123,7 @@ int remove_emote(string verb, string rule)
       m_delete(emotes, verb);
    }
 
-   parse_remove(verb);
+   register_emote(verb);
    parse_refresh();
 
    unguarded(1, (: save_object(SAVE_FILE) :));
@@ -109,11 +137,9 @@ int move_emote(string verb, string dest)
    if ((!emotes[verb]) || (!dest))
       return 0;
    emotes[dest] = emotes[verb];
-   foreach (string rule, string soul in emotes[verb])
-   {
-      parse_add_rule(dest, rule);
-   }
    m_delete(emotes, verb);
+   register_emote(verb);
+   register_emote(dest);
    unguarded(1, (: save_object(SAVE_FILE) :));
    return 1;
 }
