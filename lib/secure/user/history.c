@@ -45,7 +45,7 @@ void add_tell_history(string add)
 
 string *list_tell_history()
 {
-   return copy(tell_history);
+   return deep_copy(tell_history);
 }
 
 void clear_tell_history()

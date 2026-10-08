@@ -38,7 +38,7 @@ void remove_pattern(string pattern)
 
 mapping query_patterns()
 {
-   return copy(patterns);
+   return deep_copy(patterns);
 }
 
 varargs void add_sub_pattern(mixed rule, string pattern, mixed action, mixed left, mixed right)

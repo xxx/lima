@@ -13,7 +13,7 @@ nosave mapping room_state_extra_longs = ([]);
 
 string *get_room_state_info()
 {
-   return copy(room_state);
+   return deep_copy(room_state);
 }
 
 int query_state(string state)

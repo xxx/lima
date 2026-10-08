@@ -110,7 +110,7 @@ void clear_damage_types()
 // Returns a string array copy of all known damage types.
 string *query_damage_types()
 {
-   return copy(damage);
+   return deep_copy(damage);
 }
 
 //: FUNCTION query_valid_damage_type

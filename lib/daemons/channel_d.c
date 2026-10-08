@@ -222,7 +222,7 @@ nomask void set_permanent(string channel_name, int is_perm)
 
 mapping query_permanent_channels()
 {
-   return copy(permanent_channels);
+   return deep_copy(permanent_channels);
 }
 
 protected

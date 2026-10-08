@@ -294,7 +294,7 @@ void clear_effects()
 // Returns copy of the effects queue
 mixed *query_effects()
 {
-   return copy(effects);
+   return deep_copy(effects);
 }
 
 //: FUNCTION add_effect

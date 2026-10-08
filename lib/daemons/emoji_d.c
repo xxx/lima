@@ -164,11 +164,11 @@ nomask mixed get_emoji(string emoji)
    {
       if (this_body() && (res = this_body()->query_perm("emojis")))
       {
-         return res[emoji] ? copy(res[emoji]) : emoji;
+         return res[emoji] ? deep_copy(res[emoji]) : emoji;
       }
    }
 
-   return res ? copy(res) : emoji;
+   return res ? deep_copy(res) : emoji;
 }
 
 nomask string *process_list(string *name_list)
@@ -178,7 +178,7 @@ nomask string *process_list(string *name_list)
 
 nomask mixed get_emoji_data()
 {
-   return copy(emoji_map);
+   return deep_copy(emoji_map);
 }
 
 string emoji_replace(string input, int msg_type)

@@ -140,5 +140,5 @@ string *get_registered()
 
 mixed *show_banishes()
 {
-   return copy(({bad_names, bad_sites}));
+   return deep_copy(({bad_names, bad_sites}));
 }

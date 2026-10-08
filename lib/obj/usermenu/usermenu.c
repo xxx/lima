@@ -98,7 +98,7 @@ mapping query_race_data()
 {
    if (!races)
       load_races();
-   return copy(races);
+   return deep_copy(races);
 }
 
 private

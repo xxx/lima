@@ -16,12 +16,12 @@ mapping managers = ([]);
 
 mapping copy_leaders()
 {
-   return copy(leaders);
+   return deep_copy(leaders);
 }
 
 mapping copy_managers()
 {
-   return copy(managers);
+   return deep_copy(managers);
 }
 
 void set_leader(string what, string leader)

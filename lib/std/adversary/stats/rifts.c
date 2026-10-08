@@ -23,7 +23,7 @@ class wear_info find_wi(string s);
 
 mapping query_stats()
 {
-   return copy(stats);
+   return deep_copy(stats);
 }
 
 nomask int query_stat_pure(string stat)

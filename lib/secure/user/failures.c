@@ -34,7 +34,7 @@ nomask void register_failure(string addr)
 
 nomask mixed *query_failures()
 {
-   return copy(failures);
+   return deep_copy(failures);
 }
 
 nomask void clear_failures()

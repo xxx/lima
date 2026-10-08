@@ -547,7 +547,7 @@ int complex_exit_do_verb_rule(string verb, string rule, mixed args...)
    dest = query_method_destination(match);
 
    /* Default to everything that's in the method. */
-   data = copy(methods[match]);
+   data = deep_copy(methods[match]);
 
    /* We want to do some operation on these */
    data.destination = objectp(dest) ? file_name(query_method_destination(match)) : dest;

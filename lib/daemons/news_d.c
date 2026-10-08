@@ -808,7 +808,7 @@ nomask void move_post(string curr_group, int curr_id, string to_group)
 {
    class news_msg msg;
    int new_id;
-   msg = copy(data[curr_group][curr_id]);
+   msg = deep_copy(data[curr_group][curr_id]);
    if (!adminp(this_user()) && msg.userid != this_user()->query_userid())
    {
       write("You cannot move posts which don't belong to you.\n");

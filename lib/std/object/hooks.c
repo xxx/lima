@@ -159,5 +159,5 @@ varargs mixed call_hooks(string tag, mixed func, mixed start, mixed *args...)
 
 mapping debug_hooks()
 {
-   return copy(hooks);
+   return deep_copy(hooks);
 }

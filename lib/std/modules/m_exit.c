@@ -542,7 +542,7 @@ void do_go_str(string dir)
 // Return all of the exit info contained within the object
 mapping debug_exits()
 {
-   return copy(exits);
+   return deep_copy(exits);
 }
 
 //: FUNCTION query_base

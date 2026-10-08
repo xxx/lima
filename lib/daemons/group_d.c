@@ -94,11 +94,11 @@ nomask mixed get_group(string group)
    {
       if (this_body() && (res = this_body()->query_perm("groups")))
       {
-         return res[group] ? copy(res[group]) : group;
+         return res[group] ? deep_copy(res[group]) : group;
       }
    }
 
-   return res ? copy(res) : group;
+   return res ? deep_copy(res) : group;
 }
 
 nomask string *process_list(string *name_list)
@@ -108,5 +108,5 @@ nomask string *process_list(string *name_list)
 
 nomask mixed get_group_data()
 {
-   return copy(group_map);
+   return deep_copy(group_map);
 }

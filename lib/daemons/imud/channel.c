@@ -278,7 +278,7 @@ nomask void chan_shutdown()
 
 nomask mapping query_chanlist()
 {
-   return copy(chanlist);
+   return deep_copy(chanlist);
 }
 
 nomask void add_channel(string channel_name, int channel_type)
@@ -347,5 +347,5 @@ nomask void listen_to_all_channels()
 
 nomask string *query_listened_channels()
 {
-   return copy(listened_channels);
+   return deep_copy(listened_channels);
 }

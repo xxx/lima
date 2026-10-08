@@ -117,7 +117,7 @@ string *list_method_equivalents(string method)
 
 mapping stat_me()
 {
-   return copy(methods);
+   return deep_copy(methods);
 }
 
 void load_config_from_file()

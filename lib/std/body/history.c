@@ -34,5 +34,5 @@ void add_say_history(string add)
 
 string *list_say_history()
 {
-   return copy(say_history);
+   return deep_copy(say_history);
 }

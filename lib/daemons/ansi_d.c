@@ -55,7 +55,7 @@ mapping *query_translations()
 
 string *query_restrictions()
 {
-   return copy(restrictions);
+   return deep_copy(restrictions);
 }
 
 mapping defaults()

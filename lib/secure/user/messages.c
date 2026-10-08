@@ -90,7 +90,7 @@ void update_translations()
       translations = ANSI_D->query_translations()[0];
    else
       translations = ANSI_D->query_translations()[1];
-   translations = copy(translations);
+   translations = deep_copy(translations);
    foreach (string code, string value in colours)
    {
       string *parts = map(explode(value, ","), ( : upper_case:));

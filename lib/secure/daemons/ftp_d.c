@@ -1132,17 +1132,17 @@ string FTP_CMD_retr_callback(object ob)
 
 mapping query_passives()
 {
-   return copy(passives);
+   return deep_copy(passives);
 }
 
 mapping query_sessions()
 {
-   return copy(sessions);
+   return deep_copy(sessions);
 }
 
 mapping query_dataports()
 {
-   return copy(dataports);
+   return deep_copy(dataports);
 }
 
 string query_iphost()

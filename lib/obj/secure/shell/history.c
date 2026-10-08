@@ -117,7 +117,7 @@ protected
 string *get_ordered_history()
 {
    if (buffer_size == -1)
-      return copy(history);
+      return deep_copy(history);
 
    if (command_number == array_index)
    {

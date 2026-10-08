@@ -58,7 +58,7 @@ nomask void rcv_mudlist(string orig_mud, string orig_user, string targ_user, mix
 
 nomask mapping query_mudlist()
 {
-   return copy(mud_info);
+   return deep_copy(mud_info);
 }
 
 nomask int has_service(string mud, string service)

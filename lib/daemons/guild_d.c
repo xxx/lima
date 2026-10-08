@@ -936,14 +936,14 @@ mapping query_favour(int tier, string name)
 mapping query_missions(int tier)
 {
    if (!tier)
-      return copy(guild_missions);
+      return deep_copy(guild_missions);
    else
-      return copy(guild_missions[tier]);
+      return deep_copy(guild_missions[tier]);
 }
 
 mapping query_mission(int tier, string name)
 {
-   return copy(guild_missions[tier][name]);
+   return deep_copy(guild_missions[tier][name]);
 }
 
 object mission_ctrl_npc(string guild)
@@ -1146,7 +1146,7 @@ void add_log(string guild, string log)
 
 string *guild_log(string guild)
 {
-   return copy(guild_log[guild]);
+   return deep_copy(guild_log[guild]);
 }
 
 int clear_guild_log(string guild)

@@ -15,7 +15,7 @@ nosave string cached_description;
 
 mapping query_stats()
 {
-   return copy(stats);
+   return deep_copy(stats);
 }
 
 int query_stat_pure(string stat)

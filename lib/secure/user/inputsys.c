@@ -63,7 +63,7 @@ void terminal_type(string term)
 mixed environ(string var)
 {
    if (!var || var == "")
-      return copy(environ);
+      return deep_copy(environ);
 
    return environ[var];
 }

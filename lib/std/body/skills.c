@@ -218,7 +218,7 @@ class skill query_skill(string s)
    class skill skill;
    if (!skills[s])
       return 0;
-   skill = copy(skills[s]);
+   skill = deep_copy(skills[s]);
    skill.skill_points = clamp(skill.skill_points + skill_bonus[s], 0, MAX_SKILL_VALUE);
    return skill;
 }

@@ -37,7 +37,7 @@ void add_annotation(mixed o, class annotation a)
 
 class annotation *retrieve_annotations(mixed o)
 {
-   return copy(annotations[(objectp(o) ? base_name(o) : o)]);
+   return deep_copy(annotations[(objectp(o) ? base_name(o) : o)]);
 }
 
 int remove_annotation(mixed o, int index)

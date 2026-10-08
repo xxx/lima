@@ -101,7 +101,7 @@ nomask mixed query_attributes(string task_id)
    if (!task)
       return 0;
 
-   return copy(task[TASK_ATTR]);
+   return deep_copy(task[TASK_ATTR]);
 }
 
 //: FUNCTION query_sub_tasks
@@ -113,7 +113,7 @@ nomask mixed *query_sub_tasks(string task_id)
    if (!task)
       return 0;
 
-   return copy(task[TASK_SUB]);
+   return deep_copy(task[TASK_SUB]);
 }
 
 //: FUNCTION set_title
@@ -313,7 +313,7 @@ nomask string resolve_parent_id(string task_id)
 // Return a copy of the specified task.
 nomask mixed *query_task(string task_id)
 {
-   return copy(find_task(task_id));
+   return deep_copy(find_task(task_id));
 }
 
 //: FUNCTION query_tasks
@@ -324,7 +324,7 @@ varargs nomask mixed *query_tasks(string task_id)
 
    if (!task_id)
    {
-      return copy(tasks);
+      return deep_copy(tasks);
    }
 
    task = find_task(task_id);
@@ -378,7 +378,7 @@ string add_task(string parent_id, string title, string description, string who)
 // Remove the specified task.
 mixed *remove_task(string task_id)
 {
-   mixed *task = copy(find_task(task_id));
+   mixed *task = deep_copy(find_task(task_id));
    string parent_id = resolve_parent_id(task_id);
 
    // This catches problems with task_id being invalid.

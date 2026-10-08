@@ -424,7 +424,7 @@ string repair_cost_string(object ob)
 
 mapping estimate_objects(object player, object *obs)
 {
-   mapping pouch = copy(player->query_materials());
+   mapping pouch = deep_copy(player->query_materials());
    mapping picked_mats = ([]);
    int remainder = 0;
    if (!arrayp(obs))

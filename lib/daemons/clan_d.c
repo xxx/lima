@@ -53,7 +53,7 @@ mapping query_clan_info(string clan_name)
 {
    if (!clan_name || !stringp(clan_name))
       return 0;
-   return copy(clan_data[clan_name]);
+   return deep_copy(clan_data[clan_name]);
 }
 
 //: FUNCTION init_clan

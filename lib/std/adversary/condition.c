@@ -45,7 +45,7 @@ void remove_readied(object ob)
 
 object *query_readied()
 {
-   return copy(readied);
+   return deep_copy(readied);
 }
 
 int query_attack_speed()
