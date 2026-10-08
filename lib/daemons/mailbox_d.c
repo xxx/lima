@@ -52,6 +52,10 @@ nomask void unload_mailbox(string the_owner)
 {
    object mailbox;
 
+   foreach (object session in children(USER_OB))
+      if (session != previous_object() && session->query_userid() == the_owner)
+         return;
+
    if (mailbox = mailboxes[the_owner])
    {
       mailbox->remove();
@@ -64,7 +68,7 @@ nomask void close_mailboxes()
    string *names;
    string name;
 
-   names = keys(mailboxes) - users()->query_userid();
+   names = keys(mailboxes) - children(USER_OB)->query_userid();
    foreach (name in names)
    {
       if (mailboxes[name]) /* might have been destructed */
