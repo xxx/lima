@@ -15,6 +15,8 @@ nosave int busy_at = 0;
 nosave string busy_func;
 nosave string busy_action;
 nosave int no_heals = 0;
+private nosave int busy_timer = 0;
+private nosave int hunt_timer = 0;
 
 void adversary_met(object who);
 varargs void attacked_by(object who, int take_a_swing);
@@ -30,7 +32,8 @@ void remove_hook(string tag, function hook);
 void do_move_away();
 nomask object query_link();
 
-function adv_met_fn = ( : adversary_met:);
+function adv_met_fn = adversary_met;
+private nosave function busy_interrupt_fn = end_busy;
 
 void add_hunted(object who)
 {
@@ -47,13 +50,14 @@ private
 int not_busy()
 {
    busy_at = 0;
-   busy_with = 0;
+   busy_with = nil;
    return 1;
 }
 
 void stop_busy()
 {
-   remove_call_out("end_busy");
+   remove_call_out(busy_timer);
+   busy_timer = 0;
    not_busy();
 }
 
@@ -70,8 +74,11 @@ void end_busy(mixed *args)
       tell(this_object(), "You fail at " + busy_action + ".\n");
    }
 
-   if (find_call_out("end_busy") == -1)
+   if (!query_call_out(busy_timer))
+   {
+      busy_timer = 0;
       not_busy();
+   }
 }
 
 //: FUNCTION busy_with
@@ -108,8 +115,9 @@ varargs int busy_with(object ob, string action, string bf, mixed args, int busy)
       busy_with = ob;
       busy_func = bf;
       busy_action = action;
-      call_out("end_busy", busy || BUSY_LENGTH, args);
-      add_hook("interrupt", ( : end_busy:));
+      remove_call_out(busy_timer);
+      busy_timer = call_out(&end_busy(args), busy || BUSY_LENGTH);
+      add_hook("interrupt", busy_interrupt_fn);
       return 1;
    }
 
@@ -152,9 +160,9 @@ void i_met(object who)
 // This function is only called for ADVERSARY, not if you are a player.
 void adversary_met(object who)
 {
-   if (find_call_out("is_hunted_call") == -1)
+   if (!query_call_out(hunt_timer))
    {
-      call_out("is_hunted_call", 1 + random(2), who);
+      hunt_timer = call_out(&is_hunted_call(who), 1 + random(2));
       i_met(who);
    }
    else
@@ -174,6 +182,8 @@ void adversary_moved()
    }
 
    my_env = environment();
+   if (!my_env)
+      return;
    my_env->add_hook("object_arrived", adv_met_fn);
    foreach (object liv in filter(all_inventory(my_env), ( : $1->is_living() && $1 != this_object() :)))
       adversary_met(liv);
@@ -183,7 +193,7 @@ void behavior_hooks()
 {
    if (!behavior_hooks)
    {
-      add_hook("move", ( : adversary_moved:));
+      add_hook("move", adversary_moved);
       adversary_moved();
       behavior_hooks = 1;
    }
@@ -299,6 +309,6 @@ void do_move_away()
    if (!dest)
       return;
 
-   if (functionp("do_game_command"))
-      do_game_command(sprintf("go %s", chosen_dir));
+   if (function_exists("do_game_command", this_object()))
+      this_object()->do_game_command(sprintf("go %s", chosen_dir));
 }
