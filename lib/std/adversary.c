@@ -57,7 +57,7 @@ void mudlib_setup(mixed *args...)
 
    /* by pinging query_weapon(), we will default to self as a weapon */
    query_weapon();
-   call_out("setup_monster", 0);
+   call_out(setup_monster, 0);
 }
 
 //: FUNCTION start_fight
