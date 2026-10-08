@@ -313,14 +313,25 @@ nomask void process_message(string fname)
    int message_key;
    class mail_msg msg;
 
-   message_key = to_int(fname[0.. < 3]); /* ### dependent on SAVE_EXTENSION */
+   mixed problem = catch(message_key = to_int(fname));
+   if (problem || message_key < 0 || fname != sprintf("%d%s", message_key, __SAVE_EXTENSION__))
+      error("mail: invalid saved-message filename: " + fname + "\n");
    msg = restore_msg(message_key);
+   if (!msg)
+      error("mail: missing saved message: " + fname + "\n");
+   if (!valid_pending_owners(msg.dels_pending))
+      error("mail: invalid pending-owner metadata\n");
+   foreach (string user in msg.dels_pending)
+      if (!user_exists(user))
+         error("mail: invalid pending-owner account: " + user + "\n");
    map(msg.dels_pending, ( : MAILBOX_D->get_mailbox($1)->receive_new_message($(message_key)) :));
 }
 
 nomask void rebuild_mailboxes()
 {
-   string *messages = unguarded(1, (: get_dir(MAIL_PATH "*.o") :));
+   if (!check_previous_privilege(1))
+      error("security violation: illegal rebuild of mailboxes\n");
+   string *messages = unguarded(1, (: get_dir(MAIL_PATH "*" + __SAVE_EXTENSION__) :));
 
    map(messages, process_message);
 }

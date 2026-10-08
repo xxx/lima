@@ -148,16 +148,8 @@ nomask int first_unread_message()
    return -1;
 }
 
-nomask void delete_message(int message_key)
+private nomask void delete_mail_entry(int message_key)
 {
-   // ### need some work on ensuring the call stack is correct
-   //     if ( !check_privilege(owner) )
-   if (this_user()->query_userid() != owner)
-      error("security violation: you are not allowed to read this mail\n");
-
-   if (!has_key(mailbox, message_key))
-      error("non-existent message\n");
-
    MAIL_D->delete_mail(message_key, owner);
    int deleted_index = member_array(message_key, query_message_keys());
    m_delete(mailbox, message_key);
@@ -171,15 +163,29 @@ nomask void delete_message(int message_key)
    save_me();
 }
 
+nomask void delete_message(int message_key)
+{
+   // ### need some work on ensuring the call stack is correct
+   //     if ( !check_privilege(owner) )
+   if (this_user()->query_userid() != owner)
+      error("security violation: you are not allowed to read this mail\n");
+
+   if (!has_key(mailbox, message_key))
+      error("non-existent message\n");
+
+   delete_mail_entry(message_key);
+}
+
 nomask void nuke_mailbox()
 {
    if (!check_previous_privilege(1))
       error("security violation: illegal nuke of mailbox\n");
 
    foreach (int message_key in keys(mailbox))
-      MAIL_D->delete_mail(message_key, owner);
+      delete_mail_entry(message_key);
 
    mailbox = ([]);
+   message_index = 0;
    unguarded(1, (: rm(get_fname() + __SAVE_EXTENSION__) :));
 }
 
@@ -189,8 +195,8 @@ nomask void receive_new_message(int message_key)
 {
    object user;
 
-   //    if( previous_object() != find_object( MAIL_D ) )
-   //	return;
+   if (previous_object() != find_object(MAIL_D))
+      error("security violation: illegal attempt to deliver mail\n");
 
    mailbox[message_key] = F_UNREAD;
    save_me();
