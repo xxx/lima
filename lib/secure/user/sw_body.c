@@ -136,7 +136,7 @@ nomask void incarnate(string name, int is_new, string new_fname)
 void sw_body_handle_existing_logon(string, int);
 
 private
-nomask void rcv_try_to_boot(object who, string answer)
+nomask void rcv_try_to_boot(object who, string name, string answer)
 {
    // TBUG("rcv_try_to_boot("+identify(who)+", "+identify(answer));
    answer = lower_case(answer);
@@ -145,23 +145,27 @@ nomask void rcv_try_to_boot(object who, string answer)
       /* Check this again, in case the user quits after the question is asked
        * but before this point. If 'who' exists, give them a message and steal
        * the body, otherwise not. */
-      if (who)
+      if (who && who->query_userid() == query_userid() && who->query_body() &&
+          lower_case(who->query_body()->query_name()) == lower_case(name))
       {
          who->receive_private_msg("You are taken over by yourself, or something.\n");
          body = who->query_body();
          who->steal_body();
          start_shell(0);
          body->reconnect(this_object());
+         initialize_user();
          return;
       }
-      sw_body_handle_existing_logon(query_userid(), 0);
+      sw_body_handle_existing_logon(name, 0);
+      if (body) initialize_user();
       return;
    }
    if (answer == "n" || answer == "no")
    {
       if (wizardp(query_userid()))
       {
-         sw_body_handle_existing_logon(query_userid(), 1);
+         sw_body_handle_existing_logon(name, 1);
+         if (body) initialize_user();
          return;
       }
 
@@ -170,7 +174,7 @@ nomask void rcv_try_to_boot(object who, string answer)
    }
 
    write("please type 'y' or 'n'  >");
-   modal_simple(&rcv_try_to_boot(who), 0, 0, 1);
+   modal_simple(&rcv_try_to_boot(who, name), 0, 0, 1);
 }
 
 protected
@@ -196,8 +200,6 @@ nomask void sw_body_handle_existing_logon(string name, int enter_now)
       ** be interactive or link-dead.  Do the right thing...
       */
       object *users;
-      string *ids;
-      int idx;
       object the_user;
 
       /* adjust the privilege of the user ob */
@@ -207,13 +209,21 @@ nomask void sw_body_handle_existing_logon(string name, int enter_now)
          set_privilege(query_userid());
 
       /* check for link-deadedness */
-      users = children(USER_OB) - ({this_object()});
-      ids = users->query_userid();
-      if ((idx = member_array(query_userid(), ids)) != -1)
+      users = ({});
+      foreach (object session in children(USER_OB) - ({this_object()}))
+      {
+         object current = session->query_body();
+         if (session->query_userid() == query_userid() && current &&
+             lower_case(current->query_name()) == lower_case(name))
+            users += ({session});
+      }
+      if (sizeof(users) > 1)
+         error("Multiple sessions own the selected character.\n");
+      if (sizeof(users))
       {
          // If the user is not interactive (DC'ed) we can take them over directly.
          // If the user does not have a body yet (hanging on login typically), the same.
-         if (!interactive(the_user = users[idx]) || !the_user->query_body())
+         if (!interactive(the_user = users[0]) || !the_user->query_body())
          {
             if (body = the_user->query_body())
             {
@@ -227,7 +237,7 @@ nomask void sw_body_handle_existing_logon(string name, int enter_now)
          else
          {
             write("\nYou are already logged in!\nThrow yourself off?\n");
-            modal_simple(&rcv_try_to_boot(the_user), 0, 0, 1);
+            modal_simple(&rcv_try_to_boot(the_user, name), 0, 0, 1);
             return;
          }
       }

@@ -154,8 +154,8 @@ void enter_game(string name, string fname)
 
    // Get people into the a body
    sw_body_handle_existing_logon(name, 0);
-   // Then initialize channels and show didlog and other things needed.
-   initialize_user();
+   // A takeover answer completes initialization once a body is accepted.
+   if (query_body()) initialize_user();
 }
 
 private

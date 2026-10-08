@@ -54,7 +54,7 @@ nomask void unload_mailbox(string the_owner)
 
    if (mailbox = mailboxes[the_owner])
    {
-      destruct(mailbox);
+      mailbox->remove();
       m_delete(mailboxes, the_owner);
    }
 }
@@ -68,7 +68,7 @@ nomask void close_mailboxes()
    foreach (name in names)
    {
       if (mailboxes[name]) /* might have been destructed */
-         destruct(mailboxes[name]);
+         mailboxes[name]->remove();
 
       m_delete(mailboxes, name);
    }
