@@ -21,7 +21,6 @@
 // .. TAGS: RST
 
 #include <config/time.h>
-#include <localtime.h>
 
 inherit CMD;
 inherit M_FRAME;
@@ -45,27 +44,29 @@ void main(string notused)
    int time = time();
    string restarted_at = ctime(time - uptime());
    string str = "";
-   mixed local = localtime(time);
+   string local_offset = strftime("%z", time);
+   int gmtoff = (to_int(local_offset[1..2]) * 3600 + to_int(local_offset[3..4]) * 60) *
+                (local_offset[0..0] == "-" ? -1 : 1);
    mixed my_offset;
 
    my_offset = this_body()->query_tz();
    if (intp(my_offset) || floatp(my_offset))
-      my_offset = to_int(3600.0 * my_offset);
+      my_offset = to_int(3600.0 * to_float(my_offset));
 
 #ifdef USE_GAME_TIME
    str += sprintf("<190>%s<res> -  %d game days / real day\n", EVENT_D->time_to_str(), EVENT_D->game_days_per_day());
    str += week_view() + "\n";
 #endif
    str += sprintf("%s.\n", ctime(time));
-   str += sprintf("%s.\n", ctime(time - local[LT_GMTOFF]));
+   str += sprintf("%s.\n", ctime(time - gmtoff));
    my_offset = this_body()->query_tz();
    if (intp(my_offset) || floatp(my_offset))
    {
-      my_offset = to_int(3600.0 * my_offset);
+      my_offset = to_int(3600.0 * to_float(my_offset));
       str += sprintf("\n%s.\n", ctime(time + my_offset));
    }
    str += sprintf("\n" + mud_name() + " restarted on " + restarted_at + ". \n");
-   str += mud_name() + " has been up for " + time_to_string(uptime());
+   str += mud_name() + " has been up for " + time_to_string(uptime(), 0);
 
    str = str[0.. < 2] + ".\n";
 
@@ -90,4 +91,9 @@ void player_menu_entry(string str)
    bare_init();
    main(str);
    done_outputing();
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
