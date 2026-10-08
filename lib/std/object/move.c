@@ -161,7 +161,7 @@ varargs object give_new_obj(object target, string obj, int recurse, mixed args)
    {
       if (ob->move(target) == MOVE_OK)
          return ob;
-      if (recurse &&target = environment(target))
+      if (recurse && (target = environment(target)))
          continue;
       error("give_new_obj() failed: No room for object anywhere (recursed).");
    }
