@@ -118,7 +118,7 @@ int remove_abuse(int a)
 {
    int cap_skill = should_cap_skill("misc/life/endocrines");
    if (test_skill("misc/life/endocrines", a, cap_skill))
-      abuse += to_int(a * 2);
+      abuse -= to_int(a * 2);
    else
       abuse -= a;
 
@@ -236,18 +236,18 @@ void update_max_health()
 int update_body_style(string bstyle)
 {
    mapping new_body = BODY_D->get_body(bstyle);
-   body_style = bstyle;
-   limb_sizes = BODY_D->get_body_size(bstyle);
    // TBUG("Setting body style " + body_style + " for " + this_object() + " Level " + this_object()->query_level());
 
-   if (!new_body)
+   if (!sizeof(new_body))
       return 0;
 
    // Make sure we have at least one vital or system limb..
 
-   if (!filter(keys(new_body), ( : ((class limb)$(new_body)[$1])->flags & (LIMB_VITAL | LIMB_SYSTEM) :)))
+   if (!sizeof(filter(keys(new_body), ( : ((class limb)$(new_body)[$1]).flags & (LIMB_VITAL | LIMB_SYSTEM) :))))
       return 0;
 
+   body_style = bstyle;
+   limb_sizes = BODY_D->get_body_size(bstyle);
    health = new_body;
 
    foreach (string name, class limb l in health)
@@ -255,7 +255,7 @@ int update_body_style(string bstyle)
       if (l.health == -1)
          continue;
       l.max_health = hp_adjustment(l.max_health, query_level());
-      l.health = hp_adjustment(l.max_health, query_level());
+      l.health = l.max_health;
 #ifdef LIMB_SHIELDS
       l.max_shield = shield_adjustment(l.max_health, query_level());
       l.shield = shield_adjustment(l.max_health, query_level());
@@ -278,27 +278,27 @@ string query_body_style()
 
 int is_vital_limb(string limb)
 {
-   return ((class limb)health[limb])->flags & LIMB_VITAL;
+   return ((class limb)health[limb]).flags & LIMB_VITAL;
 }
 
 int is_system_limb(string limb)
 {
-   return ((class limb)health[limb])->flags & LIMB_SYSTEM;
+   return ((class limb)health[limb]).flags & LIMB_SYSTEM;
 }
 
 int is_wielding_limb(string limb)
 {
-   return ((class limb)health[limb])->flags & LIMB_WIELDING;
+   return ((class limb)health[limb]).flags & LIMB_WIELDING;
 }
 
 int is_mobile_limb(string limb)
 {
-   return ((class limb)health[limb])->flags & LIMB_MOBILE;
+   return ((class limb)health[limb]).flags & LIMB_MOBILE;
 }
 
 int is_attacking_limb(string limb)
 {
-   return ((class limb)health[limb])->flags & LIMB_ATTACKING;
+   return ((class limb)health[limb]).flags & LIMB_ATTACKING;
 }
 
 //: FUNCTION query_limbs
@@ -312,14 +312,14 @@ string *query_limbs()
 // Returns a string *containing all the limbs that can wield weapons.
 string *query_wielding_limbs()
 {
-   return filter(keys(health), ( : ((class limb)health[$1])->flags & LIMB_WIELDING:));
+   return filter(keys(health), ( : ((class limb)health[$1]).flags & LIMB_WIELDING:));
 }
 
 //: FUNCTION query_attacking_limbs
 // Returns a string *containing all the limba that can attack.
 string *query_attacking_limbs()
 {
-   return filter(keys(health), ( : ((class limb)health[$1])->flags & LIMB_ATTACKING:));
+   return filter(keys(health), ( : ((class limb)health[$1]).flags & LIMB_ATTACKING:));
 }
 
 //: FUNCTION query_vital_limbs
@@ -328,7 +328,7 @@ string *query_attacking_limbs()
 // adversary dies.
 string *query_vital_limbs()
 {
-   return filter(keys(health), ( : ((class limb)health[$1])->flags & LIMB_VITAL:));
+   return filter(keys(health), ( : ((class limb)health[$1]).flags & LIMB_VITAL:));
 }
 
 //: FUNCTION query_mobile_limbs
@@ -336,7 +336,7 @@ string *query_vital_limbs()
 // those who want health of mobile limbs to affect movement and such.
 string *query_mobile_limbs()
 {
-   return filter(keys(health), ( : ((class limb)health[$1])->flags & LIMB_MOBILE:));
+   return filter(keys(health), ( : ((class limb)health[$1]).flags & LIMB_MOBILE:));
 }
 
 //: FUNCTION query_system_limbs
@@ -344,7 +344,7 @@ string *query_mobile_limbs()
 // disabled, the adversary dies.
 string *query_system_limbs()
 {
-   return filter(keys(health), ( : ((class limb)health[$1])->flags & LIMB_SYSTEM:));
+   return filter(keys(health), ( : ((class limb)health[$1]).flags & LIMB_SYSTEM:));
 }
 
 //: FUNCTION query_non_limbs
@@ -352,7 +352,7 @@ string *query_system_limbs()
 // Such body parts are defined by having a max_health of -1.
 string *query_non_limbs()
 {
-   return filter(keys(health), ( : ((class limb)health[$1])->max_health == -1 :));
+   return filter(keys(health), ( : ((class limb)health[$1]).max_health == -1 :));
 }
 
 //: FUNCTION query_reflex
@@ -552,9 +552,9 @@ string query_random_limb()
    {
       update_body_style(body_style);
    }
-   limbs = filter_mapping(limb_sizes, ( : ((class limb)health[$1])->health > 0 :));
+   limbs = filter(limb_sizes, ( : ((class limb)health[$1]).health > 0 :));
 
-   return sizeof(limbs) ? element_of_weighted(limbs) : 0;
+   return sizeof(limbs) ? element_of_weighted(limbs) : nil;
 }
 
 //: FUNCTION disable_limb
@@ -567,16 +567,16 @@ void disable_limb(string limb)
    if (health[limb].health == -1)
       return;
 
-   ((class limb)health[limb])->health = 0;
-   if (((class limb)health[limb])->flags & LIMB_VITAL)
+   ((class limb)health[limb]).health = 0;
+   if (((class limb)health[limb]).flags & LIMB_VITAL)
    {
       kill_us();
    }
-   else if (((class limb)health[limb])->flags & LIMB_SYSTEM)
+   else if (((class limb)health[limb]).flags & LIMB_SYSTEM)
    {
       foreach (string l in query_system_limbs())
       {
-         if (((class limb)health[l])->health != 0)
+         if (((class limb)health[l]).health != 0)
             dont_kill_me_now = 1;
       }
       if (dont_kill_me_now == 1)
@@ -589,7 +589,7 @@ void disable_limb(string limb)
       else
          kill_us();
    }
-   else if (((class limb)health[limb])->flags & LIMB_WIELDING)
+   else if (((class limb)health[limb]).flags & LIMB_WIELDING)
    {
       filtered_simple_action("$N %^COMBAT_CONDITION%^cannot use%^RESET%^ $p $o anymore.",
                              (
@@ -654,7 +654,7 @@ varargs int hurt_us(int x, string limb)
    tmp = health[limb];
 
    if (tmp.health == -1)
-      return;
+      return 0;
 
    if (!tmp)
       error("Bad limb '" + limb + "'.\n");
@@ -709,7 +709,7 @@ varargs int query_max_health(string limb)
    int x = 1;
 
    if (limb)
-      return is_limb(limb) ? ((class limb)health[limb])->max_health : 0;
+      return is_limb(limb) ? ((class limb)health[limb]).max_health : 0;
 
    foreach (string l in keys(health))
       if (health[l].max_health > x)
@@ -785,7 +785,7 @@ int query_health(string limb)
    update_health();
    if (!limb)
       limb = "head";
-   return ((class limb)health[limb])->health;
+   return ((class limb)health[limb]).health;
 }
 
 //: FUNCTION get_health
@@ -851,7 +851,7 @@ string badly_wounded()
    {
       class limb lb = health[limb];
 
-      if ((lb.flags & LIMB_VITAL) && (lb->health < ((lb.max_health * wimpy_at) / 100)))
+      if ((lb.flags & LIMB_VITAL) && (lb.health < ((lb.max_health * wimpy_at) / 100)))
       {
          banner_wounded(limb, lb.health);
          return limb;
@@ -868,7 +868,7 @@ string very_wounded()
    {
       class limb lb = health[limb];
 
-      if ((lb.flags & LIMB_VITAL) && (lb->health < ((lb.max_health * 50) / 100)))
+      if ((lb.flags & LIMB_VITAL) && (lb.health < ((lb.max_health * 50) / 100)))
       {
          banner_wounded(limb, lb.health);
          return limb;
