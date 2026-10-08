@@ -71,15 +71,15 @@ int chance_to_hit(object weapon, object target)
    defend_value = target->aggregate_skill(defend_skill) * defend_mod || 1;
 
    if (combat_debug)
-      TBUG("This: " + this_object() + " Weapon: " + weapon + " target: " + target + "\nAttack skill: " + attack_skill +
-           " (" + attack_value + ") Defend skill: " + defend_skill + " (" + defend_value + ")");
+      TBUG(sprintf("This: %O Weapon: %O target: %O\nAttack skill: %s (%d) Defend skill: %s (%d)",
+                   this_object(), weapon, target, attack_skill, attack_value, defend_skill, defend_value));
    // TBUG("Train restriction: Limit: " + weapon->query_train_limit() + " rank: " + cached_skill_rank(attack_skill));
    if (combat_debug)
       TBUG("@( ((0.0+" + attack_value + ") / " + defend_value + ") * 50)");
    train_limit = cached_skill_rank(attack_skill) >= weapon->query_train_limit() || should_cap_skill(attack_skill);
    skill_test = this_object()->test_skill(attack_skill, defend_value, train_limit); // Don't learn things.
 
-   res = ((0.0 + attack_value) / defend_value) * 50 + skill_contrib;
+   res = to_int(((0.0 + attack_value) / defend_value) * 50 + skill_contrib);
    if (combat_debug)
       TBUG("Res before skill test: " + res + " skill_test:" + skill_test);
 
@@ -130,7 +130,7 @@ int defend_chance(object weapon, object target)
       target->dodge_message();
    }
 
-   res = ((0.0 + defend_value) / attack_value) * MAX_SKILL_VALUE;
+   res = to_int(((0.0 + defend_value) / attack_value) * MAX_SKILL_VALUE);
    res = (res * 50 / (MAX_SKILL_VALUE)) + (((target->query_dex() * skill_impact) / DEFEND_STAT_IMPACT));
    if (combat_debug)
       TBUG("defend," + defend_skill + "," + defend_value + ",attack," + attack_skill + "," + attack_value +
