@@ -100,9 +100,9 @@ void drop_corpse()
 protected
 void die()
 {
-   stop_fight(0);
+   stop_fight(nil);
    stop_attacking();
    simple_action(query_death_message());
    drop_corpse(); // subtle pun
-   call_out("remove", 1);
+   call_out(remove, 1);
 }
