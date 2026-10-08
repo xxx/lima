@@ -14,6 +14,7 @@ int query_combat_forbidden();
 varargs string show_objects(object except)
 {
    object *obs;
+   object *candidates;
    string user_show;
    string obj_show;
    string str;
@@ -25,6 +26,7 @@ varargs string show_objects(object except)
    {
       obs -= ({except});
    }
+   candidates = filter(obs, (: !$1->is_living() && !$1->is_attached() :));
 
    n = sizeof(obs);
    user_show = "";
@@ -51,9 +53,9 @@ varargs string show_objects(object except)
       }
       else
       {
-         if (!duplicatep(obs[n]))
+         if (!duplicatep(obs[n], candidates))
          {
-            if ((str = obs[n]->show_in_room()) && strlen(str))
+            if ((str = obs[n]->show_in_room(candidates)) && strlen(str))
             {
                if (except)
                   str += sprintf(" (outside %s)", except->the_short());

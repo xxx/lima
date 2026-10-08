@@ -92,8 +92,8 @@ string untouched_long()
 
 //: FUNCTION show_in_room
 // Return a string appropriate for including in a room long description.
-// Note that duplicatep() objects return nothing.
-string show_in_room()
+// The room renderer supplies the same candidates used for duplicate selection.
+varargs string show_in_room(object *candidates)
 {
    string str;
    int our_count;
@@ -109,7 +109,7 @@ string show_in_room()
     */
    if (is_attached())
       return nil;
-   our_count = count();
+   our_count = count(this_object(), candidates);
    if (our_count > 4)
    {
       if (plural_in_room_desc)
