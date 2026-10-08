@@ -94,3 +94,8 @@ void main(string arg)
    set_frame_header(header);
    out(frame_render());
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}

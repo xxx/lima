@@ -17,3 +17,8 @@ void main()
    write("You have the following types of money:\n\t" +
          implode(explode(MONEY_D->money_string(this_body()), "\n"), "\n\t"));
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main();
+}
