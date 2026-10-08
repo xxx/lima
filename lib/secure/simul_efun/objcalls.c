@@ -336,3 +336,8 @@ object *children(string path)
       result[i + 1] = clones[count - i - 1];
    return result;
 }
+
+object master()
+{
+   return find_object(MASTER_OB);
+}

@@ -16,6 +16,7 @@
 #define USER_OB            "/secure/user"
 #define USER_OB_BAK        "/secure/user_bak"
 
+#define MASTER_OB          "/secure/master"
 #define SIMUL_OB           "/secure/simul_efun"
 
 #define BASE_ROOM          "/std/base_room"

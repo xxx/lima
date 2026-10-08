@@ -728,3 +728,13 @@ int valid_snoop(object caller, object observer, object target, string operation,
       && caller == find_object("/secure/simul_efun")
       && program == "/secure/simul_efun/overrides.c";
 }
+
+int valid_recompile(object prototype, object caller, string program)
+{
+   return prototype == this_object()
+      && objectp(caller)
+      && caller == find_object("/trans/admincmds/master")
+      && program == "/trans/admincmds/master.c"
+      && objectp(this_user())
+      && check_privilege(1);
+}
