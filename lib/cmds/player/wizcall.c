@@ -44,3 +44,8 @@ void main(string arg)
    if (member_array(this_user(), wizlist) == -1)
       outf("You wizcall: %s\n", arg);
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}
