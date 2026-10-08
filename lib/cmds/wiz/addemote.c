@@ -100,12 +100,12 @@ nomask void got_rule(string verb, string str)
    write("Separate message rules for different message targets by '&&'s.\n");
    write("e.g.: This is seen by the user && This is seen by the target && This is seen by everyone else\n");
    write("Message: ");
-   modal_simple(( : got_message, verb, rule:));
+   modal_simple((: got_message($(verb), $(rule), $1) :));
 }
 
 nomask private void main(string str)
 {
-   string rule = 0;
+   string rule = nil;
    string verb = str;
 
    if (!str)
@@ -118,12 +118,17 @@ nomask private void main(string str)
    if (!rule)
    {
       write("(type '.' to abort entry)\nRule: ");
-      modal_simple(( : got_rule, verb:));
+      modal_simple((: got_rule($(verb), $1) :));
    }
    else
    {
       rule = parse_rule(rule);
       write("Message: ");
-      modal_simple(( : got_message, verb, rule:));
+      modal_simple((: got_message($(verb), $(rule), $1) :));
    }
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
