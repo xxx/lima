@@ -209,7 +209,7 @@ string get_base_long()
 
 string fancy_long()
 {
-   return rtrim("\n   " + replace_string(simple_long(), "\n", "\n\n   ")) + "\n";
+   return trim("\n   " + replace_string(simple_long(), "\n", "\n\n   "), TRIM_RIGHT) + "\n";
 }
 
 // Only used for #define COUNT_EXITS.
@@ -233,7 +233,7 @@ string long()
                   show_exits() + "\n", objtally);
 #endif
 #else
-   return sprintf("%s%s", (dont_show_long() ? "" : rtrim(fancy_long()) + "\n"), show_objects());
+   return sprintf("%s%s", (dont_show_long() ? "" : trim(fancy_long(), TRIM_RIGHT) + "\n"), show_objects());
 #endif
 }
 

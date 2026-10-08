@@ -163,12 +163,12 @@ private nomask void send_mail_message(string subject, string *buf, mixed to_list
    string *name_list;
 
    if (stringp(to_list))
-      to_list = map(explode(to_list, ","), ( : trim:));
+      to_list = map(explode(to_list, ","), trim);
    else if (!arrayp(to_list))
       to_list = ({});
 
    if (stringp(cc_list))
-      cc_list = map(explode(cc_list, ","), ( : trim:));
+      cc_list = map(explode(cc_list, ","), trim);
    else if (!arrayp(cc_list))
       cc_list = ({});
 

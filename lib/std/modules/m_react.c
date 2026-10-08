@@ -207,7 +207,7 @@ string handle_expression(string e)
 {
    string *parts = explode(e, " ");
 
-   parts = ({1}) + map(parts, ( : trim:)) - ({""});
+   parts = ({1}) + map(parts, trim) - ({""});
 
    if (sizeof(parts) == 1)
       error("Missing expression.\n");

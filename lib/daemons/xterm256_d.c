@@ -406,7 +406,7 @@ string xterm256_wrap(string str, int wrap_at, int indent_at)
        } :),
        running, wrap_at, indent_at);
 
-   return implode(map(explode(implode(parts, " "), "\n"), ( : rtrim:)), "\n");
+   return implode(map(explode(implode(parts, " "), "\n"), trim, TRIM_RIGHT), "\n");
 }
 
 int ansip(string text)

@@ -61,7 +61,7 @@ void use_data_file(string fname)
 {
    string *lines;
    int i;
-   lines = map(explode(read_file(fname), "\n"), ( : trim:));
+   lines = map(explode(read_file(fname), "\n"), trim);
    lines = filter(lines - ({""}), ( : $1[0] != '#' :));
 
    /* find the extent of the grid descriptions */

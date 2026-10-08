@@ -282,9 +282,9 @@ void set_frame_header(string hc)
    {
       string line = header_lines[i];
       if (!XTERM256_D->colourp(line) && hcolours[COL_ACCENT] != "")
-         line = "<" + hcolours[COL_ACCENT] + ">" + rtrim(line) + "<res>";
+         line = "<" + hcolours[COL_ACCENT] + ">" + trim(line, TRIM_RIGHT) + "<res>";
       else
-         line = rtrim(line);
+         line = trim(line, TRIM_RIGHT);
       header_lines[i] = line;
       i++;
    }
