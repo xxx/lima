@@ -57,12 +57,12 @@ nomask void create(string the_owner)
       error("*Security violation: invalid creation");
 
    owner = the_owner;
-   unguarded(1, ( : restore_object, get_fname(), 1 :));
+   unguarded(1, (: restore_object(get_fname()) :));
 }
 private
 nomask void save_me()
 {
-   unguarded(1, ( : save_object, get_fname() :));
+   unguarded(1, (: save_object(get_fname()) :));
 }
 nomask void remove()
 {
@@ -84,7 +84,7 @@ nomask class mail_msg get_one_message(int message_key)
       error("security violation: you are not allowed to use this mailbox\n");
 
    if (!has_key(mailbox, message_key))
-      return 0;
+      return nil;
 
    msg = MAIL_D->get_one_message(message_key);
    if (!msg)
@@ -129,7 +129,7 @@ nomask void set_message_read(int message_key)
 }
 nomask int query_unread_count()
 {
-   return implode(values(mailbox), ( : $1 + $2:));
+   return reduce(values(mailbox), ( : $1 + $2:), 0);
 }
 nomask int first_unread_message()
 {
@@ -175,7 +175,7 @@ nomask void nuke_mailbox()
       MAIL_D->delete_mail(message_key, owner);
 
    mailbox = ([]);
-   unguarded(1, ( : rm, get_fname() + __SAVE_EXTENSION__:));
+   unguarded(1, (: rm(get_fname() + __SAVE_EXTENSION__) :));
 }
 
 // ### temp functions?  wait and see

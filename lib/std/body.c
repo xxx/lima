@@ -249,7 +249,7 @@ void save_me()
    saved_items = save_to_string(1); // 1 meaning it is recursive.
 
    // Save to the body id, and not the user ID. Part of User menu change.
-   unguarded(1, ( : save_object, USER_PATH(bodyid) :));
+   unguarded(1, (: save_object(USER_PATH(bodyid)) :));
    saved_items = 0;
 }
 
@@ -414,7 +414,7 @@ void create(string userid)
    set_name(userid);
 
    // TBUG("restore_object("+USER_PATH(userid)+",1);");
-   unguarded(1, ( : restore_object, USER_PATH(userid), 1 :));
+   unguarded(1, (: restore_object(USER_PATH(userid)) :));
    // TBUG("Done");
    // up to the player
    set_attack_speed(0);
