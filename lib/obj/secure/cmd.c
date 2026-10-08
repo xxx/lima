@@ -67,7 +67,9 @@ nomask varargs void resend(string ob, mixed arg1, mixed arg2)
       ob->do_resend(arg1, arg2);
    else
       error("Illegal resend()\n");
-   out(ob->get_output());
+   string output = ob->get_output();
+   if (output != nil)
+      out(output);
 }
 
 nomask void do_resend(mixed arg1, mixed arg2)

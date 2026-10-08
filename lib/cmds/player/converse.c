@@ -42,8 +42,7 @@ nomask void start_cmd()
       return;
    }
 
-   modal_push((
-                  : handle_piping:),
+   modal_push(handle_piping,
 #if 0 // Clients can't handle \r without \n well - Beek
       "\r" BLANKLINE "\r" PROMPT "\r"
 #else
@@ -63,4 +62,9 @@ nomask private void main()
       return;
    }
    destruct();
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main();
 }
