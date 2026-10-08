@@ -562,21 +562,21 @@ private string ed_after_change()
    return ed_auto_print && !ed_global && ed_cursor > 0 ? ed_print(ed_cursor, ed_cursor, 0) : "";
 }
 
-private mapping ed_indent_lex()
+private mapping ed_indent_lex(string *lines)
 {
-   string text = implode(ed_lines, "\n");
+   string text = implode(lines, "\n");
    string pattern = "[ \\t\\r\\n]+|//[^\\n]*|(?s:/\\*.*?\\*/)|\"(?:\\\\[\\s\\S]|[^\"\\\\])*\"|'''|'(?:\\\\.|[^'])'|[\\p{Alphabetic}_]\\w*|::|(?s:.)";
    string *tokens = allocate(sizeof(text) + 1);
    int *rows = allocate(sizeof(text) + 1);
-   int *prefix = allocate(sizeof(ed_lines));
-   int *keep = allocate(sizeof(ed_lines));
-   int *columns = allocate(sizeof(ed_lines), -1);
+   int *prefix = allocate(sizeof(lines));
+   int *keep = allocate(sizeof(lines));
+   int *columns = allocate(sizeof(lines), -1);
    int count;
    int pos;
    int row;
    int col;
-   for (int line = 0; line < sizeof(ed_lines); line++)
-      prefix[line] = sizeof(regmatch(ed_lines[line], "^[ \\t]*"));
+   for (int line = 0; line < sizeof(lines); line++)
+      prefix[line] = sizeof(regmatch(lines[line], "^[ \\t]*"));
    while (pos < sizeof(text))
    {
       mixed *match;
@@ -588,15 +588,15 @@ private mapping ed_indent_lex()
       if (text[pos] == '#' && col == prefix[row])
       {
          int last = row;
-         while (sizeof(ed_lines[last]) && ed_lines[last][<1] == '\\')
+         while (sizeof(lines[last]) && lines[last][<1] == '\\')
          {
-            if (++last == sizeof(ed_lines)) ed_fail("unfinished preprocessor continuation");
+            if (++last == sizeof(lines)) ed_fail("unfinished preprocessor continuation");
          }
-         piece = ed_lines[row][col..];
+         piece = lines[row][col..];
          for (int line = row; line <= last; line++)
          {
             keep[line] = 1;
-            if (line > row) piece += "\n" + ed_lines[line];
+            if (line > row) piece += "\n" + lines[line];
          }
          pos += sizeof(piece);
       }
@@ -606,16 +606,16 @@ private mapping ed_indent_lex()
       {
          string marker = match[1];
          int last = row + 1;
-         while (last < sizeof(ed_lines) && ed_lines[last] != marker && ed_lines[last] != marker + ";") last++;
-         if (last == sizeof(ed_lines)) ed_fail("unterminated text block");
-         piece = ed_lines[row][col..];
+         while (last < sizeof(lines) && lines[last] != marker && lines[last] != marker + ";") last++;
+         if (last == sizeof(lines)) ed_fail("unterminated text block");
+         piece = lines[row][col..];
          for (int line = row + 1; line <= last; line++)
          {
             keep[line] = 1;
-            piece += "\n" + ed_lines[line];
+            piece += "\n" + lines[line];
          }
          token = "<literal>";
-         extra_semicolon = ed_lines[last] == marker + ";";
+         extra_semicolon = lines[last] == marker + ";";
          pos += sizeof(piece);
       }
       else
@@ -704,7 +704,7 @@ private int ed_indent_closer(string token)
 private void ed_indent_group(mapping work, int column)
 {
    string close = ed_indent_close(ed_indent_peek(work));
-   int inner = column + (ed_shiftwidth > 1 ? ed_shiftwidth / 2 : 1);
+   int inner = column + (work["shiftwidth"] > 1 ? work["shiftwidth"] / 2 : 1);
    ed_indent_enter(work);
    ed_indent_take(work, column);
    ed_indent_comments(work, inner);
@@ -765,7 +765,7 @@ private void ed_indent_block(mapping work, int column, int labels)
    for (;;)
    {
       string token;
-      ed_indent_comments(work, column + ed_shiftwidth);
+      ed_indent_comments(work, column + work["shiftwidth"]);
       token = ed_indent_peek(work);
       if (!sizeof(token)) ed_fail("unclosed indentation block");
       if (token == "}")
@@ -774,7 +774,7 @@ private void ed_indent_block(mapping work, int column, int labels)
          work["nest"]--;
          return;
       }
-      ed_indent_statement(work, column + ed_shiftwidth, labels);
+      ed_indent_statement(work, column + work["shiftwidth"], labels);
    }
 }
 
@@ -782,7 +782,7 @@ private void ed_indent_body(mapping work, int column, int labels, string end)
 {
    string token;
    int first_row;
-   int continuation = column + (ed_shiftwidth > 1 ? ed_shiftwidth / 2 : 1);
+   int continuation = column + (work["shiftwidth"] > 1 ? work["shiftwidth"] / 2 : 1);
    ed_indent_comments(work, column);
    token = ed_indent_peek(work);
    if (!sizeof(token)) ed_fail("missing control-statement body");
@@ -807,7 +807,7 @@ private void ed_indent_body(mapping work, int column, int labels, string end)
       else
       {
          if (control == "switch") ed_fail("switch requires a block");
-         ed_indent_statement(work, column + ed_shiftwidth, 0);
+         ed_indent_statement(work, column + work["shiftwidth"], 0);
       }
       ed_indent_comments(work, column);
       if (control == "if" && ed_indent_peek(work) == "else")
@@ -816,7 +816,7 @@ private void ed_indent_body(mapping work, int column, int labels, string end)
          ed_indent_comments(work, column);
          if (ed_indent_peek(work) == "if" || ed_indent_peek(work) == "{")
             ed_indent_statement(work, column, 0);
-         else ed_indent_statement(work, column + ed_shiftwidth, 0);
+         else ed_indent_statement(work, column + work["shiftwidth"], 0);
       }
       if (control == "do")
       {
@@ -835,7 +835,7 @@ private void ed_indent_body(mapping work, int column, int labels, string end)
    {
       int ternary;
       if (!labels) ed_fail("case label outside switch");
-      column -= ed_shiftwidth;
+      column -= work["shiftwidth"];
       ed_indent_take(work, column);
       for (;;)
       {
@@ -890,31 +890,52 @@ private void ed_indent_statement(mapping work, int column, int labels, string en
    work["nest"]--;
 }
 
-private string ed_indent()
+private string *ed_indent_lines(string *lines, int shiftwidth)
 {
-   mapping work = ed_indent_lex();
-   string *next = allocate(sizeof(ed_lines));
-   int changed;
+   mapping work;
+   string *next;
+   if (shiftwidth < 1 || shiftwidth > 15) ed_fail("shiftwidth must be between 1 and 15");
+   ed_check_lines(lines);
+   work = ed_indent_lex(lines);
+   work["shiftwidth"] = shiftwidth;
+   next = allocate(sizeof(lines));
    while (sizeof(ed_indent_peek(work)))
    {
       ed_indent_comments(work, 0);
       if (sizeof(ed_indent_peek(work))) ed_indent_statement(work, 0, 0);
    }
-   for (int row = 0; row < sizeof(ed_lines); row++)
+   for (int row = 0; row < sizeof(lines); row++)
    {
       int column = work["columns"][row];
-      if (work["keep"][row]) next[row] = ed_lines[row];
-      else if (work["prefix"][row] == sizeof(ed_lines[row])) next[row] = "";
+      if (work["keep"][row]) next[row] = lines[row];
+      else if (work["prefix"][row] == sizeof(lines[row])) next[row] = "";
       else
       {
          if (column < 0 || column > ED_MAX_LINE_BYTES) ed_fail("invalid indentation column");
-         next[row] = " " * column + ed_lines[row][work["prefix"][row]..];
+         next[row] = " " * column + lines[row][work["prefix"][row]..];
       }
-      if (next[row] != ed_lines[row]) changed = 1;
    }
    ed_check_lines(next);
+   return next;
+}
+
+protected string indent_code(string source, int shiftwidth = 4)
+{
+   string *lines;
+   int terminated = sizeof(source) && source[<1] == '\n';
+   if (ed_bytes(source) > ED_MAX_BYTES) ed_fail("source exceeds 8192 UTF-8 bytes");
+   lines = sizeof(source) ? explode(source, "\n") : ({});
+   if (terminated) lines = lines[0..<2];
+   lines = ed_indent_lines(lines, shiftwidth);
+   return implode(lines, "\n") + (terminated ? "\n" : "");
+}
+
+private string ed_indent()
+{
+   string *next = ed_indent_lines(ed_lines, ed_shiftwidth);
+   for (int row = 0; row < sizeof(next); row++)
+      if (next[row] != ed_lines[row]) ed_dirty = 1;
    ed_lines = next;
-   if (changed) ed_dirty = 1;
    return sprintf("Indented %d lines.\n", sizeof(next));
 }
 

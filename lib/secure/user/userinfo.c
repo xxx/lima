@@ -49,8 +49,17 @@ nomask int query_n_gen()
 
 nomask void set_ed_setup(int code)
 {
+   int previous = ed_setup;
+   mixed problem;
+   if (code < 0 || code > 0xff || (code && !(code & 0x0f)))
+      error("unsupported editor setup code");
    ed_setup = code;
-   save_me();
+   problem = catch(save_me());
+   if (problem)
+   {
+      ed_setup = previous;
+      throw(problem);
+   }
 }
 
 nomask int query_ed_setup()

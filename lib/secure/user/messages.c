@@ -139,49 +139,52 @@ void remove_colour(string which)
 
 void do_receive(string msg, int msg_type)
 {
-   string *lines = explode(msg, "\n");
-   if (query_screen_width() < 0)
-      msg_type |= NO_WRAP;
-
-   // Force message type to be NO_WRAP and NO_ANSI if we simplify (use a screen reader).
-   if (query_shell_ob() && query_shell_ob()->get_variable("simplify") == 1)
+   if (!(msg_type & TREAT_AS_BLOB))
    {
-      msg_type = NO_WRAP + NO_ANSI;
-   }
+      string *lines = explode(msg, "\n");
+      if (query_screen_width() < 0)
+         msg_type |= NO_WRAP;
 
-   if (msg_type & NO_ANSI)
-   {
-      if (msg_type & NO_WRAP)
+      // Force message type to be NO_WRAP and NO_ANSI if we simplify (use a screen reader).
+      if (query_shell_ob() && query_shell_ob()->get_variable("simplify") == 1)
       {
-         // Get rid of any pinkfish and other strange characters.
-         lines = map(lines, ( : XTERM256_D->substitute_colour($1, $2) :), "plain");
+         msg_type = NO_WRAP + NO_ANSI;
+      }
+
+      if (msg_type & NO_ANSI)
+      {
+         if (msg_type & NO_WRAP)
+         {
+            // Get rid of any pinkfish and other strange characters.
+            lines = map(lines, ( : XTERM256_D->substitute_colour($1, $2) :), "plain");
+         }
+         else
+         {
+            lines = map(lines, wrap, query_screen_width());
+         }
       }
       else
       {
-         lines = map(lines, wrap, query_screen_width());
-      }
-   }
-   else
-   {
-      int indent = (msg_type & MSG_INDENT) ? 4 : 0;
-      int wrap = (msg_type & NO_WRAP) ? 0 : query_screen_width();
+         int indent = (msg_type & MSG_INDENT) ? 4 : 0;
+         int wrap = (msg_type & NO_WRAP) ? 0 : query_screen_width();
 
-      // Only do XTERM/ANSI parsing if needed.
-      if (wrap)
-      {
-         lines = map(lines, ( : XTERM256_D->xterm256_wrap($1, $(wrap), $(indent)) :));
+         // Only do XTERM/ANSI parsing if needed.
+         if (wrap)
+         {
+            lines = map(lines, ( : XTERM256_D->xterm256_wrap($1, $(wrap), $(indent)) :));
+         }
+         lines = map(lines, ( : XTERM256_D->substitute_colour($1, $2) :), terminal_mode());
       }
-      lines = map(lines, ( : XTERM256_D->substitute_colour($1, $2) :), terminal_mode());
-   }
 
-   msg = implode(lines, "\n");
+      msg = implode(lines, "\n");
+   }
 
    if (!(msg_type & MSG_PROMPT))
    {
       msg += "\n";
    }
 
-   if ((msg_type & EMOJI_MSG) && query_shell_ob() && query_shell_ob()->get_variable("emoji") == 1)
+   if (!(msg_type & TREAT_AS_BLOB) && (msg_type & EMOJI_MSG) && query_shell_ob() && query_shell_ob()->get_variable("emoji") == 1)
       msg = EMOJI_D->emoji_replace(msg, msg_type);
 
    if (debug)
