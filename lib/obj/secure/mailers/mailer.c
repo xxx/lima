@@ -154,7 +154,10 @@ protected nomask string *build_message(int mail_key, int supress_header)
       return nil;
    }
    if (!msg)
-      return ({"*** LOST THE MESSAGE! ***"});
+   {
+      write("*** LOST THE MESSAGE! ***\n");
+      return nil;
+   }
 
    if (!valid_message_body(msg.body))
       return nil;
@@ -278,7 +281,11 @@ protected nomask void cmd_read(int user_num, string outputfile, int supress_head
       if (strsrch(outputfile, "/") == -1)
          outputfile = wiz_dir(this_user()) + "/Mail/" + outputfile;
 
-      if (!write_file(outputfile, implode(output, "\n")))
+      int written;
+      mixed problem = catch(written = write_file(outputfile, implode(output, "\n")));
+      if (problem)
+         printf("Unable to save message to %s: %s\n", outputfile, trim(problem));
+      else if (!written)
          write("Failed.\n");
       else
          printf("Saved message to %s.\n", outputfile);
