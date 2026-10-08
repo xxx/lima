@@ -34,7 +34,7 @@ void main(mixed *arg)
 
    }
    ob->stop_actions();
-   ob->set_actions(100, 0);
+   ob->set_actions(100, nil);
    outf("%s has been quieted.", ob->short());
 
    return;

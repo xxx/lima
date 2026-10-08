@@ -18,14 +18,18 @@ void action_arrival(object);
 void action_departure(object);
 
 private
-nosave function arrival_fn = ( : action_arrival:);
+nosave function arrival_fn = action_arrival;
 private
-nosave function departure_fn = ( : action_departure:);
+nosave function departure_fn = action_departure;
+private
+nosave function movement_fn = action_movement;
 
 private
 function my_hook;
 private
 nosave string *response_queue = ({});
+private nosave int *response_timers = ({});
+private nosave int action_timer;
 private
 int delay_time = 5;
 private
@@ -107,12 +111,48 @@ void do_game_command(string str)
 private
 void do_respond()
 {
+   response_timers = filter(response_timers, (: query_call_out($1) :));
    mixed cmd = response_queue[0];
    if (stringp(cmd))
       do_game_command(cmd);
    else
       evaluate(cmd);
    response_queue = response_queue[1..];
+}
+
+private
+void cancel_pending_actions()
+{
+   stop_actions();
+   foreach (int timer in response_timers)
+      remove_call_out(timer);
+   response_timers = ({});
+   response_queue = ({});
+}
+
+private
+void ensure_action_cleanup()
+{
+   if (!my_hook)
+   {
+      my_hook = cancel_pending_actions;
+      add_hook("remove", my_hook);
+   }
+}
+
+private
+void run_actions()
+{
+   action_timer = 0;
+   actions();
+}
+
+private
+void schedule_actions()
+{
+   if (!query_call_out(action_timer))
+      action_timer = call_out(run_actions, delay_time);
+   ensure_action_cleanup();
 }
 
 //: FUNCTION respond
@@ -126,12 +166,9 @@ void do_respond()
 void respond(string str)
 {
    response_queue += ({str});
-   call_out(( : do_respond:), random(3));
-   if (!my_hook)
-   {
-      my_hook = ( : remove_call_out:);
-      add_hook("remove", my_hook);
-   }
+   response_timers = filter(response_timers, (: query_call_out($1) :));
+   response_timers += ({call_out(do_respond, random(3))});
+   ensure_action_cleanup();
 }
 
 // Return the number of listeners (player in room)
@@ -150,9 +187,9 @@ void actions()
 {
    if (!this_object()->query_target() && sizeof(my_actions))
       do_game_command(choice(my_actions));
-   if (my_actions && query_listeners() && find_call_out("actions") == -1)
+   if (my_actions && query_listeners())
    {
-      call_out("actions", delay_time);
+      schedule_actions();
    }
 }
 
@@ -162,7 +199,7 @@ void action_departure(object who)
    if (who->query_link())
    {
       if (!query_listeners())
-         remove_call_out("actions");
+         stop_actions();
    }
 }
 
@@ -171,9 +208,9 @@ void action_arrival(object who)
 {
    if (who->query_link())
    {
-      if (query_listeners() == 1 && find_call_out("actions") == -1)
+      if (query_listeners() == 1)
       {
-         call_out("actions", delay_time);
+         schedule_actions();
       }
    }
 }
@@ -191,9 +228,8 @@ void action_movement()
    env = environment();
    env->add_hook("object_arrived", arrival_fn);
    env->add_hook("object_left", departure_fn);
-   if (find_call_out("actions") < 0)
-      if (query_listeners())
-         call_out("actions", delay_time);
+   if (query_listeners())
+      schedule_actions();
 }
 
 void start_actions()
@@ -202,22 +238,23 @@ void start_actions()
    if (!arrayp(my_actions))
       return;
 
-   add_hook("move", ( : action_movement:));
+   add_hook("move", movement_fn);
    if (env = environment(this_object()))
    {
       env->add_hook("object_arrived", arrival_fn);
       env->add_hook("object_left", departure_fn);
    }
 
-   if (query_listeners() && find_call_out("actions") == -1)
+   if (query_listeners())
    {
-      call_out("actions", delay_time);
+      schedule_actions();
    }
 }
 
 void stop_actions()
 {
-   remove_call_out("actions");
+   remove_call_out(action_timer);
+   action_timer = 0;
 }
 
 //: FUNCTION set_actions
