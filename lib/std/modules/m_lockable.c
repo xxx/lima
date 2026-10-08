@@ -38,13 +38,10 @@ string query_key_type()
    return key_type;
 }
 
-varargs void set_locked(string x, string y)
+varargs void set_locked(string x, string y = x)
 {
    locked = x;
-   if (nullp(y))
-      key_type = x;
-   else
-      key_type = y;
+   key_type = y;
    hook_state("prevent_open", my_open_hook, locked);
 }
 
@@ -104,7 +101,7 @@ mixed magic_unlock()
    }
 #endif
 
-   set_locked(0, "magic");
+   set_locked(nil, "magic");
    return 1;
 }
 
@@ -140,12 +137,14 @@ mixed do_pick()
    }
 #endif
 
-   set_locked(0, "picked");
+   set_locked(nil, "picked");
    this_body()->simple_action(pick_msg, this_object());
 }
 
-varargs void do_unlock(object ob)
+void do_unlock(object *keys...)
 {
+   if (sizeof(keys) > 1) error("do_unlock: too many keys");
+   object ob = sizeof(keys) ? keys[0] : nil;
    //: HOOK prevent_unlock
    // A yes/no/error hook which can prevent an object from being unlocked.
    mixed ex = call_hooks("prevent_unlock", HOOK_YES_NO_ERROR);
@@ -157,7 +156,7 @@ varargs void do_unlock(object ob)
       return;
    }
 
-   if (undefinedp(ob))
+   if (!sizeof(keys))
    {
       ob = present("key", this_body());
       write("(with " + ob->the_short() + ")\n");
@@ -166,7 +165,7 @@ varargs void do_unlock(object ob)
    if (ob->get_key_type() == key_type)
    {
       this_body()->simple_action(unlock_msg, this_object(), ob);
-      set_locked(0, key_type);
+      set_locked(nil, key_type);
       hook_state("prevent_open", my_open_hook, locked);
    }
    else
@@ -175,8 +174,10 @@ varargs void do_unlock(object ob)
    }
 }
 
-varargs void do_lock(object ob)
+void do_lock(object *keys...)
 {
+   if (sizeof(keys) > 1) error("do_lock: too many keys");
+   object ob = sizeof(keys) ? keys[0] : nil;
    //: HOOK prevent_lock
    // A yes/no/error hook which can prevent an object from being locked.
    mixed ex = call_hooks("prevent_lock", HOOK_YES_NO_ERROR);
@@ -188,7 +189,7 @@ varargs void do_lock(object ob)
       return;
    }
 
-   if (undefinedp(ob))
+   if (!sizeof(keys))
    {
       ob = present("key", this_body());
       write("(with " + ob->the_short() + ")\n");

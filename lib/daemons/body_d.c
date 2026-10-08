@@ -22,7 +22,7 @@ class limb upgrade_limb_data_to_limb(class limb_data ld)
 
 mapping get_body(string type)
 {
-   if (!undefinedp(body_types[type]))
+   if (has_key(body_types, type))
    {
 #ifdef LIMB_SHIELDS
       mapping tmp = ([]);
@@ -53,7 +53,7 @@ mapping get_body_size(string type)
 
 int body_exist(string type)
 {
-   return !undefinedp(body_types[type]) ? 1 : 0;
+   return has_key(body_types, type) ? 1 : 0;
 }
 
 void add_body(string body_name, mapping body_limbs)

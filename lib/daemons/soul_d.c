@@ -318,17 +318,17 @@ mixed can_verb_rule(string verb, string rule)
 {
    if (!emotes[verb])
       return;
-   return !undefinedp(emotes[verb][rule]);
+   return has_key(emotes[verb], rule);
 }
 
 mixed direct_verb_rule(string verb, string rule)
 {
-   return !undefinedp(emotes[verb][rule]);
+   return has_key(emotes[verb], rule);
 }
 
 mixed indirect_verb_rule(string verb, string rule)
 {
-   return !undefinedp(emotes[verb][rule]);
+   return has_key(emotes[verb], rule);
 }
 
 void do_verb_rule(string verb, string rule, mixed args...)

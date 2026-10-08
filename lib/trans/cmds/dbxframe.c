@@ -25,16 +25,9 @@ string print_vars(mixed *vars)
       else if (functionp(vars[i]))
          result[i] = "(: ... :)";
       else if (intp(vars[i]))
-      {
-         if (vars[i])
-            result[i] = vars[i] + "";
-         else if (nullp(vars[i]))
-            result[i] = "NULL";
-         else if (undefinedp(vars[i]))
-            result[i] = "UNDEFINED";
-         else
-            result[i] = "0";
-      }
+         result[i] = vars[i] + "";
+      else if (nilp(vars[i]))
+         result[i] = "nil";
       else if (stringp(vars[i]))
          result[i] = "\"" + vars[i] + "\"";
       else if (arrayp(vars[i]))

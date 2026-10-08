@@ -85,7 +85,7 @@ int fnmatch(string name, string pattern)
 {
    string result;
 
-   if (undefinedp(cache[pattern]))
+   if (!has_key(cache, pattern))
    {
       result = "^" + translate(pattern) + "$";
       cache[pattern] = result;

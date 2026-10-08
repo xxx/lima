@@ -111,7 +111,7 @@ nomask void handle_r(string cmd, string input)
       alias_info = ALIAS_D->query_default_aliases()[0];
    else
       alias_info = ALIAS_D->query_default_aliases()[2];
-   if (undefinedp(alias_info[input]))
+   if (!has_key(alias_info, input))
    {
       if (cmd == "r")
          printf("%s wasn't a player alias.\n", input);

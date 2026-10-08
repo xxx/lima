@@ -185,7 +185,7 @@ void unregister_one(string channel_name, object listener)
       ci.listeners -= ({listener});
 
       /* purge the channel if it isn't permanent */
-      if (undefinedp(permanent_channels[channel_name]))
+      if (!has_key(permanent_channels, channel_name))
          test_for_purge(channel_name);
    }
 }
@@ -204,7 +204,7 @@ void register_body(object body)
 protected
 nomask void set_permanent(string channel_name, int is_perm)
 {
-   int no_exist = undefinedp(permanent_channels[channel_name]);
+   int no_exist = !has_key(permanent_channels, channel_name);
 
    if (is_perm && no_exist)
    {
@@ -232,7 +232,7 @@ nomask void set_flags(string channel_name, int flags)
 
    ci.flags = flags;
 
-   if (!undefinedp(permanent_channels[channel_name]))
+   if (has_key(permanent_channels, channel_name))
    {
       permanent_channels[channel_name] = flags;
       save_me();
@@ -570,7 +570,7 @@ nomask int query_flags(string channel_name)
       return 0;
 
    flags = ci.flags;
-   if (!undefinedp(permanent_channels[channel_name]))
+   if (has_key(permanent_channels, channel_name))
       flags |= CHANNEL_PERMANENT;
 
    return flags;

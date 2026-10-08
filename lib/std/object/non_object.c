@@ -50,10 +50,8 @@ varargs mixed release_object(object target, int force)
 //: FUNCTION set_attached
 // set_attached(1) or set_attached() sets the ATTACHED flag for this
 // object, and set_attached(0) removes it.
-varargs void set_attached(int a)
+void set_attached(int a = 1)
 {
-   if (undefinedp(a))
-      a = 1;
    assign_flag(ATTACHED, a);
 }
 

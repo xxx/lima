@@ -142,10 +142,12 @@ object query_last_location()
 // give_new_obj creates a new object and moves it to target. If recurse is 1
 // the object will be moved to the environment if the move fails.
 // The optional args are passed to the object when it is created.
-varargs object give_new_obj(object target, string obj, int recurse, mixed args)
+object give_new_obj(object target, string obj, int recurse = 0, mixed *values...)
 {
    object ob;
-   if (undefinedp(args))
+   if (sizeof(values) > 1) error("give_new_obj: too many arguments");
+   mixed args = sizeof(values) ? values[0] : nil;
+   if (!sizeof(values))
       ob = clone_object (absolute_path(obj));
    else if (arrayp(args))
       ob = clone_object (absolute_path(obj), args...);

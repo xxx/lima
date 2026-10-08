@@ -54,16 +54,19 @@ void set_flow(mapping *flows)
    {
       class flow_set fl;
       fl = new (class flow_set);
-      if (undefinedp(fl.cond = fs["cond"]))
+      if (!has_key(fs, "cond"))
          error("cond undefined");
-      if (undefinedp(fl.to = fs["to"]))
+      fl.cond = fs["cond"];
+      if (!has_key(fs, "to"))
          error("to undefined");
-      if (undefinedp(fl.msg_here = fs["msg_here"]))
+      fl.to = fs["to"];
+      if (!has_key(fs, "msg_here"))
          error("msg_here undefined");
-      if (undefinedp(fl.msg_there = fs["msg_there"]))
+      fl.msg_here = fs["msg_here"];
+      if (!has_key(fs, "msg_there"))
          error("msg_there undefined");
-      if (undefinedp(fl.delay = fs["delay"]))
-         fl.delay = 0;
+      fl.msg_there = fs["msg_there"];
+      fl.delay = has_key(fs, "delay") ? fs["delay"] : 0;
       flow_arr += ({fl});
    }
    add_hook("object_arrived", ( : fall_through:));

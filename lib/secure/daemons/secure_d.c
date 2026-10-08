@@ -268,7 +268,8 @@ mixed *walk_path(string file, int write)
    result[0] = !!write;
    for (i = 1; i < sizeof(result); i++)
    {
-      if (undefinedp(tmp = node[path[i - 1]]))
+      tmp = node[path[i - 1]];
+      if (!has_key(node, path[i - 1]))
       {
          result[i] = -1;
          break;
@@ -356,7 +357,7 @@ nomask string set_protection(string file, int write, mixed prot)
       path = desc[1];
       for (i = 0; i < sizeof(path) - 1; i++)
       {
-         if (undefinedp(node[path[i]]))
+         if (!has_key(node, path[i]))
             node[path[i]] = ({-1, subnode = allocate_mapping(1)});
          else if (!(subnode = node[path[i]][1]))
             node[path[i]][1] = subnode = allocate_mapping(1);
@@ -626,8 +627,11 @@ nomask mapping query_access_tree(string path, int write)
       return copy(result);
    for (i = 0; i < sizeof(p) - 1 && sizeof(result); i++)
       result = result[p[i]] ? result[p[i]][1] : 0;
-   if (sizeof(result) && !undefinedp(tmp = result[p[ < 1]]))
+   if (sizeof(result) && has_key(result, p[ < 1]))
+   {
+      tmp = result[p[ < 1]];
       return ([p[ < 1]:({tmp[0] == -1 ? query_protection(path + "/foo", write) : tmp[0], copy(tmp[1])})]);
+   }
    else
       return ([p[ < 1]:({query_protection(path + "/foo", write), 0})]);
 }
@@ -738,7 +742,7 @@ nomask int valid_privilege(mixed p)
    if (n < 0)
       n = strlen(p);
    if (list = privileges[p[0..n - 1]])
-      return !undefinedp(list[p[n..]]);
+      return has_key(list, p[n..]);
 }
 
 // returns 1 if a >= b

@@ -80,7 +80,7 @@ nomask void add_news_id_read(string group, int id)
  * registered we must take care of that as well */
 nomask void unsubscribe_group(string group)
 {
-   if (undefinedp(news_data[group]))
+   if (!has_key(news_data, group))
    {
       news_data[group] = "#";
    }
@@ -95,7 +95,7 @@ nomask void unsubscribe_group(string group)
  * we need to do that too. */
 nomask void subscribe_group(string group)
 {
-   if (undefinedp(news_data[group]))
+   if (!has_key(news_data, group))
    {
       news_data[group] = ":";
    }

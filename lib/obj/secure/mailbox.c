@@ -83,7 +83,7 @@ nomask class mail_msg get_one_message(int message_key)
    if (this_user()->query_userid() != owner)
       error("security violation: you are not allowed to use this mailbox\n");
 
-   if (undefinedp(mailbox[message_key]))
+   if (!has_key(mailbox, message_key))
       return 0;
 
    msg = MAIL_D->get_one_message(message_key);
@@ -155,7 +155,7 @@ nomask void delete_message(int message_key)
    if (this_user()->query_userid() != owner)
       error("security violation: you are not allowed to read this mail\n");
 
-   if (undefinedp(mailbox[message_key]))
+   if (!has_key(mailbox, message_key))
       error("non-existent message\n");
 
    MAIL_D->delete_mail(message_key, owner);

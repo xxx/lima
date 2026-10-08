@@ -699,7 +699,7 @@ void heal_limb(string limb, int x)
 // Returns 1 if 's' is a valid limb.
 int is_limb(string s)
 {
-   return !undefinedp(health[s]);
+   return has_key(health, s);
 }
 
 //: FUNCTION query_max_health
@@ -721,7 +721,7 @@ varargs int query_max_health(string limb)
 // Heals all limbs by 'x' amount.
 varargs void heal_us(int x, string limb)
 {
-   if (!limb || undefinedp(limb))
+   if (!limb)
    {
       foreach (limb in keys(health))
          heal_limb(limb, x);

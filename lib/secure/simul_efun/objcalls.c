@@ -7,10 +7,8 @@ object find_body(string);
 string evaluate_path(string);
 varargs void tell_environment(object, string);
 
-string base_name(mixed val)
+mixed base_name(mixed val = previous_object())
 {
-   if (nullp(val))
-      val = previous_object();
    if (objectp(val))
       val = file_name(val);
    else if (!stringp(val))
@@ -124,7 +122,7 @@ object get_object(string arg)
    object ob;
 
    if (!arg)
-      return 0;
+      return nil;
 
    if (arg == "me")
       return this_body();
@@ -139,7 +137,7 @@ object get_object(string arg)
       if (environment(this_body()) && !(ob = present(arg, environment(this_body()))))
          if (!(ob = find_body(arg)))
             if (!(ob = load_object(evaluate_path(arg))))
-               return 0;
+               return nil;
 
    return ob;
 }
@@ -150,7 +148,7 @@ object root_environment(object o)
 
    env = environment(o);
    if (!env)
-      return 0;
+      return nil;
    while (env2 = environment(env))
       env = env2;
    return env;
@@ -255,7 +253,7 @@ varargs string inv_list(object *obs, int flag, int depth)
             res += ob->inventory_recurse(depth);
       }
    }
-   return res == "" ? 0 : res;
+   return res == "" ? nil : res;
 }
 
 object owner(object ob)

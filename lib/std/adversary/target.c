@@ -111,7 +111,7 @@ void stop_hitting_me()
 // with us too).  stop_fight(0) stops all fights.
 varargs void stop_fight(object who)
 {
-   if (!who || undefinedp(who))
+   if (!who)
    {
       if (target)
          target->stop_hitting_me();

@@ -304,16 +304,17 @@ mixed *query_effects()
 // Usage: add_effect(string ob, mixed args, int repeats, mixed interval)
 // repeats will default to ob->query_repeats()
 // interval will default to ob->query_interval()
-void add_effect(string ob, mixed args, int repeats, mixed interval)
+void add_effect(string ob, mixed args = nil, mixed *options...)
 {
+   if (sizeof(options) > 2) error("add_effect: too many arguments");
+   int repeats;
+   mixed interval;
    class effect_class this_effect = new (class effect_class);
    object obj = load_object(ob);
    if (!obj)
       return;
-   if (undefinedp(repeats))
-      repeats = ob->query_repeats();
-   if (undefinedp(interval))
-      interval = ob->query_interval();
+   repeats = sizeof(options) ? (int)options[0] : ob->query_repeats();
+   interval = sizeof(options) > 1 ? options[1] : ob->query_interval();
 
    this_effect.effect_ob = ob;
    this_effect.name = ob->query_name();

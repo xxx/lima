@@ -8,7 +8,7 @@ mapping non_armours = allocate_mapping(({"left hand", "right hand", "neck"}), 0)
 private
 int wear_non_armour(object what, string sname)
 {
-   if (undefinedp(non_armours[sname]) || non_armours[sname])
+   if (!has_key(non_armours, sname) || non_armours[sname])
       return 0;
 
    non_armours[sname] = what;
@@ -23,7 +23,7 @@ nomask int wear_item(object what, string sname)
    if (wear_non_armour(what, sname) == 1)
       return 1;
 
-   if (undefinedp(slots[sname]) || slots[sname])
+   if (!has_key(slots, sname) || slots[sname])
       return 0;
 
    slots[sname] = what;
@@ -57,7 +57,7 @@ nomask mixed get_random_clothing()
 // Returns 1 if 'what' is a valid armour slot.
 nomask int has_body_slot(string what)
 {
-   return (!undefinedp(slots[what]) || !undefinedp(non_armours[what]));
+   return (has_key(slots, what) || has_key(non_armours, what));
 }
 
 //: FUNCTION query_armour_slots

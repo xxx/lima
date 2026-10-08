@@ -31,7 +31,7 @@ string *create_footer(mapping config)
 string *create_config(mapping config)
 {
    string *out;
-   if (!config || !mapp(config) || undefinedp(config["config"]))
+   if (!config || !mapp(config) || !has_key(config, "config"))
       error("Invalid config mapping.");
 
    out = create_header(config);

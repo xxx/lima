@@ -23,7 +23,7 @@ void setup_for_save()
 
 int is_variable(string var)
 {
-   return !undefinedp(variables[var]);
+   return has_key(variables, var);
 }
 
 void default_variables()
@@ -75,7 +75,7 @@ void print_variable(string v)
    if (!variables)
       default_variables();
 
-   if (undefinedp(variables[v]))
+   if (!has_key(variables, v))
       printf("%s: undefined variable.\n", v);
    else
       printf("The value of %s is: %O\n", v, variables[v]);
@@ -98,7 +98,7 @@ varargs protected mixed expand_if_variable(string arg, int only_expand_if_string
    }
 
    a = M_REGEX->regexplode(arg[1..], "[a-zA-Z0-9]+");
-   if (sizeof(a) < 2 || a[0] != "" || undefinedp(variables[a[1]]))
+   if (sizeof(a) < 2 || a[0] != "" || !has_key(variables, a[1]))
       return arg;
    if (!stringp(variables[a[1]]))
    {
@@ -168,7 +168,7 @@ int cmd_set(string *argv, string *implode_info)
       write("\n");
       return 1;
    case 2:
-      if (!undefinedp(variables[argv[1]]))
+      if (has_key(variables, argv[1]))
       {
          printf("Variable %s is already set.\n", argv[1]);
          return 1;

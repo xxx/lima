@@ -587,7 +587,7 @@ mixed json_decode_parse_value(mixed *parse)
          if (json_decode_parse_at_token(parse, "null", 1))
          {
             json_decode_parse_next_chars(parse, 4);
-            return 0;
+            return nil;
          }
          else
          {
@@ -646,10 +646,10 @@ mixed json_decode(string text)
 
 varargs string json_encode(mixed value, mixed *pointers)
 {
-   if (undefinedp(value))
-      return "null";
    if (intp(value) || floatp(value))
       return to_string(value);
+   if (nilp(value))
+      return "null";
    if (stringp(value))
    {
       if (member_array('"', value) != -1)

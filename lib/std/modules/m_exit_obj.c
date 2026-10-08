@@ -217,7 +217,7 @@ varargs void add_exit(mixed dir, mixed dest, int prep_only)
 mixed direct_go_word_obj(string prep)
 {
    prep = PREPOSITION_D->translate_preposition(prep);
-   if (undefinedp(prep_dest[prep]))
+   if (!has_key(prep_dest, prep))
       return "You can't " + query_go_method() + " " + prep + " that, only " + format_list(keys(prep_dest), "or") + ".";
    // prep and this_body() are needed because of set_exit_check()
    return evaluate(prep_check[prep], prep, this_body());

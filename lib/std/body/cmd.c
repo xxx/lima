@@ -99,8 +99,8 @@ varargs nomask int do_game_command(string str, int debug)
    default:
       write("This parser code should never be reached. If it is, let "
             "someone know how you got here.\n");
-      if (undefinedp(result))
-         write("Result was undefined.\n");
+      if (nilp(result))
+         write("Result was nil.\n");
       else
       {
          write("Error was: ");

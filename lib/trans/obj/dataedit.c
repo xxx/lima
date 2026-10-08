@@ -114,7 +114,7 @@ void quit_and_save()
 
 void remove_variable(string var)
 {
-   if (undefinedp(data[var]))
+   if (!has_key(data, var))
       write("No such variable.\n");
    else
    {
@@ -131,7 +131,7 @@ void remove_var()
 
 void rename_variable(string oldv, string newv)
 {
-   if (!undefinedp(data[newv]))
+   if (has_key(data, newv))
       write("A variable by that name already exists.\n");
    else
    {
@@ -144,7 +144,7 @@ void rename_variable(string oldv, string newv)
 
 void get_new_name(string old)
 {
-   if (undefinedp(data[old]))
+   if (!has_key(data, old))
       write("No such variable.\n");
    else
    {

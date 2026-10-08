@@ -79,7 +79,7 @@ void parse_verb_defs(string dir, string filecontents)
       if (!size || words[0][0] == '#')
          continue;
       cmd = words[0];
-      if (!undefinedp(pathmap[cmd]))
+      if (has_key(pathmap, cmd))
          errors += sprintf("Warning: %s redefined.  Previous definition being clobbered.\n", cmd);
       pathmap[cmd] = new (class proto_info);
       // ### gross.
@@ -315,7 +315,7 @@ mixed smart_arg_parsing(mixed argv, string *path, string *implode_info)
       cmd_name = info[2];
    }
 
-   if (undefinedp(proto_info[this_path]) || undefinedp(pstuff = proto_info[this_path][cmd_name]))
+   if (!has_key(proto_info, this_path) || !has_key(proto_info[this_path], cmd_name))
    {
       // no prototypes, so don't do no globbing or nothin'.
       // In fact, just send back the raw string.
@@ -329,6 +329,8 @@ mixed smart_arg_parsing(mixed argv, string *path, string *implode_info)
       else
          return ({cmd_obj, ([]), 0});
    }
+
+   pstuff = proto_info[this_path][cmd_name];
 
    // Remove "'s for:  "word1 word2"
    argv = map(argv, ( : (stringp($1) && $1[0] == '"' && $1[ < 1] == '"') ? $1[1.. < 2] : $1:));

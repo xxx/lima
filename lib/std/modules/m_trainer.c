@@ -155,7 +155,7 @@ void train_stat(string s)
    object b = this_body();
    int cost = stat_train_cost(s);
 
-   if (undefinedp(stat_abrevs[s]))
+   if (!has_key(stat_abrevs, s))
       error("Unknown stat '" + s + "'.");
 
    // No spare points, end it here. = this_body()->stat_abrevs();

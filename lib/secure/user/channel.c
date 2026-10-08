@@ -35,7 +35,7 @@ void setup_channels()
 protected
 void initialize_channels()
 {
-   if (undefinedp(channel_list))
+   if (!arrayp(channel_list))
       setup_channels();
    CHANNEL_D->register_channels(channel_list);
 }

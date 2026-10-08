@@ -120,7 +120,7 @@ int cmp(mixed a, mixed b)
       foreach (x, y in a)
       {
          z = b[x];
-         if (undefinedp(z))
+         if (!has_key(b, x))
             return 0;
          if (!cmp(y, z))
             return 0;
@@ -771,12 +771,10 @@ varargs string identify(mixed a)
    string ret;
    mapping real_map;
 
-   if (undefinedp(a))
-      return "UNDEFINED";
-   if (nullp(a))
-      return "0";
    if (intp(a))
       return "" + a;
+   if (nilp(a))
+      return "nil";
    if (floatp(a))
       return "" + a;
    if (objectp(a))

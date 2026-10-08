@@ -30,9 +30,9 @@ varargs string tail(string fname, int nlines)
    int chunk, offset, num_nl, p, skip;
    string str = "";
 
-   if (nullp(fname))
+   if (!stringp(fname))
       error("tail: No file name supplied.");
-   if (nullp(nlines) || nlines < 1)
+   if (nlines < 1)
       nlines = 10;
 
    chunk = nlines * 80;

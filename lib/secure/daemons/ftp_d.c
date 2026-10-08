@@ -1109,7 +1109,7 @@ string FTP_CMD_retr_callback(object ob)
    int start, length;
    mixed ret;
 
-   if (!ob || undefinedp(outfile[ob]))
+   if (!ob || !has_key(outfile, ob))
       return 0;
 
    start = outfile[ob][2];

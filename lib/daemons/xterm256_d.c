@@ -155,7 +155,7 @@ void load_all_colours()
 
 //: FUNCTION substitute_ansi
 public
-varargs string substitute_ansi(string text, string mode)
+varargs string substitute_ansi(string text = "", string mode)
 {
    mixed *assoc;
    string *parts, sub, part;
@@ -163,7 +163,7 @@ varargs string substitute_ansi(string text, string mode)
    int sz, num;
    mapping user;
 
-   if (nullp(text))
+   if (text == "")
       return "";
 
    assoc = pcre_assoc(text, ({PINKFISH_COLOURS}), ({1}));
@@ -252,14 +252,14 @@ varargs string substitute_ansi(string text, string mode)
 //   xterm - replace all tokens with xterm256 colour codes
 //   ansi  - fall back to ansi colour codes
 public
-varargs string substitute_colour(string text, string mode)
+varargs string substitute_colour(string text = "", string mode)
 {
    mixed *assoc;
    string *parts, sub;
    int *matched;
    int sz, num;
 
-   if (nullp(text))
+   if (text == "")
       return "";
 
    if (ansip(text))
@@ -291,8 +291,9 @@ varargs string substitute_colour(string text, string mode)
          // First, are we an alt code
          if (sscanf(parts[sz], "<%s>", sub) == 1)
          {
-            if (!nullp(sub = alt_codes[sub]))
+            if (has_key(alt_codes, sub))
             {
+               sub = alt_codes[sub];
                parts[sz] = sub;
                continue;
             }
@@ -311,8 +312,9 @@ varargs string substitute_colour(string text, string mode)
          // First, are we an alt code
          if (sscanf(parts[sz], "<%s>", sub) == 1)
          {
-            if (!nullp(sub = alt_codes[sub]))
+            if (has_key(alt_codes, sub))
             {
+               sub = alt_codes[sub];
                parts[sz] = sub;
                continue;
             }
@@ -335,8 +337,9 @@ varargs string substitute_colour(string text, string mode)
          // First, are we an alt code
          if (sscanf(parts[sz], "<%s>", sub) == 1)
          {
-            if (!nullp(sub = alt_codes[sub]))
+            if (has_key(alt_codes, sub))
             {
+               sub = alt_codes[sub];
                parts[sz] = sub;
                continue;
             }

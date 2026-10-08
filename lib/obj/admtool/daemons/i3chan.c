@@ -85,7 +85,7 @@ nomask void rcv_remove_channel(string channel_name)
    mapping chanlist = IMUD_D->query_chanlist();
 
    channel_name = lower_case(channel_name);
-   if (undefinedp(chanlist[channel_name]))
+   if (!has_key(chanlist, channel_name))
    {
       write("** That channel does not exist.\n");
       return;
@@ -100,7 +100,7 @@ nomask void rcv_listen_channel(string channel_name)
    mapping chanlist = IMUD_D->query_chanlist();
 
    channel_name = lower_case(channel_name);
-   if (undefinedp(chanlist[channel_name]))
+   if (!has_key(chanlist, channel_name))
    {
       write("** That channel does not exist.\n");
       return;
@@ -115,7 +115,7 @@ nomask void rcv_ignore_channel(string channel_name)
    mapping chanlist = IMUD_D->query_chanlist();
 
    channel_name = lower_case(channel_name);
-   if (undefinedp(chanlist[channel_name]))
+   if (!has_key(chanlist, channel_name))
    {
       write("** That channel does not exist.\n");
       return;
@@ -145,7 +145,7 @@ nomask void allow_mud_on_our_channel(string channel_name, string allowed_mud_nam
    mapping chanlist = IMUD_D->query_chanlist();
 
    channel_name = lower_case(channel_name);
-   if (undefinedp(chanlist[channel_name]))
+   if (!has_key(chanlist, channel_name))
    {
       write("** That channel does not exist.\n");
       return;
@@ -159,7 +159,7 @@ nomask void disallow_mud_on_our_channel(string channel_name, string disallowed_m
    mapping chanlist = IMUD_D->query_chanlist();
 
    channel_name = lower_case(channel_name);
-   if (undefinedp(chanlist[channel_name]))
+   if (!has_key(chanlist, channel_name))
    {
       write("** That channel does not exist.\n");
       return;

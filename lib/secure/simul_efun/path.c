@@ -207,7 +207,7 @@ mapping map_paths(mixed paths)
    paths = map_array(paths, ( : split_path:));
    for (i = 0; i < sizeof(paths); i++)
    {
-      if (undefinedp(res[paths[i][0]]))
+      if (!has_key(res, paths[i][0]))
          res[paths[i][0]] = ({paths[i][1]});
       else
          res[paths[i][0]] += ({paths[i][1]});

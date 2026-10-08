@@ -62,7 +62,7 @@ int bind(string command, string *argv)
    if (sizeof(argv) != 1)
       return -1;
    fname = argv[0];
-   if (undefinedp(personal_bindings[command]) && dispatch[command])
+   if (!has_key(personal_bindings, command) && dispatch[command])
       return -2;
 
    personal_bindings[command] = fname;
@@ -78,7 +78,7 @@ void unbind(string *argv)
    if (sizeof(argv) != 1)
       return;
    command = argv[0];
-   if (undefinedp(personal_bindings[command]))
+   if (!has_key(personal_bindings, command))
       return;
 
    map_delete(personal_bindings, command);
