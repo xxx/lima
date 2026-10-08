@@ -11,7 +11,7 @@ void setup()
    set_damage_type("bludgeon");
    set_long("A rough club carved from a single piece of wood.");
    set_in_room_desc("A simple club is lying on the ground.");
-   set_weight(1);
+   set_weight(1.0);
    set_value(0.1);
    set_skill_used("combat/melee/club");
    set_combat_messages("combat-bludgeon");

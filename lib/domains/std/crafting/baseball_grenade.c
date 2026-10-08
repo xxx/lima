@@ -14,8 +14,8 @@ void setup()
    set_combat_messages("combat-firearm");
    set_damage_type("bludgeon");
    set_weapon_class(10);
-   set_value(40);
-   set_weight(1);
+   set_value(40.0);
+   set_weight(1.0);
 }
 
 mapping query_recipe()
@@ -38,15 +38,15 @@ void has_been_thrown(object target)
    if (target)
    {
       set_damage_type("force");
-      do_thrown_vital_damage(target, ( : calc_damage, 1 :));
+      do_thrown_vital_damage(target, &calc_damage(1));
       tell_from_inside(environment(), "The baseball grenade detonates near the target in a BANG!\n");
    }
    else
    {
-      object targets = filter(all_inventory(environment()), ( : $1->attackable() && !$1->is_body() :));
+      object *targets = filter(all_inventory(environment()), ( : $1->attackable() && !$1->is_body() :));
       foreach (object t in targets)
       {
-         do_thrown_damage(t, ( : calc_damage, sizeof(targets) :));
+         do_thrown_damage(t, &calc_damage(sizeof(targets)));
          tell_from_inside(environment(), "The baseball grenade detonates in the middle of the room with a BANG!\n");
       }
    }

@@ -32,7 +32,7 @@ varargs private nomask void throw_one(object ob, object target)
    if (stringp(tmp))
    {
       write(tmp);
-      return tmp;
+      return;
    }
 }
 
@@ -41,6 +41,11 @@ void do_throw_obj(object ob)
    if (!try_to_acquire(ob))
       return;
    throw_one(ob);
+}
+
+void do_throw_obs(mixed *info)
+{
+   handle_obs(info, do_throw_obj);
 }
 
 void do_throw_obj_at_obj(object to_throw, object target)
