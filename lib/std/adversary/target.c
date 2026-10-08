@@ -69,7 +69,7 @@ object get_target()
           (member_array(target, deep_useful_inv(parser_root_environment(environment(this_object())))) == -1))
    {
       if (!n)
-         return (target = 0);
+         return (target = nil);
       x = random(n);
       target = other_targets[x];
       other_targets[x..x] = ({});
@@ -98,17 +98,17 @@ void switch_to(object who)
 void stop_hitting_me()
 {
    if (previous_object() == target)
-      target = 0;
+      target = nil;
    other_targets -= ({previous_object()});
 }
 
 /* This stops attacking "who".  It also takes care of stoping them
- * from attacking us.  stop_fight() or stop_fight(0) stops all
+ * from attacking us.  stop_fight() or stop_fight(nil) stops all
  * combat.
  */
 //: FUNCTION stop_fight
 // stop fighting with object ob (handles making sure they stop fighting
-// with us too).  stop_fight(0) stops all fights.
+// with us too).  stop_fight(nil) stops all fights.
 varargs void stop_fight(object who)
 {
    if (!who)
@@ -116,18 +116,18 @@ varargs void stop_fight(object who)
       if (target)
          target->stop_hitting_me();
       other_targets->stop_hitting_me();
-      target = 0;
+      target = nil;
       other_targets = ({});
       stop_attacking();
       return;
    }
 
    if (who == target)
-      target = 0;
+      target = nil;
    else
       other_targets -= ({who});
    who->stop_hitting_me();
-   if (query_targets() == ({0}))
+   if (!target && !sizeof(other_targets))
    {                    // If there are no targets left,
       stop_attacking(); // remove the heart_beat().
    }
