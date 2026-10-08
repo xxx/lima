@@ -14,8 +14,6 @@
 ** 95-Jul-20.  Beek.    Prompts can be strings as well as functions
 */
 
-#include <driver/function.h>
-
 string query_userid();
 void start_shell(int);
 mixed query_privilege();
@@ -126,7 +124,7 @@ private nomask int create_handler()
    return 0;
 }
 
-private nomask class input_info get_top_handler(int require_handler)
+private nomask class input_info get_top_handler(int require_handler, int notify_return)
 {
    int some_popped = 0;
 
@@ -138,10 +136,13 @@ private nomask class input_info get_top_handler(int require_handler)
       ** Get the top of the stack and make sure the func is valid
       */
       info = modal_stack[ < 1];
-      if (!(functionp(info.input_func) & FP_OWNER_DESTED))
+      if (functionp(info.input_func) && function_info(info.input_func)["owner"])
       {
-         if (some_popped && info.return_to_func)
+         if (some_popped && notify_return && info.return_to_func)
+         {
             evaluate(info.return_to_func);
+            return get_top_handler(require_handler, 0);
+         }
          return info;
       }
 
@@ -150,7 +151,7 @@ private nomask class input_info get_top_handler(int require_handler)
    }
 
    if (!require_handler || create_handler())
-      return 0;
+      return nil;
 
    return modal_stack[ < 1];
 }
@@ -165,14 +166,14 @@ private nomask class input_info get_bottom_handler()
       ** Get the bottom of the stack and make sure the func is valid
       */
       info = modal_stack[0];
-      if (!(functionp(info.input_func) & FP_OWNER_DESTED))
+      if (functionp(info.input_func) && function_info(info.input_func)["owner"])
          return info;
 
       modal_stack = modal_stack[1..];
    }
 
    if (create_handler())
-      return 0;
+      return nil;
 
    return modal_stack[0];
 }
@@ -200,11 +201,11 @@ private nomask void push_handler(function input_func, mixed prompt, int secure, 
 
    if (info.input_type == INPUT_CHAR_MODE)
    {
-      efun::get_char(( : dispatch_modal_input:), info.secure | 2);
+      efun::get_char(dispatch_modal_input, info.secure);
    }
    else
    {
-      efun::input_to(( : dispatch_modal_input:), info.secure | 2);
+      efun::input_to(dispatch_modal_input, info.secure);
    }
 }
 
@@ -245,7 +246,7 @@ nomask void modal_pop()
    ** we need to use get_top_handler() carefully -- tell it not to require
    ** a handler.  We want it for validating any TOS that may be there.
    */
-   if ((info = get_top_handler(0)) && info.return_to_func)
+   if ((info = get_top_handler(0, 0)) && info.return_to_func)
       evaluate(info.return_to_func);
 }
 
@@ -263,7 +264,7 @@ protected nomask void modal_recapture()
    class input_info info;
    string prompt;
 
-   if (!(info = get_top_handler(1)))
+   if (!(info = get_top_handler(1, 1)))
       return;
 
    /* char handlers don't have prompts */
@@ -280,11 +281,11 @@ protected nomask void modal_recapture()
    }
    if (info.input_type == INPUT_CHAR_MODE)
    {
-      efun::get_char(( : dispatch_modal_input:), info.secure | 2);
+      efun::get_char(dispatch_modal_input, info.secure);
    }
    else
    {
-      efun::input_to(( : dispatch_modal_input:), info.secure | 2);
+      efun::input_to(dispatch_modal_input, info.secure);
    }
 }
 
@@ -303,7 +304,7 @@ protected nomask void modal_recapture()
 */
 varargs nomask void modal_simple(function input_func, mixed prompt, int secure, int lock)
 {
-   push_handler(input_func, prompt, secure, 0, INPUT_AUTO_POP, lock);
+   push_handler(input_func, prompt, secure, nil, INPUT_AUTO_POP, lock);
 }
 
 /*
@@ -317,12 +318,16 @@ nomask void modal_pass(string str)
 {
    class input_info info;
 
-   if (!dispatching_to)
-      error("no handlers to bubble to");
-
-   info = modal_stack[--dispatching_to - 1];
-   // ### how to indicate passed?
-   evaluate(info.input_func, str);
+   while (dispatching_to > 1)
+   {
+      info = modal_stack[--dispatching_to - 1];
+      if (functionp(info.input_func) && function_info(info.input_func)["owner"])
+      {
+         evaluate(info.input_func, str);
+         return;
+      }
+   }
+   error("no handlers to bubble to");
 }
 
 /*
@@ -345,46 +350,33 @@ private nomask void dispatch_to_bottom(mixed str)
 **
 ** Dispatch the command as appropriate.
 */
-private nomask void dispatch_modal_input(mixed str)
+private nomask void dispatch_modal_input(string str)
 {
-   class input_info info;
-   if (str[0] == '!' && !modal_stack[ < 1].lock)
+   class input_info info = get_top_handler(1, 1);
+   if (!info)
+      return;
+
+   if (strlen(str) && str[0] == '!' && !info.lock && info.input_type != INPUT_CHAR_MODE)
    {
-      /* Dispatch ! escapes */
-      dispatch_to_bottom(str[1..]);
+      catch(dispatch_to_bottom(str[1..]));
    }
    else
    {
-      string error;
-      /*
-       ** Get the top handler, or fail if none are present/can be created.
-       */
-      if (!(info = get_top_handler(1)))
-         return;
-
-      /* auto-pop _before_ dispatching, so we pop the correct handler */
+      // Keep the position above the remaining stack when a one-shot handler pops.
+      dispatching_to = sizeof(modal_stack);
       if (info.input_type == INPUT_AUTO_POP)
          modal_pop();
-
-      dispatching_to = sizeof(modal_stack);
-
-      error = catch(evaluate(info.input_func, str));
-      if (error)
-      {
-         modal_recapture();
-         return;
-      }
+      catch(evaluate(info.input_func, str));
    }
+   dispatching_to = 0;
 
    if (this_object())
-   {
       modal_recapture();
-   }
 }
 
 nomask void modal_push_char(function input_func)
 {
-   push_handler(input_func, 0, 1, 0, INPUT_CHAR_MODE, 0);
+   push_handler(input_func, nil, 1, nil, INPUT_CHAR_MODE, 0);
 }
 
 /*
@@ -398,9 +390,10 @@ nomask void modal_push_char(function input_func)
 **
 ** maybe we should only use input_to if we need it now.  -Beek
 */
-private nomask string process_input(string str)
+private nomask int process_input(string str)
 {
    dispatch_modal_input(str);
+   return 1;
 }
 
 /*
@@ -445,8 +438,10 @@ protected nomask void clear_input_stack()
    while (sizeof(modal_stack))
    {
       if (catch {
-             top = get_top_handler(1);
-             modal_pop();
+             top = get_top_handler(0, 0);
+             if (!top)
+                break;
+             modal_stack = modal_stack[0.. < 2];
              evaluate(top.input_func, -1);
           })
       {
