@@ -56,3 +56,8 @@ nomask private void main(string arg)
 
    out("Brief mode is now " + query_setting() + ".\n");
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}

@@ -289,10 +289,12 @@ nomask string *find_topic(string name)
    return filter(
        result,
        (: [string file, int lvl] {
-          mixed *parts = explode(file, "/");
+          string *parts = explode(file, "/") - ({""});
           if (sizeof(parts) < 3)
              return 1;
-          return (lvl >= restrict[parts[1]] || lvl >= restrict[parts[1] + "/" + parts[2]]);
+          mixed general = restrict[parts[1]];
+          mixed specific = restrict[parts[1] + "/" + parts[2]];
+          return (lvl >= (intp(general) ? general : 0) || lvl >= (intp(specific) ? specific : 0));
        } :),
        lvl);
 }

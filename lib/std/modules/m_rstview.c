@@ -41,9 +41,9 @@ private string replace_types(string s, string replace, string with)
 
 private string header_type(string line)
 {
-   string part = strlen(line) > 3 ? line[0..2] : 0;
+   string part = strlen(line) > 3 ? line[0..2] : nil;
    if (!part)
-      return 0;
+      return nil;
 
    switch (part)
    {
@@ -305,7 +305,7 @@ string rst_format(string *file, string searchtext)
             code = replace_code(code, searchtext);
             output += code + ({""});
             lines += sizeof(code) + 1;
-            code = 0;
+            code = nil;
          }
          else
          {

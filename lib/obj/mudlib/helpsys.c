@@ -105,7 +105,7 @@ nomask int f_parse(string s)
    if (s[2] == '#')
       return 0;
 
-   if (member_array(':', s) == -1)
+   if (strsrch(s, ":") == -1)
       directives[trim(s[2..])] = 1;
    else
    {
@@ -140,13 +140,13 @@ nomask void parse_directory(string fname)
 private
 rst_view(string fname, string topic)
 {
-   lines = rst_format_file(fname, topic);
+   lines = explode(rst_format_file(fname, topic), "\n");
 }
 
 private
 md_view(string fname, string topic)
 {
-   lines = md_format_file(fname, topic);
+   lines = explode(md_format_file(fname, topic), "\n");
 }
 
 private
@@ -196,7 +196,7 @@ varargs nomask void present_topic(string fname, string topic)
    {
    case -1:
       lines = ({"This helpfile no longer exists.", "Its reference will vanish next time help_d is updated"});
-      topic_files = 0;
+      topic_files = nil;
       break;
    case -2:
       parse_directory(fname);
@@ -207,7 +207,7 @@ varargs nomask void present_topic(string fname, string topic)
       parse_file(fname, topic);
       write("\n");
       more(lines);
-      topic_files = 0;
+      topic_files = nil;
    }
 
    /*
@@ -242,7 +242,7 @@ nomask void display_choice(string topic)
                       this_user()->query_screen_width()) +
          "\n");
 
-   modal_func(( : receive_choice, topic:));
+   modal_func(&receive_choice(topic));
 }
 
 private
@@ -297,7 +297,7 @@ nomask void receive_choice(string topic, mixed arg)
    }
    else
    {
-      topic_files = 0;
+      topic_files = nil;
       lookup_topic(arg);
    }
 }
@@ -326,7 +326,7 @@ nomask void receive_more(mixed arg)
    {
       more(lines);
       if (cur_line == 0)
-         modal_func(( : receive_topic:));
+         modal_func(receive_topic);
    }
    else
    {
@@ -362,7 +362,7 @@ nomask void begin_help(string topic)
 {
    if (!topic || topic == "")
       topic = "topics";
-   modal_push(( : receive_topic:), ( : query_prompt:));
+   modal_push(receive_topic, query_prompt);
    lookup_topic(topic);
 }
 
