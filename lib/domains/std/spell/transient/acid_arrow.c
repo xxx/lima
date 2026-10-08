@@ -4,17 +4,24 @@ inherit TRANSIENT_SPELL;
 
 //: FUNCTION do_effect
 // Executes the shield action effect.
-int do_effect()
+void do_effect(object affected)
 {
    object target = environment();
-   object spell = load_object(SPELL_D->query_spell_obname("acid arrow"));
+   object spell;
+   if (!target || !target->is_living())
+   {
+      remove();
+      return;
+   }
+   spell = load_object(SPELL_D->query_spell_obname("acid arrow"));
 
    if (objectp(spell))
-      spell->ongoing_damage(query_caster(), query_target(), query_limb(), 1);
+      spell->ongoing_damage(query_caster(), query_target(), query_limb());
 }
 
-void setup()
+void setup(int strength, int duration, string action, string limb)
 {
+   transient_spell::setup(strength, duration, action, limb);
    set_effect_type("acid");
    set_effect_name("acid arrow");
    set_effect_duration(2);

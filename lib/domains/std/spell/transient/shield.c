@@ -35,7 +35,7 @@ int query_boost_strength()
 
 //: FUNCTION do_effect
 // Executes the shield action effect.
-int do_effect()
+void do_effect(object affected)
 {
    shield_action();
 }
@@ -45,7 +45,9 @@ int do_effect()
 // Passed the object of the effect to be extended.
 void extend_effect(object t)
 {
-   environment()->simple_action("$P magical shield is renewed.");
+   object env = environment();
+   if (t && env && env->is_living())
+      env->simple_action("$P magical shield is renewed.");
    if (t)
       ::extend_effect(t);
 }
@@ -69,9 +71,13 @@ void remove()
    ::remove();
 }
 
-void mudlib_setup(int strength_par, int duration_par, string action_par)
+void mudlib_setup()
 {
    transient::mudlib_setup();
+}
+
+void setup(int strength_par, int duration_par, string action_par)
+{
    set_effect_type("shield");
    set_effect_name("shield spell");
    strength = strength_par;

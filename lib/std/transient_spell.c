@@ -50,12 +50,15 @@ int query_boost_strength()
    return strength;
 }
 
-void mudlib_setup(int strength_par, int duration_par, string action_par, string limb_par)
+void mudlib_setup()
 {
    transient::mudlib_setup();
-   strength = strength_par;
-   action = action_par;
+}
+
+void setup(mixed *args...)
+{
+   strength = sizeof(args) > 0 ? args[0] : 0;
+   action = sizeof(args) > 2 ? args[2] : nil;
    caster = this_body();
-   limb = limb_par;
-   this_object()->setup();
+   limb = sizeof(args) > 3 ? args[3] : nil;
 }

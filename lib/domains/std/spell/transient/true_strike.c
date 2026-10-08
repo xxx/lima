@@ -12,7 +12,7 @@ inherit TRANSIENT_SPELL;
 
 int spent;
 
-int do_effect()
+void do_effect(object affected)
 {
    if (spent)
       remove();
@@ -21,18 +21,20 @@ int do_effect()
 class event_info effect_modify_event(class event_info evt)
 {
    // Only modify events that are combat events from the caster.
-   if (this_body() == query_caster() && !spent)
+   object caster = query_caster();
+   if (caster && this_body() == caster && !spent)
    {
       this_body()->targetted_action("$N $vstrike true against $t!",environment());
       evt.data[1] = evt.data[1] > 0 ? evt.data[1] * 2 : 1;
       spent = 1;
-      call_out("do_effect", 1);
+      call_out(&do_effect(environment()), 1);
    }
    return evt;
 }
 
 void setup(int duration_par)
 {
+   transient_spell::setup(0, duration_par, nil, nil);
    set_effect_type("true strike");
    set_effect_name("true strike spell");
    set_effect_duration(duration_par);

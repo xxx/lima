@@ -9,7 +9,12 @@ private
 void speed_action()
 {
    object env = environment();
-   if (action && env && env->is_living())
+   if (!env || !env->is_living())
+   {
+      remove();
+      return;
+   }
+   if (action)
       if (action[0] != '!')
          env->simple_action(action);
       else
@@ -22,7 +27,7 @@ int query_boost_strength()
    return strength;
 }
 
-int do_effect()
+void do_effect(object affected)
 {
    speed_action();
 }
@@ -48,10 +53,14 @@ void remove()
    ::remove();
 }
 
-void mudlib_setup(int s, int d, string a)
+void mudlib_setup()
 {
    transient::mudlib_setup();
    add_save(({"action", "strength"}));
+}
+
+void setup(int s, int d, string a)
+{
    set_effect_type("speed");
    set_effect_name("speed drug");
    strength = s;
