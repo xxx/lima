@@ -13,5 +13,5 @@ void setup()
    set_last_drink_action("$N $vtake a drink of beer, finishing the bottle off.");
    set_num_drinks(3);
    set_heal_value(3);
-   set_value(50);
+   set_value(50.0);
 }

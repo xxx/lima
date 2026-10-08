@@ -8,7 +8,7 @@ void setup()
    set_long("A bottle of blackberry cider - lightly fermented. Smells quite good!.");
    set_num_drinks(4);
    set_heal_value(3);
-   set_weight(1);
+   set_weight(1.0);
    set_drink_action("$N $vtake a swig of blackberry cider.");
    set_last_drink_action("$N $vtake a drink of blackberry cider, finishing the bottle off.");
 }

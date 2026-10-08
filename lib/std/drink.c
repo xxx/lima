@@ -1,5 +1,5 @@
 
-inherit OBJ;
+inherit OBJ base_object;
 inherit M_GETTABLE;
 inherit M_DRINK_CONTAINER;
 inherit M_DRINKABLE;
@@ -31,18 +31,14 @@ void set_heal_value(int v)
    ::set_heal_value(v);
 }
 
-mixed direct_drink_obj(object ob)
-{
-   return m_drinkable::direct_drink_obj(ob);
-}
 
 int query_value()
 {
    // Alcholic drinks are cheaper than water, and heal more, yeah sad sad world.
-   int heal_mod = query_alchohol_level() ? 0.5 : 1;
+   float heal_mod = query_alchohol_level() ? 0.5 : 1.0;
    if (this_object()->decays())
       return 0;
-   return to_int((float)query_num_drinks() * query_heal_value() * heal_mod);
+   return to_int(to_float(query_num_drinks()) * to_float(query_heal_value()) * heal_mod);
 }
 
 int is_drink()
@@ -52,7 +48,9 @@ int is_drink()
 
 string get_extra_long()
 {
-   int drink_level = to_int(100 * (1.0 * query_num_drinks() + query_drinks_current_unit()) / query_num_drinks());
+   int remaining = query_num_drinks();
+   int total = remaining - query_drinks_current_unit();
+   int drink_level = total > 0 ? 100 * remaining / total : 0;
 
    switch (drink_level)
    {
@@ -71,6 +69,12 @@ string get_extra_long()
    case 100:
       return "It is untouched.";
    }
+}
+
+varargs void drink_it(object drinkee)
+{
+   calculate_num_drinks();
+   m_drinkable::drink_it(drinkee);
 }
 
 void alchohol_drink_action()
@@ -96,12 +100,12 @@ int crafting_xp()
 
 void mudlib_setup()
 {
-   object::mudlib_setup();
+   base_object::mudlib_setup();
    set_id("bottle");
    set_num_drinks(5);
    set_heal_value(2);
-   set_weight(1);
-   set_taste_action(( : alchohol_drink_action:));
+   set_weight(1.0);
+   set_taste_action(alchohol_drink_action);
    set_needs_contents(0);
    set_drink_action("$N $vtake a swig from the bottle.");
    set_last_drink_action("$N $vtake a drink, finishing the bottle off.");

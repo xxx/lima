@@ -7,8 +7,20 @@
 private
 int needs_contents;
 
-string the_short();
-int query_drinks();
+private object selected_drink(object selected)
+{
+   if (!needs_contents)
+      return !selected || selected == this_object() ? this_object() : nil;
+   if (selected)
+      return environment(selected) == this_object() ? selected : nil;
+   return first_content();
+}
+
+private object first_content()
+{
+   object *contents = all_inventory(this_object());
+   return sizeof(contents) ? contents[0] : nil;
+}
 
 //: FUNCTION set_needs_contents
 // If needs_contents is 1, then the container can only be drunk from if it
@@ -25,27 +37,32 @@ mixed direct_drink_from_obj()
    object ob;
 
    if (this_object()->query_closed())
-      return capitalize(the_short()) + " is closed.\n";
+      return capitalize(this_object()->the_short()) + " is closed.\n";
 
    if (needs_contents)
-      ob = first_inventory();
+      ob = first_content();
    else
       ob = this_object();
 
    if (!ob)
-      return capitalize(the_short()) + " is empty.\n";
+      return capitalize(this_object()->the_short()) + " is empty.\n";
 
    return ob->direct_drink_obj();
 }
 
-void drink_from_it()
+varargs void drink_from_it(object selected)
 {
    object ob;
-
-   if (needs_contents)
-      ob = first_inventory();
-   else
-      ob = this_object();
-
+   if (this_object()->query_closed())
+   {
+      write(capitalize(this_object()->the_short()) + " is closed.\n");
+      return;
+   }
+   ob = selected_drink(selected);
+   if (!ob)
+   {
+      write("Pity there's nothing in it.\n");
+      return;
+   }
    ob->drink_it();
 }
