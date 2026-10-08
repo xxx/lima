@@ -17,14 +17,20 @@ int valid_set(string set)
    int part1, part2;
    string rest;
    string *parts = explode(set, ",");
-   if (set = "")
+   if (set == "")
       return 1;
    foreach (string part in parts)
    {
-      if (sscanf(part, "%d-%d%s", part1, part2, rest) != 2)
+      rest = "";
+      if (sscanf(part, "%d-%d%s", part1, part2, rest) < 2 || rest != "" || part1 > part2)
          return 0;
    }
    return 1;
+}
+
+private string set_prefix(string set, int length)
+{
+   return length ? set[0..length - 1] : "";
 }
 
 string set_add(string set, int number)
@@ -64,21 +70,21 @@ string set_add(string set, int number)
          {
             if (number == first - 1)
             {
-               res = set[0..lastidx - 1] + lastfirst + "-" + last;
+               res = set_prefix(set, lastidx) + lastfirst + "-" + last;
                if (nextidx)
                   res += set[nextidx - 1..];
                return res;
             }
-            return set[0..lastidx - 1] + lastfirst + "-" + number + set[idx - 1..];
+            return set_prefix(set, lastidx) + lastfirst + "-" + number + set[idx - 1..];
          }
          if (number == first - 1)
          {
-            res = set[0..idx - 1] + number + "-" + last;
+            res = set_prefix(set, idx) + number + "-" + last;
             if (nextidx)
                res += set[nextidx - 1..];
             return res;
          }
-         return set[0..idx - 1] + number + "-" + number + "," + set[idx..];
+         return set_prefix(set, idx) + number + "-" + number + "," + set[idx..];
       }
       if (number <= last)
          return set;
@@ -90,7 +96,7 @@ string set_add(string set, int number)
    } while (idx);
 
    if (number == lastlast + 1)
-      return set[0..lastidx - 1] + lastfirst + "-" + number;
+      return set_prefix(set, lastidx) + lastfirst + "-" + number;
    else
       return set + "," + number + "-" + number;
 }
@@ -102,6 +108,8 @@ string set_add_range(string set, int nfirst, int nlast)
 
    if (!valid_set(set))
       error(sprintf("Invalid set in set_add_range: %s\n", set));
+   if (nfirst > nlast)
+      return set;
    if (set == "")
       return nfirst + "-" + nlast;
 
@@ -140,21 +148,21 @@ string set_add_range(string set, int nfirst, int nlast)
          {
             if (nlast >= first - 1)
             {
-               res = set[0..lastidx - 1] + lastfirst + "-" + last;
+               res = set_prefix(set, lastidx) + lastfirst + "-" + (nlast > last ? nlast : last);
                if (nextidx)
                   res += set[nextidx - 1..];
                return res;
             }
-            return set[0..lastidx - 1] + lastfirst + "-" + nlast + set[idx - 1..];
+            return set_prefix(set, lastidx) + lastfirst + "-" + nlast + set[idx - 1..];
          }
          if (nlast >= first - 1)
          {
-            res = set[0..sidx - 1] + nfirst + "-" + last;
+            res = set_prefix(set, sidx) + nfirst + "-" + (nlast > last ? nlast : last);
             if (nextidx)
                res += set[nextidx - 1..];
             return res;
          }
-         return set[0..sidx - 1] + nfirst + "-" + nlast + set[idx - 1..];
+         return set_prefix(set, sidx) + nfirst + "-" + nlast + "," + set[idx..];
       }
       if (nlast <= last)
          return set;
@@ -166,7 +174,7 @@ string set_add_range(string set, int nfirst, int nlast)
    } while (idx);
 
    if (nfirst <= lastlast + 1)
-      return set[0..lastidx - 1] + lastfirst + "-" + nlast;
+      return set_prefix(set, lastidx) + lastfirst + "-" + nlast;
    else
       return set + "," + nfirst + "-" + nlast;
 }
@@ -204,31 +212,23 @@ string set_remove(string set, int number)
          {
             if (number == first)
             {
-               if (idx)
-               {
-                  res = set[0..idx - 1];
-                  if (nextidx)
-                     res += set[nextidx - 1..];
-               }
-               else
-               {
-                  res = (nextidx ? set[nextidx..] : "");
-               }
-               return res;
+               string before = idx ? set_prefix(set, idx - 1) : "";
+               string after = nextidx ? set[nextidx..] : "";
+               return before + (before != "" && after != "" ? "," : "") + after;
             }
-            res = set[0..idx - 1] + first + "-" + (last - 1);
+            res = set_prefix(set, idx) + first + "-" + (last - 1);
             if (nextidx)
                res += set[nextidx - 1..];
             return res;
          }
          if (number == first)
          {
-            res = set[0..idx - 1] + (first + 1) + "-" + last;
+            res = set_prefix(set, idx) + (first + 1) + "-" + last;
             if (nextidx)
                res += set[nextidx - 1..];
             return res;
          }
-         res = set[0..idx - 1] + first + "-" + (number - 1) + "," + (number + 1) + "-" + last;
+         res = set_prefix(set, idx) + first + "-" + (number - 1) + "," + (number + 1) + "-" + last;
          if (nextidx)
             res += set[nextidx - 1..];
          return res;
@@ -347,82 +347,42 @@ string set_union(string set1, string set2)
 string set_difference(string set1, string set2)
 {
    string res = "";
-   int f1 = -1, f2 = -1, l1, l2;
+   int cut_index;
+   string *cuts;
    if (!valid_set(set1))
       error(sprintf("Invalid first set in set_difference: %s\n", set1));
    if (!valid_set(set2))
       error(sprintf("Invalid second set in set_difference: %s\n", set2));
-   sscanf(set1, "%d-%d%s", f1, l1, set1);
-   sscanf(set2, "%d-%d%s", f2, l2, set2);
-   while (f1 != -1)
+   if (set1 == "" || set2 == "")
+      return set1;
+   cuts = explode(set2, ",");
+   foreach (string part in explode(set1, ","))
    {
-      if (set1[0] == ',')
-         set1 = set1[1..];
-      if (set2[0] == ',')
-         set2 = set2[1..];
-      if (f2 == -1)
+      int first, last, covered;
+      sscanf(part, "%d-%d", first, last);
+      while (cut_index < sizeof(cuts))
       {
-         /* This might want to be reconstructed as string addition to
-          * conform with the rest of the function, but right now it
-          * works, and I can deal better w/ sprintf()S -- Tigran */
-         res += sprintf("%s%i-%i%s%s", (res == "" ? "" : ","), f1, l1, set1 == "" ? "" : ",", set1);
-         f1 = -1;
-         continue;
+         int cut_first, cut_last;
+         sscanf(cuts[cut_index], "%d-%d", cut_first, cut_last);
+         if (cut_first > last)
+            break;
+         if (cut_last < first)
+         {
+            cut_index++;
+            continue;
+         }
+         if (cut_first > first)
+            res += (res == "" ? "" : ",") + first + "-" + (cut_first - 1);
+         if (cut_last >= last)
+         {
+            covered = 1;
+            break;
+         }
+         first = cut_last + 1;
+         cut_index++;
       }
-      else if (l1 < f2)
-      {
-         res += (res == "" ? "" : ",") + f1 + "-" + l1;
-         f1 = -1;
-         sscanf(set1, "%d-%d%s", f1, l1, set1);
-         if (set1[0] == ',')
-            set1 = set1[1..];
-      }
-      else if (l2 < f1)
-      {
-         f2 = -1;
-         sscanf(set2, "%d-%d%s", f2, l2, set2);
-         if (set2[0] == ',')
-            set2 = set2[1..];
-      }
-      else
-      {
-         if (f1 < f2)
-         {
-            res += (res == "" ? "" : ",") + f1 + "-" + (f2 - 1);
-            f1 = -1;
-            sscanf(set1, "%d-%d%s", f1, l1, set1);
-         }
-         if (l2 < l1)
-         {
-            f1 = l2 + 1;
-            f2 = -1;
-            sscanf(set2, "%d-%d%s", f2, l2, set2);
-         }
-         else if (l1 < l2)
-         {
-            f1 = -1;
-            sscanf(set1, "%d-%d%s", f1, l1, set1);
-            if (set1[0] == ',')
-               set1 = set1[1..];
-         }
-         else if (f1 == f2)
-         {
-            if (l1 == l2)
-            {
-               f1 = -1;
-               sscanf(set1, "%d-%d%s", f1, l1, set1);
-               f2 = -1;
-               sscanf(set2, "%d-%d%s", f2, l2, set2);
-            }
-         }
-         else
-         {
-            f2 = -1;
-            sscanf(set2, "%d-%d%s", f2, l2, set2);
-            if (set2[0] == ',')
-               set2 = set2[1..];
-         }
-      }
+      if (!covered)
+         res += (res == "" ? "" : ",") + first + "-" + last;
    }
    return res;
 }

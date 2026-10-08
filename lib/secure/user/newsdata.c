@@ -31,6 +31,8 @@ nomask int set_threading(int i)
       threading_toggled = 1;
    else
       threading_toggled = 0;
+   save_me();
+   return threading_toggled;
 }
 
 nomask int query_threading()
@@ -38,15 +40,25 @@ nomask int query_threading()
    return threading_toggled;
 }
 
+private void register_news_group(string group)
+{
+   if (!news_data)
+      news_data = ([]);
+   if (!has_key(news_data, group))
+      news_data[group] = "#";
+}
+
 /* Function that should be used to catch up a group */
 nomask void catch_up_newsgroup(string group)
 {
+   register_news_group(group);
    news_data[group] = sprintf("%c%s", news_data[group][0], set_add_range("", 1, NEWS_D->get_group_last_id(group)));
    save_me();
 }
 
 nomask void mark_newsgroup_unread(string group)
 {
+   register_news_group(group);
    news_data[group] = sprintf("%c", check_subscribed(group) ? ':' : '#');
    save_me();
 }
@@ -54,6 +66,8 @@ nomask void mark_newsgroup_unread(string group)
 /* Function for querying whigh articles have been read */
 nomask string get_news_id_read(string group)
 {
+   if (!news_data || !has_key(news_data, group))
+      return "";
    if (!valid_set(news_data[group][1..]))
    {
       catch_up_newsgroup(group);
@@ -68,6 +82,7 @@ nomask string get_news_id_read(string group)
 /* Function for adding a news article to the list of read articles */
 nomask void add_news_id_read(string group, int id)
 {
+   register_news_group(group);
    if (set_min(news_data[group][1..]) == 0)
    {
       news_data[group] = sprintf("%c%s", news_data[group][0], set_remove(news_data[group][1..], 0));
@@ -80,6 +95,8 @@ nomask void add_news_id_read(string group, int id)
  * registered we must take care of that as well */
 nomask void unsubscribe_group(string group)
 {
+   register_news_group(group);
+   register_news_group(group);
    if (!has_key(news_data, group))
    {
       news_data[group] = "#";
@@ -95,6 +112,7 @@ nomask void unsubscribe_group(string group)
  * we need to do that too. */
 nomask void subscribe_group(string group)
 {
+   register_news_group(group);
    if (!has_key(news_data, group))
    {
       news_data[group] = ":";
@@ -109,7 +127,7 @@ nomask void subscribe_group(string group)
 /* Check to see if the group is subscribed to */
 nomask int check_subscribed(string group)
 {
-   return news_data[group] ? (news_data[group][0] == '#' ? 0 : 1) : 0;
+   return news_data && news_data[group] ? (news_data[group][0] == '#' ? 0 : 1) : 0;
 }
 
 /* Return a list of all subscribed groups.  Possibly this should be removed
@@ -118,9 +136,9 @@ nomask string *subscribed_groups()
 {
    string *groups;
    if (!sizeof(news_data))
-      return nil;
+      return ({});
    groups = sort_array(keys(news_data), 1);
-   return filter(groups, ( : check_subscribed:));
+   return filter(groups, check_subscribed);
 }
 
 /* Returns all groups that are registered either as subscribed or
@@ -128,7 +146,7 @@ nomask string *subscribed_groups()
 nomask string *registered_groups()
 {
    if (!sizeof(news_data))
-      return nil;
+      return ({});
    return keys(news_data);
 }
 
@@ -151,7 +169,7 @@ nomask void validate_groups()
    {
       if (intp(data))
       {
-         data = sprintf(":%s", set_add_range("", 1, data));
+         news_data[group] = sprintf(":%s", set_add_range("", 1, data));
       }
    }
    save_me();
