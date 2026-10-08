@@ -44,7 +44,7 @@ string pluralize(string str)
    if (str[ < 5.. < 1] == "penis")
       return str + "es";
 
-   return efun::pluralize(str);
+   return "/std/language/english"->pluralize(str);
 }
 
 //: FUNCTION number_of
