@@ -5,11 +5,11 @@ string dest;
 string key = "";
 
 mixed do_press();
-mixed direct_press_obj();
+mixed direct_press_obj(object ob);
 
 string long()
 {
-   return "The button is marked '" + (key ? "(" + key + ") " : "") + capitalize(dest) + "'\n";
+   return "The button is marked '" + (strlen(key) > 0 ? "(" + key + ") " : "") + capitalize(dest) + "'\n";
 }
 
 string query_destination()
@@ -37,7 +37,7 @@ mixed do_press()
    return 1;
 }
 
-mixed direct_press_obj()
+mixed direct_press_obj(object ob)
 {
    return 1;
 }

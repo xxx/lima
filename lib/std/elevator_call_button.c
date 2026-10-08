@@ -4,12 +4,12 @@ inherit OBJ;
 string where;
 string elevator;
 
-mixed direct_press_obj();
+mixed direct_press_obj(object ob);
 
 void do_press()
 {
    int state = 0;
-   object ele = load_object(evaluate_path(elevator, 0, 1));
+   object ele = load_object(evaluate_path(elevator, nil, 1));
    if (!ele)
       error("Cannot load elevator called '" + elevator + "'");
    this_body()->simple_action("$N $vcall the elevator by pressing the $o.", this_object());
@@ -39,7 +39,7 @@ void setup(string w, string e)
    elevator = e;
 }
 
-mixed direct_press_obj()
+mixed direct_press_obj(object ob)
 {
    return 1;
 }

@@ -25,7 +25,8 @@ void setup()
    set_distance("1/lima", "4/wizhall", 42);
 
    // Set an elevator door direction and default location
-   set_objects((["/std/elevator_door":({"east", "^std//Attic"})]));
+   set_door_direction("east");
+   set_objects((["/std/elevator_door":({"east", query_location()})]));
 
    // Spawn the buttons on the wall automatically.
    // This *must* be done after the set_destinations() cal.

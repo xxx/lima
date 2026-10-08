@@ -10,6 +10,8 @@ string where;
 string travelling_to;
 function in_progress;
 int progress_delay;
+int progress_timer;
+int arrival_timer;
 
 int query_distance(string destination)
 {
@@ -31,59 +33,71 @@ string query_location()
    return dests[where];
 }
 
+protected object resolve_destination(string name)
+{
+   string path = dests[name];
+   object destination;
+
+   if (!path || !strlen(path))
+      error(sprintf("Invalid destination '%s' in %O.\n", name, this_object()));
+   destination = load_object(evaluate_path(path, nil, 1));
+   if (!destination)
+      error("Cannot load destination '" + name + "' at " + path + ".\n");
+   return destination;
+}
+
 void arrive()
 {
-   object dest = load_object(evaluate_path(dests[where], 0, 1));
+   object dest;
+
+   if (!travelling_to)
+      return;
+   dest = resolve_destination(travelling_to);
+   remove_call_out(arrival_timer);
+   remove_call_out(progress_timer);
+   arrival_timer = 0;
+   progress_timer = 0;
    where = travelling_to;
-   travelling_to = 0;
-   remove_call_out("do_progress");
-   if (dest)
-      dest->arrived(this_object());
+   travelling_to = nil;
+   dest->arrived(this_object());
 }
 
 void do_progress()
 {
+   int trip = arrival_timer;
+
+   remove_call_out(progress_timer);
+   progress_timer = 0;
+   if (!travelling_to || !in_progress)
+      return;
    evaluate(in_progress);
-   call_out("do_progress", progress_delay);
+   if (travelling_to && arrival_timer == trip && in_progress && progress_delay > 0 && !progress_timer)
+      progress_timer = call_out(do_progress, progress_delay);
 }
 
 void move_to(string dest)
 {
    int dist;
 
-   // We're already going tere.
-   if (dest == travelling_to)
+   resolve_destination(dest);
+   if (dest == travelling_to || dest == where)
       return;
-
-   // Some hard error() calls for wizards.
-   if (!dests[dest])
-      error("Invalid destination '" + dest + "' in " + previous_object() + ".\n");
    if (travelling_to)
       error("In motion to '" + travelling_to + " while asked to move_to " + dest + ".\n");
 
    if (where)
    {
-      if (dests[where])
-      {
-         object dest_ob = load_object(evaluate_path(dests[where], 0, 1));
-         if (dest_ob)
-            dest_ob->departed(this_object());
-      }
-      else
-      {
-         error("Destination '" + where + "' not found.");
-         return;
-      }
+      object origin = resolve_destination(where);
       dist = query_distance(dest);
+      origin->departed(this_object());
       travelling_to = dest;
-      where = 0;
-      call_out(( : arrive:), dist);
-      if (progress_delay)
-         call_out("do_progress", progress_delay);
+      where = nil;
+      arrival_timer = call_out(arrive, dist);
+      if (in_progress && progress_delay > 0)
+         progress_timer = call_out(do_progress, progress_delay);
    }
    else
    {
-      /* initial move */
       where = dest;
    }
 }

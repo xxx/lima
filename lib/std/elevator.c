@@ -6,6 +6,7 @@ inherit MOVING_ROOM;
 /* The destinations with their lamps lit */
 string *queue = ({});
 string door_direction = "nowhere";
+private function closed_hook;
 
 void hook_elevator_door_closed();
 
@@ -35,7 +36,7 @@ void setup_buttons()
       if (sscanf(dest, "%s/%s", key, dest) == 2)
          clone_object ("/std/elevator_button", dest, key)->move(this_object());
       else
-         clone_object ("/std/elevator_button", dest, 0)->move(this_object());
+         clone_object ("/std/elevator_button", dest, nil)->move(this_object());
    }
    generate_panel_item();
 }
@@ -47,8 +48,10 @@ void setup()
    set_state_description("elevator_door_on", "\nThere is an open door to the " + door_direction + ".");
    set_state_description("elevator_door_off", "\nThere is a closed door to the " + door_direction + ".");
 
-   set_in_progress(( : tell_from_inside, this_object(), "The elevator continues ...\n" :), 5);
-   add_hook("elevator_door_closed", ( : hook_elevator_door_closed:));
+   set_in_progress(&tell_from_inside(this_object(), "The elevator continues ...\n"), 5);
+   if (!closed_hook)
+      closed_hook = hook_elevator_door_closed;
+   add_hook("elevator_door_closed", closed_hook);
 }
 
 void set_door_direction(string d)
@@ -81,7 +84,7 @@ void handle_queue()
 
 void hook_elevator_door_closed()
 {
-   if (!sizeof(queue))
+   if (query_in_motion() || !sizeof(queue))
       return;
 
    move_to(queue[0]);
@@ -95,7 +98,8 @@ string *queue()
 /* add a destination to the queue. */
 void add_to_queue(string where)
 {
-   if (member_array(where, queue) != -1)
+   resolve_destination(where);
+   if (where == query_where() || member_array(where, queue) != -1)
    {
       return;
    }
@@ -111,6 +115,7 @@ void handle_press(string dest)
       return;
    }
 
+   resolve_destination(dest);
    if (sscanf(dest, "%s/%s", key, newdest) == 2)
       this_body()->simple_action("$N $vpress the '" + (key ? "[" + key + "] " : "") + capitalize(newdest) +
                                  "' button.\n");
@@ -129,6 +134,9 @@ void handle_press(string dest)
 
 void arrive()
 {
+   if (!query_in_motion())
+      return;
+   resolve_destination(travelling_to);
    tell_from_inside(this_object(), "The elevator slows down and stops\n");
    ::arrive();
    queue -= ({query_where()});
@@ -139,10 +147,11 @@ int call_elevator(string where)
 {
    if (!dest_exists(where))
    {
-      error("Getting called to unknown '" + where + "' destination in " + environment(previous_object()) + ".");
+      error(sprintf("Getting called to unknown '%s' destination in %O.", where, environment(previous_object())));
       return 0;
    }
 
+   resolve_destination(where);
    if (query_where() == where)
    {
       call_hooks("elevator_arrived", HOOK_IGNORE, 0, query_location());
