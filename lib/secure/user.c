@@ -60,6 +60,7 @@ void remove()
 {
    object body = query_body();
 
+   clear_input_stack();
    MAILBOX_D->unload_mailbox(query_userid());
    unload_mailer();
 
