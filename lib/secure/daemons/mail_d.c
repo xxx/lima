@@ -67,13 +67,22 @@ nomask class mail_msg restore_msg(int message_key)
 {
    class mail_msg msg;
 
-   if (!unguarded(1, (: restore_object(get_fname(message_key)) :)))
-      return nil;
+   int restored;
 
-   msg = saved_msg;
-
-   /* don't leave the message sitting around in our variables */
    saved_msg = nil;
+   mixed problem = catch {
+      restored = unguarded(1, (: restore_object(get_fname(message_key)) :));
+      if (restored)
+         msg = saved_msg;
+   };
+   saved_msg = nil;
+
+   if (problem)
+      error(problem);
+   if (!restored)
+      return nil;
+   if (!msg)
+      error("mail: saved record contains no message\n");
 
    return msg;
 }

@@ -131,6 +131,12 @@ private nomask int valid_message_recipients(mixed names)
    return 1;
 }
 
+private nomask void report_read_error(int key, string problem)
+{
+   int number = member_array(key, mailbox_ob->query_message_keys()) + 1;
+   printf("Unable to read message %d: %s\n", number, trim(problem));
+}
+
 /*
 ** build_message()
 **
@@ -141,7 +147,12 @@ protected nomask string *build_message(int mail_key, int supress_header)
    string *output;
    class mail_msg msg;
 
-   msg = mailbox_ob->get_one_message(mail_key);
+   mixed problem = catch(msg = mailbox_ob->get_one_message(mail_key));
+   if (problem)
+   {
+      report_read_error(mail_key, problem);
+      return nil;
+   }
    if (!msg)
       return ({"*** LOST THE MESSAGE! ***"});
 
@@ -318,9 +329,12 @@ protected nomask void cmd_headers(string rangestr)
 
    foreach (key in mail_keys)
    {
-      class mail_msg msg = mailbox_ob->get_one_message(key);
+      class mail_msg msg;
+      mixed problem = catch(msg = mailbox_ob->get_one_message(key));
 
-      if (!msg)
+      if (problem)
+         output += ({sprintf("%c %-3d *** ERROR READING MESSAGE: %s", mailbox_ob->query_message_read(key) ? 'N' : ' ', nums[key], trim(problem))});
+      else if (!msg)
          output += ({sprintf("  %-3d %-15s  %10s  %s", nums[key], "", "", "*** LOST MESSAGE ***")});
       else if (!valid_message_metadata(msg))
          output += ({sprintf("%c %-3d *** INVALID MESSAGE METADATA ***", mailbox_ob->query_message_read(key) ? 'N' : ' ', nums[key])});
@@ -428,7 +442,12 @@ protected nomask void cmd_reply(int user_num, int reply_all)
    if (!key)
       return;
 
-   msg = mailbox_ob->get_one_message(key);
+   mixed problem = catch(msg = mailbox_ob->get_one_message(key));
+   if (problem)
+   {
+      report_read_error(key, problem);
+      return;
+   }
    if (!msg)
    {
       write("*** ERROR: the message was lost!\n");
@@ -524,7 +543,12 @@ protected nomask void cmd_forward(int user_num, string newto)
    if (!key)
       return;
 
-   msg = mailbox_ob->get_one_message(key);
+   mixed problem = catch(msg = mailbox_ob->get_one_message(key));
+   if (problem)
+   {
+      report_read_error(key, problem);
+      return;
+   }
    if (!msg)
    {
       write("*** ERROR: the message was lost!\n");
