@@ -7,13 +7,33 @@ inherit M_SWITCHABLE;
 
 void turn_on()
 {
-   set_is_on(1);
+   if (!query_is_on())
+   {
+      mixed tmp = set_is_on(1);
+      if (!tmp)
+         tmp = "You can't seem to turn it on.\n";
+      if (stringp(tmp))
+      {
+         write(tmp);
+         return;
+      }
+   }
    do_light();
 }
 
 void turn_off()
 {
-   set_is_on(0);
+   if (query_is_on())
+   {
+      mixed tmp = set_is_on(0);
+      if (!tmp)
+         tmp = "You can't seem to turn it off.\n";
+      if (stringp(tmp))
+      {
+         write(tmp);
+         return;
+      }
+   }
    do_extinguish();
 }
 
