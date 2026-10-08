@@ -514,11 +514,11 @@ void kill_us()
    if (previous_object()->is_turret())
       killer = previous_object()->acts_for();
 
+   object *viable = filter(all_inventory(environment(this_object())), ( : $1->is_body() :));
    die();
    if (killer)
    {
       string team = PARTY_D->locate_user(killer->short());
-      object *viable = filter(all_inventory(environment(this_object())), ( : $1->is_body() :));
       this_object()->slain_by(killer);
       if (team && sizeof(viable) > 1)
       {
