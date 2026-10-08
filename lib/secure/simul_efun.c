@@ -16,6 +16,7 @@ inherit __DIR__ "simul_efun/objcalls";
 inherit __DIR__ "simul_efun/userfuncs";
 inherit __DIR__ "simul_efun/path";
 inherit __DIR__ "simul_efun/string";
+inherit __DIR__ "simul_efun/regex";
 inherit __DIR__ "simul_efun/misc";
 inherit __DIR__ "simul_efun/more";
 inherit __DIR__ "simul_efun/tell";
