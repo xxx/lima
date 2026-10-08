@@ -67,7 +67,7 @@ nomask void begin_describing()
    if (previous_object() != find_object(CMD_OB_DESCRIBE))
       error("invalid attempt to use describe.c\n");
 
-   modal_push(( : receive_line:), "");
+   modal_push(receive_line, "");
 }
 
 void create()
@@ -93,4 +93,9 @@ void main(string s)
        "-----------------------------------------\n");
 
    clone_object (CMD_OB_DESCRIBE)->begin_describing();
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
