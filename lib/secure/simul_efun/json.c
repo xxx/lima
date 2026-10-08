@@ -629,8 +629,7 @@ mixed json_decode_parse(mixed *parse)
 mixed json_decode(string text)
 {
    mixed *parse;
-   buffer endl = allocate_buffer(1);
-   endl[0] = 0;
+   bytes endl = to_bytes(({0}));
 
    if (!text)
    {
