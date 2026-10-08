@@ -65,29 +65,29 @@ void do_print(string which)
       return;
    }
 
-   illegal = filter(colours, ( : $(null)[$1] == 0 :));
+   illegal = filter(colours, ( : $(null)[$1] == nil :));
    colours -= illegal;
 
    foreach (string item in colours)
       if (strlen(item) > longest)
          longest = strlen(item);
 
-   illegal = map(illegal, ( : lower_case:));
+   illegal = map(illegal, lower_case);
    if (sizeof(illegal))
       write("Unsupported settings (use 'colours remove whatever'): " + implode(illegal, "\n") + "\n\n");
 
    colours = map(
        sort_array(colours, 1),
-       function(string item, int longest) {
+       (: [string item, int longest] {
           string what = this_user()->query_colour(item);
-          int what_int = to_int(what);
+          int what_int = what ? to_int(what) : 0;
           if (what_int > 0 && strlen(what) == 3 && what_int < 256)
              what = "<" + what + ">" + what + "<res>";
           if (what)
              return sprintf("%-" + longest + "s : %%^%s%%^%s%%^RESET%%^", lower_case(item), upper_case(item), what);
           else
              return sprintf("%-" + longest + "s : (not set)", item);
-       },
+       } :),
        longest);
    write(colour_table(colours, this_user()->query_screen_width()) + "\n");
    write("(Use 'colours help' for quick help)\n");
@@ -101,7 +101,7 @@ nomask private void main(string str)
 
    if (!str)
    {
-      do_print(0);
+      do_print(nil);
       return;
    }
 
@@ -127,4 +127,9 @@ nomask private void main(string str)
 
    this_user()->set_colour(which, what);
    printf("'%s' set to '%%^%s%%^%s%%^RESET%%^'.\n", which, upper_case(which), what);
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
