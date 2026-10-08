@@ -33,7 +33,7 @@ private string expand_range(string str)
    int i, x, y;
 
    if (!stringp(str))
-      return 0;
+      return nil;
    ret = "";
    str = implode(explode(str, " "), "");
    tmp = explode(str, ",");
@@ -244,7 +244,10 @@ protected nomask void cmd_headers(string rangestr)
 
    mail_keys = mailbox_ob->query_message_keys();
    if (!sizeof(mail_keys))
-      return write("No mail.\n");
+   {
+      write("No mail.\n");
+      return;
+   }
 
    nums = ([]);
    for (i = sizeof(mail_keys); i--;)
@@ -289,7 +292,7 @@ private nomask void mailer_get_cc_list(mixed to_list, string subject, string cc_
    rm(file);
 }
 
-private nomask void mailer_done_edit(string to_list, string subject, string fname)
+private nomask void mailer_done_edit(mixed to_list, string subject, string fname)
 {
    /*
    ** Just return if they cancelled the edit
@@ -298,14 +301,14 @@ private nomask void mailer_done_edit(string to_list, string subject, string fnam
       return;
 
    write("Cc: ");
-   modal_simple(( : mailer_get_cc_list, to_list, subject:));
+   modal_simple(&mailer_get_cc_list(to_list, subject));
 }
 
 private nomask void mailer_get_subject(string to_list, string arg)
 {
    string subject = arg ? arg : "<none>";
 
-   clone_object(EDIT_OB, EDIT_FILE, tmp_fname(), ( : mailer_done_edit, to_list, subject:));
+   clone_object(EDIT_OB, EDIT_FILE, tmp_fname(), &mailer_done_edit(to_list, subject));
 }
 
 protected nomask void cmd_mail(string to_list)
@@ -319,7 +322,7 @@ protected nomask void cmd_mail(string to_list)
    }
 
    write("Subject: ");
-   modal_simple(( : mailer_get_subject, to_list:));
+   modal_simple(&mailer_get_subject(to_list));
 }
 
 protected nomask void cmd_reply(int user_num, int reply_all)
@@ -355,7 +358,7 @@ protected nomask void cmd_reply(int user_num, int reply_all)
    file = tmp_fname();
    write_file(file, body);
 
-   clone_object(EDIT_OB, EDIT_FILE, tmp_fname(), ( : mailer_done_edit, to_list, subject:));
+   clone_object(EDIT_OB, EDIT_FILE, tmp_fname(), &mailer_done_edit(to_list, subject));
 }
 
 protected nomask void cmd_delete(string arg)
@@ -385,10 +388,16 @@ protected nomask void cmd_setcurrent(mixed arg)
    int count;
 
    if (!(count = mailbox_ob->query_message_count()))
-      return printf("No messages.\n");
+   {
+      printf("No messages.\n");
+      return;
+   }
 
    if (!arg)
-      return (void)printf("Current message is: %d\n", mailbox_ob->query_message_index() + 1);
+   {
+      printf("Current message is: %d\n", mailbox_ob->query_message_index() + 1);
+      return;
+   }
 
    arg = to_int(arg);
    if (arg <= 0 || arg > count)

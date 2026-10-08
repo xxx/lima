@@ -29,3 +29,8 @@ nomask private void main(string arg)
 {
    this_user()->query_mailer()->begin_mail(arg);
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}

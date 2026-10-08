@@ -160,7 +160,7 @@ nomask int parse_Mh_cmd(string input)
       Mh_cmd_forward(arg);
       return 1;
    case '#':
-      cmd_read(to_int(arg), 0, 0);
+      cmd_read(to_int(arg), nil, 0);
       return 1;
    case 's':
       Mh_cmd_save(arg);
@@ -178,7 +178,7 @@ nomask int parse_Mh_cmd(string input)
       if (!idx)
          printf("No more messages.\n");
       else
-         cmd_read(idx, 0, 0);
+         cmd_read(idx, nil, 0);
       return 1;
    }
    case '+':

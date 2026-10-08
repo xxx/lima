@@ -150,7 +150,7 @@ nomask void mail_prompt(string input)
          return;
       }
       else
-         cmd_read(idx, 0, 0);
+         cmd_read(idx, nil, 0);
       return;
    }
 
@@ -197,7 +197,7 @@ nomask void mail_prompt(string input)
       if (!idx)
          printf("No more messages.\n");
       else
-         cmd_read(idx, 0, 0);
+         cmd_read(idx, nil, 0);
       break;
    }
    case '+':
@@ -211,7 +211,7 @@ nomask void mail_prompt(string input)
       break;
    default:
       if (to_int(input) > 0)
-         cmd_read(to_int(input), 0, 0);
+         cmd_read(to_int(input), nil, 0);
       else
          write("Type ? for help\n");
       break;
@@ -228,7 +228,7 @@ nomask void begin_mail(string arg)
       return;
    }
 
-   modal_push(( : mail_prompt:), ( : query_prompt:));
+   modal_push(mail_prompt, query_prompt);
    idx = mailbox_ob->first_unread_message() + 1;
    if (!idx)
    {
