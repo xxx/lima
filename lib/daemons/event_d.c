@@ -214,7 +214,7 @@ void run_scheduler()
    foreach (string file, mapping m in events)
       foreach (string extra, string timing in m)
       {
-         if (file_length(file) > 0 || file_length(file + ".c") > 0)
+         if (file_size(file) > 0 || file_size(file + ".c") > 0)
             schedule_event(timing, file, extra);
          else
             write("** Not scheduling jobs for file '" + file + "' since it does not exist.");

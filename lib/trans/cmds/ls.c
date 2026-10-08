@@ -28,8 +28,19 @@ inherit CMD;
 
 mapping info;
 
+private mapping listing_info(string path)
+{
+   int length, modified;
+   if (catch(length = file_size(path)) || length == -1)
+      return nil;
+   if (catch(modified = file_time(path)) || modified == -1)
+      return nil;
+   return ([ "size": length, "modified": modified,
+             "loaded": length >= 0 && !!find_object(path) ]);
+}
+
 /* these used to be mappings too, but they duplicate info in 'info' */
-#define size(x) (info[x] ? info[x][0] : 0)
+#define size(x) (info[x] ? info[x]["size"] : 0)
 #define is_dir(x) (size(x) == -2)
 
 // We don't do this for everyone to save LOTS of processing.
@@ -41,7 +52,7 @@ string make_ansi_string(string file, string path)
 
    if (is_dir(fname))
       return "%^LS_DIR%^" + file + "%^RESET%^/";
-   if (info[fname] && sizeof(info[fname]) == 4 && intp(info[fname][2]) && info[fname][2])
+   if (info[fname] && info[fname]["loaded"])
    {
       return "%^LS_LOADED%^" + file + "%^RESET%^*";
    }
@@ -56,7 +67,7 @@ string make_l_flag_line(string basename, string fullname)
 
    if (!info[fullname])
       return sprintf("           %-20s %s", "Unreadable", basename);
-   return sprintf("%-10d %20s %s", info[fullname][0], ctime(info[fullname][1])[4..], basename);
+   return sprintf("%-10d %20s %s", info[fullname]["size"], ctime(info[fullname]["modified"])[4..], basename);
 }
 
 private
@@ -105,12 +116,7 @@ int do_ls(mixed argv, mapping flags)
       info = ([]);
       foreach (item in argv[0])
       {
-         info[item] = stat(item);
-         if (sizeof(info[item]) == 1)
-         {
-            /* directory */
-            info[item] = ({-2, time(), 0});
-         }
+         info[item] = listing_info(item);
       }
    }
 
@@ -128,17 +134,17 @@ int do_ls(mixed argv, mapping flags)
 
       if (uses_ansi)
       {
-         outarr = map(outarr, ( : make_ansi_string:), path);
+         outarr = map(outarr, make_ansi_string, path);
       }
       if (flags["l"])
-         outarr = map_ls_arrays(( : make_l_flag_line:), outarr, fullpatharr);
+         outarr = map_ls_arrays(make_l_flag_line, outarr, fullpatharr);
       else if (flags["s"])
          outarr = map_ls_arrays(( : (size($2) + 1024) / 1024 + " " + $1:), outarr, fullpatharr);
 
       if (!flags["p"] && !uses_ansi)
          outarr = map_ls_arrays((
                                     : is_dir($1) ? $2 + "/"
-                                      : info[$1] ? info[$1][2] ? $2 + "*" : $2
+                                      : info[$1] ? info[$1]["loaded"] ? $2 + "*" : $2
                                                  : $2 + "?"
                                     :),
                                 fullpatharr, outarr);

@@ -150,16 +150,16 @@ void build_output_data()
                                                      :)),
                                        "\n"));
 
-   f = function(int offset, int count)
+   f = (: [int offset, int count]
    {
+      int size;
       string lines;
       string s = "";
 
-      if (!error_data.file || !sizeof(stat(error_data.file)))
+      if (!error_data.file || catch(size = file_size(error_data.file)) || size < 0)
          return s;
 
-      lines = read_file(error_data.file, error_data.line + offset, count);
-      if (!stringp(lines))
+      if (catch(lines = read_file(error_data.file, error_data.line + offset, count)) || !stringp(lines))
          return s;
 
       if (!offset)
@@ -169,9 +169,9 @@ void build_output_data()
             s += sprintf("%d:  %s\n", error_data.line + offset++, line);
 
       return s;
-   };
+   } :);
 
-   output_data.context = sprintf("\n\n\n%sContext:%s\n\n%s%s%s", HIW, NOR, (*f)(-3, 3), (*f)(0, 1), (*f)(1, 3));
+   output_data.context = sprintf("\n\n\n%sContext:%s\n\n%s%s%s", HIW, NOR, f(-3, 3), f(0, 1), f(1, 3));
 }
 
 protected

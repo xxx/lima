@@ -150,7 +150,7 @@ void load_config_from_file()
    string *input;
    damage = ({});
 
-   if (!sizeof(stat(DAMAGE_CONFIG_FILE)))
+   if (file_size(DAMAGE_CONFIG_FILE) < 0)
    {
       write("Error: Missing config file '" + DAMAGE_CONFIG_FILE + "'.");
       return;

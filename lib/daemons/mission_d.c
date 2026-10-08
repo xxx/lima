@@ -20,7 +20,7 @@ int is_file(string file)
 {
    if (file[ < 2..] != ".c")
       file += ".c";
-   return file_length(file) != -1;
+   return file_size(file) >= 0;
 }
 
 int unregister_mission(string name)

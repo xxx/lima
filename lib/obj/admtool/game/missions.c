@@ -89,7 +89,7 @@ nomask rcv_controller(string mission, string giver, string controller)
       return;
    }
 
-   if (file_length(absolute_path(controller) + ".c") == -1)
+   if (file_size(absolute_path(controller) + ".c") < 0)
    {
       write("ERROR: file does not exist.\n");
       return;
@@ -111,7 +111,7 @@ nomask rcv_giver(string mission, string giver)
       return;
    }
 
-   if (file_length(absolute_path(giver) + ".c") == -1)
+   if (file_size(absolute_path(giver) + ".c") < 0)
    {
       write("ERROR: file does not exist.\n");
       return;

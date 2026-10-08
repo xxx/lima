@@ -694,7 +694,7 @@ void load_config_from_file()
    mapping upgrade_mat_schemes = ([]);
    string *material_input;
 
-   if (!sizeof(stat(MATERIALS_CONFIG_FILE)))
+   if (file_size(MATERIALS_CONFIG_FILE) < 0)
    {
       write("Error: Missing config file '" + MATERIALS_CONFIG_FILE + "'.");
       return;

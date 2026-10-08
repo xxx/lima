@@ -390,13 +390,19 @@ nomask void display_topic_columns(string *files, string header)
    }
 }
 
+private int topic_already_read(string path, object reader)
+{
+   int modified = file_time(path);
+   return modified != -1 && modified <= reader->query_help_topic(path);
+}
+
 // uses this_body()->query_help_topic() to determine what has been
 // read recently.
 nomask void display_topics(string *arr)
 {
    string *new_stuff, *old_stuff;
 
-   old_stuff = filter(arr, ( : stat($1)[1] <= $(this_body())->query_help_topic($1) :));
+   old_stuff = filter(arr, topic_already_read, this_body());
 
    new_stuff = arr - old_stuff;
    if (sizeof(new_stuff))

@@ -125,7 +125,7 @@ void load_config_from_file()
    string *input;
    methods = ([]);
 
-   if (!sizeof(stat(METHOD_CONFIG_FILE)))
+   if (file_size(METHOD_CONFIG_FILE) < 0)
    {
       write("Error: Missing config file '" + METHOD_CONFIG_FILE + "'.");
       return;

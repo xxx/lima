@@ -30,7 +30,7 @@ int load_races()
    }
 
    // If we have a restricted directory, check this one as well.
-   if (file_length("/std/race/restricted") != -1)
+   if (file_size("/std/race/restricted") == -2)
    {
       rcs2 += get_dir("/std/race/restricted/*.c");
       foreach (string r in rcs2)
