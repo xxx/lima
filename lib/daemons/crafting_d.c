@@ -53,55 +53,60 @@ int longest_material = 0;
 
 string *query_material_categories();
 
+private mixed *read_recipe(string item)
+{
+   string contents = read_file(CRAFTING_ITEMS + item);
+   string name;
+   object obj;
+   mixed recipe, station;
+
+   if (!contents)
+      error("Unable to read recipe source.");
+   foreach (string line in explode(contents, "\n"))
+   {
+      if (line[0..10] == "//CRAFTING:")
+         name = trim(line[11..]);
+      else if (line[0..11] == "// CRAFTING:")
+         name = trim(line[12..]);
+   }
+   if (!name || name == "")
+      error("Missing //CRAFTING: string.");
+   obj = load_object(CRAFTING_ITEMS + item);
+   if (!obj)
+      error("load_object returned nil.");
+   recipe = obj->query_recipe();
+   station = obj->query_station() || "unknown";
+   if (!mappingp(recipe) || !stringp(station))
+      error("Invalid recipe or station result.");
+   return ({name, recipe, station});
+}
+
 void load_crafting_recipes()
 {
    string *files = get_dir(CRAFTING_ITEMS "*.c");
-   string contents;
-   string *ar_contents;
-   string err;
+   mapping recipes = ([]), sources = ([]), stations = ([]), recipe_stations = ([]);
 
    foreach (string item in files)
    {
-      string crafting_str;
-      object obj;
-      if (err = catch (obj = load_object(CRAFTING_ITEMS + item)))
+      mixed *entry;
+      string err = catch(entry = read_recipe(item));
+      if (err)
       {
-         write("Error while loading crafting item:\n" + err + "\n");
+         write("Error while loading crafting item " + item + ":\n" + err + "\n");
          continue;
       }
-
-      contents = read_file(CRAFTING_ITEMS + item);
-      if (strlen(contents))
-      {
-         int found = 0;
-         ar_contents = explode(contents, "\n");
-         foreach (string line in ar_contents)
-         {
-            if (line[0..10] == "//CRAFTING:")
-            {
-               crafting_str = trim(line[11..]);
-            }
-            else if (line[0..11] == "// CRAFTING:")
-            {
-               crafting_str = trim(line[12..]);
-            }
-         }
-      }
-
-      if (!crafting_str)
-      {
-         write("Missing //CRAFTING: string for '" + item + "'.\n");
-         continue;
-      }
-
-      recipe_file[crafting_str] = item;
-      crafting_recipes[crafting_str] = obj->query_recipe();
-      if (!crafting_stations[obj->query_station() || "unknown"])
-         crafting_stations[obj->query_station() || "unknown"] = ({});
-      crafting_stations[obj->query_station() || "unknown"] += ({crafting_str});
-      //        TBUG("Adding " + crafting_str + " to " + obj->query_station());
-      crafting_str = 0;
+      recipes[entry[0]] = entry[1];
+      sources[entry[0]] = item;
+      recipe_stations[entry[0]] = entry[2];
    }
+   foreach (string name, string station in recipe_stations)
+      stations[station] = (stations[station] || ({})) + ({name});
+
+   mapping schemes = checked_upgrades(upgrade_mat_schemes, materials, special_mats, recipes);
+   crafting_recipes = recipes;
+   recipe_file = sources;
+   crafting_stations = stations;
+   upgrade_mat_schemes = schemes;
    save_me();
 }
 
@@ -134,7 +139,7 @@ mapping query_crafting_recipe(string name)
 
 int valid_crafting_recipe(string name)
 {
-   return crafting_recipes[name] != 0;
+   return !!crafting_recipes[name];
 }
 
 mixed *query_all_special_mats()
@@ -144,7 +149,17 @@ mixed *query_all_special_mats()
 
 mixed *query_special_mats(string category)
 {
-   return ({special_mats[category], mat_sums});
+   mapping qualities = special_mats[category];
+   int *sums = ({});
+   int sum = 0;
+   if (!qualities)
+      return ({nil, mat_sums});
+   foreach (int weight in sort_array(keys(qualities), -1))
+   {
+      sum += weight;
+      sums += ({sum});
+   }
+   return ({qualities, sums});
 }
 
 mapping query_upgrade_schemes()
@@ -156,19 +171,23 @@ string *query_upgrade_scheme(string category, string material)
 {
    if (upgrade_mat_schemes[category] && upgrade_mat_schemes[category][material])
       return upgrade_mat_schemes[category][material];
-   return 0;
+   return nil;
 }
 
 private
 void refresh_cache()
 {
    cache_names = ({});
+   cache_cats = ([]);
+   longest_material = 0;
    foreach (string category in keys(materials))
    {
       foreach (string m in materials[category])
       {
          cache_names += ({m});
          cache_cats[m] = category;
+         if (strlen(m) > longest_material)
+            longest_material = strlen(m);
       }
    }
 }
@@ -198,10 +217,8 @@ int add_category(string category, string *m)
    if (valid_category(category))
       return 0;
 
-   if (!materials[category])
-      materials[category] = m;
-   foreach (string mat in m)
-      cache_names += ({category + " " + mat});
+   materials[category] = m;
+   refresh_cache();
    save_me();
    return 1;
 }
@@ -217,6 +234,7 @@ int remove_category(string c)
       return 0;
 
    m_delete(materials, c);
+   m_delete(upgrade_mat_schemes, c);
    refresh_cache();
    save_me();
    return 1;
@@ -247,7 +265,7 @@ object create_material(string m)
       return mat;
    }
    else if (!valid_material(m))
-      return 0;
+      return nil;
 
    if (!mat)
       mat = clone_object (MATERIAL, m);
@@ -259,7 +277,7 @@ string material_below(string category, string material)
    string *mats = query_materials(category);
    int pos;
    if (!sizeof(mats))
-      return 0;
+      return nil;
    pos = member_array(material, mats);
    pos--;
 
@@ -267,7 +285,7 @@ string material_below(string category, string material)
    {
       return mats[pos];
    }
-   return 0;
+   return nil;
 }
 
 string material_above(string category, string material)
@@ -275,13 +293,13 @@ string material_above(string category, string material)
    string *mats = query_materials(category);
    int pos;
    if (!sizeof(mats))
-      return 0;
+      return nil;
    pos = member_array(material, mats);
    pos++;
 
    if (pos < (sizeof(mats)))
       return mats[pos];
-   return 0;
+   return nil;
 }
 
 object create_material_for_me(string m)
@@ -300,7 +318,7 @@ string salvage_description(object *s)
    {
       parts += ({ob->short()});
    }
-   return tidy_list(parts);
+   return tidy_list(parts, "and");
 }
 
 int *chance_array(int cnt)
@@ -413,7 +431,7 @@ void salvage_obj(object ob)
 float money_to_repair(object ob)
 {
    if (!ob)
-      return 0;
+      return 0.0;
    return ob->missing_durability() / REPAIR_FACTOR;
 }
 
@@ -473,7 +491,7 @@ mapping estimate_objects(object player, object *obs)
 
 int pay_for_repair_with_money(object player, mixed obs)
 {
-   float total_cost = 0;
+   float total_cost = 0.0;
    int all_good = 1;
    mapping money;
 
@@ -611,56 +629,71 @@ mixed estimate_with_mats(object player, mixed obs)
    if (picked_mats["money"] && player->query_amt_currency(currency_type) < (picked_mats["money"] / REPAIR_FACTOR))
    {
       returnStr +=
-          "Money: " + format_list(buy_durability(picked_mats["money"])) + " %%^RED%%^(You lack money!)%%^RESET%%^\n";
+          "Money: " + format_list(buy_durability(picked_mats["money"]), "and") + " %%^RED%%^(You lack money!)%%^RESET%%^\n";
       possible = 0;
    }
 
    returnStr +=
-       (mats_used ? "(You save " + format_list(buy_durability(obs, picked_mats["money"])) + " by using materials)"
+       (mats_used ? "(You save " + format_list(buy_durability(obs, picked_mats["money"]), "and") + " by using materials)"
                   : "(Salvage weapons and armours to get materials for cheaper repairs)") +
        "\n\n";
 
    return ({possible, returnStr});
 }
 
-int add_upgrade_scheme(string category, string special_material, string *recipes)
+private int valid_upgrade(string category, string material, string *names,
+                          mapping categories, mapping qualities, mapping recipes)
 {
-   int halt = 0;
-
-   if (!valid_category(category))
+   if (!categories[category])
    {
       write("Invalid salvage category '" + category + "'.\n");
       return 0;
    }
-
-   if (member_array(special_material, values(special_mats[category])) == -1)
+   if (!qualities[category] || member_array(material, values(qualities[category])) == -1)
    {
-      write("Invalid special material for " + category + ": '" + special_material + "'.\n");
+      write("Invalid special material for " + category + ": '" + material + "'.\n");
       return 0;
    }
-
-   if (!sizeof(recipes))
+   if (!names || !sizeof(names))
    {
       write("Invalid empty recipe list for " + category + ".\n");
       return 0;
    }
-
-   foreach (string recipe in recipes)
+   foreach (string name in names)
    {
-      if (!query_crafting_recipe(recipe))
+      if (!recipes[name])
       {
-         write("Unknown recipe '" + recipe + "' for category '" + category + "' material '" + special_material +
-               "'.\n");
-         halt = 1;
+         write("Unknown recipe '" + name + "' for category '" + category + "' material '" + material + "'.\n");
+         return 0;
       }
    }
-   if (halt)
-      return;
+   return 1;
+}
 
+private mapping checked_upgrades(mapping schemes, mapping categories, mapping qualities, mapping recipes)
+{
+   mapping result = ([]);
+   foreach (string category, mapping entries in schemes)
+   {
+      foreach (string material, string *names in entries)
+      {
+         if (!valid_upgrade(category, material, names, categories, qualities, recipes))
+            continue;
+         if (!result[category])
+            result[category] = ([]);
+         result[category][material] = names;
+      }
+   }
+   return result;
+}
+
+int add_upgrade_scheme(string category, string special_material, string *recipes)
+{
+   if (!valid_upgrade(category, special_material, recipes, materials, special_mats, crafting_recipes))
+      return 0;
    if (!upgrade_mat_schemes[category])
       upgrade_mat_schemes[category] = ([]);
    upgrade_mat_schemes[category][special_material] = recipes;
-
    save_me();
    return 1;
 }
@@ -686,85 +719,64 @@ int query_longest_mat()
    return longest_material;
 }
 
-void load_config_from_file()
+private mapping read_material_config()
 {
-   int errors_found = 0;
-   mapping materials = ([]);
-   mapping special_mats = ([]);
-   mapping upgrade_mat_schemes = ([]);
-   string *material_input;
-
+   mapping categories = ([]), qualities = ([]), schemes = ([]);
    if (file_size(MATERIALS_CONFIG_FILE) < 0)
    {
       write("Error: Missing config file '" + MATERIALS_CONFIG_FILE + "'.");
-      return;
+      return nil;
    }
-
-   material_input = explode(read_file(MATERIALS_CONFIG_FILE), "\n");
-
-   foreach (string line in material_input)
+   foreach (string line in explode(read_file(MATERIALS_CONFIG_FILE), "\n"))
    {
-      string category, tmp, tmp2, *mats, *tmpar;
-      int count, linetype;
-      mapping tmpmap = ([]);
-
-      // Skip comments.
-      if (line[0] == '#' || sscanf(line, "%s:%s", category, tmp) != 2)
+      string category, parts, material;
+      string *names;
+      line = trim(line);
+      if (line == "" || line[0] == '#' || sscanf(line, "%s:%s", category, parts) != 2)
          continue;
       category = trim(category);
-      mats = explode(tmp, ",");
-      mats -= ({""});
-      count = sizeof(mats) - 1;
-
-      // Figure out what kind of linetype we have
-      linetype = strtype(category);
-
-      // Trim all the parts of the array
-      mats = map(mats, ( : trim($1) :));
-
-      switch (linetype)
+      names = map(explode(parts, ","), trim) - ({""});
+      switch (strtype(category))
       {
       case 0:
-         // Materials
-         category = category[1.. < 2]; // Strip the brackets.
-         add_category(category, mats);
-         foreach (string m in mats)
-            if (strlen(m) > longest_material)
-               longest_material = strlen(m);
+         categories[category[1..<2]] = names;
          break;
       case 1:
-         // Qualities
-         foreach (string m in mats)
-         {
-            tmpmap[pow(2, count)] = m;
-            count--;
-         }
-         special_mats[category] = tmpmap;
+         if (category[0..7] != "quality-" || strlen(category) <= 8 || !sizeof(names) || sizeof(names) > 8)
+            error("Invalid quality definition for '" + category + "'.");
+         category = category[8..];
+         qualities[category] = ([]);
+         for (int i = 0; i < sizeof(names); i++)
+            qualities[category][1 << (sizeof(names) - i - 1)] = names[i];
          break;
       case 2:
-         // Upgrade schemes
-         if (sscanf(category, "%s/%s", tmp, tmp2) != 2)
-         {
-            write("Bad format for: " + category);
-            errors_found++;
-         }
-         else if (!add_upgrade_scheme(tmp, tmp2, mats))
-            errors_found++;
+         sscanf(category, "%s/%s", category, material);
+         category = trim(category);
+         material = trim(material);
+         if (!schemes[category])
+            schemes[category] = ([]);
+         schemes[category][material] = names;
          break;
       default:
          error("Unknown type for '" + category + "'.");
-         errors_found++;
       }
    }
+   return (["materials":categories, "qualities":qualities, "upgrades":schemes]);
+}
 
-   if (!errors_found)
-   {
-      write(__FILE__ + ": " + MATERIALS_CONFIG_FILE + " loaded.");
-      write("Saved.");
-      save_me();
-   }
-   else
-      write(__FILE__ + ": Not saved. " + errors_found + " errors while loading, see messages above.");
+void load_config_from_file()
+{
+   mapping config = read_material_config();
+   mapping schemes;
+   if (!config)
+      return;
+   schemes = checked_upgrades(config["upgrades"], config["materials"], config["qualities"], crafting_recipes);
+   materials = config["materials"];
+   special_mats = config["qualities"];
+   upgrade_mat_schemes = schemes;
+   refresh_cache();
+   save_me();
+   write(__FILE__ + ": " + MATERIALS_CONFIG_FILE + " loaded and saved.");
 }
 
 int count_materials()
@@ -777,7 +789,7 @@ void stat_me()
    foreach (string category in keys(materials))
    {
       write("%^BOLD%^Category: %^RESET%^%^YELLOW%^" + category + "%^RESET%^\n");
-      write(" " + format_list(materials[category]));
+      write(" " + format_list(materials[category], "and"));
       write("\n");
    }
    write("\n\n%^BLUE%^Crafting recipes:%^RESET%^ \n");
@@ -798,14 +810,20 @@ void stat_me()
 
 void create()
 {
+   mapping config;
+   int fresh;
    ::create();
-   restore_me();
-   if (sizeof(keys(materials)) == 0)
-   {
-      load_config_from_file();
-   }
-   load_crafting_recipes();
+   config = read_material_config();
+   fresh = !sizeof(materials);
+   if (fresh && config)
+      materials = config["materials"];
+   if (config)
+      special_mats = config["qualities"];
    refresh_cache();
+   load_crafting_recipes();
+   if (fresh && config)
+      upgrade_mat_schemes = checked_upgrades(config["upgrades"], materials, special_mats, crafting_recipes);
+   save_me();
 }
 
 //@CRAFTING_D->remove_category("plastic")
