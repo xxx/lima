@@ -160,7 +160,7 @@ nomask void init_cmd_hook()
    naming_init_ids();
 
 #ifdef USE_MASS
-   set_mass(100);
+   set_mass(100.0);
 #endif
 #ifdef USE_SIZE
    set_size(VERY_LARGE);
@@ -173,13 +173,13 @@ nomask void init_cmd_hook()
 
       if (e = catch (load_from_string(saved_items, 1)))
       {
-         mapping tmp = restore_variable(saved_items);
+         mapping tmp = restore_value(saved_items);
 
          if (tmp["#base_name#"] != base_name(this_object()))
          {
             update_for_new_body(tmp);
             tmp["#base_name#"] = base_name(this_object());
-            load_from_string(save_variable(tmp), 1);
+            load_from_string(save_value(tmp), 1);
          }
          else
             error("Rethrown: " + e);
