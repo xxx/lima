@@ -31,6 +31,7 @@ void special(object attacker, object target)
    int check = skill_check(attacker, target);
    int rank = skill_rank(attacker);
    string limb;
+   string *limbs;
 
    if (!check)
    {
@@ -38,10 +39,14 @@ void special(object attacker, object target)
       return;
    }
 
+   limbs = target->query_mobile_limbs();
+   if (!sizeof(limbs))
+      return;
+
    switch (rank)
    {
    case 0:
-      limb = choice(target->query_mobile_limbs());
+      limb = choice(limbs);
       if (limb)
       {
          attacker->targetted_action("$N $vperform a simple single-leg sweep on $p1 $o.", target, limb);
@@ -50,7 +55,7 @@ void special(object attacker, object target)
       }
       break;
    case 1:
-      limb = choice(target->query_mobile_limbs());
+      limb = choice(limbs);
       if (limb)
       {
          attacker->targetted_action("$N $vperform a drop sweep on $p1 $o.", target, limb);
@@ -59,14 +64,17 @@ void special(object attacker, object target)
       }
       break;
    default:
-      limb = choice(target->query_mobile_limbs());
+      limb = choice(limbs);
       if (limb)
       {
          attacker->targetted_action("$N $vperform a trap sweep on $p1 $o.", target, limb);
          target->stun(limb, 5 + random(5));
          target->hurt_us(15 + random(5), limb);
       }
-      limb = choice(target->query_mobile_limbs() - ({limb}));
+      limbs = target->query_mobile_limbs() - ({limb});
+      if (!sizeof(limbs))
+         break;
+      limb = choice(limbs);
       if (limb)
       {
          target->stun(limb, 5 + random(5));

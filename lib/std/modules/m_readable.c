@@ -207,11 +207,12 @@ mapping dump_entries()
 // Returns a text containing an index of page numbers and synonyms
 string synonym_index()
 {
+   if (!mappingp(synonyms) || !sizeof(synonyms))
+      return nil;
+
    string ret = capitalize(query_id()[0]) + " Index:\n";
    string *entries = ({});
    string rsyn = choice(keys(synonyms));
-   if (!mapp(synonyms) || !sizeof(keys(synonyms)))
-      return 0;
 
    foreach (string syn, string entry in synonyms)
    {

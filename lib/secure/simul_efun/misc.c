@@ -394,25 +394,19 @@ mixed *decompose(mixed *org)
 }
 
 //: FUNCTION choice
-// Returns a random element of the structure passed, if that
-//  is an aggregate type (i.e., A string, array or mapping).
+// Returns an array element, mapping value, or integer string scalar.
+// Empty arrays and mappings error; an empty string returns integer zero.
 
-mixed choice(mixed f)
+mixed choice(mixed value)
 {
-   mixed *k;
-
-   switch (typeof(f))
-   {
-   case T_STRING:
-      return f[random(strlen(f))];
-   case T_ARRAY:
-      return f[random(sizeof(f))];
-   case T_MAPPING:
-      k = keys(f);
-      return f[k[random(sizeof(k))]];
-   default:
-      error("choice of non-sequential type");
-   }
+    if (stringp(value) || arrayp(value))
+        return value[random(sizeof(value))];
+    if (mappingp(value))
+    {
+        mixed *indices = keys(value);
+        return value[indices[random(sizeof(indices))]];
+    }
+    throw("choice: expected a string, array or mapping.");
 }
 
 mixed sum(mixed *numbers...)

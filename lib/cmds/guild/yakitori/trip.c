@@ -42,6 +42,7 @@ void special(object attacker, object target)
    int check = skill_check(attacker, target);
    int rank = skill_rank(attacker);
    string limb;
+   string *limbs;
 
    if (!check)
    {
@@ -58,10 +59,14 @@ void special(object attacker, object target)
       return;
    }
 
+   limbs = target->query_mobile_limbs();
+   if (!sizeof(limbs))
+      return;
+
    switch (rank)
    {
    case 0:
-      limb = choice(target->query_mobile_limbs());
+      limb = choice(limbs);
       if (limb)
       {
          if (random(2))
@@ -81,7 +86,7 @@ void special(object attacker, object target)
       }
       break;
    default:
-      limb = choice(target->query_mobile_limbs());
+      limb = choice(limbs);
       if (limb)
       {
          attacker->targetted_action("$N $vperform a backward trip on $t, sending $t HARD on $p1 butt.", target, limb);
