@@ -55,7 +55,7 @@ void do_print(string which)
 
 nomask private void main(string str)
 {
-   do_print(0);
+   do_print(nil);
 }
 
 void player_menu_entry(string str)
@@ -63,4 +63,9 @@ void player_menu_entry(string str)
    bare_init();
    main(str);
    done_outputing();
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
