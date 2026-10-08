@@ -160,7 +160,7 @@ nomask int parse_Mh_cmd(string input)
       Mh_cmd_forward(arg);
       return 1;
    case '#':
-      cmd_read(to_int(arg), nil, 0);
+      cmd_read(arg ? to_int(arg) : 0, nil, 0);
       return 1;
    case 's':
       Mh_cmd_save(arg);

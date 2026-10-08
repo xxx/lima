@@ -356,7 +356,7 @@ protected nomask void cmd_reply(int user_num, int reply_all)
       to_list = clean_array(to_list + msg.to_list + msg.cc_list);
 
    file = tmp_fname();
-   write_file(file, body);
+   write_file(file, body, 1);
 
    clone_object(EDIT_OB, EDIT_FILE, tmp_fname(), &mailer_done_edit(to_list, subject));
 }
