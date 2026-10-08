@@ -50,5 +50,5 @@ int x_dice_dl(int n, int d)
    for (int i = 0; i < n; i++)
       total += ({dice(d)});
    min = min(total);
-   return sum(total) - min;
+   return sum(total...) - min;
 }

@@ -417,20 +417,15 @@ mixed choice(mixed f)
 
 mixed sum(mixed *numbers...)
 {
-   mixed number, result = 0;
-   foreach (number in numbers)
+   mixed result = 0;
+   foreach (mixed number in numbers)
    {
-      switch (typeof(number))
-      {
-      case T_INT:
+      if (intp(number))
          result += number;
-         break;
-      case T_FLOAT:
+      else if (floatp(number))
          result = to_float(result) + number;
-         break;
-      default:
-         error("Argument must be an array of int or float, found type: " + typeof(number) + ".\n");
-      }
+      else
+         error("sum: arguments must be ints or floats.");
    }
    return result;
 }
