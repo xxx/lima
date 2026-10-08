@@ -66,6 +66,13 @@ int is_stateful()
    return is_lit();
 }
 
+int state_update()
+{
+   if (query_num_decays() == INF_FUEL)
+      return 1;
+   return m_decay::state_update();
+}
+
 void burn_out()
 {
    set_light(0);
