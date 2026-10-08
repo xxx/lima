@@ -345,6 +345,7 @@ varargs void enter_party_password(string owner, string party_name, int failures,
    {
       write("Sorry, you just didn't make the cut.\n");
       destruct();
+      return;
    }
 
    if (!PARTY_D->add_member(owner, party_name, response))
