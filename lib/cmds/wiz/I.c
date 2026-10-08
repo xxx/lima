@@ -38,3 +38,8 @@ void main(string str)
    if (DID_D->someone_did(str))
       out("Reported.  (Thank you!)\n");
 }
+
+protected varargs void dispatch_main(mixed raw, mixed parsed, mixed flags, mixed implode_info)
+{
+   main(raw);
+}

@@ -63,7 +63,6 @@ private
 void main(string str)
 {
    int ndays = 1;
-   string days;
    string header;
    string pattern;
    string version;
@@ -74,9 +73,15 @@ void main(string str)
    {
       string a = args[location];
       string parameter;
-      string next_param = (location + 1) < sizeof(args) ? args[location + 1] : 0;
+      string next_param = (location + 1) < sizeof(args) ? args[location + 1] : nil;
       if (strlen(a) > 1 && a[0] == '-')
          parameter = a[1..];
+      if (member_array(parameter, ({"newversion", "nw", "version", "v", "ver", "pattern", "p"})) != -1 &&
+          (!next_param || next_param == "" || next_param[0] == '-'))
+      {
+         out("didlog -" + parameter + " requires a parameter.\n");
+         return;
+      }
       switch (parameter)
       {
          // Dirty returning statements up here.
@@ -90,7 +95,7 @@ void main(string str)
          if (mud_name() == "LIMA")
          {
             out("Error: Set version in secure/simul_efun/misc.c for LIMA library.");
-            DID_D->set_version(0);
+            DID_D->set_version(nil);
             return;
          }
          DID_D->set_version(newversion);
@@ -116,7 +121,7 @@ void main(string str)
          if (member_array(version, DID_D->versions()) == -1)
          {
             out("Unknown version '" + version + "'.");
-            version = 0;
+            version = nil;
             return;
          }
          location++;
@@ -136,21 +141,26 @@ void main(string str)
          break;
       }
 
-      parameter = 0;
+      parameter = nil;
    }
 
    if (ndays == 1)
       header = "DID_D report for the past day" + (version ? " for " + version : "");
-   if (ndays == -1)
+   else if (ndays == -1)
    {
       header = "Complete DID_D report" + (version ? " for " + version : "");
    }
    else
       header = sprintf("DID_D report for the past %d days" + (version ? " for " + version : ""), ndays);
 
-   if (strlen(pattern) > 0)
+   if (pattern && strlen(pattern) > 0)
       header += " matching '" + pattern + "'";
 
    out(DID_D->get_did_info(time() - ndays * 24 * 60 * 60, ({header, ("-" * (sizeof(header))), ""}), pattern,
-                           0, version));
+                           nil, version));
+}
+
+protected varargs void dispatch_main(mixed raw, mixed parsed, mixed flags, mixed implode_info)
+{
+   main(raw);
 }

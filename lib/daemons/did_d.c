@@ -24,7 +24,9 @@ string curver()
 
 void set_version(string s)
 {
-   if (!check_privilege("Mudlib:daemons"))
+   if (!check_privilege("Mudlib:daemons") &&
+       !(previous_object() == find_object("/cmds/wiz/didlog") &&
+         adminp(this_user()) && check_previous_privilege("Mudlib:wizcmds")))
       error("Only Admins may set didlog versions.\n");
    version = s;
    did[s] = ({});
