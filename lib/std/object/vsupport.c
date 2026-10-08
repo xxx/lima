@@ -63,13 +63,13 @@ mixed direct_verb_rule(string verb, string rule, mixed args...)
          }
       }
    }
-   else if (this_object()->is_exit())
+   if (this_object()->is_exit())
    {
       temp = this_object()->complex_exit_direct_verb_rule(verb, rule, args...);
       if (!temp || stringp(temp))
          return temp;
    }
-   else
+   else if (!this_object()->is_container())
    {
       return 0;
    }
@@ -94,7 +94,8 @@ int do_verb_rule(string verb, string rule, mixed args...)
       }
    }
    if (this_object()->is_exit())
-      this_object()->complex_exit_do_verb_rule(verb, rule, args...);
+      return this_object()->complex_exit_do_verb_rule(verb, rule, args...);
+   return 0;
 }
 
 //: FUNCTION direct_get_obj

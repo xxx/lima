@@ -1,117 +1,100 @@
 /* Do not remove the headers from this file! see /USAGE for more info. */
 
-/*
- * Daemon which serves the purpose of translating synonyms for "go methods"
- * on exits.
- * Written by Tigran@Illusions, Lima Bean   Feb 4, 1999
- */
-
+/* Synonyms for movement methods on complex exits. */
 inherit M_DAEMON_DATA;
 
 #define METHOD_CONFIG_FILE "/data/config/methods"
 
 private mapping methods = ([]);
 
-void load_config_from_file();
-
-//: FUNCTION add_method
-// Add a method and a set of equivalents
-// Any arguments after the first are equivalents to the method.
-void add_method(string method, string *equivs...)
+private string normalize_method(string method)
 {
-   string *add = ({});
    string verb, prep;
-   if (!check_privilege("Mudlib:daemons"))
-      error("Insufficient privileges to add_method()");
+   method = trim(method);
+   if (!strlen(method))
+      error("Empty movement method");
    if (sscanf(method, "%s %s", verb, prep) == 2)
    {
-      /* There is a preposition */
-      prep = PREPOSITION_D->translate_preposition(prep);
+      prep = PREPOSITION_D->translate_preposition(trim(prep));
       if (member_array(prep, PREPOSITION_D->consolidated_preps()) == -1)
          error("Illegal preposition in method");
-      method = sprintf("%s %s", verb, prep);
+      return verb + " " + prep;
    }
-   equivs = clean_array(({method}) + equivs);
-   foreach (string test in equivs)
+   return method;
+}
+
+private string *normalize_equivalents(string *equivs)
+{
+   string *result = ({});
+   foreach (string method in equivs)
    {
-      if (sscanf(test, "%s %s", verb, prep) == 2)
-      {
-         /* There is a preposition */
-         prep = PREPOSITION_D->translate_preposition(prep);
-         if (member_array(prep, PREPOSITION_D->consolidated_preps()) == -1)
-            error("Illegal preposition in method");
-         add += ({sprintf("%s %s", verb, prep)});
-      }
-      add += ({test});
+      method = normalize_method(method);
+      if (member_array(method, result) == -1)
+         result += ({method});
    }
-   methods[method] = clean_array(add);
+   return result;
+}
+
+//: FUNCTION add_method
+// Add a method and its equivalents.
+void add_method(string method, string *equivs...)
+{
+   if (!check_privilege("Mudlib:daemons"))
+      error("Insufficient privileges to add_method()");
+   method = normalize_method(method);
+   methods[method] = normalize_equivalents(({method}) + equivs);
    save_me();
 }
 
 //: FUNCTION remove_method
-// Remove a method and it's equivalents
+// Remove a method and its equivalents.
 void remove_method(string method)
 {
    if (!check_privilege("Mudlib:daemons"))
       error("Insufficient privileges to remove_method");
-   m_delete(methods, method);
+   m_delete(methods, normalize_method(method));
    save_me();
 }
 
 //: FUNCTION list_methods
-// Return an array of all methods which have equivalents
+// Return the canonical method names.
 string *list_methods()
 {
    return keys(methods);
 }
 
-//: FUNCTION add_method_equivalants
-// Add an additional equivalents to a given method.
+//: FUNCTION add_method_equivalents
+// Add equivalents to an existing method.
 void add_method_equivalents(string method, string *equivs...)
 {
-   string *add = ({});
    if (!check_privilege("Mudlib:daemons"))
       error("Insufficient privileges to add_method_equivalents");
-   if (member_array(method, keys(methods)) == -1)
+   method = normalize_method(method);
+   if (nilp(methods[method]))
       error("Attempted to add equivalents to a nonexistant method");
-   foreach (string test in equivs)
-   {
-      string verb, prep;
-      if (sscanf(test, "%s %s", verb, prep) == 2)
-      {
-         /* There is a preposition */
-         prep = PREPOSITION_D->translate_preposition(prep);
-         if (member_array(prep, PREPOSITION_D->consolidated_preps()) == -1)
-            error("Illegal preposition in method");
-         add += ({sprintf("%s %s", verb, prep)});
-      }
-      add += ({test});
-   }
-
-   methods[method] = clean_array(add + methods[method]);
+   methods[method] = normalize_equivalents(equivs + methods[method]);
    save_me();
 }
 
 //: FUNCTION remove_method_equivalents
-// Remove equivalents from a given method
+// Remove equivalents from an existing method.
 void remove_method_equivalents(string method, string *equivs...)
 {
    if (!check_privilege("Mudlib:daemons"))
       error("Insufficient privileges to remove_method_equivalents");
-   if (member_array(method, keys(methods)) == -1)
+   method = normalize_method(method);
+   if (nilp(methods[method]))
       error("Attempted to remove equivalents from a nonexistant method");
-   methods[method] -= equivs;
+   methods[method] -= normalize_equivalents(equivs);
    if (!sizeof(methods[method]))
-      remove_method(method);
+      m_delete(methods, method);
    save_me();
 }
 
 //: FUNCTION list_method_equivalents
-// Return an array of equivalents to a given method
+// Return the equivalents, or nil for an absent method.
 string *list_method_equivalents(string method)
 {
-   if (member_array(method, keys(methods)) == -1)
-      return 0;
    return methods[method];
 }
 
@@ -120,52 +103,53 @@ mapping stat_me()
    return deep_copy(methods);
 }
 
-void load_config_from_file()
+private mapping read_configuration()
 {
-   string *input;
-   methods = ([]);
-
+   mapping result = ([]);
+   string text;
    if (file_size(METHOD_CONFIG_FILE) < 0)
+      error("Missing movement method configuration");
+   text = read_file(METHOD_CONFIG_FILE);
+   if (!text)
+      error("Missing movement method configuration");
+   foreach (string line in explode(text, "\n"))
    {
-      write("Error: Missing config file '" + METHOD_CONFIG_FILE + "'.");
-      return;
-   }
-
-   input = explode(read_file(METHOD_CONFIG_FILE), "\n");
-
-   foreach (string line in input)
-   {
-      string mthd, equiv, *tmpar;
-
-      // Skip comments
-      if (line[0] == '#')
-      {
+      string method, equivs;
+      string *aliases = ({});
+      line = trim(line);
+      if (!strlen(line) || line[0] == '#')
          continue;
-      }
-      else if (sscanf(line, "%s:%s", mthd, equiv) == 2)
+      if (sscanf(line, "%s:%s", method, equivs) == 2)
       {
-         tmpar = explode(equiv, ",");
-         tmpar -= ({""});
-         tmpar = map(tmpar, ( : trim($1) :));
-         add_method(mthd);
-         add_method_equivalents(mthd, explode(equiv, ",")...);
+         foreach (string alias in explode(equivs, ","))
+         {
+            alias = trim(alias);
+            if (strlen(alias))
+               aliases += ({alias});
+         }
       }
       else
-      {
-         add_method(line);
-      }
+         method = line;
+      method = normalize_method(method);
+      result[method] = normalize_equivalents(aliases + ({method}));
    }
+   return result;
+}
 
-   write(__FILE__ + ": " + METHOD_CONFIG_FILE + " loaded.");
-   write("Saved.");
+void load_config_from_file()
+{
+   if (!check_privilege("Mudlib:daemons"))
+      error("Insufficient privileges to load_config_from_file()");
+   methods = read_configuration();
    save_me();
 }
 
 void create()
 {
    ::create();
-   if (sizeof(keys(methods)) == 0)
+   if (!sizeof(methods))
    {
-      load_config_from_file();
+      methods = read_configuration();
+      save_me();
    }
 }

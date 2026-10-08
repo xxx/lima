@@ -37,5 +37,5 @@ void mudlib_setup()
 #endif
            set_max_capacity(LARGE, "under");
            /* This probably isn't a very good capacity for under */
-           add_method("crawl under", this_object(), ( : enter_check:), ({"$N $vcrawl under the crafting station."}));
+           add_method("crawl under", this_object(), enter_check, ({"$N $vcrawl under the crafting station."}));
 }

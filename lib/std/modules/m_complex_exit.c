@@ -61,6 +61,8 @@ string *all_methods_matched(string method)
       /* Put the method back together */
       method = sprintf("%s %s", verb, prep);
    }
+   if (member_array(method, METHOD_D->list_methods()) != -1)
+      return ({method});
    /* Must sweep through the methods to find matches.*/
    foreach (string test_method in METHOD_D->list_methods())
    {
@@ -170,7 +172,7 @@ mixed query_obvious_description()
 string query_direction()
 {
    string tmp;
-   if (tmp = query_obvious_description())
+   if (tmp = evaluate(query_obvious_description()))
       return tmp;
    return query_primary_id();
 }
@@ -187,8 +189,9 @@ string query_direction()
 varargs void set_method(string method, mixed destination, mixed checks, mixed *exit_messages, mixed *enter_messages)
 {
    class move_data new_method = new (class move_data);
+   string verb, prep;
    string *matches = all_methods_matched(method);
-   if (sizeof(matches) != 1 && !prime_method(method))
+   if (sizeof(matches) != 1)
    {
       error(sprintf("Cannot set method '%s'.  Method is either too ambiguous "
                     "or should be added to METHOD_D",
@@ -216,7 +219,9 @@ varargs void set_method(string method, mixed destination, mixed checks, mixed *e
       new_method.enter_messages = ({enter_messages});
    else
       new_method.enter_messages = ({});
-   new_method.exit_dir = ( : the_short:);
+   if (sscanf(method, "%s %s", verb, prep) == 2)
+      new_method.relation = PREPOSITION_D->translate_preposition(prep);
+   new_method.exit_dir = the_short;
    new_method.source = this_object();
    methods[matches[0]] = new_method;
 }
@@ -237,7 +242,11 @@ varargs void add_method(string method, mixed destination, mixed checks, mixed *e
 // Remove a go method from the exit
 void remove_method(string method)
 {
-   m_delete(methods, method);
+   string *matches = methods_matched(method);
+   if (sizeof(matches) > 1)
+      error("Attempted to remove_method on an ambiguous method");
+   if (sizeof(matches))
+      m_delete(methods, matches[0]);
 }
 
 //: FUNCTION list_methods
@@ -375,7 +384,7 @@ string query_method_enter_message(string method)
    if (sizeof(applicable_methods) > 1)
       error("Attempted to query_method_enter_message on an ambiguous method");
    if (!sizeof(methods[applicable_methods[0]].enter_messages))
-      return;
+      return nil;
 
    ret = methods[applicable_methods[0]].enter_messages;
    /* We know that ret has to be an *at this point, select one element
@@ -456,7 +465,7 @@ string query_method_exit_message(string method)
    if (sizeof(applicable_methods) > 1)
       error("Attempted to query_method_exit_message on an ambiguous method");
    if (!sizeof(methods[applicable_methods[0]].exit_messages))
-      return;
+      return nil;
 
    ret = methods[applicable_methods[0]].exit_messages;
    /* We know that ret has to be an array at this point, select one element
@@ -482,98 +491,73 @@ mixed *list_method_exit_messages(string method)
 /*
  * Parser Rules
  */
-mixed complex_exit_direct_verb_rule(string verb, string rule, mixed args...)
-// second_part,mixed third)
+private string requested_method(string verb, string rule, mixed *args)
 {
-   string prep;
-   string *matches;
+   if (rule == "WRD OBJ" || rule == "WRD")
+   {
+      if (!sizeof(args) || !stringp(args[0]))
+         return nil;
+      return verb + " " + PREPOSITION_D->translate_preposition(args[0]);
+   }
+   if (rule == "OBJ" || rule == "")
+      return verb;
+   return nil;
+}
+
+mixed complex_exit_direct_verb_rule(string verb, string rule, mixed args...)
+{
    string method;
-   /* The first argument is always the verb used. */
-   /* The second argument is the rule used.  For our purposes it should always
-    * be WRD OBJ or OBJ, but lets make sure, just in case.*/
+   string *matches;
    if (rule != "WRD OBJ" && rule != "OBJ")
       return 0;
-   // Commenting this out. A direct_verb_rule() check should not error on
-   // the format of a particular rule, especially if no previous
-   // checks eliminated that kind of rule.  -- Marroc
-   //	error(sprintf("Cannot properly parse the rule in complex_exit_direct_verb_rule().\nUnknown Rule: %s",rule));
-
-   if (stringp(args[0]))
-      method = sprintf("%s %s", verb, args[0]);
-   else
-      method = verb;
-   /* Get all possible matches */
-   matches = methods_matched(method);
-   /* If there are no matches, fail. */
-   if (sizeof(matches) == 0)
+   method = requested_method(verb, rule, args);
+   if (!method)
       return 0;
-   /* If there are more than one match, it is ambiguous and we can't determine
-    * which method to use */
+   matches = methods_matched(method);
+   if (!sizeof(matches))
+      return 0;
    if (sizeof(matches) > 1)
       return sprintf("Unable to determine whether you want to %s the %s", format_list(matches, "or"), the_short());
-   /* Now that the failures have been eliminated, return the check */
-   return query_method_checks(method);
+   return query_method_checks(matches[0]);
 }
 
 int complex_exit_do_verb_rule(string verb, string rule, mixed args...)
 {
-   class move_data data;
-   string prep;
+   string method = requested_method(verb, rule, args);
+   string *matches;
    string match;
-   string method;
-   mixed dest;
+   class move_data data;
    object sibling;
    mixed checks;
-   /* For our purposes the rule should always be WRD OBJ or OBJ or no rule at
-      all.  -- Check for no rule first.*/
-
-   /* Make a method out of it */
-   if (rule == "WRD OBJ")
-   {
-      args[0] = PREPOSITION_D->translate_preposition(args[0]);
-      method = sprintf("%s %s", verb, args[0]);
-   }
-   else if (rule == "WRD")
-   {
-      method = sprintf("%s %s", verb, args[0]);
-   }
-   else
-      method = verb;
-
-   /* We know now that there can be only one match, or it would not have
-    * passed the direct_verb_rule */
-   match = methods_matched(method)[0];
-   sscanf(match, "%s %s", method, prep);
-   dest = query_method_destination(match);
-
-   /* Default to everything that's in the method. */
-   data = deep_copy(methods[match]);
-
-   /* We want to do some operation on these */
-   data.destination = objectp(dest) ? file_name(query_method_destination(match)) : dest;
-   data.relation = prep;
-   data.exit_messages = query_method_exit_message(match);
-   /* Fetch enter msg from sibling, if one is found */
-   if (sibling = this_object()->get_sibling())
-      data.enter_messages = sibling->query_method_enter_message(match);
-   else
-      data.enter_messages = query_method_enter_message(match);
-   /* Set up the through object for M_SMARTMOVE */
-   data.through = sibling;
-   data.who = this_body();
-
-   checks = query_method_checks(method);
-
+   if (!method)
+      return 0;
+   matches = methods_matched(method);
+   if (sizeof(matches) != 1)
+      return 0;
+   match = matches[0];
+   checks = query_method_checks(match);
    if (stringp(checks))
    {
-      if (checks[0] == '#')
+      if (strlen(checks) && checks[0] == '#')
          checks = checks[1..];
       write(checks);
       return 0;
    }
+   if (!intp(checks) || checks != 1)
+      return 0;
 
-   /* It is now time to check enter methods, and then move the body to the destination */
-   return intp(checks) && checks == 1 && this_body()->move_to(data);
+   data = deep_copy(methods[match]);
+   data.destination = query_method_destination(match);
+   if (objectp(data.destination))
+      data.destination = file_name(data.destination);
+   data.exit_messages = query_method_exit_message(match);
+   if (sibling = this_object()->get_sibling())
+      data.enter_messages = sibling->query_method_enter_message(match);
+   else
+      data.enter_messages = query_method_enter_message(match);
+   data.through = sibling;
+   data.who = this_body();
+   return this_body()->move_to(data);
 }
 
 string stat_me()
