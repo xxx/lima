@@ -146,10 +146,10 @@ void confirm_create(string owner, string party_name, string response)
       destruct();
    case "y":
    case "yes":
-      modal_simple(( : enter_password, owner, party_name, 0 :), "   Enter password: ", 1);
+      modal_simple(&enter_password(owner, party_name, 0), "   Enter password: ", 1);
       return;
    default:
-      modal_simple(( : confirm_create, owner, party_name:), "Enter 'yes' or 'no' please: ", 0);
+      modal_simple(&confirm_create(owner, party_name), "Enter 'yes' or 'no' please: ", 0);
       return;
    }
 }
@@ -165,7 +165,7 @@ void confirm_password(string owner, string party_name, string password, int fail
          write("Sorry..\n");
          destruct();
       }
-      modal_simple(( : enter_password, owner, party_name, failures:), "   Enter password: ", 1);
+      modal_simple(&enter_password(owner, party_name, failures), "   Enter password: ", 1);
       return;
    }
 
@@ -184,7 +184,7 @@ void confirm_change_password(string password, string confirmed_password)
 
    if (!confirmed_password)
    {
-      modal_simple(( : confirm_change_password, password:), "   Once more: ", 1);
+      modal_simple(&confirm_change_password(password), "   Once more: ", 1);
       return;
    }
    if (password != confirmed_password)
@@ -199,7 +199,7 @@ void confirm_change_password(string password, string confirmed_password)
 private
 void change_password()
 {
-   modal_simple(( : confirm_change_password:), "   Enter password: ", 1);
+   modal_simple(confirm_change_password, "   Enter password: ", 1);
 }
 
 private
@@ -227,7 +227,7 @@ void invite_member(string member)
 
    if (!member || member == "" || member == "i")
    {
-      modal_simple(( : invite_member:), "Invite whom? (q to quit): ", 1);
+      modal_simple(invite_member, "Invite whom? (q to quit): ", 1);
       return;
    }
 
@@ -294,7 +294,7 @@ void kick_member(string member)
       count++;
       write("[" + count + "] " + m);
    }
-   modal_simple(( : kick_member:), "[1" + (count > 1 ? "-" + count : "") + ",q]: ", 1);
+   modal_simple(kick_member, "[1" + (count > 1 ? "-" + count : "") + ",q]: ", 1);
 }
 
 private
@@ -308,7 +308,7 @@ varargs void enter_password(string owner, string party_name, int failures, strin
          write("Sorry.\n");
          destruct();
       }
-      modal_simple(( : enter_password, owner, party_name, failures:), "   Enter password: ", 1);
+      modal_simple(&enter_password(owner, party_name, failures), "   Enter password: ", 1);
       return;
    }
 
@@ -322,7 +322,7 @@ varargs void enter_password(string owner, string party_name, int failures, strin
             write("Sorry.\n");
             destruct();
          }
-         modal_simple(( : enter_password, owner, party_name, failures:), "   Enter password: ", 1);
+         modal_simple(&enter_password(owner, party_name, failures), "   Enter password: ", 1);
          return;
       }
       failures = 0;
@@ -330,7 +330,7 @@ varargs void enter_password(string owner, string party_name, int failures, strin
    }
    else
    {
-      modal_simple(( : confirm_password, owner, party_name, response, failures:), "\n   Confirm password: ", 1);
+      modal_simple(&confirm_password(owner, party_name, response, failures), "\n   Confirm password: ", 1);
       return;
    }
 
@@ -350,7 +350,7 @@ varargs void enter_party_password(string owner, string party_name, int failures,
    if (!PARTY_D->add_member(owner, party_name, response))
    {
       write("Password is incorrect.\n");
-      modal_simple(( : enter_party_password, owner, party_name, ++failures:), "Try again. Enter password: ");
+      modal_simple(&enter_party_password(owner, party_name, ++failures), "Try again. Enter password: ");
    }
    else
    {
@@ -362,22 +362,22 @@ private
 void enter_party_name(string owner, string response)
 {
    response = trim(response);
-   if (!response || response == "" || !regexp(response, "^[a-zA-Z 0-9]+$"))
+   if (!response || response == "" || !regmatch(response, "^[a-zA-Z 0-9]+$"))
    {
       write("Invalid name, only letters, numbers and spaces.\n");
-      modal_simple(( : enter_party_name, owner:), "   Enter party name: ");
+      modal_simple(&enter_party_name(owner), "   Enter party name: ");
       return;
    }
 
    if (PARTY_D->party_exists(response))
    {
       printf("%s exists.\n", response);
-      modal_simple(( : enter_party_password, owner, response, 0 :), "   Enter password: ", 1);
+      modal_simple(&enter_party_password(owner, response, 0), "   Enter password: ", 1);
    }
    else
    {
       printf("Party '%s' does not exist. ", response);
-      modal_simple(( : confirm_create, owner, response:), "Create it? ");
+      modal_simple(&confirm_create(owner, response), "Create it? ");
    }
 }
 
@@ -391,13 +391,13 @@ void confirm_join_party(string owner, string response)
 
    if (response == "y" || response == "yes")
    {
-      modal_simple(( : enter_party_name, owner:), "  Enter party name: ");
+      modal_simple(&enter_party_name(owner), "  Enter party name: ");
    }
 }
 
-int is_invited(object player)
+string is_invited(object player)
 {
-   return member_array(player, invites) != -1 ? party_name : 0;
+   return member_array(player, invites) != -1 ? party_name : nil;
 }
 
 int is_party_menu()
@@ -442,7 +442,7 @@ void accept_invite(string party)
       return;
    }
 
-   if (to_int(party))
+   if (party && to_int(party))
    {
       int k = to_int(party);
       if (k >= 1 && k <= sizeof(party_invites))
@@ -461,7 +461,7 @@ void accept_invite(string party)
          count++;
          write("[" + count + "] " + m);
       }
-      modal_simple(( : accept_invite:), "[1" + (count > 1 ? "-" + count : "") + ",q]: ", 1);
+      modal_simple(accept_invite, "[1" + (count > 1 ? "-" + count : "") + ",q]: ", 1);
 
       break;
    case 1:
@@ -479,14 +479,14 @@ void join_party(string arg)
 
    if (arg == "accept")
    {
-      accept_invite(0);
+      accept_invite(nil);
       return;
    }
 
    if (!PARTY_D->locate_user(owner))
    {
       write("You are not a member of any party.\n");
-      modal_simple(( : confirm_join_party, owner:), "Would you like to join one? ");
+      modal_simple(&confirm_join_party(owner), "Would you like to join one? ");
    }
    else
    {
@@ -536,7 +536,7 @@ void give_lead(string member)
       count++;
       write("[" + count + "] " + m);
    }
-   modal_simple(( : give_lead:), "[1" + (count > 1 ? "-" + count : "") + ",q]: ", 1);
+   modal_simple(give_lead, "[1" + (count > 1 ? "-" + count : "") + ",q]: ", 1);
 }
 
 private
@@ -585,17 +585,17 @@ void set_party_theme(string t)
       count++;
       write("[" + count + "] " + capitalize(m));
    }
-   modal_simple(( : set_party_theme:), "[0" + (count > 1 ? "-" + count : "") + ",q]: ", 1);
+   modal_simple(set_party_theme, "[0" + (count > 1 ? "-" + count : "") + ",q]: ", 1);
 }
 
 private
 void add_lead_menu()
 {
-   add_menu_item(party_maint, new_menu_item("Kick member", ( : kick_member:), "k"));
-   add_menu_item(party_maint, new_menu_item("Invite member", ( : invite_member:), "i"));
-   add_menu_item(party_maint, new_menu_item("Change password", ( : change_password:), "p"));
-   add_menu_item(party_maint, new_menu_item("Give lead", ( : give_lead:), "L"));
-   add_menu_item(party_maint, new_menu_item("Set party theme", ( : set_party_theme:), "t"));
+   add_menu_item(party_maint, new_menu_item("Kick member", kick_member, "k"));
+   add_menu_item(party_maint, new_menu_item("Invite member", invite_member, "i"));
+   add_menu_item(party_maint, new_menu_item("Change password", change_password, "p"));
+   add_menu_item(party_maint, new_menu_item("Give lead", give_lead, "L"));
+   add_menu_item(party_maint, new_menu_item("Set party theme", set_party_theme, "t"));
 
    // Ensure the right order of menus.
    remove_section_item(toplevel, party_data);
@@ -625,12 +625,12 @@ void start_menu()
    empty = new_menu("Empty Menu");
    maint = new_menu(party_name + " Maintenance Menu");
 
-   quit_item = new_menu_item("Quit", ( : quit_menu_application:), "q");
+   quit_item = new_menu_item("Quit", quit_menu_application, "q");
    add_section_item(toplevel, party_data);
 
-   add_menu_item(party_data, new_menu_item("Members list", ( : who_current:), "m"));
-   add_menu_item(party_data, new_menu_item("Active parties", ( : list_active:), "a"));
-   add_menu_item(party_data, new_menu_item("Last ten kills", ( : last_ten_kills:), "l"));
+   add_menu_item(party_data, new_menu_item("Members list", who_current, "m"));
+   add_menu_item(party_data, new_menu_item("Active parties", list_active, "a"));
+   add_menu_item(party_data, new_menu_item("Last ten kills", last_ten_kills, "l"));
 
    if (PARTY_D->query_owner(party_name) == user->query_name() && !is_lead)
    {
@@ -638,8 +638,8 @@ void start_menu()
    }
 
    add_section_item(toplevel, party_menu);
-   add_menu_item(party_menu, new_menu_item("QUIT party", ( : quit_party:), "x"));
-   add_menu_item(party_menu, new_menu_item("Help!", ( : party_help:), "h"));
+   add_menu_item(party_menu, new_menu_item("QUIT party", quit_party, "x"));
+   add_menu_item(party_menu, new_menu_item("Help!", party_help, "h"));
    add_menu_item(party_menu, quit_item);
 
    init_menu_application(toplevel);
