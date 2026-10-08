@@ -37,6 +37,18 @@ private
 string client_fname;
 private
 function client_func;
+private
+string staged_file;
+
+private
+void discard_staged_file()
+{
+   if (staged_file)
+   {
+      rm(staged_file);
+      staged_file = nil;
+   }
+}
 
 private
 string tmp_fname()
@@ -104,6 +116,8 @@ void end_edit(int aborted)
          arg = buf;
    }
 
+   discard_staged_file();
+
    // The continuation may start another editor.
    if (!already_editing && this_body())
       this_body()->clear_flag(F_IN_EDIT);
@@ -119,11 +133,8 @@ void end_edit(int aborted)
 private
 nomask void end_ed()
 {
-   string tmp_file;
-
-   tmp_file = tmp_fname();
-   buf = read_strings(tmp_file, 0);
-   rm(tmp_file);
+   buf = read_strings(staged_file, 0);
+   discard_staged_file();
 
    write("Continue editing file.\n");
 }
@@ -133,6 +144,8 @@ void handle_escape(string str)
 {
    string tmp;
    string tmp_file;
+   object session;
+   mixed problem;
 
    switch (str[1])
    {
@@ -170,9 +183,28 @@ void handle_escape(string str)
       return;
 
    case 'e':
+      problem = catch(session = clone_object(ED_SESSION));
+      if (problem)
+      {
+         write("Line editor unavailable; continue editing here.\n");
+         return;
+      }
+
       tmp_file = tmp_fname();
-      write_file(tmp_file, build_string());
-      clone_object (ED_SESSION)->begin_editing(tmp_file, !this_user()->query_privilege(), end_ed);
+      problem = catch {
+         rm(tmp_file);
+         if (!write_file(tmp_file, build_string()))
+            error("Unable to stage edit buffer.\n");
+      };
+      if (problem)
+      {
+         // Cleanup uses the editor's privilege for its unused session.
+         unguarded(1, &destruct(session));
+         write("Unable to stage draft; continue editing here.\n");
+         return;
+      }
+      staged_file = tmp_file;
+      session->begin_editing(tmp_file, !this_user()->query_privilege(), end_ed);
       return;
    }
 }
@@ -182,6 +214,7 @@ nomask void parse_edit(mixed str)
 {
    if (str == -1)
    {
+      discard_staged_file();
       // The input stack has already removed this handler.
       if (!already_editing && this_body())
          this_body()->clear_flag(F_IN_EDIT);
