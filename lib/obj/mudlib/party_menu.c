@@ -219,7 +219,7 @@ void invite_member(string member)
    class party party = PARTY_D->query_party(party_name);
    mapping members = party.members;
 
-   if (lower_case(member) == "q" || member == "")
+   if ((member && lower_case(member) == "q") || member == "")
    {
       write("Ok, no invite.");
       return;
