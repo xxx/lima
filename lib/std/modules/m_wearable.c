@@ -264,7 +264,7 @@ void remove()
    object env = environment();
 
    if (!slot || !env)
-      return 0;
+      return;
    set_worn(0);
    if (stat_mods)
    {
@@ -307,7 +307,7 @@ void do_wear()
 void do_remove()
 {
    if (!slot)
-      return 0;
+      return;
    environment()->remove_item(this_object(), slot);
    set_worn(0);
    environment()->simple_action(query_removemsg(), this_object());

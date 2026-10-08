@@ -1,6 +1,6 @@
 /* Do not remove the headers from this file! see /USAGE for more info. */
 
-inherit OBJ;
+inherit OBJ base_object;
 inherit M_WEARABLE;
 inherit M_GETTABLE;
 inherit M_SALVAGEABLE;
@@ -16,20 +16,20 @@ inherit M_DURABILITY;
 
 void mudlib_setup()
 {
-   object::mudlib_setup();
+   base_object::mudlib_setup();
    m_wearable::mudlib_setup();
    set_salvageable((["textile":50, "metal":50]));
    add_id("armour", "armor");
-   set_mass(1);
+   set_mass(1.0);
 }
 
 int query_value()
 {
-   int value = ::query_value();
+   int value = to_int(::query_value());
    int level = query_armour_class() + array_sum(values(query_stat_mods()));
    if (!value)
       value = ARMOUR_LVL_PRICE * level - random(ARMOUR_LVL_PRICE);
-   set_value(value);
+   set_value(to_float(value));
    return value;
 }
 
@@ -48,7 +48,7 @@ void set_worn(int g)
 void remove()
 {
    m_wearable::remove();
-   object::remove();
+   base_object::remove();
 }
 
 mixed ob_state()
