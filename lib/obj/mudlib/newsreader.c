@@ -601,9 +601,9 @@ nomask void post_message()
    modal_simple(receive_post_subject, "Subject: ");
 }
 
-nomask void receive_reply_text(string *text)
+private
+nomask void receive_reply_text(string subject, string recipient, string *text)
 {
-   class news_msg msg = ((class news_msg)NEWS_D->get_message(current_group, current_id));
    if (!text)
    {
       write("Post aborted.\n");
@@ -611,19 +611,19 @@ nomask void receive_reply_text(string *text)
    }
    wrap_post(text);
 
-   this_user()->query_mailer()->send_news_reply("Re: " + msg.subject, text, lower_case(msg.poster));
+   this_user()->query_mailer()->send_news_reply("Re: " + subject, text, ({recipient}));
 }
 
 private
 nomask void reply_to_message()
 {
    class news_msg msg = ((class news_msg)NEWS_D->get_message(current_group, current_id));
-   if (!msg)
+   if (!msg || !msg.body)
    {
       write("You may not reply to that message -- it was removed.\n");
       return;
    }
-   clone_object (EDIT_OB, EDIT_TEXT, 0, receive_reply_text);
+   clone_object (EDIT_OB, EDIT_TEXT, 0, &receive_reply_text(msg.subject, lower_case(msg.poster)));
 }
 
 private
@@ -631,7 +631,7 @@ nomask void reply_with_message()
 {
    class news_msg msg = ((class news_msg)NEWS_D->get_message(current_group, current_id));
    string *lines;
-   if (!msg)
+   if (!msg || !msg.body)
    {
       write("You may not reply to that message -- it was removed.\n");
       return;
@@ -639,7 +639,7 @@ nomask void reply_with_message()
    lines = ({sprintf("On %s %s wrote post %s in %s:", intp(msg.time) ? ctime(msg.time) : msg.time, msg.poster,
                      msg.subject, current_group)});
    lines += map(explode(msg.body, "\n"), ( : "> " + $1:));
-   clone_object (EDIT_OB, EDIT_TEXT, lines, receive_reply_text);
+   clone_object (EDIT_OB, EDIT_TEXT, lines, &receive_reply_text(msg.subject, lower_case(msg.poster)));
 }
 
 nomask void receive_followup_text(string *text)
