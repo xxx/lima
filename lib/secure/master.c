@@ -30,8 +30,8 @@ object compile_object(string path)
    {
       int idx = strsrch(pname, "/", -1);
 
-      if (idx == -1)
-         return 0;
+      if (idx <= 0)
+         return nil;
 
       pname = pname[0..idx - 1];
 
@@ -70,7 +70,7 @@ nomask string get_player_fname()
    else
       return USER_OB;
 
-   return 0;
+   return nil;
 }
 
 #ifdef DEBUG_CONNECTIONS
@@ -96,7 +96,7 @@ object connect(int port)
    if (ret)
    {
       write(ret + "\n");
-      return 0;
+      return nil;
    }
    return ob;
 }
@@ -125,81 +125,42 @@ string trace_line(object obj, string prog, string file, int line)
 
 varargs string standard_trace(mapping mp, int flag)
 {
-   string ret;
-   mapping *trace;
-   int i, n;
-
-   ret = ctime(time());
-   ret += "\n";
-   ret += mp["error"] + "Object: " + trace_line(mp["object"], mp["program"], mp["file"], mp["line"]);
-   ret += "\n";
-   trace = mp["trace"];
-
-   n = sizeof(trace);
-
-   for (i = 0; i < n; i++)
-   {
-      if (flag)
-         ret += sprintf("#%d: ", i);
-
-      ret += sprintf("'%s' at %s", trace[i]["function"],
-                     trace_line(trace[i]["object"], trace[i]["program"], trace[i]["file"], trace[i]["line"]));
-   }
-   return ret;
+   return ctime(time()) + "\n" + mp["diagnostic"];
 }
 
-/* ***WARNING***:
- * We do NOT runtime errors in here, so program defensively.  I've already
- * had to fix a few cases where people assumed this_user() couldn't be zero,
- * etc.  BE CAREFUL.
- *
- * -Beek
- */
-string error_handler(mapping mp, int caught)
+void error_handler(mapping mp)
 {
-   string ret;
-   string logfile = (caught ? LOG_FILE_CATCH : LOG_FILE_RUNTIME);
-   string what = mp["error"];
-   string userid;
+   object user = this_interactive();
+   object channel = find_object(CHANNEL_D);
+   string text = standard_trace(mp);
+   string userid = "(none)";
+   int wizard;
 
-   ret = "---\n" + standard_trace(mp);
-   write_file(logfile, ret);
-
-   // If an object didn't load, they get compile errors.  Don't spam
-   // or confuse them
-   if (what[0..23] == "*Error in loading object")
-      return 0;
-
-   if (this_user())
-   {
-      userid = this_user()->query_userid();
-      if (!userid || userid == "")
-         userid = "(none)";
-      if (wizardp(this_user()))
-         printf("%sTrace written to %s\n", what, logfile);
-      else
-         printf(BUG_MSG);
-      errors[userid] = mp;
-   }
-   else
-      userid = "(none)";
    errors["last"] = mp;
+   catch (write_file(LOG_FILE_RUNTIME, "---\n" + text));
 
-   // Strip trailing \n, and indent nicely
-   what = replace_string(what[0.. < 2], "\n", "\n         *");
-   CHANNEL_D->deliver_string(
-       "errors",
-       sprintf("%%^CHANNEL%%^[errors]%%^RESET%%^ (%s) Error logged to %s\n" + "%%^CHANNEL%%^[errors]%%^RESET%%^ %s\n" +
-                   "%%^CHANNEL%%^[errors]%%^RESET%%^ %s\n",
-               capitalize(userid), logfile, what, trace_line(mp["object"], mp["program"], mp["file"], mp["line"])));
-   return 0;
+   if (user)
+   {
+      catch (userid = user->query_userid());
+      if (!stringp(userid) || userid == "")
+         userid = "(none)";
+      errors[userid] = mp;
+      if (find_object(SECURE_D))
+         catch (wizard = wizardp(user));
+      catch (tell(user, wizard ? text : BUG_MSG));
+   }
+
+   if (channel)
+      catch (channel->deliver_string("errors",
+         sprintf("%%^CHANNEL%%^[errors]%%^RESET%%^ (%s) %s at %s\n",
+                 capitalize(userid), mp["error"], mp["location"])));
 }
 
 mapping query_error(string name)
 {
    /* This MUST be secure */
    if (!check_privilege(1))
-      return 0;
+      return nil;
    return errors[name];
 }
 
@@ -441,13 +402,13 @@ string parser_gen_pos(object ob, int num, int indirect)
    string str = "";
 
    if (env == 0)
-      return 0;
+      return nil;
 
    if (num > 1)
    {
       str += M_GRAMMAR->number_word(num) + " ";
       if (!ob->query_plural())
-         str += pluralize(ob->short());
+         str += "/std/language/english"->pluralize(ob->short());
       else
          str += ob->short();
    }
@@ -489,7 +450,7 @@ string parser_error_message(int kind, object ob, mixed arg, int flag)
       break;
    case ERR_NOT_LIVING:
       if (flag)
-         return ret + "None of the " + pluralize(arg) + " are alive.\n";
+         return ret + "None of the " + "/std/language/english"->pluralize(arg) + " are alive.\n";
       return ret + "The " + arg + " isn't alive.\n";
       break;
    case ERR_NOT_ACCESSIBLE:
@@ -596,15 +557,8 @@ void remove()
 private
 nomask void preload(string file)
 {
-   object o;
-
-   catch (o = load_object(file));
-   /*
-   if (objectp(o))
-      write("success\n");
-   else
-      write("FAILED: " + err + "\n");
-   */
+   if (!objectp(load_object(file)))
+      error("preload: failed to load " + file);
 }
 
 string *epilog(int eflag)
@@ -629,54 +583,54 @@ string object_name(object ob)
    return ob->short();
 }
 
-#if 0
-mixed valid_write(string path, string eff_user, string call_fun, object caller)
-{
-  return 1;
-}
-
-mixed valid_read(string path, string eff_user, string call_fun, object caller)
-{
-  return 1;
-}
-#else
 #pragma strict_types
 
-mixed valid_write(mixed path, object caller, string call_fun)
+int valid_write(string path, string call_fun, object caller, string program)
 {
+   object secure;
+
+   if (!objectp(caller))
+      return 0;
    if (caller == this_object())
       return 1;
-   path = canonical_path(path);
+   secure = find_object(SECURE_D);
+   if (!secure)
+      return 0;
 
-   if (SECURE_D->check_privilege(SECURE_D->query_protection(path, 1), 1))
-      return path;
+   if (secure->check_privilege(secure->query_protection(path, 1), 1))
+      return 1;
 
-   write_file(ACCESS_LOG,
-              (this_user() ? this_user()->query_userid() : file_name(caller)) + ": attempted to write " + path + "\n");
-
+   catch (write_file(ACCESS_LOG,
+      (this_user() ? this_user()->query_userid() : file_name(caller)) +
+      ": attempted to write " + path + "\n"));
    printf("Permission denied: %s.\n", path);
    return 0;
 }
 
-mixed valid_read(string path, object caller, string call_fun)
+int valid_read(string path, string call_fun, object caller, string program)
 {
+   object secure;
+
+   // Includes have no executing object and await a compiler-access policy.
+   if (call_fun == "include" || !objectp(caller))
+      return 0;
    if (caller == this_object())
       return 1;
    if (file_name(caller) == SECURE_D && call_fun == "restore_object")
       return 1;
+   secure = find_object(SECURE_D);
+   if (!secure)
+      return 0;
 
-   path = canonical_path(path);
-   if (SECURE_D->check_privilege(SECURE_D->query_protection(path, 0), 0))
-      return path;
+   if (secure->check_privilege(secure->query_protection(path, 0), 0))
+      return 1;
 
-   write_file(ACCESS_LOG,
-              (this_user() ? this_user()->query_userid() : file_name(caller)) + ": attempted to read " + path + "\n");
-
+   catch (write_file(ACCESS_LOG,
+      (this_user() ? this_user()->query_userid() : file_name(caller)) +
+      ": attempted to read " + path + "\n"));
    printf("Permission denied: %s.\n", path);
    return 0;
 }
-
-#endif
 
 int valid_bind(object binder, object old_owner, object new_owner)
 {

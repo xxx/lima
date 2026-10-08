@@ -3,7 +3,7 @@
 #comments must have the # in the very first column.
 #
 /secure/user
-/secure/obj/shell
+/obj/secure/shell
 /std/body/cmd
 /std/body
 /daemons/xterm256_d
