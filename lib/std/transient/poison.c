@@ -30,7 +30,7 @@ int query_poison_strength()
    return strength;
 }
 
-int do_effect()
+void do_effect(object affected)
 {
    poison_action();
 }
@@ -48,10 +48,14 @@ void extend_effect(object t)
    }
 }
 
-void mudlib_setup(int s, int d, string a)
+void mudlib_setup()
 {
    transient::mudlib_setup();
    add_save(({"action", "strength"}));
+}
+
+void setup(int s, int d, string a)
+{
    set_effect_type("poison");
    set_effect_name("some kind of poison");
    strength = s;
