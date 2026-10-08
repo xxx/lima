@@ -72,14 +72,14 @@ void create()
 {
    ::create();
    process_queue();
-   call_out("check_queue", ONE_HOUR);
+   call_out(check_queue, ONE_HOUR);
 }
 
 private
 void check_queue()
 {
    process_queue();
-   call_out("check_queue", ONE_HOUR);
+   call_out(check_queue, ONE_HOUR);
 }
 
 string format_addrs(mapping m)
@@ -109,7 +109,7 @@ void send_warning(int id, string *warning)
    }
 
    this_info = outgoing_queue[id];
-   recipient = ((class mail_msg)internal_queue[this_info.msgId])->sender;
+   recipient = ((class mail_msg)internal_queue[this_info.msgId]).sender;
 
    unguarded(1, (
                     : MAIL_D->send_mail("I3 Mail Service", "Delivery Still Pending",
@@ -130,7 +130,7 @@ void report_errors(int id, string *errorset)
    string recipient;
 
    this_info = outgoing_queue[id];
-   recipient = ((class mail_msg)internal_queue[this_info.msgId])->sender;
+   recipient = ((class mail_msg)internal_queue[this_info.msgId]).sender;
 
    unguarded(
        1, (
@@ -496,10 +496,10 @@ string *incoming_mail(string mudname, mixed *mail_packet)
       if (!user_exists(local_recipients[i]))
       {
          errors += ({sprintf("'%s' is not a user on %s.", local_recipients[i], mud_name())});
-         local_recipients[i] = 0;
+         local_recipients[i] = nil;
       }
    }
-   local_recipients -= ({0});
+   local_recipients -= ({nil});
 
    if (sizeof(local_recipients))
    {
