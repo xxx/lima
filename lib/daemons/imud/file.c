@@ -116,7 +116,7 @@ nomask mixed *handle_file_reply(string mudname, object socket, mixed *message, s
    if (!sizeof(requests) || requests[0][0] != request_type)
    {
       oob_svc_error(socket, "bad-proto", "unexpected " + reply_type, message);
-      return 0;
+      return nil;
    }
    request = requests[0];
    file_requests[mudname] = requests[1..];
@@ -124,7 +124,7 @@ nomask mixed *handle_file_reply(string mudname, object socket, mixed *message, s
    if (request[request_id] != message[reply_id])
    {
       oob_svc_error(socket, "bad-proto", reply_type + " did not match the " + request_type, message);
-      return 0;
+      return nil;
    }
 
    p = find_user(request[req_user_idx]);
@@ -147,7 +147,9 @@ nomask void handle_file_list_req(string mudname, object socket, mixed *message)
    }
 
    dir = prepare_path(dir);
-   err = catch (data = get_dir(dir + "/*", -1));
+   err = catch (data = map(get_dir(dir + "/*"),
+       (: [string name] ({name, file_size($(dir) + "/" + name),
+                         file_time($(dir) + "/" + name)}) :)));
    if (err)
    {
       oob_svc_error(socket, "bad-directory", err, ({}));
@@ -168,11 +170,11 @@ nomask void handle_file_list_reply(string mudname, object socket, mixed *message
 
    if (message[2])
    {
-      list = implode(message[2],
-                     (
-                         : sprintf("%s%-20s %8s   %s\n", $1, $2[0], $2[1] == -2 ? "- DIR -" : "" + $2[1], ctime($2[2]))
-                         :),
-                     "");
+      list = "";
+      foreach (mixed *entry in message[2])
+         list += sprintf("%-20s %8s   %s\n", entry[0],
+                         entry[1] == -2 ? "- DIR -" : sprintf("%d", entry[1]),
+                         ctime(entry[2]));
    }
    else
    {
@@ -308,23 +310,18 @@ nomask int file_send_outgoing(string mudname, object socket)
       oob_svc_send(socket, request[0..4]);
       break;
    }
+   return 1;
 }
 
 protected
 nomask void file_startup()
 {
-   oob_register_requests((["file-list-req":(
-                                               : handle_file_list_req:),
-                                "file-put":(
-                                               : handle_file_put:),
-                            "file-get-req":(
-                                               : handle_file_get_req:),
+   oob_register_requests((["file-list-req":handle_file_list_req,
+                                "file-put":handle_file_put,
+                            "file-get-req":handle_file_get_req,
    ]));
-   oob_register_replies((["file-list-reply":(
-                                                : handle_file_list_reply:),
-                             "file-put-ack":(
-                                                : handle_file_put_ack:),
-                           "file-get-reply":(
-                                                : handle_file_get_reply:),
+   oob_register_replies((["file-list-reply":handle_file_list_reply,
+                             "file-put-ack":handle_file_put_ack,
+                           "file-get-reply":handle_file_get_reply,
    ]));
 }

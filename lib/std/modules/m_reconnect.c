@@ -18,6 +18,7 @@ nosave function reconn_func;
 ** attempting to establish contact.
 */
 nosave private mapping retry_info = ([]);
+nosave private mapping retry_timers = ([]);
 
 #define MAX_RETRY_PERIOD 3600 /* one hour */
 #define RETRY_PER_PERIOD 4    /* 4 retries at each time period */
@@ -25,6 +26,7 @@ nosave private mapping retry_info = ([]);
 private
 nomask void time_to_reconnect(string key)
 {
+   m_delete(retry_timers, key);
    /*
    ** If the connection was successful and the retry data was cleared,
    ** then just return.
@@ -38,6 +40,8 @@ nomask void time_to_reconnect(string key)
 protected
 nomask void cancel_reconnection(string key)
 {
+   if (retry_timers[key]) remove_call_out(retry_timers[key]);
+   m_delete(retry_timers, key);
    m_delete(retry_info, key);
 }
 
@@ -69,7 +73,8 @@ nomask void trigger_reconnect(string key)
    else
       delay = retry_info[key][0];
 
-   call_out(( : time_to_reconnect:), delay, key);
+   if (retry_timers[key]) remove_call_out(retry_timers[key]);
+   retry_timers[key] = call_out(&time_to_reconnect(key), delay);
 }
 
 string stat_me()

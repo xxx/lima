@@ -26,7 +26,7 @@ nomask void rcv_who_req(string orig_mud, string orig_user, string targ_user, mix
                   (: [object user] {
                      object body = user->query_body();
                      string visname = user->query_userid();
-                     string title = 0;
+                     string title = nil;
 
                      if (body)
                      {

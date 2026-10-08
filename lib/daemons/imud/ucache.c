@@ -46,11 +46,11 @@ nomask string get_visname(string mudname, string username)
    class user_info user;
 
    if (!ucache[mudname])
-      return 0;
+      return nil;
 
    user = ucache[mudname][username];
    if (!user)
-      return 0;
+      return nil;
 
    return user.visname;
 }

@@ -98,8 +98,11 @@ nomask void rcv_chanlist_reply(string orig_mud, string orig_user, string targ_us
    string channel_name;
    mixed channel_data;
    int i;
-   string *added_channels = keys(message[1]) - keys(chanlist);
-   string *removed_channels = keys(chanlist) - keys(message[1]);
+   string *removed_channels;
+
+   if (sizeof(message) != 2 || !intp(message[0]) || !mappingp(message[1])) return;
+   foreach (mixed name in keys(message[1])) if (!stringp(name)) return;
+   removed_channels = keys(chanlist) - keys(message[1]);
 
    chanlist_id = message[0];
    chanlist = message[1];
@@ -115,7 +118,7 @@ nomask void rcv_chanlist_reply(string orig_mud, string orig_user, string targ_us
       string int_name = "imud_" + channel_name;
       i++;
       CHANNEL_D->register_channels(({int_name}));
-      call_out("listen_to_channel", i, channel_name);
+      call_out(&listen_to_channel(channel_name), i);
    }
 
    chanlist = message[1];
@@ -133,7 +136,7 @@ nomask void rcv_chan_who_req(string orig_mud, string orig_user, string targ_user
    else
    {
       listeners -= ({0, this_object()});
-      listeners = filter(listeners, ( : userp($1) :));
+      listeners = filter(listeners, (: objectp($1) && $1->is_user() :));
       send_to_user("chan-who-reply", orig_mud, orig_user, ({message[0], listeners->query_body()->query_name()}));
    }
 }

@@ -540,10 +540,24 @@ int valid_override(string file, string efun_name, string main_file)
 
 int valid_socket(object ob, string what, mixed *info)
 {
-   string fname;
-
-   sscanf(file_name(ob), "%s#%*s", fname);
-   return fname == OLD_SOCKET || fname == SOCKET;
+   if (!ob || previous_object() != ob || base_name(ob) != SOCKET || !clonep(ob) ||
+       !arrayp(info) || sizeof(info) != 5)
+      return 0;
+   switch (what)
+   {
+   case "connect":
+   case "listen":
+   case "write":
+   case "close":
+      return info[1] == ob && info[4] == nil;
+   case "info":
+      return (info[1] == ob || info[1] == nil) && info[4] == nil;
+   case "release":
+      return info[1] == ob && objectp(info[4]) && base_name(info[4]) == SOCKET && clonep(info[4]);
+   case "acquire":
+      return info[4] == ob && objectp(info[1]) && base_name(info[1]) == SOCKET && clonep(info[1]);
+   }
+   return 0;
 }
 
 void remove()

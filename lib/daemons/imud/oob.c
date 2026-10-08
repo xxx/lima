@@ -23,11 +23,11 @@ string canon_mudname(string mudname);
 mapping query_mudlist();
 
 // void file_process_packet(object socket, mixed * message);
-void file_has_outgoing(string remote_mudname);
-void file_send_outgoing(string remote_mudname, object socket);
+int file_has_outgoing(string remote_mudname);
+int file_send_outgoing(string remote_mudname, object socket);
 // void mail_process_packet(object socket, mixed * message);
-void mail_has_outgoing(string remote_mudname);
-void mail_send_outgoing(string remote_mudname, object socket);
+int mail_has_outgoing(string remote_mudname);
+int mail_send_outgoing(string remote_mudname, object socket);
 
 /*
 ** This class is used to record the state of each OOB session.  It is
@@ -90,11 +90,10 @@ nosave private mapping oob_replies = ([]);
 #define OOB_CLEANUP_TIME 150             /* how often for timeout/cleanup */
 
 void oob_cleanup();
-nosave private function oob_cleanup_func = ( : oob_cleanup:);
+nosave private int oob_cleanup_id = -1;
 nosave private int oob_cleanup_running;
 
-// ### driver can't remove a func ptr callout. need a string
-#define oob_cleanup_func "oob_cleanup"
+
 
 /* the OOB listening socket */
 nosave private object oob_socket;
@@ -105,16 +104,17 @@ nomask void oob_close(class oob_info info)
    if (info.socket)
    {
       m_delete(oob_socket_map, info.socket);
-      catch (info->socket->remove());
+      catch (info.socket->remove());
    }
-   m_delete(oob_mudname_map, info.remote_mudname);
+   if (oob_mudname_map[info.remote_mudname] == info)
+      m_delete(oob_mudname_map, info.remote_mudname);
 }
 
 private
 nomask int oob_send(class oob_info info, mixed *message)
 {
    DBBUG(message);
-   if (catch (info->socket->send(message)))
+   if (catch (info.socket->send(message)))
    {
       oob_close(info);
       return 1;
@@ -138,7 +138,7 @@ nomask void oob_svc_send(object socket, mixed *message)
    if (!info)
       error("socket is not an OOB socket\n");
 
-   oob_send(info, message);
+   if (oob_send(info, message)) error("OOB packet was not admitted");
 }
 protected
 nomask void oob_svc_error(object socket, string errcode, string errmsg, mixed *errpacket)
@@ -169,7 +169,7 @@ nomask void oob_cleanup()
    oob_cleanup_map(oob_socket_map);
 
    if (sizeof(oob_mudname_map) + sizeof(oob_socket_map))
-      call_out(oob_cleanup_func, OOB_CLEANUP_TIME);
+      oob_cleanup_id = call_out(oob_cleanup, OOB_CLEANUP_TIME);
    else
       oob_cleanup_running = 0;
 }
@@ -195,6 +195,7 @@ nomask void oob_callback_read(object socket, mixed *message)
    class oob_info info = oob_socket_map[socket];
    function f_request;
    function f_reply;
+   int got_reply;
 
    DBBUG(message);
 
@@ -210,7 +211,7 @@ nomask void oob_callback_read(object socket, mixed *message)
 
       if (!oob_cleanup_running)
       {
-         call_out(oob_cleanup_func, OOB_CLEANUP_TIME);
+         oob_cleanup_id = call_out(oob_cleanup, OOB_CLEANUP_TIME);
          oob_cleanup_running = 1;
       }
 
@@ -218,10 +219,12 @@ nomask void oob_callback_read(object socket, mixed *message)
    }
 
    /* remember that we heard something from the other guy */
+   if (!info) return;
    info.activity_time = time();
 
    f_request = oob_requests[message[0]];
    f_reply = oob_replies[message[0]];
+   got_reply = !!f_reply;
 
    /*
    ** If a request just came in and we're waiting for data or a close,
@@ -247,24 +250,42 @@ nomask void oob_callback_read(object socket, mixed *message)
       oob_error(info, "bad-proto", "packet came at wrong time", message);
       return;
    }
+   if (f_reply && info.state != OOB_STATE_SENT_DATA && info.state != OOB_STATE_WAIT_REPLY)
+   {
+      oob_error(info, "bad-proto", "reply came at wrong time", message);
+      return;
+   }
 
    switch (message[0])
    {
       // ### it would be nice to have different packets for the originator vs.
       // ### the target mud
    case "oob-begin":
+      if (sizeof(message) != 4 || !stringp(message[1]) ||
+          !intp(message[2]) || !intp(message[3]))
+      {
+         oob_close(info);
+         return;
+      }
       if (info.state == OOB_STATE_SENT_BEGIN)
       {
+         if (message[1] != info.remote_mudname || message[2] != 0 || message[3] != 0)
+         {
+            oob_close(info);
+            return;
+         }
          /* this is a reply to our oob-begin; trigger outgoing data */
-         f_reply = (function)1;
+         got_reply = 1;
+         info.state = OOB_STATE_SENT_DATA;
       }
       else if (info.state == OOB_STATE_WAIT_BEGIN)
       {
          /* somebody connected to us. validate their tokens. */
-         if (!validate_auth(message[1], message[3]))
+         if (message[2] != OOB_AUTH_TYPE_MUD || !validate_auth(message[1], message[3]))
          {
             LOG_D->log(LOG_I3_ERROR, sprintf("%s failed the authentication test\n", message[1]));
             oob_close(info);
+            return;
          }
          else
          {
@@ -297,6 +318,11 @@ nomask void oob_callback_read(object socket, mixed *message)
       // ### it would be nice to have different packets for the originator vs.
       // ### the target mud
    case "oob-end":
+      if (sizeof(message) != 2 || message[1] != info.remote_mudname)
+      {
+         oob_close(info);
+         return;
+      }
       if (info.state == OOB_STATE_SENT_END)
       {
          /*
@@ -374,7 +400,7 @@ nomask void oob_callback_read(object socket, mixed *message)
    ** or were connected to).  Note that we should be in the SENT_DATA
    ** or the WAIT_REPLY state.  We can remain in that state.
    */
-   if (f_reply)
+   if (got_reply)
    {
       if (oob_has_outgoing(info.remote_mudname))
       {
@@ -410,13 +436,10 @@ nomask void oob_open_connection(string mudname, int auth_type, int auth_token)
    object skt;
 
    DBBUG("opening connection");
-   if (catch (skt = unguarded(1, (
-                                     : clone_object, SOCKET, SKT_STYLE_CONNECT_M, info.addr,
-                                       (
-                                           : oob_callback_read:),
-                                       (
-                                           : oob_callback_close:)
-                                     :))))
+   if (!info) return;
+   if (catch (skt = unguarded(1,
+       &clone_object(SOCKET, SKT_STYLE_CONNECT_M, info.addr,
+                     oob_callback_read, oob_callback_close))))
    {
       oob_close(info);
       return;
@@ -468,7 +491,7 @@ varargs nomask void oob_initiate_connection(string mudname, function fail_func)
 
    if (!oob_cleanup_running)
    {
-      call_out(oob_cleanup_func, OOB_CLEANUP_TIME);
+      oob_cleanup_id = call_out(oob_cleanup, OOB_CLEANUP_TIME);
       oob_cleanup_running = 1;
    }
 
@@ -487,7 +510,7 @@ varargs nomask void oob_initiate_connection(string mudname, function fail_func)
       /* send an oob-req to get them to open a port and then connect */
       send_to_mud("oob-req", mudname, ({}));
 
-      call_out(( : oob_open_connection, mudname, OOB_AUTH_TYPE_NONE, 0 :), OOB_OPEN_DELAY);
+      call_out(&oob_open_connection(mudname, OOB_AUTH_TYPE_NONE, 0), OOB_OPEN_DELAY);
    }
 }
 
@@ -522,7 +545,7 @@ nomask void oob_debug_close()
 
    if (oob_cleanup_running)
    {
-      remove_call_out(oob_cleanup_func);
+      remove_call_out(oob_cleanup_id);
       oob_cleanup_running = 0;
    }
 }
@@ -575,14 +598,12 @@ nomask void oob_startup()
    string err;
 
    err = catch (oob_socket = clone_object (SOCKET, SKT_STYLE_LISTEN_M, PORT_I3_TCP_OOB,
-                                  (
-                                      : oob_callback_read:),
-                                  (
-                                      : oob_callback_close:)));
+                                  oob_callback_read,
+                                  oob_callback_close));
    if (err)
    {
-      oob_socket->remove();
-      oob_socket = 0;
+      if (oob_socket) oob_socket->remove();
+      oob_socket = nil;
       error(err);
    }
 }

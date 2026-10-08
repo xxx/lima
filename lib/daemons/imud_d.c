@@ -44,72 +44,50 @@ inherit __DIR__ "imud/mail";
 nosave private object router_socket;
 
 private
-string *router_list = ({({ROUTER, ROUTER_ADDRESS})});
+mixed *router_list = ({({ROUTER, ROUTER_ADDRESS})});
 // private string *        router_list = ({ ({ "*i4", "204.209.44.3 8080"}) });
 // private string *        router_list = ({ ({ "*yatmim", "149.152.218.102 23"}) });
 // private string *        router_list = ({ ({ "*gjs", "198.144.203.194 9000"}) });
 // private string *	router_list = ({ ({ "*gjs", "208.192.43.105 9000"}) });
 private
 int password;
+nosave private int relisten_id;
 
 void rcv_startup_reply(string orig_mud, string orig_user, string targ_user, mixed *message);
 void rcv_error(string orig_mud, string orig_user, string targ_user, mixed *message);
 void rcv_oob_req(string orig_mud, string orig_user, string targ_user, mixed *message);
 
-nosave private mapping dispatch = (["tell":(
-                                               : rcv_tell:),
-                                 "emoteto":(
-                                               : rcv_emoteto:),
+nosave private mapping dispatch = (["tell":rcv_tell,
+                                 "emoteto":rcv_emoteto,
 
-                                 "who-req":(
-                                               : rcv_who_req:),
-                               "who-reply":(
-                                               : rcv_who_reply:),
+                                 "who-req":rcv_who_req,
+                               "who-reply":rcv_who_reply,
 
-                              "finger-req":(
-                                               : rcv_finger_req:),
-                            "finger-reply":(
-                                               : rcv_finger_reply:),
+                              "finger-req":rcv_finger_req,
+                            "finger-reply":rcv_finger_reply,
 
-                              "locate-req":(
-                                               : rcv_locate_req:),
-                            "locate-reply":(
-                                               : rcv_locate_reply:),
+                              "locate-req":rcv_locate_req,
+                            "locate-reply":rcv_locate_reply,
 
-                          "chanlist-reply":(
-                                               : rcv_chanlist_reply:),
-                            "chan-who-req":(
-                                               : rcv_chan_who_req:),
-                          "chan-who-reply":(
-                                               : rcv_chan_who_reply:),
-                               "channel-m":(
-                                               : rcv_channel_m:),
-                               "channel-e":(
-                                               : rcv_channel_e:),
-                               "channel-t":(
-                                               : rcv_channel_t:),
-                           "chan-user-req":(
-                                               : rcv_chan_user_req:),
-                         "chan-user-reply":(
-                                               : rcv_chan_user_reply:),
+                          "chanlist-reply":rcv_chanlist_reply,
+                            "chan-who-req":rcv_chan_who_req,
+                          "chan-who-reply":rcv_chan_who_reply,
+                               "channel-m":rcv_channel_m,
+                               "channel-e":rcv_channel_e,
+                               "channel-t":rcv_channel_t,
+                           "chan-user-req":rcv_chan_user_req,
+                         "chan-user-reply":rcv_chan_user_reply,
 
-                            "auth-mud-req":(
-                                               : rcv_auth_mud_req:),
-                          "auth-mud-reply":(
-                                               : rcv_auth_mud_reply:),
+                            "auth-mud-req":rcv_auth_mud_req,
+                          "auth-mud-reply":rcv_auth_mud_reply,
 
-                           "ucache-update":(
-                                               : rcv_ucache_update:),
+                           "ucache-update":rcv_ucache_update,
 
-                                 "mudlist":(
-                                               : rcv_mudlist:),
+                                 "mudlist":rcv_mudlist,
 
-                           "startup-reply":(
-                                               : rcv_startup_reply:),
-                                   "error":(
-                                               : rcv_error:),
-                                 "oob-req":(
-                                               : rcv_oob_req:),
+                           "startup-reply":rcv_startup_reply,
+                                   "error":rcv_error,
+                                 "oob-req":rcv_oob_req,
 ]);
 
 private
@@ -132,13 +110,13 @@ nomask void send_message(string type, string target_mud, string target_user, mix
 protected
 void send_to_router(string type, mixed *message)
 {
-   send_message(type, ROUTER, 0, message);
+   send_message(type, router_list[0][0], nil, message);
 }
 
 protected
 void send_to_mud(string type, string mudname, mixed *message)
 {
-   send_message(type, mudname, 0, message);
+   send_message(type, mudname, nil, message);
 }
 
 protected
@@ -150,7 +128,7 @@ void send_to_user(string type, string mudname, string username, mixed *message)
 protected
 void send_to_all(string type, mixed *message)
 {
-   send_message(type, 0, 0, message);
+   send_message(type, nil, nil, message);
 }
 
 protected
@@ -163,8 +141,17 @@ void return_error(string mudname, string username, string errcode, string errmsg
 private
 nomask void handle_router_read(object socket, mixed *message)
 {
-   if (!message)
+   if (socket != router_socket || !message)
       return;
+   if (sizeof(message) < 6 || !intp(message[1]) ||
+       !stringp(message[2]) || !sizeof(message[2]) ||
+       !(stringp(message[3]) || message[3] == 0) ||
+       !(stringp(message[4]) || message[4] == 0) ||
+       !(stringp(message[5]) || message[5] == 0))
+      return;
+   // Only protocol user fields use wire zero as a missing string.
+   if (message[3] == 0) message[3] = nil;
+   if (message[5] == 0) message[5] = nil;
    if (message[0] != "mudlist")
    {
       string s = sprintf("%O", message);
@@ -186,7 +173,8 @@ nomask void handle_router_read(object socket, mixed *message)
 private
 nomask void handle_router_close(object socket)
 {
-   router_socket = 0;
+   if (socket != router_socket) return;
+   router_socket = nil;
 
    /* mark all the muds as down. when we reconnect we'll get new data */
    mudlist_reset_entries();
@@ -200,24 +188,21 @@ nomask void handle_router_close(object socket)
 }
 
 /* (re)connect to the router */
-nomask void reconnect()
+nomask void reconnect(string key)
 {
    string err;
 
-   err = catch (router_socket = unguarded(1, (
-                                                 : clone_object, SOCKET, SKT_STYLE_CONNECT_M, router_list[0][1],
-                                                   (
-                                                       : handle_router_read:),
-                                                   (
-                                                       : handle_router_close:)
-                                                 :)));
+   if (router_socket) return;
+   err = catch (router_socket = unguarded(1,
+       &clone_object(SOCKET, SKT_STYLE_CONNECT_M, router_list[0][1],
+                     handle_router_read, handle_router_close)));
 
    if (err)
    {
       if (router_socket)
       {
          router_socket->remove();
-         router_socket = 0;
+         router_socket = nil;
       }
 
       trigger_reconnect("router");
@@ -236,7 +221,8 @@ nomask void reconnect()
                          0, /* other_data */
                      }));
    }
-   call_out("relisten_all_channels", 5 * TOO_GREEDY_DAEMONS);
+   if (relisten_id) remove_call_out(relisten_id);
+   relisten_id = call_out(relisten_all_channels, 5 * TOO_GREEDY_DAEMONS);
 }
 
 void create()
@@ -263,7 +249,7 @@ void create()
 
    mudlist_reset_entries();
 
-   reconn_func = ( : reconnect:);
+   reconn_func = reconnect;
 
    oob_startup();
    chan_startup();
@@ -273,14 +259,6 @@ void create()
    trigger_reconnect("router");
    set_privilege("Mudlib:daemons");
 
-   call_out("imud_socket_keepalive", 120);
-}
-
-private
-void imud_socket_keepalive()
-{
-   router_socket->send_telnet_nop();
-   call_out("imud_socket_keepalive", 120);
 }
 
 void remove(int coming_back_soon)
@@ -300,7 +278,7 @@ void remove(int coming_back_soon)
    chan_shutdown();
    oob_shutdown();
 
-   remove_call_out();
+   foreach (mixed *row in query_call_outs()) remove_call_out(row[4]);
 
    destruct();
 }
@@ -324,6 +302,12 @@ nomask void log_error_snd(string mudname, mixed *message)
 private
 nomask void rcv_startup_reply(string orig_mud, string orig_user, string targ_user, mixed *message)
 {
+   if (sizeof(message) != 2 || !arrayp(message[0]) ||
+       !sizeof(message[0]) || !intp(message[1])) return;
+   foreach (mixed route in message[0])
+      if (!arrayp(route) || sizeof(route) != 2 ||
+          !stringp(route[0]) || !sizeof(route[0]) ||
+          !stringp(route[1]) || !sizeof(route[1])) return;
    /*
    ** If the first router listed in the router list is not the one that
    ** we just connected to, then close the connection and connect to
@@ -335,6 +319,7 @@ nomask void rcv_startup_reply(string orig_mud, string orig_user, string targ_use
       /* tell it we'll be gone indefinitely */
       send_to_router("shutdown", ({0}));
       router_socket->remove();
+      router_socket = nil;
    }
 
    router_list = message[0];

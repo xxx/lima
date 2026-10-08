@@ -48,13 +48,14 @@ nomask int mail_send_outgoing(string mudname, object socket)
 
    oob_svc_send(socket, requests[0]);
    mail_requests[mudname] = requests[1..];
+   return 1;
 }
 
 protected
 nomask void mail_startup()
 {
-   oob_register_requests((["mail":( : handle_mail:), ]));
-   oob_register_replies((["mail-ack":( : handle_mail_ack:), ]));
+   oob_register_requests((["mail":handle_mail, ]));
+   oob_register_replies((["mail-ack":handle_mail_ack, ]));
 }
 
 private

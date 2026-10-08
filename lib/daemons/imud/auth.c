@@ -53,6 +53,7 @@ nomask int validate_auth(string mudname, int provided_key)
 protected
 nomask void rcv_auth_mud_req(string orig_mud, string orig_user, string target_user, mixed *message)
 {
+   if (sizeof(message)) return;
    class auth_data auth = new (class auth_data);
 
    auth.session_key = random(2000000000);
@@ -71,6 +72,7 @@ nomask void rcv_auth_mud_req(string orig_mud, string orig_user, string target_us
 protected
 nomask void rcv_auth_mud_reply(string orig_mud, string orig_user, string target_user, mixed *message)
 {
+   if (sizeof(message) != 1 || !intp(message[0])) return;
    /* only the OOB system needs this reply */
    oob_handle_auth_mud_reply(orig_mud, message[0]);
 }

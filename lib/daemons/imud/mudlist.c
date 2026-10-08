@@ -40,7 +40,14 @@ protected
 nomask void rcv_mudlist(string orig_mud, string orig_user, string targ_user, mixed *message)
 {
    string mudname;
-   mixed *info;
+   mixed info;
+
+   if (sizeof(message) != 2 || !intp(message[0]) || !mappingp(message[1])) return;
+   foreach (mixed name, mixed data in message[1])
+      if (!stringp(name) || !sizeof(name) ||
+          (data != 0 && (!arrayp(data) || sizeof(data) < 12 ||
+           !intp(data[0]) || !stringp(data[1]) || !intp(data[3]) ||
+           !mappingp(data[11])))) return;
 
    mudlist_id = message[0];
 
@@ -71,7 +78,7 @@ nomask int has_service(string mud, string service)
    {
       return -1;
    }
-   return inf[11][service] != 0;
+   return !!inf[11][service];
 }
 
 nomask string *query_mudnames()
@@ -86,5 +93,5 @@ nomask string *query_up_muds()
 
 nomask int mud_exists(string mudname)
 {
-   return canon_mudname(mudname) != 0;
+   return !!canon_mudname(mudname);
 }

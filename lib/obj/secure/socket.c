@@ -1,479 +1,341 @@
 /* Do not remove the headers from this file! see /USAGE for more info. */
 
-/*
-** socket.c
-**
-** This object represents an open UDP/TCP socket using the FluffOS
-** socket facilities.
-**
-** 09-Feb-95. Deathblade. Created.
-** 05-Jan-96. Cowl. Added STREAM BINARY connect and listen styles
-** 12-Jul-96. Rust. Added write callback.
-** 25-Jun-23. Tsath. changed stat_me to return string. The rest of the mudlib
-**            expects this, who knows why it returned int.
-** 29-Oct-24. Tsath. Extended with external_start() support.
-*/
-
-#include <driver/socket_err.h>
-#include <log.h>
 #include <mudlib.h>
 #include <socket.h>
 
-// #define SKTLOG(x,y)	write_file("/open/sktlog",sprintf("%s: %O\n",x,y))
-#define SKTLOG(x, y)
+inherit "/std/modules/m_i3_codec";
 
-/*
-** If this is defined, then the specified privilege is needed to create
-** an outbound connection
-*/
-#define REQUIRE_PRIV "Mudlib:socket"
+#define MAX_OUTPUT_BYTES 524288
+#define MAX_OUTPUT_FRAMES 64
+#define WRITE_CHUNK_BYTES 8192
+#define WRITE_BATCH 8
+#define READ_BATCH 8
+#define CLOSE_WAIT 10
 
 nosave private int style;
-nosave private int fdOwned = -1; /* no socket yet */
+nosave private int configured;
+nosave private int fdOwned = -1;
+nosave private int ready;
+nosave private int closing;
+nosave private int native_closing;
+nosave private int suppress_close;
+nosave private int close_notified;
+nosave private int input_eof;
+nosave private int output_active;
+nosave private int input_timer;
+nosave private int output_timer;
+nosave private int close_timer;
+nosave private object client;
+nosave private object offer_parent;
 nosave private function read_func;
 nosave private function close_func;
 nosave private function write_func;
+nosave private mixed *remote_endpoint;
+nosave private mixed *local_endpoint;
+nosave private bytes *write_queue = ({});
+nosave private int queued_bytes;
+nosave private int write_offset;
 
-nosave private mixed *write_queue = ({});
-nosave private int blocked;
-
-/* For debug purposes only */
-nosave private mixed addr;
-
-void set_write_callback(function f)
+private void require_client()
 {
+   if (previous_object() != client && previous_object() != this_object())
+      throw("socket: caller does not control this connection");
+}
+
+private void cancel_work()
+{
+   if (input_timer) remove_call_out(input_timer);
+   if (output_timer) remove_call_out(output_timer);
+   if (close_timer) remove_call_out(close_timer);
+   input_timer = output_timer = close_timer = 0;
+}
+
+private void notify_close()
+{
+   if (!close_notified && !suppress_close)
+   {
+      close_notified = 1;
+      if (close_func) catch(evaluate(close_func, this_object()));
+   }
+}
+
+private void finish_connection()
+{
+   fdOwned = -1;
+   ready = 0;
+   closing = 1;
+   cancel_work();
+   write_queue = ({});
+   queued_bytes = write_offset = 0;
+   i3_reset_input();
+   notify_close();
+   if (this_object()) destruct();
+}
+
+private void fail_connection()
+{
+   if (fdOwned > 0) catch(socket_close(fdOwned));
+   finish_connection();
+}
+
+private void close_expired()
+{
+   close_timer = 0;
+   fail_connection();
+}
+
+private void flush_output()
+{
+   if (!ready || native_closing || fdOwned < 1)
+      return;
+   for (int batch = 0; batch < WRITE_BATCH && sizeof(write_queue); batch++)
+   {
+      bytes frame = write_queue[0];
+      int end = write_offset + WRITE_CHUNK_BYTES - 1;
+      if (end >= sizeof(frame)) end = sizeof(frame) - 1;
+      if (!socket_write(fdOwned, frame[write_offset..end]))
+         return;
+      write_offset = end + 1;
+      if (write_offset == sizeof(frame))
+      {
+         queued_bytes -= sizeof(frame);
+         write_queue = write_queue[1..];
+         write_offset = 0;
+      }
+   }
+   if (sizeof(write_queue))
+   {
+      if (!output_timer) output_timer = call_out(continue_output, 0);
+   }
+   else if (closing)
+   {
+      socket_close(fdOwned);
+      native_closing = 1;
+   }
+}
+
+private void continue_output()
+{
+   output_timer = 0;
+   if (catch(flush_output())) fail_connection();
+}
+
+private void begin_close()
+{
+   if (closing) return;
+   closing = 1;
+   if (input_timer) remove_call_out(input_timer);
+   input_timer = 0;
+   i3_reset_input();
+   close_timer = call_out(close_expired, CLOSE_WAIT);
+   if (!ready || style == SKT_STYLE_LISTEN_M)
+   {
+      write_queue = ({});
+      queued_bytes = write_offset = 0;
+      socket_close(fdOwned);
+      native_closing = 1;
+   }
+   else
+      flush_output();
+}
+
+private void pump_input()
+{
+   for (int count = 0; count < READ_BATCH && !closing; count++)
+   {
+      mixed *packet = i3_next_packet();
+      if (packet == nil)
+      {
+         if (input_eof)
+         {
+            i3_end_input();
+            begin_close();
+            notify_close();
+         }
+         return;
+      }
+      catch(evaluate(read_func, this_object(), packet));
+      if (!this_object()) return;
+   }
+   if (!closing && !input_timer) input_timer = call_out(continue_input, 0);
+}
+
+private void continue_input()
+{
+   input_timer = 0;
+   if (!closing && catch(pump_input())) fail_connection();
+}
+
+private void release_callback(int fd, object previous)
+{
+   if (origin() != "efun" || previous != offer_parent || previous_object() != offer_parent || fdOwned > 0)
+      throw("socket: invalid ownership offer");
+   socket_acquire(fd, event_callback);
+   fdOwned = fd;
+   ready = 1;
+   mapping info = socket_info(fd);
+   remote_endpoint = info["remote"];
+   local_endpoint = info["local"];
+   offer_parent = nil;
+   catch(evaluate(read_func, this_object(), nil));
+}
+
+nomask function ownership_offer()
+{
+   if (previous_object() != offer_parent || fdOwned > 0)
+      throw("socket: ownership offer is private to the listener");
+   return release_callback;
+}
+
+private void accept_connection(int fd)
+{
+   object peer;
+   int acquired;
+   mixed failure = catch {
+      peer = clone_object(SOCKET, SKT_STYLE_INT_ACQUIRE, read_func, close_func, this_object(), client);
+      acquired = socket_release(fd, peer, peer->ownership_offer());
+   };
+   if (failure || !acquired)
+   {
+      if (peer) peer->remove();
+      catch(socket_close(fd));
+   }
+}
+
+private void dispatch_event(int fd, string name, mixed data)
+{
+   switch (name)
+   {
+   case "ready":
+      ready = 1;
+      remote_endpoint = data["remote"];
+      local_endpoint = data["local"];
+      flush_output();
+      break;
+   case "accept":
+      if (closing) socket_close(data);
+      else accept_connection(data);
+      break;
+   case "read":
+      if (!closing) { i3_feed(data); pump_input(); }
+      break;
+   case "eof":
+      if (!closing) { input_eof = 1; pump_input(); }
+      break;
+   case "drained":
+      flush_output();
+      if (!closing && !sizeof(write_queue) && output_active)
+      {
+         output_active = 0;
+         if (write_func) catch(evaluate(write_func, this_object()));
+      }
+      break;
+   case "closed":
+      finish_connection();
+      break;
+   }
+}
+
+private void event_callback(int fd, string name, mixed data)
+{
+   if (origin() != "driver" || fd != fdOwned)
+      throw("socket: invalid native event");
+   if (catch(dispatch_event(fd, name, data)) && this_object()) fail_connection();
+}
+
+nomask void set_write_callback(function f)
+{
+   require_client();
    write_func = f;
 }
 
-string stat_me()
-{
-   string out = "";
-   switch (style)
-   {
-   case SKT_STYLE_LISTEN:
-      out += sprintf("%O: listening at %O\n", this_object(), addr);
-      out += sprintf("    read_func=%O  close_func=%O\n", read_func, close_func);
-      break;
-
-   case SKT_STYLE_CONNECT:
-      out += sprintf("%O: connected to %O\n", this_object(), socket_address(fdOwned));
-      out += sprintf("    read_func=%O  close_func=%O\n", read_func, close_func);
-      break;
-
-   case SKT_STYLE_UDP:
-      out += sprintf("%O: UDP at %O\n", this_object(), socket_address(fdOwned));
-      out += sprintf("    read_func=%O\n", read_func);
-      break;
-
-   case SKT_STYLE_LISTEN_M:
-      out += sprintf("%O: (mud) listening at %O\n", this_object(), addr);
-      out += sprintf("    read_func=%O  close_func=%O\n", read_func, close_func);
-      break;
-
-   case SKT_STYLE_CONNECT_M:
-      out += sprintf("%O: (mud) connected to %O\n", this_object(), socket_address(fdOwned));
-      out += sprintf("    read_func=%O  close_func=%O\n", read_func, close_func);
-      break;
-
-   case SKT_STYLE_INT_ACQUIRE:
-      out += sprintf("%O: accepted connection from %s\n", this_object(), socket_address(fdOwned));
-      out += sprintf("    read_func=%O  close_func=%O\n", read_func, close_func);
-      break;
-   }
-
-   if (sizeof(write_queue))
-      out += sprintf("queue: %O\n", write_queue);
-
-   return out;
-}
-
-// ### socket_connect() doesn't take funcptr yet...
-/* private */ protected
-nomask void read_callback(int fd, mixed message)
-{
-   SKTLOG("read_callback: self", this_object());
-   SKTLOG("read_callback: fd", fd);
-   // debug_message("socket: "+identify(message));
-   catch (evaluate(read_func, this_object(), message));
-}
-
-private
-nomask void read_udp_callback(int fd, mixed message, string address)
-{
-   SKTLOG("read_udp_callback: self", this_object());
-   SKTLOG("read_udp_callback: fd", fd);
-   SKTLOG("read_udp_callback: read_func", read_func);
-   // debug_message("socket: "+identify(message));
-   catch (evaluate(read_func, this_object(), message, address));
-}
-
-private
-nomask void close_callback(int fd)
-{
-   SKTLOG("close_callback: self", this_object());
-   SKTLOG("close_callback: fd", fd);
-   SKTLOG("close_callback: close_func", close_func);
-
-   /* this descriptor is closed. don't try to close again. */
-   fdOwned = -1;
-
-   if (close_func)
-   {
-      catch (evaluate(close_func, this_object()));
-   }
-
-   destruct();
-}
-
-// ### socket_connect() doesn't take a funcptr yet
-/* private */ protected
-nomask void write_callback(int fd)
-{
-   mixed tmp;
-   SKTLOG("write_callback: self", this_object());
-   SKTLOG("write_callback: fd", fd);
-   SKTLOG("write_callback: # elem", sizeof(write_queue));
-
-   /*
-   ** No longer blocked (can accept new data).
-   */
-   if (!sizeof(write_queue) && write_func && blocked)
-   {
-      //        write_queue = ({ evaluate(write_func, this_object()) });
-      evaluate(write_func, this_object());
-   }
-
-   blocked = 0;
-
-   while (sizeof(write_queue) > 0)
-   {
-      int err;
-
-      err = socket_write(fd, write_queue[0]);
-
-      if (err == EEALREADY)
-      {
-         // write_callback will get called automatically.
-         blocked = 1;
-         return;
-      }
-      if (err == EEWOULDBLOCK)
-      {
-         // write_callback needs to get called manually.
-         blocked = 1;
-         call_out("write_callback", 1, fd);
-         return;
-      }
-
-      /*
-      ** Remove the item from the queue.  It has been written.
-      */
-      write_queue = write_queue[1..];
-
-      if (err == EECALLBACK)
-      {
-         /* done for now... wait for the next callback */
-         blocked = 1;
-         return;
-      }
-      if (err < 0)
-      {
-         error("could not write: " + socket_error(err) + "\n");
-      }
-      else if (write_func)
-      {
-         tmp = evaluate(write_func, this_object());
-         if (sizeof(tmp))
-            write_queue += ({tmp});
-      }
-   }
-}
-
-/* private */ nomask void release_callback(int fdToAcquire)
-{
-   int err;
-
-   SKTLOG("release_callback: self", this_object());
-   fdOwned = fdToAcquire;
-   SKTLOG("release_callback: fdOwned", fdOwned);
-   err = socket_acquire(fdOwned, ( : read_callback:), ( : write_callback:), ( : close_callback:));
-   SKTLOG("release_callback: err", err);
-
-   if (err < 0)
-      error("could not release: " + socket_error(err) + "\n");
-
-   /*
-   ** Deliver a 0 indicating a new connection (and providing self)
-   */
-   catch (evaluate(read_func, this_object(), 0));
-}
-
-// ### socket_listen doesn't take funcptrs yet...
-/* private */ protected
-nomask void listen_callback(int fd)
-{
-   object s;
-   int err;
-
-   SKTLOG("listen_callback: self", this_object());
-   SKTLOG("listen_callback: fd", fd);
-   fd = socket_accept(fd, ( : read_callback:), ( : write_callback:));
-   s = clone_object (SOCKET, SKT_STYLE_INT_ACQUIRE, read_func, close_func);
-   SKTLOG("listen_callback: new sock", s);
-   err = socket_release(fd, s, "release_callback");
-   SKTLOG("listen_callback: err", err);
-   if (err < 0)
-      error("could not release: " + socket_error(err) + "\n");
-}
-
-// ### need a way to protect this from random writes
 varargs nomask void send(mixed message, string address)
 {
-   int err;
-
-   SKTLOG("send: self", this_object());
-   SKTLOG("send: fd", fdOwned);
-   SKTLOG("send: # elem", sizeof(write_queue));
-
-   if (address)
-      err = socket_write(fdOwned, message, address);
-   else if (blocked)
-   {
-      /*
-      ** If we are blocked, then the socket doesn't want us to send
-      ** any more.  Place it on our queue for sending later.
-      */
-      write_queue += ({message});
-   }
-   else
-   {
-      while (sizeof(message))
-      {
-         err = socket_write(fdOwned, message);
-
-         if (err == EEALREADY)
-         {
-            // write_callback will get called automatically.
-            blocked = 1;
-            write_queue += ({message});
-            return;
-         }
-         if (err == EEWOULDBLOCK)
-         {
-            // write_callback needs to get called manually.
-            blocked = 1;
-            write_queue += ({message});
-            call_out("write_callback", 1, fdOwned);
-            return;
-         }
-         if (err == EECALLBACK)
-         {
-            /*
-            ** Socket took the message but is blocked until it can
-            ** write it out.  Set a flag so that we don't write any
-            ** more until we get the callback.
-            */
-            blocked = 1;
-            return;
-         }
-
-         message = "";
-         if (write_func)
-         {
-            message = evaluate(write_func, this_object());
-         }
-      }
-   }
-
-   if (err < 0)
-      error("could not write: " + socket_error(err) + "\n");
+   require_client();
+   if (closing || fdOwned < 1 || style == SKT_STYLE_LISTEN_M)
+      throw("socket: connection is not writable");
+   if (address) throw("socket: MUD packets have no per-message address");
+   bytes frame = i3_encode(message);
+   if (sizeof(write_queue) >= MAX_OUTPUT_FRAMES || sizeof(frame) > MAX_OUTPUT_BYTES - queued_bytes)
+      throw("socket: output queue limit");
+   write_queue += ({frame});
+   queued_bytes += sizeof(frame);
+   output_active = 1;
+   flush_output();
 }
 
 void remove()
 {
-   int err;
-
-   if (fdOwned >= 0)
-   {
-      SKTLOG("remove: self", this_object());
-      SKTLOG("remove: fdOwned", fdOwned);
-      err = socket_close(fdOwned);
-      SKTLOG("remove: err", err);
-      if (err < 0)
-         LOG_D->log(LOG_SOCKET, "could not close: " + socket_error(err) + "\n");
-   }
-
-   destruct();
+   if (previous_object() != client && previous_object() != this_object() && previous_object() != find_object(SIMUL_OB) && previous_object() != offer_parent)
+      throw("socket: caller does not control this connection");
+   suppress_close = 1;
+   if (fdOwned < 1) { finish_connection(); return; }
+   if (catch(begin_close())) fail_connection();
 }
 
-nomask mixed *address()
-{
-   string tmp;
-   string host;
-   int port;
+nomask mixed *address() { return remote_endpoint ? remote_endpoint[0..] : nil; }
+nomask int local_port() { return local_endpoint ? local_endpoint[1] : 0; }
+nomask string local_address() { return local_endpoint ? local_endpoint[0] : nil; }
 
-   tmp = socket_address(fdOwned);
-   sscanf(tmp, "%s %d", host, port);
-   return ({host, port});
+nomask mapping query_status()
+{
+   mapping info = fdOwned > 0 ? socket_info(fdOwned) : nil;
+   return (["handle":fdOwned, "ready":ready, "closing":closing,
+            "queued_bytes":queued_bytes, "queued_frames":sizeof(write_queue),
+            "native_output_pending":info ? info["output_pending"] : 0,
+            "pending_input":i3_pending_input(), "local":local_endpoint ? local_endpoint[0..] : nil,
+            "remote":remote_endpoint ? remote_endpoint[0..] : nil]);
 }
 
-nomask int local_port()
+string stat_me()
 {
-   string address;
-   int port;
-   sscanf(socket_address(fdOwned, 1), "%s %d", address, port);
-   return port;
+   return sprintf("%O: style=%d local=%O remote=%O ready=%d closing=%d queue=%d bytes/%d frames\n",
+                  this_object(), style, local_endpoint, remote_endpoint, ready, closing, queued_bytes, sizeof(write_queue));
 }
 
-nomask string local_address()
+varargs void create(int skt_style, mixed p1, mixed p2, mixed p3, mixed p4)
 {
-   string address;
-   int port;
-   sscanf(socket_address(fdOwned, 1), "%s %d", address, port);
-   return address;
-}
-
-nomask void start(mixed p1, mixed p2)
-{
-   if (style != SKT_STYLE_EXTSTART)
-      error("Socket not SKT_STYLE_EXTSTART, so start() not available in socket.");
-   SKTLOG("start: self " + sprintf("external %s %s", "" + p1, p2), this_object());
-   external_start(p1, p2, read_func, close_func);
-}
-
-void create(int skt_style, mixed p1, mixed p2, mixed p3, mixed p4)
-{
-   int err;
-
-   if (!clonep())
-      return;
-
-   SKTLOG("create: self", this_object());
+   if (!clonep()) return;
+   if (configured) throw("socket: already configured");
+   configured = 1;
    style = skt_style;
-   //    addr = p1;
-
-   switch (style)
+   client = previous_object();
+   if (style == SKT_STYLE_INT_ACQUIRE)
    {
-   case SKT_STYLE_LISTEN:
-      read_func = p2;
-      close_func = p3;
-      fdOwned = socket_create(1 /* STREAM */, ( : read_callback:), ( : close_callback:));
-      if (fdOwned < 0)
-         error("could not create socket: " + socket_error(fdOwned) + "\n");
-      if ((err = socket_bind(fdOwned, p1)) < 0)
-         error("could not bind socket: " + socket_error(err) + "\n");
-      if ((err = socket_listen(fdOwned, "listen_callback")) < 0)
-         error("could not listen to socket: " + socket_error(err) + "\n");
-      SKTLOG("create: SKT_STYLE_LISTEN", fdOwned);
-      break;
-
-   case SKT_STYLE_CONNECT:
-      read_func = p2;
-      close_func = p3;
-#ifdef REQUIRE_PRIV
-      if (!check_previous_privilege(REQUIRE_PRIV))
-      {
-         error("Insufficient privs to open an outgoing socket.\n");
-      }
-#endif
-      fdOwned = socket_create(1 /* STREAM */, ( : read_callback:), ( : close_callback:));
-      if (fdOwned < 0)
-         error("could not create socket: " + socket_error(fdOwned) + "\n");
-      err = socket_connect(fdOwned, p1, "read_callback", "write_callback");
-      if (err < 0)
-         error("could not listen to socket: " + socket_error(err) + "\n");
-      SKTLOG("create: SKT_STYLE_CONNECT", fdOwned);
-      SKTLOG("create: close_func", close_func);
-      break;
-
-   case SKT_STYLE_LISTEN_B:
-      read_func = p2;
-      close_func = p3;
-      fdOwned = socket_create(3 /* STREAM BINARY */, ( : read_callback:), ( : close_callback:));
-      if (fdOwned < 0)
-         error("could not create socket: " + socket_error(fdOwned) + "\n");
-      if ((err = socket_bind(fdOwned, p1)) < 0)
-         error("could not bind socket: " + socket_error(err) + sprintf(" %O ", socket_address(fdOwned)) + "\n");
-      if ((err = socket_listen(fdOwned, "listen_callback")) < 0)
-         error("could not listen to socket: " + socket_error(err) + "\n");
-      SKTLOG("create: SKT_STYLE_LISTEN_B", fdOwned);
-      break;
-
-   case SKT_STYLE_CONNECT_B:
-#ifdef REQUIRE_PRIV
-      if (!check_previous_privilege(REQUIRE_PRIV))
-      {
-         error("Insufficient privs to open an outgoing socket.\n");
-      }
-#endif
-      read_func = p2;
-      close_func = p3;
-      fdOwned = socket_create(3 /* STREAM BINARY */, ( : read_callback:), ( : close_callback:));
-      if (fdOwned < 0)
-         error("could not create socket: " + socket_error(fdOwned) + "\n");
-      err = socket_connect(fdOwned, p1, "read_callback", "write_callback");
-      if (err < 0)
-         error("could not listen to socket: " + socket_error(err) + "\n");
-      SKTLOG("create: SKT_STYLE_CONNECT_B", fdOwned);
-      SKTLOG("create: close_func", close_func);
-      break;
-
-   case SKT_STYLE_UDP:
-#ifdef REQUIRE_PRIV
-      if (!check_previous_privilege(REQUIRE_PRIV))
-      {
-         error("Insufficient privs to open a datagram socket.\n");
-      }
-#endif
-      read_func = p2;
-      fdOwned = socket_create(2 /* DATAGRAM */, ( : read_udp_callback:));
-      if (fdOwned < 0)
-         error("could not create socket: " + socket_error(fdOwned) + "\n");
-      if ((err = socket_bind(fdOwned, p1)) < 0)
-         error("could not bind socket: " + socket_error(err) + "\n");
-      SKTLOG("create: SKT_STYLE_UDP", fdOwned);
-      break;
-
-   case SKT_STYLE_LISTEN_M:
-      read_func = p2;
-      close_func = p3;
-      fdOwned = socket_create(0 /* MUD */, ( : read_callback:), ( : close_callback:));
-      if (fdOwned < 0)
-         error("could not create socket: " + socket_error(fdOwned) + "\n");
-      if ((err = socket_bind(fdOwned, p1)) < 0)
-         error("could not bind socket: " + socket_error(err) + "\n");
-      if ((err = socket_listen(fdOwned, "listen_callback")) < 0)
-         error("could not listen to socket: " + socket_error(err) + "\n");
-      SKTLOG("create: SKT_STYLE_LISTEN_M", fdOwned);
-      break;
-
-   case SKT_STYLE_CONNECT_M:
-#ifdef REQUIRE_PRIV
-      if (!check_previous_privilege(REQUIRE_PRIV))
-      {
-         error("Insufficient privs to open an outgoing socket.\n");
-      }
-#endif
-      read_func = p2;
-      close_func = p3;
-      fdOwned = socket_create(0 /* MUD */, ( : read_callback:), ( : close_callback:));
-      if (fdOwned < 0)
-         error("could not create socket: " + socket_error(fdOwned) + "\n");
-      err = socket_connect(fdOwned, p1, "read_callback", "write_callback");
-      if (err < 0)
-         error("could not listen to socket: " + socket_error(err) + "\n");
-      SKTLOG("create: SKT_STYLE_CONNECT_M", fdOwned);
-      SKTLOG("create: close_func", close_func);
-      break;
-
-   case SKT_STYLE_INT_ACQUIRE:
+      if (!client || base_name(client) != SOCKET || !clonep(client) || p3 != client || !objectp(p4))
+         throw("socket: only a listener can construct an accepted connection");
+      offer_parent = client;
+      client = p4;
       read_func = p1;
       close_func = p2;
+   }
+   else
+   {
+      read_func = p2;
+      close_func = p3;
+   }
+   if (!functionp(read_func) || (close_func != nil && !functionp(close_func)))
+      throw("socket: expected callbacks");
+   switch (style)
+   {
+   case SKT_STYLE_CONNECT_M:
+      if (!check_previous_privilege("Mudlib:socket"))
+         throw("Insufficient privs to open an outgoing socket.");
+      if (!stringp(p1)) throw("socket: expected host and port");
+      string *parts = explode(p1, " ");
+      if (sizeof(parts) != 2 || parts[0] == "" || parts[1] == "")
+         throw("socket: expected host and port");
+      foreach (int ch in to_bytes(parts[1], "UTF-8"))
+         if (ch < 48 || ch > 57) throw("socket: invalid port");
+      fdOwned = socket_connect(parts[0], to_int(parts[1]), event_callback);
       break;
-   case SKT_STYLE_EXTSTART:
-      read_func = p3;
-      close_func = p4;
-      external_start(p1, p2, read_func, close_func);
+   case SKT_STYLE_LISTEN_M:
+      if (!intp(p1) || (p4 != nil && !stringp(p4))) throw("socket: invalid listen address");
+      fdOwned = socket_listen(p4 == nil ? "0.0.0.0" : p4, p1, event_callback);
       break;
+   case SKT_STYLE_INT_ACQUIRE:
+      break;
+   default:
+      throw("socket: only MUD-mode TCP is supported by this adapter");
    }
 }
