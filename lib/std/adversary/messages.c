@@ -102,7 +102,7 @@ int message_filter(object who, mixed extra)
 
 void dodge_message()
 {
-   filtered_simple_action("$N $vdodge an attack.", ( : message_filter:), "dodge");
+   filtered_simple_action("$N $vdodge an attack.", message_filter, "dodge");
 }
 
 private
@@ -117,10 +117,11 @@ string brief_message(string target, string weapon, string limb, int percent)
 void handle_message(mixed mess, object target, object weapon, string limb, int percent)
 {
    mixed *combat_who, messages;
-   string omess = mess;
+   string omess;
 
    if (arrayp(mess))
       mess = choice(mess);
+   omess = mess;
 
    if (mess[0] == '!')
    {
@@ -146,8 +147,8 @@ void handle_message(mixed mess, object target, object weapon, string limb, int p
    combat_who = ({this_object(), target});
    if (!target)
    {
-      TBUG("Missing target: this_object(): " + this_object() + " weapon: " + weapon + " limb: " + limb +
-           " percent: " + percent);
+      TBUG(sprintf("Missing target: this_object(): %O weapon: %O limb: %O percent: %d",
+                   this_object(), weapon, limb, percent));
       TBUG(mess);
       return;
    }
@@ -169,5 +170,5 @@ void handle_message(mixed mess, object target, object weapon, string limb, int p
    {
       messages[1] = brief_message(target->short(), weapon->short(), limb, percent);
    }
-   filtered_inform(combat_who, messages, environment(), ( : message_filter:), omess[1..]);
+   filtered_inform(combat_who, messages, environment(), message_filter, omess[1..]);
 }
