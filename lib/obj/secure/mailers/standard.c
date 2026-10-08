@@ -26,7 +26,7 @@ void stdmail_cmd_replyall(mixed cmd_args)
 {
    if (cmd_args && !(cmd_args = to_int(cmd_args)))
    {
-      write("Usage: R #\n");
+      write("Usage: R [#]\n");
       return;
    }
 
@@ -38,7 +38,7 @@ void stdmail_cmd_reply(mixed cmd_args)
 {
    if (cmd_args && !(cmd_args = to_int(cmd_args)))
    {
-      write("Usage: r #\n");
+      write("Usage: r [#]\n");
       return;
    }
 
@@ -52,15 +52,15 @@ void stdmail_cmd_help()
 
    output = "?					This help screen\n"
             "\n"
-            "m <name1> [name2] [name3]...		Send mail.\n"
+            "m <name1>[,<name2>...]		Send mail.\n"
             "h [# or range (1-4,6 for example)]	Show the headers for the specified\n"
             "					range of messages, or all messages\n"
             "					if no range is specified.\n"
             "# 					Read a message.\n"
-            "r #					Reply to message\n"
-            "R #					Reply to message, all\n"
-            "					originial recipients receive the mail\n"
-            "f #					Forward message\n"
+            "r [#]					Reply to message\n"
+            "R [#]					Reply to message, all\n"
+            "					original recipients receive the mail\n"
+            "f [#] <name1>[,<name2>...]		Forward message\n"
             "d # or range				Delete message(s)\n"
             "$					Show the number of messages in your box.\n"
             "= [#]					Set current message if # is provided\n"
@@ -78,9 +78,9 @@ void stdmail_cmd_help()
    output += "\n"
              "All numbers default to the currently referenced message, which is shown by =\n"
              "\n"
-             "Groups may also be mailed to, see help for groups on how to set them\n"
-             "up.... you can mail to them by enclosing "
-             "The group in ().  Eg, Mm (admin) rust  will mail all the admins and rust.\n";
+             "Separate recipients with commas; spaces around commas are allowed.\n"
+             "To mail a group, put its name in (). See help groups to set groups up.\n"
+             "For example, m (admin),rust mails all the admins and rust.\n";
 
    more(output);
 }
@@ -93,7 +93,7 @@ void stdmail_cmd_forward(string cmd_args)
 
    if (!cmd_args || (sscanf(cmd_args, "%d %s", num, newto) != 2 && (sscanf(cmd_args, "%s", newto) != 1)))
    {
-      write("Usage: f # <name1> [name2] ...\n");
+      write("Usage: f [#] <name1>[,<name2>...]\n");
       return;
    }
 

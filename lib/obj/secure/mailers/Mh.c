@@ -52,7 +52,7 @@ void Mh_cmd_replyall(mixed arg)
 {
    if (arg && !(arg = to_int(arg)))
    {
-      write("Usage: MR #\n");
+      write("Usage: MR [#]\n");
       return;
    }
 
@@ -64,7 +64,7 @@ void Mh_cmd_reply(mixed arg)
 {
    if (arg && !(arg = to_int(arg)))
    {
-      write("Usage: Mr #\n");
+      write("Usage: Mr [#]\n");
       return;
    }
 
@@ -80,15 +80,15 @@ void Mh_cmd_help()
    output = explode("Help for Mh (Mail handler)  Version 0.9\n" + sprintf("%'-'40s", "\n") +
                         "M?					This help screen\n"
                         "\n"
-                        "Mm <name1> [name2] [name3]...		Send mail.\n"
+                        "Mm <name1>[,<name2>...]		Send mail.\n"
                         "Mh [# or range (1-4,6 for example)]	Show the headers for the specified\n"
                         "					range of messages, or all messages\n"
                         "					if no range is specified.\n"
                         "M# # 					Read a message.\n"
-                        "Mr #					Reply to message\n"
-                        "MR #					Reply to message, all\n"
-                        "					originial recipients receive the mail\n"
-                        "Mf #					Forward message\n"
+                        "Mr [#]					Reply to message\n"
+                        "MR [#]					Reply to message, all\n"
+                        "					original recipients receive the mail\n"
+                        "Mf [#] <name1>[,<name2>...]		Forward message\n"
                         "Md # or range				Delete message(s)\n"
                         "M$					Show the number of messages in your box.\n"
                         "M= [#]					Set current message if # is provided\n"
@@ -103,9 +103,9 @@ void Mh_cmd_help()
       output += ({"Ms [#] <filename>			Save message w/ header intact to file.",
                   "Mw [#] <filename>			Save message but no header to file."});
    output += ({"", "All numbers default to the currently referenced message, which is shown", "by M=\n", "",
-               "Groups may also be mailed to, see help for groups on how to set them",
-               "up.... you can mail to them like a regular name, or you can enclose",
-               "The group in ().  Eg, Mm (admin) rust  will mail all the admins and rust."});
+               "Separate recipients with commas; spaces around commas are allowed.",
+               "To mail a group, put its name in (). See help groups to set groups up.",
+               "For example, Mm (admin),rust mails all the admins and rust."});
    more(output);
 }
 
@@ -117,7 +117,7 @@ void Mh_cmd_forward(mixed arg)
 
    if (!arg || (sscanf(arg, "%d %s", num, newto) != 2 && (sscanf(arg, "%s", newto) != 1)))
    {
-      write("Usage: Mf # <name1> [name2] ...\n");
+      write("Usage: Mf [#] <name1>[,<name2>...]\n");
       return;
    }
 
