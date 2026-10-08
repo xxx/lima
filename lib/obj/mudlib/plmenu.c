@@ -155,22 +155,22 @@ void query_personal_info()
 
 void prompt_change_title()
 {
-   input_one_arg("Change title to what? ", ( : change_title:));
+   input_one_arg("Change title to what? ", change_title);
 }
 
 void prompt_change_email()
 {
-   input_one_arg("Change e-mail to what? ", ( : change_email:));
+   input_one_arg("Change e-mail to what? ", change_email);
 }
 
 void prompt_change_real_name()
 {
-   input_one_arg("Change real name to what? ", ( : change_real_name:));
+   input_one_arg("Change real name to what? ", change_real_name);
 }
 
 void prompt_change_url()
 {
-   input_one_arg("Change your WWW homepage address to what? ", ( : change_url:));
+   input_one_arg("Change your WWW homepage address to what? ", change_url);
 }
 
 void set_mode(string s)
@@ -180,7 +180,7 @@ void set_mode(string s)
 
 void prompt_change_mode()
 {
-   input_one_arg("Set mode 'plain', 'vt100', 'ansi' or 'xterm': ", ( : set_mode:));
+   input_one_arg("Set mode 'plain', 'vt100', 'ansi' or 'xterm': ", set_mode);
 }
 
 void set_simplify(string s)
@@ -190,7 +190,7 @@ void set_simplify(string s)
 
 void prompt_change_simplify()
 {
-   input_one_arg("Set simplify to reduce fancy UI for screenreaders.\n" + " 'on' or 'off': ", ( : set_simplify:));
+   input_one_arg("Set simplify to reduce fancy UI for screenreaders.\n" + " 'on' or 'off': ", set_simplify);
 }
 
 void set_emoji(string s)
@@ -201,8 +201,7 @@ void set_emoji(string s)
 void prompt_change_emoji()
 {
    input_one_arg("Set emoji replacements. Requires unicode in your client.\n" + " 'on', 'off' or 'list': ",
-                 (
-                     : set_emoji:));
+                 set_emoji);
 }
 
 void set_frames(string s)
@@ -215,8 +214,7 @@ void prompt_change_frames()
    input_one_arg("Set frame style, colour theme. Requires unicode for fancier ones.\n\t" +
                      "'styles' to see other style options.\n\t" + "'style <style>' to see other options.\n\t" +
                      "'themes' to list the colour themes.\n\t" + "'theme <theme>' to select a colour theme.\n",
-                 (
-                     : set_frames:));
+                 set_frames);
 }
 
 void set_metric(string s)
@@ -226,7 +224,7 @@ void set_metric(string s)
 
 void prompt_change_metric()
 {
-   input_one_arg("Use the metric system? (on/off)\n", ( : set_metric:));
+   input_one_arg("Use the metric system? (on/off)\n", set_metric);
 }
 
 void set_playerwidth(string s)
@@ -236,7 +234,7 @@ void set_playerwidth(string s)
 
 void prompt_change_width()
 {
-   input_one_arg("Set to a number or 'auto' for automatic detection? \n", ( : set_playerwidth:));
+   input_one_arg("Set to a number or 'auto' for automatic detection? \n", set_playerwidth);
 }
 
 void set_biff(string s)
@@ -271,7 +269,7 @@ void finish_who(string mudname)
 void remote_who()
 {
    write("Which mud do you want to query?\n");
-   complete_choice(0, IMUD_D->query_mudnames(), ( : finish_who:));
+   complete_choice(nil, IMUD_D->query_mudnames(), finish_who);
 }
 void update_ccmenu()
 {
@@ -283,75 +281,47 @@ void update_ccmenu()
    add_section_item(ccmenu, other);
    add_menu_item(combat, new_menu_item("Hide missed swings in combat      [" +
                                            (this_body()->combat_config(CC_HIDE_MISSES) ? "ON" : "OFF") + "]",
-                                       (
-                                           : get_input_then_call,
-                                             (
-                                                 : toggle_cc, CC_HIDE_MISSES:),
+                                       &get_input_then_call(&toggle_cc(CC_HIDE_MISSES),
                                              "Toggle on "
-                                             "(y/n): "
-                                           :),
+                                             "(y/n): "),
                                        "s"));
 
    add_menu_item(combat, new_menu_item("Hide attacks without damage       [" +
                                            (this_body()->combat_config(CC_HIDE_NO_DAMAGE) ? "ON" : "OFF") + "]",
-                                       (
-                                           : get_input_then_call,
-                                             (
-                                                 : toggle_cc, CC_HIDE_NO_DAMAGE:),
+                                       &get_input_then_call(&toggle_cc(CC_HIDE_NO_DAMAGE),
                                              "Toggle on "
-                                             "(y/n): "
-                                           :),
+                                             "(y/n): "),
                                        "n"));
 
    add_menu_item(combat, new_menu_item("Hide low damage attacks           [" +
                                            (this_body()->combat_config(CC_HIDE_LOW_DAMAGE) ? "ON" : "OFF") + "]",
-                                       (
-                                           : get_input_then_call,
-                                             (
-                                                 : toggle_cc, CC_HIDE_LOW_DAMAGE:),
+                                       &get_input_then_call(&toggle_cc(CC_HIDE_LOW_DAMAGE),
                                              "Toggle on "
-                                             "(y/n): "
-                                           :),
+                                             "(y/n): "),
                                        "l"));
    add_menu_item(combat, new_menu_item("Hide disabled limb messages       [" +
                                            (this_body()->combat_config(CC_HIDE_DISABLE_LIMB) ? "ON" : "OFF") + "]",
-                                       (
-                                           : get_input_then_call,
-                                             (
-                                                 : toggle_cc, CC_HIDE_DISABLE_LIMB:),
+                                       &get_input_then_call(&toggle_cc(CC_HIDE_DISABLE_LIMB),
                                              "Toggle on "
-                                             "(y/n): "
-                                           :),
+                                             "(y/n): "),
                                        "d"));
    add_menu_item(combat, new_menu_item("Hide non-vital stuns              [" +
                                            (this_body()->combat_config(CC_HIDE_SIMPLE_STUNS) ? "ON" : "OFF") + "]",
-                                       (
-                                           : get_input_then_call,
-                                             (
-                                                 : toggle_cc, CC_HIDE_SIMPLE_STUNS:),
+                                       &get_input_then_call(&toggle_cc(CC_HIDE_SIMPLE_STUNS),
                                              "Toggle on "
-                                             "(y/n): "
-                                           :),
+                                             "(y/n): "),
                                        "S"));
    add_menu_item(combat, new_menu_item("Hide dodges                       [" +
                                            (this_body()->combat_config(CC_HIDE_DODGES) ? "ON" : "OFF") + "]",
-                                       (
-                                           : get_input_then_call,
-                                             (
-                                                 : toggle_cc, CC_HIDE_DODGES:),
+                                       &get_input_then_call(&toggle_cc(CC_HIDE_DODGES),
                                              "Toggle on "
-                                             "(y/n): "
-                                           :),
+                                             "(y/n): "),
                                        "D"));
    add_menu_item(combat, new_menu_item("Brief combat messages             [" +
                                            (this_body()->query_brief_combat(CC_HIDE_DODGES) ? "ON" : "OFF") + "]",
-                                       (
-                                           : get_input_then_call,
-                                             (
-                                                 : toggle_brief:),
+                                       &get_input_then_call(toggle_brief,
                                              "Toggle on "
-                                             "(y/n): "
-                                           :),
+                                             "(y/n): "),
                                        "b"));
 }
 
@@ -386,7 +356,7 @@ void toggle_cc(int flag, string state)
       return;
    }
 
-   if (get_user_variable("cconfig") == 0)
+   if (get_user_variable("cconfig") == nil)
       shell->set_variable("cconfig", CC_SIZE);
 
    cconfig = explode(get_user_variable("cconfig"), "");
@@ -424,20 +394,16 @@ void create()
    add_section_item(toplevel, config);
    add_section_item(toplevel, other);
 
-   quit_item = new_menu_item("Quit", ( : quit_menu_application:), "q");
+   quit_item = new_menu_item("Quit", quit_menu_application, "q");
    goto_main_menu_item = new_menu_item("Return to main menu", toplevel, "m");
 
    // MENU: Main
-   add_menu_item(info, new_menu_item("Read news", ( : simple_cmd:), "n"));
-   add_menu_item(info, new_menu_item("Send or read mail", ( : start_mail:), "m"));
-   add_menu_item(info, new_menu_item("See who's on", ( : simple_cmd:), "w"));
+   add_menu_item(info, new_menu_item("Read news", &simple_cmd("n"), "n"));
+   add_menu_item(info, new_menu_item("Send or read mail", start_mail, "m"));
+   add_menu_item(info, new_menu_item("See who's on", &simple_cmd("w"), "w"));
    add_menu_item(info, new_menu_item("Info about a person (finger)",
-                                     (
-                                         : get_input_then_call,
-                                           (
-                                               : handle_finger:),
-                                           "Finger who? "
-                                         :),
+                                     &get_input_then_call(handle_finger,
+                                           "Finger who? "),
                                      "f"));
    add_menu_item(info, new_menu_item("Soul/emote Menu", soulmenu, "s"));
    add_menu_item(info, new_menu_item("Info on MUDs", remotemenu, "o"));
@@ -448,7 +414,7 @@ void create()
 
    add_menu_item(other, new_menu_item("Report bug, typo or idea", reportmenu, "r"));
    add_menu_item(other, quit_item);
-   add_menu_item(other, new_menu_item("Help", ( : simple_cmd:), "?"));
+   add_menu_item(other, new_menu_item("Help", &simple_cmd("?"), "?"));
 
    // MENU: Combat config
    combat = new_section("Combat Config", "accent");
@@ -459,12 +425,12 @@ void create()
    sub_other = new_section("Other", "warning");
    add_section_item(uxmenu, ui);
    add_section_item(uxmenu, sub_other);
-   add_menu_item(ui, new_menu_item("Set terminal mode", ( : prompt_change_mode:), "t"));
-   add_menu_item(ui, new_menu_item("Simpler UI for screen readers", ( : prompt_change_simplify:), "s"));
-   add_menu_item(ui, new_menu_item("Emoji replacements", ( : prompt_change_emoji:), "e"));
-   add_menu_item(ui, new_menu_item("Terminal width", ( : prompt_change_width:), "w"));
-   add_menu_item(ui, new_menu_item("Metric vs Imperial", ( : prompt_change_metric:), "i"));
-   add_menu_item(ui, new_menu_item("Frame themes", ( : prompt_change_frames:), "f"));
+   add_menu_item(ui, new_menu_item("Set terminal mode", prompt_change_mode, "t"));
+   add_menu_item(ui, new_menu_item("Simpler UI for screen readers", prompt_change_simplify, "s"));
+   add_menu_item(ui, new_menu_item("Emoji replacements", prompt_change_emoji, "e"));
+   add_menu_item(ui, new_menu_item("Terminal width", prompt_change_width, "w"));
+   add_menu_item(ui, new_menu_item("Metric vs Imperial", prompt_change_metric, "i"));
+   add_menu_item(ui, new_menu_item("Frame themes", prompt_change_frames, "f"));
    add_menu_item(sub_other, goto_main_menu_item);
    add_menu_item(sub_other, quit_item);
 
@@ -474,40 +440,24 @@ void create()
    add_section_item(soulmenu, sub_other);
 
    add_menu_item(soul, new_menu_item("List souls",
-                                     (
-                                         : get_input_then_call,
-                                           (
-                                               : show_souls:),
+                                     &get_input_then_call(show_souls,
                                            "List all souls starting with "
-                                           "(enter for ALL souls): "
-                                         :),
+                                           "(enter for ALL souls): "),
                                      "s"));
    add_menu_item(soul, new_menu_item("List adverbs",
-                                     (
-                                         : get_input_then_call,
-                                           (
-                                               : show_adverbs:),
+                                     &get_input_then_call(show_adverbs,
                                            "List all adverbs starting with "
-                                           "(enter for ALL adverbs): "
-                                         :),
+                                           "(enter for ALL adverbs): "),
                                      "a"));
    add_menu_item(soul, new_menu_item("Find souls",
-                                     (
-                                         : get_input_then_call,
-                                           (
-                                               : find_soul:),
+                                     &get_input_then_call(find_soul,
                                            "Find souls whose output "
-                                           "contains string: "
-                                         :),
+                                           "contains string: "),
                                      "f"));
 
    add_menu_item(soul, new_menu_item("Test a soul",
-                                     (
-                                         : get_input_then_call,
-                                           (
-                                               : test_soul:),
-                                           "Soul to test: "
-                                         :),
+                                     &get_input_then_call(test_soul,
+                                           "Soul to test: "),
                                      "t"));
 
    // MENU: Reporting menu
@@ -515,54 +465,52 @@ void create()
    add_section_item(reportmenu, report);
    add_section_item(reportmenu, sub_other);
 
-   add_menu_item(report, new_menu_item("Report a bug", ( : simple_cmd:), "b"));
-   add_menu_item(report, new_menu_item("Report a typo", ( : simple_cmd:), "t"));
-   add_menu_item(report, new_menu_item("Report an idea", ( : simple_cmd:), "i"));
+   add_menu_item(report, new_menu_item("Report a bug", &simple_cmd("b"), "b"));
+   add_menu_item(report, new_menu_item("Report a typo", &simple_cmd("t"), "t"));
+   add_menu_item(report, new_menu_item("Report an idea", &simple_cmd("i"), "i"));
 
    // MENU: Personal information
    personal = new_section("Personal Information", "accent");
    add_section_item(personalmenu, personal);
    add_section_item(personalmenu, sub_other);
 
-   add_menu_item(personal, new_menu_item("View your personal information", ( : query_personal_info:), "v"));
-   add_menu_item(personal, new_menu_item("Change your title", ( : prompt_change_title:), "t"));
+   add_menu_item(personal, new_menu_item("View your personal information", query_personal_info, "v"));
+   add_menu_item(personal, new_menu_item("Change your title", prompt_change_title, "t"));
    add_menu_item(personal, new_menu_item("Change your supplied "
                                          "e-mail address",
-                                         (
-                                             : prompt_change_email:),
+                                         prompt_change_email,
                                          "e"));
    add_menu_item(personal, new_menu_item("Change your supplied WWW home "
                                          "page address",
-                                         (
-                                             : prompt_change_url:),
+                                         prompt_change_url,
                                          "w"));
    add_menu_item(personal, new_menu_item("Set or unset mail notification", biffmenu, "n"));
    add_menu_item(personal, new_menu_item("Set whether or not you can be "
                                          "snooped",
                                          snoopablemenu, "s"));
-   add_menu_item(personal, new_menu_item("Change your supplied real name", ( : prompt_change_real_name:), "r"));
+   add_menu_item(personal, new_menu_item("Change your supplied real name", prompt_change_real_name, "r"));
 
    // MENU: Sub menu "biff" to Personal information menu
    biff = new_section("Mail notification", "accent");
    add_section_item(biffmenu, biff);
    add_section_item(biffmenu, sub_other);
 
-   add_menu_item(biff, new_menu_item("Yes", ( : set_biff:), "y"));
-   add_menu_item(biff, new_menu_item("No", ( : set_biff:), "n"));
+   add_menu_item(biff, new_menu_item("Yes", &set_biff("y"), "y"));
+   add_menu_item(biff, new_menu_item("No", &set_biff("n"), "n"));
 
    // MENU: Sub menu Snoop to Personal information menu
    snoop = new_section("Snoopable", "accent");
    add_section_item(snoopablemenu, snoop);
    add_section_item(snoopablemenu, sub_other);
-   add_menu_item(snoop, new_menu_item("Yes", ( : set_snoopable:), "y"));
-   add_menu_item(snoop, new_menu_item("No", ( : set_snoopable:), "n"));
+   add_menu_item(snoop, new_menu_item("Yes", &set_snoopable("y"), "y"));
+   add_menu_item(snoop, new_menu_item("No", &set_snoopable("n"), "n"));
 
    // MENU: Sub menu Snoop to Personal information menu
    remote = new_section("Other MUDs", "accent");
    add_section_item(remotemenu, remote);
    add_section_item(remotemenu, sub_other);
-   add_menu_item(remote, new_menu_item("List muds " + mud_name() + " knows about", ( : simple_cmd:), "l"));
-   add_menu_item(remote, new_menu_item("See who's on another mud", ( : remote_who:), "w"));
+   add_menu_item(remote, new_menu_item("List muds " + mud_name() + " knows about", &simple_cmd("l"), "l"));
+   add_menu_item(remote, new_menu_item("See who's on another mud", remote_who, "w"));
 }
 
 void start_menu()
