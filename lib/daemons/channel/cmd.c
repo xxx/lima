@@ -251,7 +251,7 @@ varargs nomask void cmd_channel(string channel_name, string arg, int channel_typ
    }
    else if (arg[0] == ';' || arg[0] == ':')
    {
-      if (ci.moderator && ci.speaker && user != ci.moderator && user != ci.speaker)
+      if (ci.moderator && ci.speaker && this_body() != ci.moderator && this_body() != ci.speaker)
       {
          printf("You are not the speaker on '%s'.\n", user_channel_name);
       }
@@ -286,7 +286,7 @@ varargs nomask void cmd_channel(string channel_name, string arg, int channel_typ
    }
    else
    {
-      if (ci.moderator && ci.speaker && user != ci.moderator && user != ci.speaker)
+      if (ci.moderator && ci.speaker && this_body() != ci.moderator && this_body() != ci.speaker)
       {
          printf("You are not the speaker on '%s'.\n", user_channel_name);
       }
