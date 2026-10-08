@@ -191,7 +191,12 @@ private nomask int send_mail_message(string subject, string *buf, mixed to_list,
    else if (!arrayp(cc_list))
       cc_list = ({});
 
-   name_list = MAIL_D->send_mail(this_user()->query_userid(), subject, buf, to_list, cc_list);
+   mixed problem = catch(name_list = MAIL_D->send_mail(this_user()->query_userid(), subject, buf, to_list, cc_list));
+   if (problem)
+   {
+      write("Mail delivery failed; some recipients may already have received it. Check before resending.\n");
+      return 0;
+   }
    if (!sizeof(name_list))
    {
       write("No valid destination.\n");
@@ -498,12 +503,12 @@ protected nomask void cmd_forward(int user_num, string newto)
                      0);
 }
 
-void send_news_reply(string subject, string *text, string *to)
+int send_news_reply(string subject, string *text, string *to)
 {
    if (base_name(previous_object()) != NEWSREADER)
       error("security: attempted use by: " + base_name(previous_object()) + "\n");
 
-   send_mail_message(subject, text, to, 0, 0);
+   return send_mail_message(subject, text, to, 0, 0);
 }
 
 void create()

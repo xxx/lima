@@ -604,14 +604,19 @@ nomask void post_message()
 private
 nomask void receive_reply_text(string subject, string recipient, string *text)
 {
-   if (!text)
+   if (nilp(text))
    {
       write("Post aborted.\n");
       return;
    }
-   wrap_post(text);
+   string *body = text + ({});
+   wrap_post(body);
 
-   this_user()->query_mailer()->send_news_reply("Re: " + subject, text, ({recipient}));
+   if (!this_user()->query_mailer()->send_news_reply("Re: " + subject, body, ({recipient})))
+   {
+      write("News reply text retained; continue editing. Finishing attempts another send; check before resending.\n");
+      clone_object(EDIT_OB, EDIT_TEXT, text, &receive_reply_text(subject, recipient));
+   }
 }
 
 private
