@@ -81,7 +81,7 @@ varargs nomask int do_game_command(string str, int debug)
    /*
    ** If the result is 0, the parser didn't know the verb so we keep looking.
    ** If a 1 was returned, then nothing more needs to be done.
-   ** If the result is -1 or -2, the parser figured something was wrong.
+   ** If the result is -1, -2 or -3, the parser figured something was wrong.
    **
    */
    switch (result)
@@ -91,6 +91,7 @@ varargs nomask int do_game_command(string str, int debug)
    case 1:
       return 1;
    case -1:
+   case -3:
       write(nonsense());
       return 1;
    case -2:
