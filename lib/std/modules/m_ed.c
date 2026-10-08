@@ -562,6 +562,362 @@ private string ed_after_change()
    return ed_auto_print && !ed_global && ed_cursor > 0 ? ed_print(ed_cursor, ed_cursor, 0) : "";
 }
 
+private mapping ed_indent_lex()
+{
+   string text = implode(ed_lines, "\n");
+   string pattern = "[ \\t\\r\\n]+|//[^\\n]*|(?s:/\\*.*?\\*/)|\"(?:\\\\[\\s\\S]|[^\"\\\\])*\"|'''|'(?:\\\\.|[^'])'|[\\p{Alphabetic}_]\\w*|::|(?s:.)";
+   string *tokens = allocate(sizeof(text) + 1);
+   int *rows = allocate(sizeof(text) + 1);
+   int *prefix = allocate(sizeof(ed_lines));
+   int *keep = allocate(sizeof(ed_lines));
+   int *columns = allocate(sizeof(ed_lines), -1);
+   int count;
+   int pos;
+   int row;
+   int col;
+   for (int line = 0; line < sizeof(ed_lines); line++)
+      prefix[line] = sizeof(regmatch(ed_lines[line], "^[ \\t]*"));
+   while (pos < sizeof(text))
+   {
+      mixed *match;
+      string piece;
+      string token;
+      string *parts;
+      int start_row = row;
+      int extra_semicolon;
+      if (text[pos] == '#' && col == prefix[row])
+      {
+         int last = row;
+         while (sizeof(ed_lines[last]) && ed_lines[last][<1] == '\\')
+         {
+            if (++last == sizeof(ed_lines)) ed_fail("unfinished preprocessor continuation");
+         }
+         piece = ed_lines[row][col..];
+         for (int line = row; line <= last; line++)
+         {
+            keep[line] = 1;
+            if (line > row) piece += "\n" + ed_lines[line];
+         }
+         pos += sizeof(piece);
+      }
+      else if (text[pos] == '@' &&
+               (!count || strindex("=(:,{[?;", tokens[count-1]) >= 0 || tokens[count-1] == "return") &&
+               arrayp(match = regmatch(text, "@{1,2}([A-Za-z_][A-Za-z_0-9]*)[ \\t]*\\n", 0x1040, pos)))
+      {
+         string marker = match[1];
+         int last = row + 1;
+         while (last < sizeof(ed_lines) && ed_lines[last] != marker && ed_lines[last] != marker + ";") last++;
+         if (last == sizeof(ed_lines)) ed_fail("unterminated text block");
+         piece = ed_lines[row][col..];
+         for (int line = row + 1; line <= last; line++)
+         {
+            keep[line] = 1;
+            piece += "\n" + ed_lines[line];
+         }
+         token = "<literal>";
+         extra_semicolon = ed_lines[last] == marker + ";";
+         pos += sizeof(piece);
+      }
+      else
+      {
+         match = regmatch(text, pattern, 0x1040, pos);
+         if (!arrayp(match)) ed_fail("unable to tokenize indentation input");
+         piece = match[0];
+         pos = match[<1];
+         if (piece == "\"" || piece == "'" ||
+             (piece == "/" && pos < sizeof(text) && text[pos] == '*'))
+            ed_fail("unterminated string, character or comment");
+         if (piece[0] != ' ' && piece[0] != '\t' && piece[0] != '\r' && piece[0] != '\n') token = piece;
+      }
+      parts = explode(piece, "\n");
+      if (sizeof(parts) > 1)
+      {
+         row += sizeof(parts) - 1;
+         col = sizeof(parts[<1]);
+         // Continuation-line whitespace can be part of a literal or comment payload.
+         if (sizeof(token) && (token[0] == '"' || strindex(token, "/*") == 0))
+            for (int line = start_row + 1; line <= row; line++) keep[line] = 1;
+      }
+      else col += sizeof(piece);
+      if (sizeof(token))
+      {
+         tokens[count] = token;
+         rows[count++] = start_row;
+         if (extra_semicolon)
+         {
+            tokens[count] = ";";
+            rows[count++] = row;
+         }
+      }
+   }
+   return ([ "tokens":count ? tokens[0..count-1] : ({}),
+             "rows":count ? rows[0..count-1] : ({}), "prefix":prefix,
+             "keep":keep, "columns":columns, "pos":0, "nest":0 ]);
+}
+
+private string ed_indent_peek(mapping work)
+{
+   return work["pos"] < sizeof(work["tokens"]) ? work["tokens"][work["pos"]] : "";
+}
+
+private void ed_indent_take(mapping work, int column)
+{
+   int row = work["rows"][work["pos"]];
+   if (work["columns"][row] < 0) work["columns"][row] = column;
+   work["pos"]++;
+}
+
+private void ed_indent_comments(mapping work, int column)
+{
+   string token = ed_indent_peek(work);
+   while (strindex(token, "//") == 0 || strindex(token, "/*") == 0)
+   {
+      ed_indent_take(work, column);
+      token = ed_indent_peek(work);
+   }
+}
+
+private void ed_indent_enter(mapping work)
+{
+   if (++work["nest"] > 64) ed_fail("indentation nesting exceeds 64");
+}
+
+private string ed_indent_close(string token)
+{
+   switch (token)
+   {
+   case "(": return ")";
+   case "[": return "]";
+   }
+   if (token == "({") return "})";
+   if (token == "([") return "])";
+   if (token == "(:") return ":)";
+   return "";
+}
+
+private int ed_indent_closer(string token)
+{
+   return token == ")" || token == "]" || token == "}" ||
+          token == "})" || token == "])" || token == ":)";
+}
+
+private void ed_indent_group(mapping work, int column)
+{
+   string close = ed_indent_close(ed_indent_peek(work));
+   int inner = column + (ed_shiftwidth > 1 ? ed_shiftwidth / 2 : 1);
+   ed_indent_enter(work);
+   ed_indent_take(work, column);
+   ed_indent_comments(work, inner);
+   if (close == ")" && (ed_indent_peek(work) == "{" || ed_indent_peek(work) == "[" || ed_indent_peek(work) == ":"))
+   {
+      close = ed_indent_peek(work) == "{" ? "})" : ed_indent_peek(work) == "[" ? "])" : ":)";
+      ed_indent_take(work, column);
+   }
+   if (close == ":)")
+   {
+      ed_indent_comments(work, inner);
+      if (ed_indent_peek(work) == "[") ed_indent_group(work, inner);
+      for (;;)
+      {
+         ed_indent_comments(work, inner);
+         if (ed_indent_peek(work) == ":")
+         {
+            ed_indent_take(work, column);
+            ed_indent_comments(work, column);
+            if (ed_indent_peek(work) != ")") ed_fail("mismatched closure delimiter");
+            ed_indent_take(work, column);
+            work["nest"]--;
+            return;
+         }
+         if (!sizeof(ed_indent_peek(work))) ed_fail("unclosed closure delimiter");
+         ed_indent_statement(work, inner, 0, ":");
+      }
+   }
+   for (;;)
+   {
+      string token;
+      ed_indent_comments(work, inner);
+      token = ed_indent_peek(work);
+      if (!sizeof(token)) ed_fail("unclosed indentation delimiter");
+      if (token == close || (sizeof(close) == 2 && token == close[0..0]))
+      {
+         ed_indent_take(work, column);
+         if (sizeof(close) == 2)
+         {
+            ed_indent_comments(work, column);
+            if (ed_indent_peek(work) != ")") ed_fail("mismatched literal delimiter");
+            ed_indent_take(work, column);
+         }
+         work["nest"]--;
+         return;
+      }
+      if (ed_indent_closer(token)) ed_fail("mismatched indentation delimiter");
+      if (sizeof(ed_indent_close(token))) ed_indent_group(work, inner);
+      else if (token == "{") ed_indent_block(work, inner, 0);
+      else ed_indent_take(work, inner);
+   }
+}
+
+private void ed_indent_block(mapping work, int column, int labels)
+{
+   ed_indent_enter(work);
+   ed_indent_take(work, column);
+   for (;;)
+   {
+      string token;
+      ed_indent_comments(work, column + ed_shiftwidth);
+      token = ed_indent_peek(work);
+      if (!sizeof(token)) ed_fail("unclosed indentation block");
+      if (token == "}")
+      {
+         ed_indent_take(work, column);
+         work["nest"]--;
+         return;
+      }
+      ed_indent_statement(work, column + ed_shiftwidth, labels);
+   }
+}
+
+private void ed_indent_body(mapping work, int column, int labels, string end)
+{
+   string token;
+   int first_row;
+   int continuation = column + (ed_shiftwidth > 1 ? ed_shiftwidth / 2 : 1);
+   ed_indent_comments(work, column);
+   token = ed_indent_peek(work);
+   if (!sizeof(token)) ed_fail("missing control-statement body");
+   first_row = work["rows"][work["pos"]];
+   if (token == "{")
+   {
+      ed_indent_block(work, column, 0);
+      return;
+   }
+   if (token == "if" || token == "for" || token == "foreach" || token == "while" || token == "switch" || token == "do")
+   {
+      string control = token;
+      ed_indent_take(work, column);
+      if (control != "do")
+      {
+         ed_indent_comments(work, column);
+         if (ed_indent_peek(work) != "(") ed_fail("control statement requires parentheses");
+         ed_indent_group(work, column);
+      }
+      ed_indent_comments(work, column);
+      if (ed_indent_peek(work) == "{") ed_indent_block(work, column, control == "switch");
+      else
+      {
+         if (control == "switch") ed_fail("switch requires a block");
+         ed_indent_statement(work, column + ed_shiftwidth, 0);
+      }
+      ed_indent_comments(work, column);
+      if (control == "if" && ed_indent_peek(work) == "else")
+      {
+         ed_indent_take(work, column);
+         ed_indent_comments(work, column);
+         if (ed_indent_peek(work) == "if" || ed_indent_peek(work) == "{")
+            ed_indent_statement(work, column, 0);
+         else ed_indent_statement(work, column + ed_shiftwidth, 0);
+      }
+      if (control == "do")
+      {
+         if (ed_indent_peek(work) != "while") ed_fail("do requires a trailing while");
+         ed_indent_take(work, column);
+         ed_indent_comments(work, column);
+         if (ed_indent_peek(work) != "(") ed_fail("do/while requires parentheses");
+         ed_indent_group(work, column);
+         ed_indent_comments(work, column);
+         if (ed_indent_peek(work) != ";") ed_fail("do/while requires a semicolon");
+         ed_indent_take(work, column);
+      }
+      return;
+   }
+   if (token == "case" || token == "default")
+   {
+      int ternary;
+      if (!labels) ed_fail("case label outside switch");
+      column -= ed_shiftwidth;
+      ed_indent_take(work, column);
+      for (;;)
+      {
+         ed_indent_comments(work, column);
+         token = ed_indent_peek(work);
+         if (!sizeof(token) || ed_indent_closer(token)) ed_fail("unfinished case label");
+         if (token == ":" && !ternary)
+         {
+            ed_indent_take(work, column);
+            return;
+         }
+         if (token == "?") ternary++;
+         else if (token == ":") ternary--;
+         if (sizeof(ed_indent_close(token))) ed_indent_group(work, column);
+         else ed_indent_take(work, column);
+      }
+   }
+   for (;;)
+   {
+      int target;
+      ed_indent_comments(work, continuation);
+      token = ed_indent_peek(work);
+      if (!sizeof(token)) return;
+      if (end == ":" && token == ":" && work["pos"] + 1 < sizeof(work["tokens"]) &&
+          work["tokens"][work["pos"]+1] == ")") return;
+      if (ed_indent_closer(token)) ed_fail("mismatched or unfinished indentation statement");
+      if (token == "else" || token == "case" || token == "default") ed_fail("misplaced control keyword");
+      target = work["rows"][work["pos"]] == first_row ? column : continuation;
+      if (token == ";")
+      {
+         ed_indent_take(work, column);
+         return;
+      }
+      if (sizeof(ed_indent_close(token))) ed_indent_group(work, target);
+      else if (token == "{")
+      {
+         ed_indent_block(work, column, 0);
+         ed_indent_comments(work, column);
+         token = ed_indent_peek(work);
+         if (token == ";") ed_indent_take(work, column);
+         else if (sizeof(token) == 1 && strindex("([,+-*/%&|^<>=!?:.@", token) >= 0 && token != end) continue;
+         return;
+      }
+      else ed_indent_take(work, target);
+   }
+}
+
+private void ed_indent_statement(mapping work, int column, int labels, string end = "")
+{
+   ed_indent_enter(work);
+   ed_indent_body(work, column, labels, end);
+   work["nest"]--;
+}
+
+private string ed_indent()
+{
+   mapping work = ed_indent_lex();
+   string *next = allocate(sizeof(ed_lines));
+   int changed;
+   while (sizeof(ed_indent_peek(work)))
+   {
+      ed_indent_comments(work, 0);
+      if (sizeof(ed_indent_peek(work))) ed_indent_statement(work, 0, 0);
+   }
+   for (int row = 0; row < sizeof(ed_lines); row++)
+   {
+      int column = work["columns"][row];
+      if (work["keep"][row]) next[row] = ed_lines[row];
+      else if (work["prefix"][row] == sizeof(ed_lines[row])) next[row] = "";
+      else
+      {
+         if (column < 0 || column > ED_MAX_LINE_BYTES) ed_fail("invalid indentation column");
+         next[row] = " " * column + ed_lines[row][work["prefix"][row]..];
+      }
+      if (next[row] != ed_lines[row]) changed = 1;
+   }
+   ed_check_lines(next);
+   ed_lines = next;
+   if (changed) ed_dirty = 1;
+   return sprintf("Indented %d lines.\n", sizeof(next));
+}
+
 private int ed_setup_code()
 {
    // The legacy eightbit bit is always set because native strings retain Unicode.
@@ -674,7 +1030,7 @@ private string ed_show_help(string topic)
          "q refuses modified buffers; Q discards the buffer and exits.",
          "z scrolls; set scroll changes the page size from 1 through 100.",
          "set number/nonumber, list/nolist and print/noprint change output.",
-         "set shiftwidth stores 1 through 15 for future LPC indentation.",
+         "I indents the whole buffer; set shiftwidth chooses 1 through 15 spaces.",
          "set save forwards preferences to optional owner setup methods.",
          "Restricted editors cannot load other files or save preferences.",
          "Limits: 8192 UTF-8 buffer bytes, 1000 lines, 2048 bytes per line.",
@@ -682,7 +1038,7 @@ private string ed_show_help(string topic)
          "File saves acknowledge staging; commit-time delivery may still fail.",
          "h s, h g, h set, h files or h limits gives focused help.",
          "Return advances help; q leaves help without exiting the editor.",
-         "I, autoindent and legacy regex options are not implemented yet."
+         "Autoindent and legacy regex options are not implemented yet."
       });
    else if (topic == "s")
       ed_help = ({ "[range]s/re/replacement/[gp]", "g replaces all occurrences per line; p prints changed lines.",
@@ -695,8 +1051,12 @@ private string ed_show_help(string topic)
                   "Nested globals and file/input/exit commands are refused." });
    else if (topic == "set")
       ed_help = ({ "set reports current editor options.", "set number/nonumber, list/nolist or print/noprint changes output.",
-                  "set scroll 1..100 controls scrolling and help pages.", "set shiftwidth 1..15 stores a future indentation width.",
-                  "set save uses owner query_ed_setup/set_ed_setup methods.", "I and autoindent are not implemented; Unicode is always retained." });
+                  "set scroll 1..100 controls scrolling and help pages.", "set shiftwidth 1..15 controls LPC indentation.",
+                  "set save uses owner query_ed_setup/set_ed_setup methods.", "I indents the whole buffer; autoindent is unavailable; Unicode is retained." });
+   else if (topic == "I")
+      ed_help = ({ "I indents the whole buffer without addresses or arguments.", "Blocks use shiftwidth spaces; continuations use half, with a minimum of one.",
+                  "Only leading whitespace changes; multiline literal/directive text is retained.", "Malformed delimiters and excessive growth/nesting leave the buffer intact.",
+                  "Cursor, marks and lines are preserved; changed indentation marks the buffer modified." });
    else if (topic == "files")
       ed_help = ({ "e/E open, r reads, f selects a filename.", "w stages overwrite; W stages append; x stages overwrite and exits.",
                   "Partial writes and append preserve the modified flag.", "Native file policy authorizes the owning object and module.",
@@ -759,6 +1119,9 @@ private string ed_execute(string command)
    }
    switch (operation)
    {
+   case 'I':
+      if (addressed || sizeof(argument)) ed_fail("I takes no address or argument");
+      return ed_indent();
    case 'h':
       if (addressed) ed_fail("help takes no address");
       return ed_show_help(argument);
