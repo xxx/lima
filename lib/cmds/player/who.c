@@ -29,7 +29,7 @@ string get_who_string(string arg)
    object *u;
    int i;
    string name, extra, retval;
-   string uptime = time_to_string(uptime() - (uptime() % 3600));
+   string uptime = time_to_string(uptime() - (uptime() % 3600), 0);
    // If we have bodies() and they have a level>1, the MUD must use levels.
    // This is not set by a DEFINE but a result of implementation in adversary/body.
    int use_levels_guess = sizeof(bodies()) ? bodies()[0]->query_level() > 0 : 0;
@@ -76,7 +76,7 @@ string get_who_string(string arg)
    else
       u = filter(bodies(), ( : $1->is_visible() :));
 
-   u -= ({0});
+   u = filter(u, objectp);
    i = sizeof(u);
    set_frame_title(sprintf("Who - %d user%s", i, (i != 1 ? "s" : "")));
    if (use_levels_guess)
@@ -102,7 +102,7 @@ private
 void main(string arg)
 {
    if (arg == "")
-      arg = 0;
+      arg = nil;
 
    out(get_who_string(arg));
 }
@@ -110,6 +110,11 @@ void main(string arg)
 void player_menu_entry()
 {
    bare_init();
-   main(0);
+   main(nil);
    done_outputing();
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
