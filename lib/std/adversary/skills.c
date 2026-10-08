@@ -23,7 +23,7 @@ int aggregate_skill(string skill)
    int coef = 1;
    for (int i = 0; i < sizeof(explode(skill, "/")); i++)
    {
-      pts += adversary_skills[skill] / coef;
+      pts += (adversary_skills[skill] || 0) / coef;
       coef = coef * AGGREGATION_FACTOR;
    }
    return pts;

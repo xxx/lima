@@ -92,7 +92,7 @@ int cached_skill_rank(string s)
 {
    if (!sizeof(keys(skill_ranks)))
       initiate_ranks();
-   return skill_ranks[s];
+   return skill_ranks[s] || 0;
 }
 
 //: FUNCTION banner_rankup
@@ -120,7 +120,7 @@ int check_rank(string skill_name, int sp)
    // TBUG(this_object()+"Name: "+skill_name+" Cached rank: "+skill_ranks[skill_name]+" calc rank: "+rank+" Skillpoints:
    // "+sp);
 
-   rank_up = rank > skill_ranks[skill_name] ? 1 : 0;
+   rank_up = rank > (skill_ranks[skill_name] || 0) ? 1 : 0;
    if (rank_up)
    {
       banner_rankup(skill_name, rank);
@@ -140,13 +140,13 @@ mapping query_skill_ranks()
 }
 
 //: FUNCTION set_skill
-// class skill set_skill(string skill, int skill_points, int training_points);
+// class skill set_skill(string skill, int skill_points, int training_points = 0);
 // Function for creating class skill and settings them directly into the player.
 // Mostly called internally in BODY, but can be used for testing by wizards.
 //
 // i.e. give me 100 skill_points and 20 training_points in combat/sword:
 // @.me->set_skill("combat/melee/blade",100,20)
-class skill set_skill(string skill, int skill_points, int training_points)
+class skill set_skill(string skill, int skill_points, int training_points = 0)
 {
    class skill cs = skills[skill];
 
@@ -217,9 +217,9 @@ class skill query_skill(string s)
 {
    class skill skill;
    if (!skills[s])
-      return 0;
+      return nil;
    skill = deep_copy(skills[s]);
-   skill.skill_points = clamp(skill.skill_points + skill_bonus[s], 0, MAX_SKILL_VALUE);
+   skill.skill_points = clamp(skill.skill_points + (skill_bonus[s] || 0), 0, MAX_SKILL_VALUE);
    return skill;
 }
 
@@ -258,7 +258,7 @@ void remove_skill_bonus(string s, int v)
 int query_skill_bonus(string skill)
 {
    if (skills[skill])
-      return skill_bonus[skill];
+      return skill_bonus[skill] || 0;
    return -1;
 }
 
@@ -327,7 +327,7 @@ void learn_skill(string skill, int value)
       }
 
       /* centered within skill range */
-      s = my_skill->skill_points - (MAX_SKILL_VALUE / 2);
+      s = my_skill.skill_points - (MAX_SKILL_VALUE / 2);
 
       /* as a person's skill increases, the amount they learn decreases */
       divisor = ((LEARNING_FACTOR - 1) * s * s) / (MAX_SKILL_VALUE * MAX_SKILL_VALUE / 4) + 1;
@@ -398,5 +398,8 @@ varargs int test_skill(string skill, int opposing_skill, int no_learn)
 // to the maximum possible skill level.
 int query_evaluation()
 {
-   return implode(values(skills), ( : $1 + ((class skill)$2)->skill_points:), 0) * 100 / EVALUATION_SKILL_LEVEL;
+   int total = 0;
+   foreach (class skill entry in values(skills))
+      total += entry.skill_points;
+   return total * 100 / EVALUATION_SKILL_LEVEL;
 }
