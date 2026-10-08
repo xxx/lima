@@ -374,7 +374,7 @@ string xterm256_wrap(string str, int wrap_at, int indent_at)
 
    parts = map(
        parts,
-       function(string part, mapping running, int max, int indent) {
+       (: [string part, mapping running, int max, int indent] {
           string plain;
           int len;
 
@@ -400,7 +400,7 @@ string xterm256_wrap(string str, int wrap_at, int indent_at)
           }
 
           return part;
-       },
+       } :),
        running, wrap_at, indent_at);
 
    return implode(map(explode(implode(parts, " "), "\n"), ( : rtrim:)), "\n");
