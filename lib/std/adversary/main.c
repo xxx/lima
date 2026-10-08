@@ -31,7 +31,7 @@ int stand_up();
 
 void dispatch_opponent()
 {
-   add_event(query_target(), query_weapon(), 0, "dispatch");
+   add_event(query_target(), query_weapon(), nil, "dispatch");
 }
 
 int try_to_ready()
@@ -134,9 +134,9 @@ void take_a_swing(object target)
    if (roll > chance)
    {
       if (random(100) < disarm_chance(target) && target->query_weapon() != target)
-         add_event(target, weapon, 0, "disarm");
+         add_event(target, weapon, nil, "disarm");
       else
-         add_event(target, weapon, 0, "miss");
+         add_event(target, weapon, nil, "miss");
    }
    else
    {
@@ -150,7 +150,7 @@ void take_a_swing(object target)
       // If target defended successfully, halve the damage
       if (def_roll <= defense)
       {
-         damage = damage * 0.5;
+         damage /= 2;
          //      TBUG(this_object()->short() + " attacks " + target->short() + " Def chance: " + defense + " DEFENDED");
       }
       //    else
@@ -167,7 +167,7 @@ void attack()
    object target;
    mixed tmp;
 
-   tmp = call_hooks("prevent_combat", ( : $1 + "|" + $2:));
+   tmp = call_hooks("prevent_combat", ( : $1 + "|" + $2:), 0);
    if (sizeof(tmp))
    {
       tmp = explode(tmp, "|");
@@ -180,7 +180,7 @@ void attack()
 
       if (sizeof(tmp))
       {
-         tmp = format_list(tmp);
+         tmp = format_list(tmp, "and");
          tell(this_object(), "Attack prevented by " + tmp + ".\n");
       }
       return;
