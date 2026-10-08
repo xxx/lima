@@ -23,20 +23,10 @@ class wear_info find_wi(string s)
 
    wi = armours[s];
 
-   // Upgrade class with secondary if needed
-   if (sizeof(wi) == 2)
-   {
-      class wear_info wi_upgrade = new (class wear_info);
-      wi_upgrade.primary = wi.primary;
-      wi_upgrade.others = wi.others;
-      wi = wi_upgrade;
-      armours[s] = wi;
-   }
-
    if (!wi)
    {
       if (!is_limb(s))
-         return 0;
+         return nil;
       wi = armours[s] = new (class wear_info);
    }
    return wi;
@@ -51,36 +41,69 @@ object *query_armours(string s)
    object *armours = ({});
 
    if (query_max_health(s) == -1)
-      return 0;
+      return nil;
 
    wi = find_wi(s);
    if (!wi)
-      return 0;
+      return nil;
 
-   armours += ({wi.primary}) + (arrayp(wi.others) ? wi.others : ({0})) + ({wi.secondary});
-   armours -= ({0});
-   return sizeof(armours) ? armours : 0;
+   armours += ({wi.primary}) + (arrayp(wi.others) ? wi.others : ({nil})) + ({wi.secondary});
+   armours -= ({nil});
+   return sizeof(armours) ? armours : nil;
+}
+
+private void prune_armour_slot(string limb, class wear_info wi)
+{
+   if (!sizeof(wi.others))
+      wi.others = nil;
+   if (!wi.primary && !wi.secondary && !wi.others)
+      m_delete(armours, limb);
 }
 
 //: FUNCTION update_cover
-// Update the cover of a piece of equipment using this function should the cover change between wearing it and it being
-// removed and worn again.
+// Refresh the additional limbs covered by a worn item.
 void update_cover(object what)
 {
-   mixed *also;
+   string *also;
    class wear_info wi;
+   int worn;
+
+   if (!what)
+      return;
+
+   foreach (string limb, class wear_info entry in armours)
+      if (entry.primary == what || entry.secondary == what)
+         worn = 1;
+
+   if (!worn)
+      return;
 
    also = what->also_covers();
-   if (also)
-      foreach (string limb in also)
-         if (wi = find_wi(limb))
-         {
-            if (wi.others && member_array(what, wi.others) == -1)
-               wi.others += ({what});
-            else
-               wi.others = ({what});
-            wi.others -= ({0});
-         }
+   if (!also)
+      also = ({});
+
+   foreach (string limb in keys(armours))
+   {
+      class wear_info entry = armours[limb];
+      if (entry.others && member_array(what, entry.others) != -1 &&
+          (entry.primary == what || entry.secondary == what || member_array(limb, also) == -1))
+      {
+         entry.others -= ({what, nil});
+         prune_armour_slot(limb, entry);
+      }
+   }
+
+   foreach (string limb in also)
+      if (wi = find_wi(limb))
+      {
+         if (wi.primary == what || wi.secondary == what)
+            continue;
+         if (!wi.others)
+            wi.others = ({});
+         if (member_array(what, wi.others) == -1)
+            wi.others += ({what});
+         wi.others -= ({nil});
+      }
 }
 
 //: FUNCTION wear_item
@@ -90,7 +113,6 @@ nomask int wear_item(object what, string where)
 {
    class wear_info wi;
    string orig_w = where;
-   mixed *also;
 
    // Find the limb we want to use.
    if (is_limb(where))
@@ -127,7 +149,6 @@ nomask int wear_item(object what, string where)
 
    wi.primary = what;
 
-   also = what->also_covers();
    update_cover(what);
    return 1;
 }
@@ -139,7 +160,6 @@ nomask int remove_item(object what, string where)
 {
    class wear_info wi;
    string orig_w = where;
-   string *also;
 
    if (!(wi = armours[where]) || (wi.primary != what && wi.secondary != what))
    {
@@ -154,26 +174,21 @@ nomask int remove_item(object what, string where)
       }
    }
 
-   wi.primary = 0;
-   if (wi.others == 0)
-      m_delete(armours, where);
+   if (wi.primary == what)
+      wi.primary = nil;
+   if (wi.secondary == what)
+      wi.secondary = nil;
+   prune_armour_slot(where, wi);
 
-   also = what->also_covers();
-   if (also)
-      foreach (string limb in also)
-         if (wi = find_wi(limb))
-         {
-            wi.others -= ({what});
-            wi.others -= ({0});
-
-            if (sizeof(wi.others) == 0)
-            {
-               if (wi.primary == 0)
-                  m_delete(armours, limb);
-               else
-                  wi.others = 0;
-            }
-         }
+   foreach (string limb in keys(armours))
+   {
+      class wear_info entry = armours[limb];
+      if (entry.others && member_array(what, entry.others) != -1)
+      {
+         entry.others -= ({what, nil});
+         prune_armour_slot(limb, entry);
+      }
+   }
    return 1;
 }
 
