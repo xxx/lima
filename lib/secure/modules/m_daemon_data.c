@@ -2,7 +2,7 @@
 
 inherit M_ACCESS;
 
-int lima_save = 0;
+private nosave int lima_save = 0;
 
 //: MODULE
 //
@@ -19,7 +19,7 @@ int lima_save = 0;
 // with your mudlib. Do not change this function.
 nomask string create_file_name()
 {
-   string ret = (lima_save && mud_name() == "LIMA" ? "/data/lima" : "/data") + file_name();
+   string ret = (lima_save && mud_name() == "LIMA" ? "/data/lima" : "/data") + file_name(this_object());
 
    if (ret[ < 2..] == "_d")
       ret = ret[0.. < 3];
@@ -27,7 +27,7 @@ nomask string create_file_name()
    return ret;
 }
 
-void set_lima_save()
+protected void set_lima_save()
 {
    lima_save = 1;
 }
@@ -37,7 +37,7 @@ void set_lima_save()
 protected
 nomask void save_me()
 {
-   unguarded(1, ( : save_object, create_file_name() :));
+   unguarded(1, &save_object(create_file_name()));
 }
 
 //: FUNCTION restore_me
@@ -46,11 +46,13 @@ protected
 nomask void restore_me()
 {
    string fn = create_file_name();
-   if (unguarded(1, ( : file_size, fn + __SAVE_EXTENSION__:)) > 0)
-      unguarded(1, ( : restore_object, fn, 1 :));
+   if (unguarded(1, &restore_object(fn)))
+      return;
+   if (unguarded(1, &file_size(fn + __SAVE_EXTENSION__)) != -1)
+      error("Unable to restore daemon data: " + fn);
 }
 
-create()
+void create()
 {
    set_privilege(1);
    restore_me();
