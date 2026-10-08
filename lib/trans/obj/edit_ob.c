@@ -53,7 +53,7 @@ void discard_staged_file()
 private
 string tmp_fname()
 {
-   return "/tmp/edit_ob." + this_user()->query_userid();
+   return "/tmp/edit_ob." + this_user()->query_userid() + "." + explode(file_name(this_object()), "#")[<1];
 }
 
 private
@@ -108,8 +108,8 @@ void end_edit(int aborted)
    {
       if (client_fname)
       {
-         rm(client_fname);
-         write_file(client_fname, build_string());
+         if (!write_file(client_fname, build_string(), 1))
+            error("Unable to save edited file.\n");
          arg = client_fname;
       }
       else
@@ -192,7 +192,8 @@ void handle_escape(string str)
 
       tmp_file = tmp_fname();
       problem = catch {
-         rm(tmp_file);
+         if (file_size(tmp_file) != -1)
+            error("Temporary draft filename is already in use.\n");
          if (!write_file(tmp_file, build_string()))
             error("Unable to stage edit buffer.\n");
       };
@@ -204,7 +205,14 @@ void handle_escape(string str)
          return;
       }
       staged_file = tmp_file;
-      session->begin_editing(tmp_file, !this_user()->query_privilege(), end_ed);
+      problem = catch(session->begin_editing(tmp_file, !this_user()->query_privilege(), end_ed, discard_staged_file));
+      if (problem)
+      {
+         discard_staged_file();
+         if (session)
+            unguarded(1, &destruct(session));
+         write("Unable to start line editor; continue editing here.\n");
+      }
       return;
    }
 }

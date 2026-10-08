@@ -54,7 +54,7 @@ private string *ed_read(string path, int missing_ok)
 {
    string text;
    string *lines;
-   int size = efun::file_size(path);
+   int size = file_size(path);
    if (size == -1 && missing_ok)
    {
       int slash = strindex(path, "/", 1);
@@ -62,7 +62,7 @@ private string *ed_read(string path, int missing_ok)
       // Escaping the entire leaf selects literal matching in get_dir's pattern mode.
       for (int index = slash + 1; index < sizeof(path); index++)
          pattern += "\\" + sprintf("%c", path[index]);
-      if (!sizeof(efun::get_dir(pattern)))
+      if (!sizeof(get_dir(pattern)))
          return ({});
       ed_fail("file exists but metadata is unavailable");
    }
@@ -70,7 +70,7 @@ private string *ed_read(string path, int missing_ok)
       ed_fail("filename is a directory");
    if (size > ED_MAX_BYTES)
       ed_fail("file exceeds 8192 UTF-8 bytes");
-   text = efun::read_file(path);
+   text = read_file(path);
    lines = sizeof(text) ? explode(text, "\n") : ({});
    if (sizeof(text) && text[<1] == '\n')
       lines = lines[0..<2];
@@ -172,7 +172,7 @@ private int ed_search(string pattern, int base, int direction)
    for (int offset = 1; offset <= count; offset++)
    {
       int line = (base - 1 + direction * offset + count * 2) % count + 1;
-      if (stringp(efun::regmatch(ed_lines[line-1], pattern)))
+      if (stringp(regmatch(ed_lines[line-1], pattern)))
          return line;
    }
    ed_fail("search failed");
@@ -394,7 +394,7 @@ private string ed_substitute(int first, int last, int selected_only = 0)
       else ed_fail("unsupported or repeated substitution flag");
    }
    ed_range(first, last);
-   efun::regmatch("", pattern, 0x1000);
+   regmatch("", pattern, 0x1000);
    for (int line = 1; line <= sizeof(ed_lines); line++)
       if (line < first || line > last) total_bytes += ed_bytes(ed_lines[line-1]) + 1;
    for (int original = first; original <= last; original++)
@@ -416,7 +416,7 @@ private string ed_substitute(int first, int last, int selected_only = 0)
       }
       while (selected && start <= sizeof(text))
       {
-         mixed found = efun::regmatch(text, pattern, 0x1000, start);
+         mixed found = regmatch(text, pattern, 0x1000, start);
          mixed *captures;
          int end;
          int begin;
@@ -516,13 +516,13 @@ private string ed_select(int first, int last, int inverse)
 {
    int delimiter = ed_delimiter();
    string pattern = ed_search_pattern(delimiter);
-   string command = efun::trim(ed_scan_pos < sizeof(ed_scan) ? ed_scan[ed_scan_pos..] : "");
+   string command = trim(ed_scan_pos < sizeof(ed_scan) ? ed_scan[ed_scan_pos..] : "");
    string output = "";
    ed_range(first, last);
-   efun::regmatch("", pattern);
+   regmatch("", pattern);
    ed_selected = ({});
    for (int line = first; line <= last; line++)
-      if (stringp(efun::regmatch(ed_lines[line-1], pattern)) != inverse)
+      if (stringp(regmatch(ed_lines[line-1], pattern)) != inverse)
          ed_selected += ({ line });
    if (!sizeof(command)) command = "p";
    ed_global = 1;
@@ -928,7 +928,7 @@ private int ed_setup_code()
 private int ed_retrieve_setup()
 {
    mixed code;
-   if (!efun::function_exists("query_ed_setup", this_object())) return 0x84;
+   if (!function_exists("query_ed_setup", this_object())) return 0x84;
    code = this_object()->query_ed_setup();
    if (!intp(code) || code < 0 || code > 0xff)
       ed_fail("unsupported saved setup code");
@@ -980,8 +980,8 @@ private string ed_settings(int addressed)
    else if (option == "save")
    {
       if (ed_restricted) ed_fail("setup saving is restricted");
-      if (!efun::function_exists("query_ed_setup", this_object()) ||
-          !efun::function_exists("set_ed_setup", this_object()))
+      if (!function_exists("query_ed_setup", this_object()) ||
+          !function_exists("set_ed_setup", this_object()))
          ed_fail("setup persistence is unavailable");
       this_object()->set_ed_setup(ed_setup_code());
       return "Setup handed to owner.\n";
@@ -1107,7 +1107,7 @@ private string ed_execute(string command)
    string argument;
    ed_skip_space();
    operation = ed_scan_pos < sizeof(command) ? command[ed_scan_pos++] : 0;
-   argument = ed_scan_pos < sizeof(command) ? efun::trim(command[ed_scan_pos..]) : "";
+   argument = ed_scan_pos < sizeof(command) ? trim(command[ed_scan_pos..]) : "";
    if (ed_global && operation != 0 && operation != 'p' && operation != 'l' &&
        operation != '=' && operation != 'd' && operation != 's')
       ed_fail("command is not supported inside global selection");
@@ -1260,7 +1260,7 @@ private string ed_execute(string command)
          if (sizeof(ed_lines) || addressed) ed_range(first, last);
          text = ed_text(first, last);
          output = sprintf("Staged %d lines to %s.\n", last-first+1, path);
-         efun::write_file(path, text, operation == 'W' ? 0 : 1);
+         write_file(path, text, operation == 'W' ? 0 : 1);
          if (!sizeof(ed_filename)) ed_filename = path;
          if (operation != 'W' && path == ed_filename && first == 1 && last == sizeof(ed_lines))
             ed_dirty = 0;

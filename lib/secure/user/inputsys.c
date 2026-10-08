@@ -227,6 +227,30 @@ nomask void modal_pop()
       evaluate(info.return_to_func);
 }
 
+// Remove only the caller's exact handler, even when another handler covers it.
+nomask void modal_remove(function handler)
+{
+   class input_info parent;
+   if (function_info(handler)["owner"] != previous_object())
+      error("modal_remove: handler owner mismatch");
+   for (int index = sizeof(modal_stack) - 1; index >= 0; index--)
+   {
+      if (modal_stack[index].input_func != handler)
+         continue;
+      int was_top = index == sizeof(modal_stack) - 1;
+      class input_info *remaining = index ? modal_stack[0..index-1] : ({});
+      if (index + 1 < sizeof(modal_stack))
+         remaining += modal_stack[index+1..];
+      modal_stack = remaining;
+      // Removing a lower entry shifts the current dispatch position.
+      if (index < dispatching_to - 1)
+         dispatching_to--;
+      if (was_top && (parent = get_top_handler(0, 0)) && parent.return_to_func)
+         evaluate(parent.return_to_func);
+      return;
+   }
+}
+
 varargs nomask void modal_func(function input_func, mixed prompt, int secure, int lock)
 {
    modal_stack[ < 1].input_func = input_func;

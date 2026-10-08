@@ -8,6 +8,7 @@
 **
 **    modal_push()
 **    modal_push_char()
+**    modal_remove()
 **    modal_pop()
 **    modal_func()
 **    modal_simple()
@@ -44,9 +45,21 @@ nomask void modal_push_char(function callback)
 protected
 nomask void modal_pop()
 {
-   if (input_user)
-      input_user->modal_pop();
+   object owner = input_user;
    input_user = nil;
+   if (owner)
+      owner->modal_pop();
+}
+
+protected
+nomask void modal_remove(function handler)
+{
+   object owner = input_user;
+   if (function_info(handler)["owner"] != this_object())
+      error("modal_remove: handler owner mismatch");
+   input_user = nil;
+   if (owner)
+      owner->modal_remove(handler);
 }
 
 protected
