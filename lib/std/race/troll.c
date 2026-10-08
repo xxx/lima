@@ -22,19 +22,18 @@ string *compatibility()
  */
 string short_description()
 {
-   return @LONG Trolls are extremely strong and powerful creatures; probably the toughest
-race available. Their skin is extremely thick and conventional means of
-damage do not help much in killing them. Trolls aren't very intelligent
-or quick on their feet, but have an amazingly high willpower and just
-don't know when to quit. They are not exactly social outcasts, but tend
-not to do very well politically. They are definitely a physical force to
-be reckoned with though, unless you carry a torch. Trolls have a terrible
-weakness for fire and are highly susceptible to its flames. Trolls often
-live in dark, wet areas (such as under bridges!) where they can keep
-their skin moist. Trolls do not band together in tribes or form communities
-and so they can come from any part of the land. Their chief deities are
-those related to water and nature.
-LONG;
+   return "Trolls are extremely strong and powerful creatures; probably the toughest\n"
+          "race available. Their skin is extremely thick and conventional means of\n"
+          "damage do not help much in killing them. Trolls aren't very intelligent\n"
+          "or quick on their feet, but have an amazingly high willpower and just\n"
+          "don't know when to quit. They are not exactly social outcasts, but tend\n"
+          "not to do very well politically. They are definitely a physical force to\n"
+          "be reckoned with though, unless you carry a torch. Trolls have a terrible\n"
+          "weakness for fire and are highly susceptible to its flames. Trolls often\n"
+          "live in dark, wet areas (such as under bridges!) where they can keep\n"
+          "their skin moist. Trolls do not band together in tribes or form communities\n"
+          "and so they can come from any part of the land. Their chief deities are\n"
+          "those related to water and nature.\n";
 }
 
 /*
@@ -119,8 +118,8 @@ class event_info health_modify_event(class event_info evt)
    if (!arrayp(evt.data))
       return evt;
    if (member_array("fire", evt.data) != -1)
-      evt->data[sizeof(evt.data) - 1] *= 2;
+      evt.data[sizeof(evt.data) - 1] *= 2;
    else
-      evt->data[sizeof(evt.data) - 1]--;
+      evt.data[sizeof(evt.data) - 1]--;
    return evt;
 }
