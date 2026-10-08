@@ -24,7 +24,7 @@ void set_throwmsg(string s)
    throw_response = s;
    if (!my_throw_hook)
    {
-      my_throw_hook = ( : prevent_throw:);
+      my_throw_hook = prevent_throw;
       add_hook("prevent_throw", my_throw_hook);
    }
 }
@@ -44,7 +44,7 @@ void set_throwable(int g)
 
    if (!my_throw_hook)
    {
-      my_throw_hook = ( : prevent_throw:);
+      my_throw_hook = prevent_throw;
       add_hook("prevent_throw", my_throw_hook);
    }
 }
@@ -57,7 +57,7 @@ varargs void has_been_thrown(object ob)
 void do_thrown_damage(object target, function damage_func)
 {
    this_body()->start_fight(target);
-   this_body()->add_event(target, this_object(), 0, evaluate(damage_func));
+   this_body()->add_event(target, this_object(), nil, evaluate(damage_func));
 }
 
 void do_thrown_vital_damage(object target, function damage_func)
@@ -79,8 +79,8 @@ mixed land_throwable(object target, int success)
    {
       if (target)
       {
-         TBUG("Target is: " + target);
-         this_body()->targetted_action("$N $vthrow a $o at $t, but $n1 $v1dodge out of the way.", target);
+         TBUG(sprintf("Target is: %O", target));
+         this_body()->targetted_action("$N $vthrow a $o at $t, but $n1 $v1dodge out of the way.", target, this_object());
       }
       else
          this_body()->simple_action("$N $vthrow a $o nothing in particular.");
@@ -134,12 +134,12 @@ mixed do_throw(object target)
          // Skill successful
          if (this_body()->test_skill(skill, defend_value))
          {
-            call_out("land_throwable", random(2) + 1, target, 1);
+            call_out(&land_throwable(target, 1), random(2) + 1);
             return 1;
          }
          else // Target dodged us
          {
-            call_out("land_throwable", random(3) + 1, target, 0);
+            call_out(&land_throwable(target, 0), random(3) + 1);
             return 1;
          }
       }

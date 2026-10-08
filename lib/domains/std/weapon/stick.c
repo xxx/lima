@@ -14,8 +14,8 @@ void setup(string c)
    set_damage_type("bludgeon");
    set_long("A simple stick coloured " + colour + ".");
    set_in_room_desc("A " + colour + " stick is lying on the ground.");
-   set_weight(1);
-   set_value(2);
+   set_weight(1.0);
+   set_value(2.0);
    set_skill_used("combat/melee/club");
    set_combat_messages("combat-bludgeon");
    set_salvageable((["wood":100]));
