@@ -272,7 +272,9 @@ void write_callback(object socket)
    {
       sending[socket] = ({file, i1 + i2});
    }
-   socket->send(read_buffer(file, i1, i2));
+   mixed chunk = read_bytes(file, i1, i2);
+   if (bytesp(chunk) && sizeof(chunk)) socket->send(chunk);
+   else socket->remove();
 }
 
 private
@@ -289,7 +291,7 @@ varargs private nomask void http_send(mixed text, object socket, string ext)
    string send;
    string day_of_week;
    string month;
-   mixed body;
+   bytes body;
    int day_of_month;
    int hour;
    int minute;
@@ -305,7 +307,7 @@ varargs private nomask void http_send(mixed text, object socket, string ext)
    if (!content)
       content = "text/html";
    if (stringp(text) && strlen(text) > 0)
-      body = replace_string(text, "\n", "\r\n");
+      body = to_bytes(replace_string(text, "\n", "\r\n"), "UTF-8");
    send = sprintf("HTTP/1.1 200 OK\r\n"
                   "Date: %s\r\n"
                   "Server: Lima/1.1\r\n"
@@ -392,7 +394,7 @@ nomask void handle_get_request(class client_request req, object socket)
 
    default:
       sending[socket] = ({file + "." + extention, 0});
-      socket->set_write_callback(( : write_callback:));
+      socket->set_write_callback(write_callback);
       http_send("", socket, extention);
       //	http_send(write_callback(socket),socket,extention);
       break;
@@ -457,7 +459,7 @@ void add_text_to_request(string text, object socket)
 
    if (req.remaining_content_length < 0)
    {
-      req.content = req->content[0.. < (-(req.remaining_content_length)) + 1];
+      req.content = req.content[0.. < (-(req.remaining_content_length)) + 1];
    }
    if (req.remaining_content_length <= 0)
    {
@@ -506,7 +508,7 @@ string parse_headers(string text, object socket)
       string *request_line = explode(lines[0], " ");
       request_line -= ({"\r"});
       if (sizeof(request_line) < 3)
-         return;
+         return nil;
       req.method = request_line[0];
       req.request = request_line[1];
       req.http_version = request_line[2][0.. < 2];
@@ -528,7 +530,7 @@ string parse_headers(string text, object socket)
          }
          else
          {
-            return 0;
+            return nil;
          }
       }
       colon_index = strsrch(lines[i], ':');
@@ -543,7 +545,7 @@ string parse_headers(string text, object socket)
    req.reached_end_of_headers = 1;
    }
    */
-   return 0;
+   return nil;
 }
 
 private
@@ -572,14 +574,14 @@ nomask void add_to_request(object socket, string text)
 }
 
 private
-nomask void http_read(object socket, buffer data)
+nomask void http_read(object socket, bytes data)
 {
    string request;
 
    if (!data)
       return;
    // initial connect
-   request = read_buffer(data);
+   request = to_text(data, "ISO-8859-1");
    if (!request)
       return;
 
@@ -600,13 +602,13 @@ nomask void remove()
 nomask void create()
 {
    string ret;
-   ret = catch (http_sock = clone_object (SOCKET, SKT_STYLE_LISTEN_B, PORT_HTTP, ( : http_read:), ( : http_close:)));
+   ret = catch (http_sock = clone_object (SOCKET, SKT_STYLE_LISTEN_B, PORT_HTTP, http_read, http_close));
    if (ret)
    {
       if (http_sock)
       {
          http_sock->remove();
-         http_sock = 0;
+         http_sock = nil;
       }
       error(ret);
    }
@@ -615,5 +617,4 @@ nomask void create()
 
 void clean_up()
 {
-   return 0;
 }

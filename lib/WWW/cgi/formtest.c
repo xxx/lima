@@ -2,7 +2,7 @@
 
 // POST test.
 
-string main(mapping form_info)
+varargs string main(mapping form_info, mapping headers)
 {
    return sprintf("%O\n", form_info);
 }
