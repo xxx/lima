@@ -3,7 +3,7 @@
 inherit SECRET_DOOR;
 inherit M_READABLE;
 
-mixed direct_open_obj()
+mixed direct_open_obj(object ob)
 {
    if (this_object()->query_closed())
       return "There doesn't seem to be a way to open it from here.\n";
@@ -11,7 +11,7 @@ mixed direct_open_obj()
       return "It is already open.\n";
 }
 
-mixed direct_close_obj()
+mixed direct_close_obj(object ob)
 {
    if (this_object()->query_closed())
       return "It is already closed.\n";
@@ -22,8 +22,8 @@ mixed direct_close_obj()
 void trigger()
 {
    QUEST_D->grant_points(this_body(), "std", "pirate", "secretPsg", "begin");
-   call_out("open_with", 1);
-   call_out("do_close", 8);
+   call_out(open_with, 1);
+   call_out(do_close, 8);
 }
 
 void setup()

@@ -4,7 +4,7 @@ inherit EXIT_OBJ;
 
 void award_points(object ob, string direction);
 
-function award = ( : award_points:);
+function award = award_points;
 
 void setup()
 {

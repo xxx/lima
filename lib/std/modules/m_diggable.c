@@ -81,7 +81,7 @@ void answer_question(string input)
       modal_pop();
       return;
    }
-   if (o = present(input, environment(this_body())) || o = present(input, this_body()))
+   if ((o = present(input, environment(this_body()))) || (o = present(input, this_body())))
       o->do_digging(this_object());
    else
       modal_pass(input);
@@ -104,7 +104,7 @@ void complete_dig()
       obs[0]->do_digging(this_object());
       return;
    default:
-      modal_push(( : answer_question:), "What do you want to dig with? ");
+      modal_push(answer_question, "What do you want to dig with? ");
       return;
    }
 }

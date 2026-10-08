@@ -13,7 +13,7 @@ void setup()
    set_size(MEDIUM);
 #endif
 #ifdef USE_MASS
-   set_mass(MEDIUM);
+   set_mass(to_float(MEDIUM));
 #endif
 }
 
