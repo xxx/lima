@@ -38,9 +38,9 @@ void create()
    active_doorways = ([]);
    restore_object(CLAN_SAVE_DATA);
    restore_object(DOORWAY_SAVE_DATA);
-   if (!mapp(clan_data))
+   if (!mappingp(clan_data))
       clan_data = ([]);
-   if (!mapp(active_doorways))
+   if (!mappingp(active_doorways))
       active_doorways = ([]);
 }
 
@@ -267,7 +267,7 @@ int destroy_clan_doorway(string clan_name)
       destruct(doorway_obj);
    }
 
-   map_delete(active_doorways, clan_name);
+   m_delete(active_doorways, clan_name);
    save_object(DOORWAY_SAVE_DATA);
    return 1;
 }
@@ -293,7 +293,7 @@ void remove_clan_area(string clan_name)
 
    destroy_clan_doorway(clan_name);
 
-   map_delete(clan_data, clan_name);
+   m_delete(clan_data, clan_name);
    save_object(CLAN_SAVE_DATA);
    LOG_D->log(LOG_CLAN, sprintf("%s: Removed clan area for %s.\n", ctime(time()), clan_name));
 }
@@ -373,7 +373,7 @@ void reset()
          {
             LOG_D->log(LOG_CLAN_ERROR, sprintf("Doorway for %s in %s could not be re-created: room not found.\n",
                                                clan_name, room_path));
-            map_delete(active_doorways, clan_name);
+            m_delete(active_doorways, clan_name);
             save_object(DOORWAY_SAVE_DATA);
          }
       }

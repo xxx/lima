@@ -172,7 +172,7 @@ nomask void test_for_purge(string channel_name)
    class channel_info ci = info[channel_name];
 
    if (sizeof(ci.listeners) + sizeof(ci.hooked) == 0)
-      map_delete(info, channel_name);
+      m_delete(info, channel_name);
 }
 
 private
@@ -215,7 +215,7 @@ nomask void set_permanent(string channel_name, int is_perm)
    }
    else if (!is_perm && !no_exist)
    {
-      map_delete(permanent_channels, channel_name);
+      m_delete(permanent_channels, channel_name);
       save_me();
    }
 }

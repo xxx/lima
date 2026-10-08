@@ -16,7 +16,7 @@ mapping materials = ([]);
 
 mapping query_materials()
 {
-   if (!mapp(materials))
+   if (!mappingp(materials))
       materials = ([]);
    return materials;
 }
@@ -106,7 +106,7 @@ int remove_material(string m, int count)
 
    if (!CRAFTING_D->valid_material(m))
    {
-      map_delete(materials, m);
+      m_delete(materials, m);
       return 0;
    }
 
@@ -114,7 +114,7 @@ int remove_material(string m, int count)
    {
       materials[m] -= count;
       if (!materials[m])
-         map_delete(materials, m);
+         m_delete(materials, m);
       return 1;
    }
    return 0;
@@ -168,7 +168,7 @@ void add_money(string type, float amount)
    money[currency] = money[currency] + amount;
 
    if (money[currency] <= 0)
-      map_delete(money, currency);
+      m_delete(money, currency);
 }
 
 //: FUNCTION subtract_money
@@ -188,7 +188,7 @@ void subtract_money(string type, int amount)
 // This function will return the complete money mapping
 mapping query_money()
 {
-   if (!mapp(money))
+   if (!mappingp(money))
       money = ([]);
    return money;
 }

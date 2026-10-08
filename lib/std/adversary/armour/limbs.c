@@ -156,7 +156,7 @@ nomask int remove_item(object what, string where)
 
    wi.primary = 0;
    if (wi.others == 0)
-      map_delete(armours, where);
+      m_delete(armours, where);
 
    also = what->also_covers();
    if (also)
@@ -169,7 +169,7 @@ nomask int remove_item(object what, string where)
             if (sizeof(wi.others) == 0)
             {
                if (wi.primary == 0)
-                  map_delete(armours, limb);
+                  m_delete(armours, limb);
                else
                   wi.others = 0;
             }

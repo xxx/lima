@@ -325,7 +325,7 @@ string compile_program(class parse_info pi, mixed *prog)
    if (funcs["triggers"])
    {
       ret += "void triggers(string str) {\n" + funcs["triggers"] + "}\n\n";
-      map_delete(funcs, "triggers");
+      m_delete(funcs, "triggers");
    }
 
    foreach (string name, string statements in funcs)

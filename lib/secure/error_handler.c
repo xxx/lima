@@ -108,7 +108,7 @@ void build_error_data(mapping error_map, int caught)
    error_data.uid =
        error_data.interactive ? capitalize((string)error_data.interactive->query_userid() || "(none)") : "(none)";
    error_data.trace = (mixed *)error_map["trace"];
-   if (arrayp(error_data.trace) && sizeof(error_data.trace) && mapp(error_data.trace[ < 1]))
+   if (arrayp(error_data.trace) && sizeof(error_data.trace) && mappingp(error_data.trace[ < 1]))
    {
       error_data.func = error_data.trace[ < 1]["function"];
       error_data.args = error_data.trace[ < 1]["arguments"];

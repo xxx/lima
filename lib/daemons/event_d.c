@@ -203,9 +203,9 @@ void register_event(string timing, string file, string extra)
 
 void unregister_event(string file, string extra)
 {
-   map_delete(events[file], extra);
+   m_delete(events[file], extra);
    if (!sizeof(keys(events[file])))
-      map_delete(events, file);
+      m_delete(events, file);
    save_me();
 }
 

@@ -20,7 +20,7 @@ nosave mapping locks = ([]);
 private
 nomask void unlock(string fname)
 {
-   map_delete(locks, fname);
+   m_delete(locks, fname);
 }
 
 nomask private void main(string *argv)

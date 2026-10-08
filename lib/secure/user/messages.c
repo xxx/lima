@@ -129,10 +129,10 @@ mapping query_colour_mapping()
 
 void remove_colour(string which)
 {
-   map_delete(colours, upper_case(which));
+   m_delete(colours, upper_case(which));
    /* just in case */
-   map_delete(colours, lower_case(which));
-   map_delete(colours, which);
+   m_delete(colours, lower_case(which));
+   m_delete(colours, which);
    update_translations();
    save_me();
 }

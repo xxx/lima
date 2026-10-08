@@ -78,7 +78,7 @@ void unset_variable(string name, mixed value)
    case "frame_colour":
    case "status":
    case "MORE":
-      map_delete(shell_vars, name);
+      m_delete(shell_vars, name);
       return;
    default:
       error("Bad player shell variable.");

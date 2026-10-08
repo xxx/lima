@@ -218,7 +218,7 @@ string main(mapping form)
    string fname;
 
    set_privilege(0); /* Just in case */
-   if (!mapp(form))
+   if (!mappingp(form))
    {
       return format_editor(0, 0, 0, 0);
    }

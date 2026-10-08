@@ -51,7 +51,7 @@ void shell_bind_if_undefined(string command, function f)
 protected
 void shell_unbind(string command)
 {
-   map_delete(dispatch, command);
+   m_delete(dispatch, command);
 }
 
 protected
@@ -81,8 +81,8 @@ void unbind(string *argv)
    if (!has_key(personal_bindings, command))
       return;
 
-   map_delete(personal_bindings, command);
-   map_delete(dispatch, command);
+   m_delete(personal_bindings, command);
+   m_delete(dispatch, command);
    this_object()->save();
 }
 

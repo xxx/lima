@@ -55,7 +55,7 @@ int update_quest(string domain, string quest, string task, string prev_task, int
       return 0;
 
    // Cannot update something that hasn't been begun
-   if (!mapp(quests[domain]) || member_array(quest, keys(quests[domain])) == -1)
+   if (!mappingp(quests[domain]) || member_array(quest, keys(quests[domain])) == -1)
       return 0;
 
    // Not at the right previous step in the quest
@@ -72,17 +72,17 @@ int update_quest(string domain, string quest, string task, string prev_task, int
 void remove_quest(string domain, string quest)
 {
    if (quests[domain] && quests[domain][quest])
-      map_delete(quests[domain], quest);
+      m_delete(quests[domain], quest);
    if (sizeof(keys(quests[domain])) == 0)
-      map_delete(quests, domain);
+      m_delete(quests, domain);
    save_me();
 }
 
 string quest_task(string domain, string quest)
 {
-   if (!mapp(quests))
+   if (!mappingp(quests))
       quests = ([]);
-   if (mapp(quests[domain]) && stringp(quests[domain][quest]))
+   if (mappingp(quests[domain]) && stringp(quests[domain][quest]))
       return quests[domain][quest];
    return "None";
 }

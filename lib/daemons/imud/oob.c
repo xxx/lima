@@ -104,10 +104,10 @@ nomask void oob_close(class oob_info info)
 {
    if (info.socket)
    {
-      map_delete(oob_socket_map, info.socket);
+      m_delete(oob_socket_map, info.socket);
       catch (info->socket->remove());
    }
-   map_delete(oob_mudname_map, info.remote_mudname);
+   m_delete(oob_mudname_map, info.remote_mudname);
 }
 
 private
@@ -398,8 +398,8 @@ nomask void oob_callback_close(object socket)
 
    if (info)
    {
-      map_delete(oob_socket_map, info.socket);
-      map_delete(oob_mudname_map, info.remote_mudname);
+      m_delete(oob_socket_map, info.socket);
+      m_delete(oob_mudname_map, info.remote_mudname);
    }
 }
 

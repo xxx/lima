@@ -68,12 +68,12 @@ varargs void remove_default_alias(string name, int devalias)
 
    if (devalias)
    {
-      map_delete(wizdefaults, name);
+      m_delete(wizdefaults, name);
       wizxdefaults -= ({name});
    }
    else
    {
-      map_delete(defaults, name);
+      m_delete(defaults, name);
       xdefaults -= ({name});
    }
    save_me();

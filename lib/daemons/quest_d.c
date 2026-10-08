@@ -62,9 +62,9 @@ string query_quest_name(string domain, string main)
 
 void remove_quest_name(string domain, string main)
 {
-   map_delete(quest_names[domain], main);
+   m_delete(quest_names[domain], main);
    if (sizeof(keys(quest_names[domain])) == 0)
-      map_delete(quest_names, domain);
+      m_delete(quest_names, domain);
    save_me();
 }
 
@@ -102,9 +102,9 @@ int delete_quest(string domain, string quest)
    TBUG("Domain: " + domain + " Quest: " + quest);
    if (!check_privilege(PRIV_REQUIRED) || !quests[domain][quest])
       return 0;
-   map_delete(quests[domain], quest);
+   m_delete(quests[domain], quest);
    if (sizeof(keys(quests[domain])) == 0)
-      map_delete(quests, domain);
+      m_delete(quests, domain);
    save_me();
    calculate_total_points();
    return 1;

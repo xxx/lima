@@ -27,7 +27,7 @@ int unregister_mission(string name)
 {
    if (!missions[name])
       return 0;
-   map_delete(missions, name);
+   m_delete(missions, name);
    save_me();
    return 1;
 }

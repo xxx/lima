@@ -104,14 +104,14 @@ string *remove_skill(string skill)
       return 0;
 
    /* delete the skill */
-   map_delete(skills, skill);
+   m_delete(skills, skill);
 
    /* delete all subskills: skills that start with <skill> + "/" */
    skill = skill + "/";
    foreach (string name in keys(skills))
       if (strsrch(name, skill) == 0)
       {
-         map_delete(skills, name);
+         m_delete(skills, name);
          result += ({name});
       }
 

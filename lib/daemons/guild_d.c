@@ -128,12 +128,12 @@ void create()
                   start_favour(tier, buff, guild, end_at);
                else
                {
-                  map_delete(buff_list[tier][guild], buff);
+                  m_delete(buff_list[tier][guild], buff);
                }
             }
             else
             {
-               map_delete(buff_list[tier][guild], buff);
+               m_delete(buff_list[tier][guild], buff);
             }
          }
       }
@@ -277,7 +277,7 @@ void guild_remove(string name)
    if (!check_previous(PRIV_NEEDED))
       error("insufficient privilege");
 
-   map_delete(guilds, name);
+   m_delete(guilds, name);
    save_me();
 }
 
@@ -696,15 +696,15 @@ int state_update()
          {
             if (time() > end_at - 30)
             {
-               map_delete(buffs, buff);
+               m_delete(buffs, buff);
                buff_list[tier][guild] = buffs;
             }
          }
          if (!sizeof(values(buff_list[tier][guild])))
-            map_delete(buff_list[tier], guild);
+            m_delete(buff_list[tier], guild);
       }
       if (!sizeof(values(buff_list[tier])))
-         map_delete(buff_list, tier);
+         m_delete(buff_list, tier);
    }
    return 1;
 }
@@ -1110,7 +1110,7 @@ int remove_material(string guild, string m, int count)
 
    if (!CRAFTING_D->valid_material(m))
    {
-      map_delete(materials[guild], m);
+      m_delete(materials[guild], m);
       return 0;
    }
 
@@ -1118,7 +1118,7 @@ int remove_material(string guild, string m, int count)
    {
       materials[guild][m] -= count;
       if (!materials[guild][m])
-         map_delete(materials[guild], m);
+         m_delete(materials[guild], m);
       return 1;
    }
    save_me();
@@ -1151,7 +1151,7 @@ string *guild_log(string guild)
 
 int clear_guild_log(string guild)
 {
-   map_delete(guild_log, guild);
+   m_delete(guild_log, guild);
    return 1;
 }
 

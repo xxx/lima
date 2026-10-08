@@ -123,7 +123,7 @@ void process_queue()
       // If targets array is empty, just delete the entire entry - and on we go.
       if (!sizeof(targets))
       {
-         map_delete(queue, update_time);
+         m_delete(queue, update_time);
          continue;
       }
       // Walk through each target in targets and check if they are still stateful and return true on state_update().
@@ -156,7 +156,7 @@ void process_queue()
 
       // Remove old timestamps from the queue
       if (update_time < time())
-         map_delete(queue, update_time);
+         m_delete(queue, update_time);
 
       // We'll be back later for more processing.
       if (processed == MAX_PROCESSED)

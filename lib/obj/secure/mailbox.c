@@ -90,7 +90,7 @@ nomask class mail_msg get_one_message(int message_key)
    if (!msg)
    {
       /* damn. bad message. remove it from the mailbox. */
-      map_delete(mailbox, message_key);
+      m_delete(mailbox, message_key);
       save_me();
    }
 
@@ -161,7 +161,7 @@ nomask void delete_message(int message_key)
    MAIL_D->delete_mail(message_key, owner);
    if (query_unread_count() <= message_index)
       message_index--;
-   map_delete(mailbox, message_key);
+   m_delete(mailbox, message_key);
 
    save_me();
 }

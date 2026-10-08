@@ -86,7 +86,7 @@ void get_config_setting(string key, class config c, mixed result)
    }
 
    new_settings[key] = c;
-   map_delete(settings, key);
+   m_delete(settings, key);
    configure_file();
 }
 
@@ -136,7 +136,7 @@ varargs void configure_file(string selection)
    key = sort_array(keys(settings), 1)[0];
    if (key == "config")
    {
-      map_delete(settings, "config");
+      m_delete(settings, "config");
       configure_file();
       return;
    }

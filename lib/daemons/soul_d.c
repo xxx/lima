@@ -33,12 +33,12 @@ void create()
       if (value[0])
       {
          value[""] = value[0];
-         map_delete(value, 0);
+         m_delete(value, 0);
       }
       if (value[1])
       {
          value["STR"] = value[1];
-         map_delete(value, 1);
+         m_delete(value, 1);
       }
 
       foreach (rule, ignore in value)
@@ -88,11 +88,11 @@ int remove_emote(string verb, string rule)
    {
       if (!emotes[verb][rule])
          return 0;
-      map_delete(emotes[verb], rule);
+      m_delete(emotes[verb], rule);
    }
    else
    {
-      map_delete(emotes, verb);
+      m_delete(emotes, verb);
    }
 
    parse_remove(verb);
@@ -113,7 +113,7 @@ int move_emote(string verb, string dest)
    {
       parse_add_rule(dest, rule);
    }
-   map_delete(emotes, verb);
+   m_delete(emotes, verb);
    unguarded(1, ( : save_object, SAVE_FILE:));
    return 1;
 }

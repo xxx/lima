@@ -266,7 +266,7 @@ void write_callback(object socket)
    if (i1 + i2 > file_size(file))
    {
       i2 = file_size(file) - i1;
-      map_delete(sending, socket);
+      m_delete(sending, socket);
    }
    else
    {

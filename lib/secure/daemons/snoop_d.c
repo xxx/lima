@@ -56,7 +56,7 @@ int detect_cycle_recursive(object snooper)
    if (sizeof(cycles))
    {
       // clean up
-      map_delete(cycle_info, snooper);
+      m_delete(cycle_info, snooper);
       return 1;
    }
    return 0;
@@ -89,7 +89,7 @@ int unsnoop(object snooper, object snoopee)
    snoops[snooper] -= ({snoopee, 0});
    if (!sizeof(snoops[snooper]))
    {
-      map_delete(snoops, snooper);
+      m_delete(snoops, snooper);
    }
    // Okay, I know I'm not going to get a cycle, but this function also
    // happens to put a list of admins I'm snooping in the admins array.

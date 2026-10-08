@@ -161,7 +161,7 @@ string FTP_get_welcome_msg()
 private
 void FTP_handle_idlers()
 {
-   map_delete(sessions, 0); /* Just make sure there's no stale stuff here */
+   m_delete(sessions, 0); /* Just make sure there's no stale stuff here */
    if (!sizeof(sessions))
       return;
    foreach (object socket, class ftp_session info in sessions)
@@ -176,7 +176,7 @@ void FTP_handle_idlers()
       {
          FTPLOGF("%s idled out at %s.\n", capitalize(info.user), ctime(time()));
          socket->send(sprintf("421 Timeout. (%i seconds): closing control connection.\n", MAX_IDLE_TIME));
-         map_delete(sessions, socket);
+         m_delete(sessions, socket);
          destruct(socket);
       }
    }
@@ -198,7 +198,7 @@ void FTP_addSession(object socket)
                         " wizard name.\n",
                         mud_name()));
 #endif
-   map_delete(sessions, 0); /* Just make sure there's no stale stuff here */
+   m_delete(sessions, 0); /* Just make sure there's no stale stuff here */
    if (!sizeof(sessions))
    {
       idlecall = call_out(( : FTP_handle_idlers:), 60);
@@ -376,7 +376,7 @@ void FTP_PASV_read(class ftp_session info, object socket, string text)
 private
 void FTP_close(object socket)
 {
-   map_delete(sessions, socket);
+   m_delete(sessions, socket);
 }
 
 private
@@ -502,10 +502,10 @@ void FTP_CMD_quit(class ftp_session info, string arg)
    if (member_array(info.cmdPipe, keys(passives)) > -1)
    {
       destruct(passives[info.cmdPipe]);
-      map_delete(passives, info.cmdPipe);
+      m_delete(passives, info.cmdPipe);
    }
    FTPLOGF("%s QUIT at %s.\n", capitalize(info.user), ctime(time()));
-   map_delete(sessions, info.cmdPipe);
+   m_delete(sessions, info.cmdPipe);
    destruct(info.cmdPipe);
 }
 
@@ -591,8 +591,8 @@ void FTP_CMD_pasv(class ftp_session info, string arg)
          {
             if (passives[skt])
                destruct(passives[skt]);
-            map_delete(sessions, skt);
-            map_delete(passives, skt);
+            m_delete(sessions, skt);
+            m_delete(passives, skt);
             destruct(skt);
          }
       }
@@ -1123,7 +1123,7 @@ string FTP_CMD_retr_callback(object ob)
 
    if (start + length >= file_size(outfile[ob][0]))
    {
-      map_delete(outfile, ob);
+      m_delete(outfile, ob);
       ob->set_write_callback(( : FTP_write:));
    }
 

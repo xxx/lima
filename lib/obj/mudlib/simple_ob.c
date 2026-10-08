@@ -47,7 +47,7 @@ varargs void create(mapping long, string *ids, object dest)
          add_adj(msgs["adjs"]...);
       else
          add_adj(msgs["adjs"]);
-      map_delete(msgs, "adjs");
+      m_delete(msgs, "adjs");
    }
 
    set_id(ids...);

@@ -118,7 +118,7 @@ void remove_variable(string var)
       write("No such variable.\n");
    else
    {
-      map_delete(data, var);
+      m_delete(data, var);
       write("Done.\n");
    }
    update();
@@ -136,7 +136,7 @@ void rename_variable(string oldv, string newv)
    else
    {
       data[newv] = data[oldv];
-      map_delete(data, oldv);
+      m_delete(data, oldv);
       write("Done.\n");
    }
    update();

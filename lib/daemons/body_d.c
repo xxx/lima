@@ -81,12 +81,12 @@ void add_limb_to_body(string bname, string limb, int new_health, int new_max, st
 
 void remove_limb_from_body(string body_name, string limb_name)
 {
-   map_delete(body_types[body_name], limb_name);
+   m_delete(body_types[body_name], limb_name);
    save_me();
 }
 
 void remove_body(string body_name)
 {
-   map_delete(body_types, body_name);
+   m_delete(body_types, body_name);
    save_me();
 }

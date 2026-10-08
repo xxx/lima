@@ -16,7 +16,7 @@ int remove_observer(int handle)
 {
    // Probably should check:
    // member_array(handle, keys(observers))!=-1
-   map_delete(observers, handle);
+   m_delete(observers, handle);
 }
 
 protected

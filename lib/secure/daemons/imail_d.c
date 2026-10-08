@@ -196,11 +196,11 @@ varargs private void handle_ack(mapping ack_list, int flag)
             report_errors(id, ({"The following delivery errors occured:"}) + errorset);
          }
       }
-      map_delete(outgoing_queue, id);
+      m_delete(outgoing_queue, id);
       this_msg = internal_queue[info.msgId];
       if (!(--this_msg.dels_pending))
       {
-         map_delete(internal_queue, info.msgId);
+         m_delete(internal_queue, info.msgId);
       }
    }
    save_me();
@@ -471,12 +471,12 @@ string *incoming_mail(string mudname, mixed *mail_packet)
    {
       error("illegal call to incoming_mail");
    }
-   if (!mapp(mail_packet[3]))
+   if (!mappingp(mail_packet[3]))
    {
       mail_packet[3] = ([]);
       errors += ({"Imud implementation error: TO list should be a mapping"});
    }
-   if (!mapp(mail_packet[4]))
+   if (!mappingp(mail_packet[4]))
    {
       mail_packet[4] = ([]);
       errors += ({"Imud implementation error: CC list should be a mapping"});

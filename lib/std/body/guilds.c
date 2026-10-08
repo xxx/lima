@@ -74,7 +74,7 @@ int revoke_guild(string name)
    }
    gi.member_level = 0;
    if (!gi.suspend_level && !gi.banned_level)
-      map_delete(guilds, name);
+      m_delete(guilds, name);
    return 1;
 }
 

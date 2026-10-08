@@ -409,7 +409,7 @@ void delete_exit(mixed direction)
    object which = present(direction);
    if (which && which->is_exit())
       destruct(which);
-   map_delete(exits, direction);
+   m_delete(exits, direction);
 }
 
 //: FUNCTION add_exit
@@ -444,7 +444,7 @@ varargs void add_exit(mixed direction, mixed destination)
 // exits doc
 void set_exits(mapping new_exits)
 {
-   if (mapp(new_exits))
+   if (mappingp(new_exits))
       foreach (string direction, mixed destination in new_exits)
          add_exit(direction, destination);
 }

@@ -363,7 +363,7 @@ int is_on_blackboard(string key, mixed value)
 
 void del_blackboard(string key)
 {
-   map_delete(blackboard, key);
+   m_delete(blackboard, key);
 }
 
 mixed blackboard(string key)

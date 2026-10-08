@@ -125,7 +125,7 @@ nomask void set_archive_time(string group, int numDays)
    if (!numDays)
    {
       /* Never expire */
-      map_delete(archive_info, group);
+      m_delete(archive_info, group);
    }
    else
    {
@@ -182,9 +182,9 @@ nomask void create()
       {
          if (value == "#removed#")
          {
-            map_delete(data, key);
-            map_delete(recent_changes, key);
-            map_delete(removed, key);
+            m_delete(data, key);
+            m_delete(recent_changes, key);
+            m_delete(removed, key);
          }
          else
          {
@@ -206,12 +206,12 @@ nomask void create()
    }
    foreach (string key, mixed value in data)
    {
-      if (mapp(value))
+      if (mappingp(value))
       {
          foreach (string key2, class news_msg msg in value)
          {
             if (classp(msg) && !msg.body)
-               map_delete(value, key2);
+               m_delete(value, key2);
          }
       }
    }
@@ -275,7 +275,7 @@ nomask varargs void remove_mail_forward(string group, string destination)
    if (member_array(group, keys(mail_forward)) == -1)
       return;
    if (!destination)
-      map_delete(mail_forward, group);
+      m_delete(mail_forward, group);
    else
       mail_forward[group] -= ({destination});
    return;
@@ -460,7 +460,7 @@ varargs nomask void set_write_restriction(string prefix, string restriction)
    else
       restrictions[prefix][0] = restriction;
    if (restrictions[prefix][0] == 0 && restrictions[prefix][1] == 0)
-      map_delete(restrictions, prefix);
+      m_delete(restrictions, prefix);
    save_me();
 }
 
@@ -475,7 +475,7 @@ varargs nomask void set_read_restriction(string prefix, string restriction)
    else
       restrictions[prefix][1] = restriction;
    if (restrictions[prefix][0] == 0 && restrictions[prefix][1] == 0)
-      map_delete(restrictions, prefix);
+      m_delete(restrictions, prefix);
    save_me();
 }
 
@@ -586,7 +586,7 @@ nomask void remove_group(string group)
 {
    if (!check_privilege("Mudlib:daemons"))
       error("Permission denied.\n");
-   map_delete(data, group);
+   m_delete(data, group);
    recent_changes[group] = "#removed#";
    update_all_threads();
    save_recent();
@@ -765,7 +765,7 @@ nomask void archive_post(string group, int id)
    /* This doesn't give w/ the newsreader. */
    /* the newsreader will learn */
 #if 0
-    map_delete(data[group], id);
+    m_delete(data[group], id);
 #else
    /* Do this instead. */
    remove_post(group, id);

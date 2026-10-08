@@ -168,7 +168,7 @@ void main(string who)
       s += "No plan.\n";
 #endif
 #ifdef USE_USER_MENU
-   if (mapp(info.bodies))
+   if (mappingp(info.bodies))
    {
       string *chars = map(keys(info.bodies), ( : capitalize($1) :));
       s += info.visname + " has the following characters: \n";

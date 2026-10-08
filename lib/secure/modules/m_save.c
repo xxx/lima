@@ -162,7 +162,7 @@ void load_from_string(mixed value, int recurse)
    string obj;
    object ob;
 
-   if (!mapp(value))
+   if (!mappingp(value))
       data = restore_variable(value);
    else
       data = value;

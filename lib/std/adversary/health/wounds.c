@@ -29,7 +29,7 @@ mapping wounds = ([]);
 void set_max_limb_health(string limb, int x)
 {
    ::set_max_limb_health(limb, x);
-   map_delete(wounds, limb);
+   m_delete(wounds, limb);
    if (!sizeof(wounds))
       remove_call_out("health_periodic");
 }
@@ -37,7 +37,7 @@ void set_max_limb_health(string limb, int x)
 void disable_limb(string limb)
 {
    ::disable_limb(limb);
-   map_delete(wounds, limb);
+   m_delete(wounds, limb);
    if (!sizeof(wounds))
       remove_call_out("health_periodic");
 }
@@ -106,7 +106,7 @@ void heal_limb(string limb, int x)
    if (i < n)
       wounds[limb] = tmp[i..];
    else
-      map_delete(wounds, limb);
+      m_delete(wounds, limb);
 
    /* i == number of wounds healed; n == total number before */
    if (i)
@@ -184,7 +184,7 @@ void health_periodic()
 void reincarnate()
 {
    foreach (string s in query_vital_limbs())
-      map_delete(wounds, s);
+      m_delete(wounds, s);
    ::reincarnate();
    health_periodic();
 }

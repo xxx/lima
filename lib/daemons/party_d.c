@@ -128,7 +128,8 @@ nomask void modify_karma(string name, object *viable, int karma_impact)
 mapping flip_mapping(mapping map)
 {
    mapping new_map = ([]);
-   map_mapping(map, ( : $(new_map)[$2] = $1:));
+   foreach (mixed key, mixed value in map)
+      new_map[value] = key;
    return new_map;
 }
 
@@ -216,7 +217,7 @@ nomask int remove_member(string member, string pname)
       return 0; // no such member
    else
    {
-      map_delete(((class party)parties[pname]).members, member);
+      m_delete(((class party)parties[pname]).members, member);
       ((class party)parties[pname]).members =
           move_access(((class party)parties[pname]).members, ((class party)parties[pname]).members[member]);
    }
@@ -384,7 +385,7 @@ nomask string query_password(string pname)
 
 nomask void remove_party(string pname)
 {
-   map_delete(parties, pname);
+   m_delete(parties, pname);
    save_me();
 }
 

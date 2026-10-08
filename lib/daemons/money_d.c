@@ -210,12 +210,12 @@ nomask void remove_currency(string type)
       error("illegal currency type: " + type + "\n");
    foreach (string name in denominations[type])
    {
-      map_delete(denomination, name);
+      m_delete(denomination, name);
    }
-   map_delete(denominations, type);
-   map_delete(rates, type);
-   map_delete(singulars, plurals[type]);
-   map_delete(plurals, type);
+   m_delete(denominations, type);
+   m_delete(rates, type);
+   m_delete(singulars, plurals[type]);
+   m_delete(plurals, type);
    save_me();
 }
 
@@ -293,8 +293,8 @@ void remove_denomination(string name)
    {
       denominations[type] -= ({name});
       if (!denominations[name])
-         map_delete(singulars, denomination[name].plural);
-      map_delete(denomination, name);
+         m_delete(singulars, denomination[name].plural);
+      m_delete(denomination, name);
       save_me();
    }
 }
@@ -353,7 +353,7 @@ varargs nomask string currency_to_string(mixed money, string currency)
       currency = singular_name(currency);
       if (!denominations[currency])
          error("illegal currency type: " + currency + "\n");
-      if (!mapp(money))
+      if (!mappingp(money))
          money = calculate_denominations(money, currency);
       types = denominations[currency];
    }

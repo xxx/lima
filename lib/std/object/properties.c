@@ -35,7 +35,7 @@ nomask mapping query_sets()
 
 void delete(mixed key)
 {
-   map_delete(sets, key);
+   m_delete(sets, key);
 }
 
 nomask void set_perm(mixed key, mixed value)
@@ -50,7 +50,7 @@ nomask mixed query_perm(mixed key)
 
 nomask void delete_perm(mixed key)
 {
-   map_delete(psets, key);
+   m_delete(psets, key);
 }
 
 nomask void add_perm(mixed key, mixed value)

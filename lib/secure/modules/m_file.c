@@ -199,7 +199,7 @@ void file_close(string fn)
    class file_info fi = find_file(fn);
 
    flush_buffer(fi);
-   map_delete(open_files, fn);
+   m_delete(open_files, fn);
 }
 
 void file_flush(string fn)

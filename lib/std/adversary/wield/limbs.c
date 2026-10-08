@@ -225,9 +225,9 @@ varargs void unwield(string limb)
          // TBUG("Removing seconds limb "+limb2);
       }
    }
-   map_delete(weapons, limb);
+   m_delete(weapons, limb);
    if (limb2)
-      map_delete(weapons, limb2);
+      m_delete(weapons, limb2);
    call_hooks("on_unwield", HOOK_IGNORE);
    // TBUG("Hooks and clean-up done.");
 }

@@ -216,7 +216,7 @@ int remove_category(string c)
    if (!valid_category(c))
       return 0;
 
-   map_delete(materials, c);
+   m_delete(materials, c);
    refresh_cache();
    save_me();
    return 1;
@@ -769,7 +769,7 @@ void load_config_from_file()
 
 int count_materials()
 {
-   return array_sum(values(map_mapping(materials, ( : sizeof($2) :))));
+   return array_sum(values(map(materials, ( : sizeof($2) :))));
 }
 
 void stat_me()

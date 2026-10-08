@@ -27,7 +27,7 @@ void add_spawn_control(string domain, string basename, int max)
 
 void remove_spawn_control(string basename)
 {
-   map_delete(spawn_control, basename);
+   m_delete(spawn_control, basename);
    save_me();
 }
 
@@ -42,7 +42,7 @@ void set_currency(string domain, string coin)
 
 void remove_currency(string domain)
 {
-   map_delete(currency, domain);
+   m_delete(currency, domain);
    save_me();
 }
 
@@ -81,7 +81,7 @@ int spawn_allowed(string basename)
    int instances = 1;
    int spawn;
    // We are not under supervision, spawn away!
-   if (!mapp(spawn_control[basename]))
+   if (!mappingp(spawn_control[basename]))
       return 1;
    // We do not have a max, spawn away!
    if (!intp(spawn_control[basename]["max"]))

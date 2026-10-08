@@ -52,7 +52,7 @@ void main(string arg)
       output += sarg[1];
       header += "\n" + title(this_body()->query_name()) + "<res>\n";
 
-      if (!mapp(groups) || !sizeof(groups))
+      if (!mappingp(groups) || !sizeof(groups))
          output += "\nYou have no groups defined.\n";
       else
          output += " \n\n";
@@ -107,7 +107,7 @@ void main(string arg)
    {
       if (groups[arglist[1]])
       {
-         map_delete(groups, arglist[1]);
+         m_delete(groups, arglist[1]);
          outf("Group %s nuked.\n", arglist[1]);
          return;
       }
@@ -132,7 +132,7 @@ void main(string arg)
       out(sprintf("Removed: %s from %s.\n", implode(valid, ", "), this_group));
       groups[this_group] -= valid;
       if (!sizeof(groups[this_group]))
-         map_delete(groups, this_group);
+         m_delete(groups, this_group);
       this_body()->set_perm("groups", groups);
       return;
    }

@@ -20,7 +20,7 @@ string print_vars(mixed *vars)
 
    for (i = 0; i < sizeof(vars); i++)
    {
-      if (mapp(vars[i]))
+      if (mappingp(vars[i]))
          result[i] = "([ ... ])";
       else if (functionp(vars[i]))
          result[i] = "(: ... :)";

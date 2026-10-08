@@ -49,7 +49,7 @@ void unset_variable(string var)
 {
    if (!variables)
       default_variables();
-   map_delete(variables, var);
+   m_delete(variables, var);
    this_object()->save();
 }
 

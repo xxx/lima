@@ -117,7 +117,7 @@ nomask void set_archive_time(string group, int numDays)
    if (!numDays)
    {
       /* Never expire */
-      map_delete(archive_info, group);
+      m_delete(archive_info, group);
    }
    else
    {
@@ -202,7 +202,7 @@ nomask void create()
       {
          if (value == "#removed#")
          {
-            map_delete(data, key);
+            m_delete(data, key);
             changed = 1;
          }
          else
@@ -221,12 +221,12 @@ nomask void create()
    }
    foreach (string key, mixed value in data)
    {
-      if (mapp(value))
+      if (mappingp(value))
       {
          foreach (string key2, class news_msg msg in value)
          {
             if (classp(msg) && !msg.body)
-               map_delete(value, key2);
+               m_delete(value, key2);
          }
       }
    }
@@ -340,7 +340,7 @@ nomask void remove_group(string group)
    if (fn != ADMTOOL)
       return;
 
-   map_delete(data, group);
+   m_delete(data, group);
    recent_changes[group] = "#removed#";
    save_recent();
 }
@@ -516,7 +516,7 @@ nomask void archive_post(string group, int id)
 
    /* This doesn't give w/ the newsreader. */
 #if 0
-    map_delete(data[group], id);
+    m_delete(data[group], id);
 #else
    /* Do this instead. */
    remove_post(group, id);

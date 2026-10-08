@@ -150,7 +150,7 @@ nomask void add_alias_simple(string alias_name, class alias the_alias)
 private
 nomask void internal_remove_alias(string alias_name)
 {
-   map_delete(aliases, alias_name);
+   m_delete(aliases, alias_name);
    xaliases -= ({alias_name});
 }
 

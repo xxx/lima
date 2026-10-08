@@ -145,7 +145,8 @@ nomask void validate_groups()
    if (!sizeof(news_data))
       return;
    groups = keys(news_data) - NEWS_D->get_groups();
-   map(groups, ( : map_delete(news_data, $1) :));
+   foreach (string group in groups)
+      m_delete(news_data, group);
    foreach (string group, mixed data in news_data)
    {
       if (intp(data))

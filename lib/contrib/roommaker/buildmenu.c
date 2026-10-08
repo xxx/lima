@@ -222,7 +222,7 @@ void desc_summary()
 
 void del_exit(string str)
 {
-   map_delete(xits, str);
+   m_delete(xits, str);
    write("Exit " + str + " deleted.\n");
 }
 
@@ -264,7 +264,7 @@ void prompt_new_exit()
 
 void del_obj(string str)
 {
-   map_delete(bjects, str);
+   m_delete(bjects, str);
    write("Object " + str + " deleted.\n");
 }
 

@@ -163,7 +163,7 @@ void add_prep(string prep, mixed dest)
 void set_preps(mapping p)
 {
    mixed key;
-   if (mapp(p))
+   if (mappingp(p))
    {
       prep_dest += p;
       foreach (key in keys(p))

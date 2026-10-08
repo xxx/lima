@@ -47,7 +47,7 @@ nomask void rcv_mudlist(string orig_mud, string orig_user, string targ_user, mix
    foreach (mudname, info in message[1])
    {
       if (!info)
-         map_delete(mud_info, mudname);
+         m_delete(mud_info, mudname);
       else
          mud_info[mudname] = info;
    }

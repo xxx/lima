@@ -68,7 +68,7 @@ void add_short_name(string type, string s)
 // Removed a short name.
 void remove_short_name(string type)
 {
-   map_delete(short_names, type);
+   m_delete(short_names, type);
 }
 
 //: FUNCTION query_short_names

@@ -119,7 +119,7 @@ nomask void remove_emoji(string emoji)
    if (!check_privilege(PRIV_NEEDED))
       error("illegal attempt to remove a system emoji\n");
 
-   map_delete(emoji_map, emoji);
+   m_delete(emoji_map, emoji);
    save_me();
 }
 

@@ -81,7 +81,7 @@ void set_msgs(string cls, string *msgs)
       messages = ([]);
    if (!msgs || !sizeof(msgs))
    {
-      map_delete(messages, cls);
+      m_delete(messages, cls);
       return;
    }
    messages[cls] = msgs;

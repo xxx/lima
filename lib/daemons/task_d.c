@@ -208,7 +208,7 @@ nomask void remove_attribute(string task_id, string attr)
    if (!task)
       error("unable to find task " + task_id);
 
-   map_delete(task[TASK_ATTR], attr);
+   m_delete(task[TASK_ATTR], attr);
    save_me();
 }
 

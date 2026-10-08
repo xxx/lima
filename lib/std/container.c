@@ -121,7 +121,7 @@ void remove_relations(string *rels...)
       rel = PREPOSITION_D->translate_preposition(rel);
       if (sizeof(relations[rel].contents))
          continue;
-      map_delete(relations, rel);
+      m_delete(relations, rel);
    }
 }
 
@@ -201,7 +201,7 @@ void remove_relation_alias(string relation, string *aliases...)
 {
    relation_aliases[relation] -= aliases;
    if (!sizeof(relation_aliases))
-      map_delete(relation_aliases, relation);
+      m_delete(relation_aliases, relation);
 }
 
 //: FUNCTION query_relation_aliases

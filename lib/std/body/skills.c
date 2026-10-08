@@ -206,7 +206,7 @@ void clean_skills()
    foreach (string skill in keys(skills))
    {
       if (member_array(skill, SKILL_D->query_skills()) == -1)
-         map_delete(skills, skill);
+         m_delete(skills, skill);
    }
 }
 

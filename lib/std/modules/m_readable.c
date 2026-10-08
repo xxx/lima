@@ -118,7 +118,7 @@ string read_entry(string entry)
 // See set_entries()
 int has_entries()
 {
-   return mapp(entries);
+   return mappingp(entries);
 }
 
 //: FUNCTION set_entries
@@ -157,11 +157,11 @@ void remove_entry(string entry)
       real_name = synonyms[entry];
    else
       return;
-   map_delete(entries, real_name);
+   m_delete(entries, real_name);
    foreach (string syn, string value in synonyms)
    {
       if (value == entry)
-         map_delete(synonyms, syn);
+         m_delete(synonyms, syn);
    }
 }
 
@@ -266,7 +266,7 @@ void add_synonym(string syn, string entry)
 // Removes a synonym of an entry
 void remove_synonym(string syn)
 {
-   map_delete(synonyms, syn);
+   m_delete(synonyms, syn);
 }
 
 //: FUNCTION query_synonym

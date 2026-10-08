@@ -82,7 +82,7 @@ object *worst_threats()
 {
    if (!sizeof(keys(assoc)))
       return ({});
-   map_delete(assoc, 0);
+   m_delete(assoc, 0);
    return sort_array(keys(assoc), ( : assoc[$1]["threat_level"] :));
 }
 
@@ -261,7 +261,7 @@ object *potential_targets()
    object *easy_targets = ({});
    if (!sizeof(keys(assoc)))
       return ({});
-   map_delete(assoc, 0);
+   m_delete(assoc, 0);
    potentials = keys(assoc);
    potentials = filter(potentials, ( : $1 && present($1, environment()) :));
    potentials = sort_array(keys(assoc), ( : evaluate_targets:), -1);

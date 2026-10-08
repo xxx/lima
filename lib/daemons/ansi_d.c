@@ -134,8 +134,8 @@ void remove_default_colour(string key)
 {
    require_privilege("Mudlib:daemons");
 
-   map_delete(translations, upper_case(key));
-   map_delete(defaults, upper_case(key));
+   m_delete(translations, upper_case(key));
+   m_delete(defaults, upper_case(key));
    restrictions += ({upper_case(key)});
    resync();
 }

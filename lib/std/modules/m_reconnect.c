@@ -38,7 +38,7 @@ nomask void time_to_reconnect(string key)
 protected
 nomask void cancel_reconnection(string key)
 {
-   map_delete(retry_info, key);
+   m_delete(retry_info, key);
 }
 
 protected

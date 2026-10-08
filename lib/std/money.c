@@ -46,7 +46,7 @@ void split_money(int amount, string type)
       this_body()->simple_action("$N $vtake " + MONEY_D->denomination_to_string(amount, type) + ".");
       if (money[type] <= 0)
       {
-         map_delete(money, type);
+         m_delete(money, type);
          if (!sizeof(query_money()))
             remove();
       }

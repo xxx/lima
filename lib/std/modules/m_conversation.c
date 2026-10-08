@@ -103,7 +103,7 @@ void add_option(string key, mixed act)
 // See also add_option() documentation.
 void remove_option(string key)
 {
-   map_delete(options, key);
+   m_delete(options, key);
 }
 
 //: FUNCTION add_options
@@ -334,7 +334,7 @@ void do_action(object ob, mixed action)
 // Handle goodbye for ob.
 void bye(object ob)
 {
-   map_delete(current, ob);
+   m_delete(current, ob);
 
    if (goodbye_action)
       do_action(ob, goodbye_action);
@@ -351,7 +351,7 @@ void exit_conversations()
       if (present(body, environment(this_object())))
       {
          body->modal_pop();
-         map_delete(current, body);
+         m_delete(current, body);
          do_action(body, goodbye_action || "Sorry, I have to go.");
       }
    }

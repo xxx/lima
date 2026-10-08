@@ -55,7 +55,7 @@ void take_a_swing(object target)
 {
    object weapon = query_weapon();
    object ammo;
-   object *effs = mapp(this_object()->query_effects()) ? values(this_object()->query_effects()) : ({});
+   object *effs = mappingp(this_object()->query_effects()) ? values(this_object()->query_effects()) : ({});
    int chance, roll;
 
    if (badly_wounded())

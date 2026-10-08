@@ -49,7 +49,7 @@ nomask int validate_auth(string mudname, int provided_key)
    class auth_data data = auth_info[mudname];
    int result = data && data.session_key == provided_key;
 
-   map_delete(auth_info, mudname);
+   m_delete(auth_info, mudname);
 
    return result;
 }

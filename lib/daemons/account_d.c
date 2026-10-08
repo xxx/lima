@@ -133,7 +133,7 @@ mapping query_account_data()
 
 void remove_bank(string bank)
 {
-   map_delete(accounts, bank);
+   m_delete(accounts, bank);
    save_me();
 }
 

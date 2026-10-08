@@ -112,5 +112,5 @@ nomask void bind(string sequence, function callback)
 // Remove a key binding from a charmode shell.
 nomask void unbind(string sequence)
 {
-   map_delete(bindings, sequence);
+   m_delete(bindings, sequence);
 }

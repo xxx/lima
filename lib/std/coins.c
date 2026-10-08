@@ -46,7 +46,7 @@ void split_coins(float amount, string type)
       this_body()->simple_action("$N $vtake some coins.");
       if (coins[type] <= 0)
       {
-         map_delete(coins, type);
+         m_delete(coins, type);
          if (!sizeof(query_coins()))
             remove();
       }

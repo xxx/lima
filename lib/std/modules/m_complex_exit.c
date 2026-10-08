@@ -237,7 +237,7 @@ varargs void add_method(string method, mixed destination, mixed checks, mixed *e
 // Remove a go method from the exit
 void remove_method(string method)
 {
-   map_delete(methods, method);
+   m_delete(methods, method);
 }
 
 //: FUNCTION list_methods

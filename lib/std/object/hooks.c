@@ -59,7 +59,7 @@ void remove_hook(string tag, function hook)
       hooks[tag] -= ({( : 0 :)});
    }
    if (!sizeof(hooks[tag]))
-      map_delete(hooks, tag);
+      m_delete(hooks, tag);
 }
 
 //: FUNCTION hook_state

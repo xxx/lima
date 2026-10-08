@@ -646,7 +646,7 @@ void sell_items(int key, int amount)
          {
             item.amount--;
             if (item.amount <= 0)
-               map_delete(stored_items, key);
+               m_delete(stored_items, key);
          }
       }
       else

@@ -27,7 +27,7 @@
 // valid, but remains in only for compatability reasons.
 void add_item(mixed *stuff...)
 {
-   if (mapp(stuff[ < 1]))
+   if (mappingp(stuff[ < 1]))
    {
       clone_object (SIMPLE_OB, stuff[ < 1], stuff[0.. < 2]);
       return;

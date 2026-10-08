@@ -142,7 +142,7 @@ int state_update()
          if (count > 0)
             receiver_counts[name]--;
          if (receiver_counts[name] == 0)
-            map_delete(receiver_counts, name);
+            m_delete(receiver_counts, name);
       }
       if (repeats > 0)
          repeats--;

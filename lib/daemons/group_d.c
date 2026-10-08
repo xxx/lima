@@ -44,7 +44,7 @@ nomask void remove_group(string group)
    if (!check_privilege(PRIV_NEEDED))
       error("illegal attempt to remove a system group\n");
 
-   map_delete(group_map, group);
+   m_delete(group_map, group);
    save_me();
 }
 

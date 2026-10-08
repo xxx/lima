@@ -54,7 +54,7 @@ void remove_method(string method)
 {
    if (!check_privilege("Mudlib:daemons"))
       error("Insufficient privileges to remove_method");
-   map_delete(methods, method);
+   m_delete(methods, method);
    save_me();
 }
 

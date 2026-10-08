@@ -21,7 +21,7 @@ string selected;
 
 void set_body(string name, string fname, string race, int gender)
 {
-   if (!mapp(bodies))
+   if (!mappingp(bodies))
       bodies = ([]);
    bodies[name] = ({fname, 1, race, gender});
 
@@ -37,9 +37,9 @@ void remove_body(string name)
 {
    if (USER_D->find_real_user(name) != this_user()->query_userid())
       error("fail to remove " + name + " as it does not belong to " + this_user()->query_userid());
-   if (!mapp(bodies) || !stringp(name) || strlen(name) < 1)
+   if (!mappingp(bodies) || !stringp(name) || strlen(name) < 1)
       return;
-   map_delete(bodies, name);
+   m_delete(bodies, name);
    unguarded(1, ( : rm, USER_PATH(name) + __SAVE_EXTENSION__:));
    unguarded(1, ( : call_other, LAST_LOGIN_D, "remove_user", name, 0 :));
 }
@@ -51,7 +51,7 @@ string query_selected_body()
 
 int query_num_bodies()
 {
-   if (!mapp(bodies))
+   if (!mappingp(bodies))
       bodies = ([]);
 
    return sizeof(keys(bodies));
@@ -70,7 +70,7 @@ int set_selected_body(string name)
 
 mapping query_bodies()
 {
-   if (!mapp(bodies))
+   if (!mappingp(bodies))
       bodies = ([]);
 
    return bodies;
@@ -106,7 +106,7 @@ varargs string query_fname(string name)
 {
    if (!name)
       name = query_selected_body();
-   if (!mapp(bodies))
+   if (!mappingp(bodies))
       set_body(name, "/std/race/human.c", "human", 0);
    if (bodies[name])
       return bodies[name][BODY_FNAME];
@@ -115,7 +115,7 @@ varargs string query_fname(string name)
 
 int query_gender(string name)
 {
-   if (!mapp(bodies))
+   if (!mappingp(bodies))
       set_body(name, "/std/race/human.c", "human", 0);
    if (bodies[name])
       return bodies[name][BODY_GENDER];

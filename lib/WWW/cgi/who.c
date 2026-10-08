@@ -34,7 +34,7 @@ string main(mixed data)
 
    if (stringp(data))
       userid = data;
-   if (mapp(data))
+   if (mappingp(data))
       userid = data["name"];
    if (strlen(userid) && userid[0] == '=')
       userid = userid[1..];

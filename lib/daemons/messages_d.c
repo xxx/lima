@@ -104,7 +104,7 @@ void refresh_messages()
 void create()
 {
    ::create();
-   if (!mapp(messages))
+   if (!mappingp(messages))
    {
       messages = ([]);
       refresh_messages();
@@ -123,7 +123,7 @@ int count_msgs(mixed m)
 {
    if (arrayp(m))
       return sizeof(m);
-   if (mapp(m))
+   if (mappingp(m))
    {
       int c = 0;
       foreach (mixed smth in values(m))
