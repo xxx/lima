@@ -5,6 +5,12 @@ inherit M_DECAY;
 
 int state_cnt = 0;
 
+void mudlib_setup()
+{
+   food::mudlib_setup();
+   m_decay::mudlib_setup();
+}
+
 void setup()
 {
    set_id("hamburger", "burger");

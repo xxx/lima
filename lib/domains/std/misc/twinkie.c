@@ -6,8 +6,11 @@
 inherit M_THROWABLE;
 inherit FOOD;
 
-mixed throw(object target)
+mixed do_throw(object target)
 {
+   if (!target || !is_throwable())
+      return m_throwable::do_throw(target);
+
    this_body()->targetted_action("$N $vthrow a golden twinkie at $t.", target);
    target->simple_action("$N $vare covered in a creamy filling!");
    this_object()->remove();

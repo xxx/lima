@@ -1,6 +1,6 @@
 /* Do not remove the headers from this file! see /USAGE for more info. */
 
-inherit OBJ;
+inherit OBJ base_object;
 inherit M_EDIBLE;
 inherit M_GETTABLE;
 inherit M_HEALING;
@@ -9,13 +9,13 @@ inherit M_HEALING;
 
 void mudlib_setup()
 {
-   object::mudlib_setup();
+   base_object::mudlib_setup();
    m_edible::mudlib_setup();
 }
 
 int query_value()
 {
-   float heal_mod = 1;
+   float heal_mod = 1.0;
    if (this_object()->get_original_eats() != this_object()->query_num_eats())
       return 0;
    if (this_object()->decay_begun())
@@ -25,12 +25,12 @@ int query_value()
    if (this_object()->decays())
       heal_mod = 0.65;
 
-   return to_int((float)query_num_eats() * query_heal_value() * heal_mod);
+   return to_int(to_float(query_num_eats()) * query_heal_value() * heal_mod);
 }
 
-mixed direct_eat_obj(object ob)
+mixed direct_eat_obj()
 {
-   return m_edible::direct_eat_obj(ob);
+   return m_edible::direct_eat_obj();
 }
 
 int is_food()

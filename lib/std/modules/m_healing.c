@@ -19,7 +19,8 @@ int is_healing()
 private
 object find_whom_to_heal()
 {
-   return environment()->is_living() ? environment() : this_body();
+   object env = environment();
+   return env && env->is_living() ? env : this_body();
 }
 
 //: FUNCTION set_heal_value

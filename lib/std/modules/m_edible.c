@@ -80,7 +80,7 @@ mixed direct_eat_obj()
    return 1;
 }
 
-varargs private eat_action(string action, object eater)
+private void apply_eat_action(mixed action, object eater)
 {
    if (stringp(action))
       eater->simple_action(action, this_object());
@@ -108,28 +108,15 @@ varargs void do_eat(object eater)
                      ->move(eater);
    }
 
-   if (num_eats == 1)
-   {
-      if (last_eat_action)
-         action = last_eat_action;
-      else
-         action = eat_action;
-      if (stringp(action))
-         eater->simple_action(action, this_object());
-      else
-         evaluate(action);
-
-      this_object()->remove();
-   }
+   if (num_eats == 1 && last_eat_action)
+      action = last_eat_action;
    else
-   {
+      action = eat_action;
 
-      if (stringp(eat_action))
-         eater->simple_action(eat_action, this_object());
-      else
-         evaluate(eat_action);
-      eat_action(action, eater);
+   apply_eat_action(action, eater);
 
+   if (num_eats == 1)
+      this_object()->remove();
+   else
       num_eats--;
-   }
 }
