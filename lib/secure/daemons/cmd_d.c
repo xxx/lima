@@ -62,141 +62,138 @@ void create()
    set_privilege(1);
 }
 
-private
-void parse_verb_defs(string dir, string filecontents)
+private class proto_info parse_rule(string *words)
 {
-   mapping pathmap = ([]);
-   string *lines = explode(filecontents, "\n");
-   string *words;
-   string line, cmd, item;
-   int size, flags, error_flag, i;
-   string errors = "";
+   class proto_info rule = new(class proto_info);
+   int first = 1;
+   int i;
 
-   foreach (line in lines)
+   rule.prototype = ({});
+   rule.first_optional_arg = -1;
+   rule.proto_string = words[0];
+   if (sizeof(words) > 1 && strlen(words[1]) > 1 && words[1][0] == '-')
    {
-      words = split(line, "[ \t]+") - ({"", " "});
-      size = sizeof(words);
-      if (!size || words[0][0] == '#')
-         continue;
-      cmd = words[0];
-      if (has_key(pathmap, cmd))
-         errors += sprintf("Warning: %s redefined.  Previous definition being clobbered.\n", cmd);
-      pathmap[cmd] = new (class proto_info);
-      // ### gross.
-      ((class proto_info)pathmap[cmd])->proto_string = replace_string(
-          replace_string(
-              replace_string(
-                  replace_string(replace_string(replace_string(implode(words, " "), "num", "number"), "str", "string"),
-                                 "obj", "object"),
-                  "fname", "filename"),
-              "*", "(s)"),
-          "cfile", "file");
-      if (!(--size))
-         continue;
-      words = words[1..];
-      if (words[0][0] == '-' && strlen(words[0]) > 1)
+      string seen = "";
+      rule.options = words[1][1..];
+      for (i = 0; i < strlen(rule.options); i++)
       {
-         ((class proto_info)pathmap[cmd])->options = words[0][1..];
-         if (!(--size))
-         {
-            errors += "Bad line: " + line + "\n";
-            continue;
-         }
-         words = words[1..];
+         int option = rule.options[i];
+         if (option == ':' || option == '-' || member_array(option, seen) != -1)
+            return nil;
+         seen += chr(option);
+         if (i + 1 < strlen(rule.options) && rule.options[i + 1] == ':')
+            i++;
       }
-      ((class proto_info)pathmap[cmd])->prototype = allocate(size);
-      ((class proto_info)pathmap[cmd])->first_optional_arg = -1;
-      for (i = 0; i < size; i++)
-      {
-         flags = 0;
-         if (words[i][0] == '[' && words[i][ < 1] == ']')
-         {
-            words[i] = words[i][1.. < 2];
-            if (((class proto_info)pathmap[cmd])->first_optional_arg == -1)
-               ((class proto_info)pathmap[cmd])->first_optional_arg = i;
-         }
-         if (words[i][ < 1] == '*')
-         {
-            flags |= PLURAL;
-            words[i] = words[i][0.. < 2];
-         }
-         if (words[i] == "")
-         {
-            errors += "Bad line: " + line + "\n";
-            error_flag = 0;
-            break;
-         }
-         foreach (item in explode(words[i], "|"))
-            switch (item)
-            {
-            case "str":
-               flags |= STR;
-               break;
-            case "file":
-               flags |= FILE;
-               break;
-            case "obfile":
-               flags |= OBFILE;
-               break;
-            case "dir":
-               flags |= DIR;
-               break;
-            case "obj":
-               flags |= OBJECT;
-               break;
-            case "user":
-               flags |= USER;
-               break;
-            case "fname":
-               flags |= FNAME;
-               break;
-            case "num":
-               flags |= NUM;
-               break;
-            case "cfile":
-               flags |= CFILE;
-               break;
-            default:
-               errors += "Bad line (invalid argument type): " + line + "\n";
-               error_flag = 1;
-               break;
-            }
-         if (error_flag)
-            break;
-         ((class proto_info)pathmap[cmd])->prototype[i] = flags;
-      }
-      if (error_flag)
-      {
-         error_flag = 0;
-         continue;
-      }
+      rule.proto_string += " " + words[1];
+      first++;
+      if (first == sizeof(words))
+         return nil;
    }
-   proto_info[dir] = pathmap;
-   if (strlen(errors))
-      NEWS_D->system_post(BUG_NEWSGROUP, "Bugs found by " + base_name(this_object()), errors);
+   for (i = first; i < sizeof(words); i++)
+   {
+      string word = words[i];
+      string *names = ({});
+      int flags = 0, optional = 0;
+      if (word[0] == '[' && word[<1] == ']')
+      {
+         if (strlen(word) <= 2)
+            return nil;
+         word = word[1..<2];
+         optional = 1;
+         if (rule.first_optional_arg == -1)
+            rule.first_optional_arg = i - first;
+      }
+      if (word[<1] == '*')
+      {
+         if (strlen(word) == 1)
+            return nil;
+         flags |= PLURAL;
+         word = word[0..<2];
+      }
+      foreach (string item in explode(word, "|"))
+      {
+         string display = item;
+         switch (item)
+         {
+         case "str": flags |= STR; display = "string"; break;
+         case "num": flags |= NUM; display = "number"; break;
+         case "file": flags |= FILE; break;
+         case "dir": flags |= DIR; break;
+         case "cfile": flags |= CFILE; display = "file"; break;
+         case "obfile": flags |= OBFILE; break;
+         case "fname": flags |= FNAME; display = "filename"; break;
+         case "obj": flags |= OBJECT; display = "object"; break;
+         case "user": flags |= USER; break;
+         default: return nil;
+         }
+         names += ({display});
+      }
+      word = implode(names, "|") + ((flags & PLURAL) ? "(s)" : "");
+      rule.proto_string += " " + (optional ? "[" + word + "]" : word);
+      rule.prototype += ({flags});
+   }
+   return rule;
 }
 
-private
-void cache_dir(string dir)
+private mapping parse_verb_defs(string dir, string contents)
+{
+   mapping pathmap = ([]);
+   string *lines = explode(contents, "\n");
+   int i;
+   for (i = 0; i < sizeof(lines); i++)
+   {
+      string *words = split(lines[i], "[ \t]+") - ({"", " "});
+      class proto_info rule;
+      if (!sizeof(words) || words[0][0] == '#')
+         continue;
+      if (has_key(pathmap, words[0]))
+         printf("Warning: %s redefined in %sCmd_rules.\n", words[0], dir);
+      rule = parse_rule(words);
+      // Invalid entries must not fall back to untyped command dispatch.
+      pathmap[words[0]] = rule ? rule : sprintf("Invalid command rule in %sCmd_rules:%d: %s", dir, i + 1, lines[i]);
+   }
+   return pathmap;
+}
+
+private string command_directory(string dir)
+{
+   if (!dir || !strlen(dir))
+      return nil;
+   dir = evaluate_path(dir);
+   return dir == "/" ? dir : dir + "/";
+}
+
+private void cache_dir(string dir)
 {
    string *files;
-
-   if (dir[ < 1] != '/')
-      dir += "/";
-
-   if (is_file(dir + "Cmd_rules"))
-      parse_verb_defs(dir, read_file(dir + "Cmd_rules"));
-   files = get_dir(dir + "?*.c");
-   if (!arrayp(files) || !sizeof(files))
+   mapping rules = ([]);
+   dir = command_directory(dir);
+   if (!dir)
       return;
-   cmd_info[dir] = map(files, ( : $1[0.. < 3] :));
+   if (!is_directory(dir))
+   {
+      m_delete(cmd_info, dir);
+      m_delete(proto_info, dir);
+      return;
+   }
+   files = get_dir(dir);
+   if (member_array("Cmd_rules", files) != -1)
+   {
+      string contents = read_file(dir + "Cmd_rules");
+      if (!stringp(contents))
+         error("Cannot read " + dir + "Cmd_rules");
+      rules = parse_verb_defs(dir, contents);
+   }
+   files = filter(files, (: strlen($1) > 2 && $1[<2..] == ".c" && is_file($(dir) + $1) :));
+   cmd_info[dir] = map(files, (: $1[0..<3] :));
+   proto_info[dir] = rules;
 }
 
 varargs void cache(string *paths)
 {
    if (!paths)
       paths = keys(cmd_info);
-   map(paths, ( : cache_dir:));
+   map(paths, cache_dir);
 }
 
 int is_command(object o)
@@ -218,15 +215,14 @@ varargs mixed find_cmd_in_path(string cmd, string *path)
 
    foreach (dir in path)
    {
-      if (dir[ < 1] != '/')
-         dir += "/";
-      // Try adding this dir if we don't have it,
-      if (!cmd_info[dir])
-         cache_dir(dir);
-      // And if it's still not in the cache, this is a bogus path.
-      if (!cmd_info[dir])
+      dir = command_directory(dir);
+      if (!dir)
          continue;
-      if (member_array(cmd, cmd_info[dir]) != -1 && is_file(dir + cmd + ".c") &&o = load_object(dir + cmd))
+      if (!has_key(cmd_info, dir))
+         cache_dir(dir);
+      if (!has_key(cmd_info, dir))
+         continue;
+      if (member_array(cmd, cmd_info[dir]) != -1 && is_file(dir + cmd + ".c") && (o = load_object(dir + cmd)))
       {
          if (!is_command(o))
             return -1;
@@ -250,10 +246,10 @@ varargs mixed find_cmd(string cmd, string *path)
          if (is_command(o))
          {
             mixed tmp = split_path(s);
-            dir = tmp[0];
+            dir = command_directory(tmp[0]);
             s = tmp[1];
             sscanf(s, "%s.c", s);
-            if (!cmd_info[dir])
+            if (!has_key(cmd_info, dir))
                cache_dir(dir);
             return ({o, dir, s});
          }
@@ -292,7 +288,7 @@ mixed smart_arg_parsing(mixed argv, string *path, string *implode_info)
          if ((cmd_obj = load_object(matches[0])) && is_command(cmd_obj))
          {
             mixed tmp = split_path(matches[0]);
-            this_path = tmp[0];
+            this_path = command_directory(tmp[0]);
             cmd_name = tmp[1][0.. < 3];
          }
          else
@@ -315,6 +311,11 @@ mixed smart_arg_parsing(mixed argv, string *path, string *implode_info)
       cmd_name = info[2];
    }
 
+   if (!has_key(cmd_info, this_path))
+      cache_dir(this_path);
+   if (!has_key(cmd_info, this_path))
+      return 0;
+
    if (!has_key(proto_info, this_path) || !has_key(proto_info[this_path], cmd_name))
    {
       // no prototypes, so don't do no globbing or nothin'.
@@ -327,13 +328,18 @@ mixed smart_arg_parsing(mixed argv, string *path, string *implode_info)
          return ({cmd_obj, ([]), implode_by_arr(argv[1..], implode_info)});
       }
       else
-         return ({cmd_obj, ([]), 0});
+         return ({cmd_obj, ([]), nil});
    }
 
+   if (stringp(proto_info[this_path][cmd_name]))
+   {
+      printf("%s\n", proto_info[this_path][cmd_name]);
+      return 1;
+   }
    pstuff = proto_info[this_path][cmd_name];
 
    // Remove "'s for:  "word1 word2"
-   argv = map(argv, ( : (stringp($1) && $1[0] == '"' && $1[ < 1] == '"') ? $1[1.. < 2] : $1:));
+   argv = map(argv, ( : (stringp($1) && strlen($1) >= 2 && $1[0] == '"' && $1[ < 1] == '"') ? $1[1.. < 2] : $1:));
    USAGE = pstuff.proto_string;
 
    if (sizeof(argv) > 1)
@@ -414,7 +420,7 @@ mixed smart_arg_parsing(mixed argv, string *path, string *implode_info)
    }
    if (argcounter != sizeof(argv))
    {
-      if (pstuff.prototype[i - 1] & PLURAL)
+      if (i && (pstuff.prototype[i - 1] & PLURAL))
          printf("%s: not found.\n", argv[argcounter]);
       else
          printf("Too many arguments.\nUsage: %s\n", USAGE);
@@ -476,10 +482,10 @@ mixed parse_arg(int this_arg, mixed argv)
          }
 
          if ((this_arg & IS_FILE) && !(this_arg & IS_DIR))
-            result = filter(result, ( : is_file:));
+            result = filter(result, is_file);
 
          if ((this_arg & IS_DIR) && !(this_arg & IS_FILE))
-            result = filter(result, ( : is_directory:));
+            result = filter(result, is_directory);
 
          if (!sizeof(result) && (this_arg & IS_FNAME))
          {
@@ -488,7 +494,7 @@ mixed parse_arg(int this_arg, mixed argv)
          }
 
          if (!sizeof(result))
-            result = 0;
+            result = nil;
          else
          {
             result = ({this_arg & FILE_FLAGS, result});
@@ -517,10 +523,10 @@ mixed parse_arg(int this_arg, mixed argv)
       else if (objectp(argv))
          ob = argv;
       else
-         ob = 0;
+         ob = nil;
 
       if ((this_arg & ONLY_USER) && ob && !ob->query_link())
-         ob = 0;
+         ob = nil;
 
       if (ob)
       {
@@ -567,9 +573,13 @@ mixed parse_arg(int this_arg, mixed argv)
    return result;
 }
 
-varargs mapping query_cmds(string path)
+varargs string *query_cmds(string path)
 {
-   if (path)
-      cache_dir(path);
-   return path ? cmd_info[path] : flatten_array(values(cmd_info));
+   if (!path)
+      return flatten_array(values(cmd_info));
+   path = command_directory(path);
+   if (!path)
+      return ({});
+   cache_dir(path);
+   return has_key(cmd_info, path) ? cmd_info[path] : ({});
 }

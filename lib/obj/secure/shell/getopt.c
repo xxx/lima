@@ -9,13 +9,14 @@ int classify(int opt, string options)
    int i;
 
    i = member_array(opt, options);
-   if (i == -1)
+   if (i == -1 || opt == ':')
    {
       printf("option -%c not recognized\n", opt);
-      return 0;
+      return -1;
    }
    if (++i != strlen(options))
       return options[i] == ':';
+   return 0;
 }
 
 //: FUNCTION getopt
@@ -27,6 +28,7 @@ int classify(int opt, string options)
 mixed getopt(mixed args, string options)
 {
    mapping res;
+   int kind;
    mixed optstring, opt, optarg;
 
    res = ([]);
@@ -34,7 +36,7 @@ mixed getopt(mixed args, string options)
    if (!options)
       options = "";
 
-   while (sizeof(args) && stringp(args[0]) && args[0][0] == '-' && args[0] != '-')
+   while (sizeof(args) && stringp(args[0]) && strlen(args[0]) && args[0][0] == '-' && args[0] != "-")
    {
       if (args[0] == "--")
       {
@@ -47,7 +49,10 @@ mixed getopt(mixed args, string options)
       {
          opt = optstring[0];
          optstring = strlen(optstring) == 1 ? "" : optstring[1..];
-         if (classify(opt, options))
+         kind = classify(opt, options);
+         if (kind < 0)
+            return -1;
+         if (kind)
          {
             if (optstring == "")
             {
