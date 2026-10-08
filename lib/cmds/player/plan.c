@@ -31,8 +31,13 @@ void main()
 {
 #ifdef EVERYONE_HAS_A_PLAN
    out("Enter your plan, Stan.\n");
-   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : set_plan:));
+   clone_object(EDIT_OB, EDIT_TEXT, nil, set_plan);
 #else
    out("Sorry, plans are not available.\n");
 #endif
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main();
 }

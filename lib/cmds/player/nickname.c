@@ -30,3 +30,8 @@ void main(string arg)
    this_body()->set_nickname(arg);
    out("Ok.\n");
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}
