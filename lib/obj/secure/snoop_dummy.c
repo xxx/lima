@@ -15,6 +15,7 @@ void remove()
 
 void create(string name)
 {
+   if (!clonep()) return;
    header = name + "% ";
 }
 

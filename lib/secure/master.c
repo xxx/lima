@@ -741,6 +741,8 @@ private int destruct_allowed(object requester, object target)
       return secure && secure->check_privilege(1, 0);
    if (requester == target)
       return 1;
+   if (base_name(requester) == USER_OB && target->is_body() && target->query_link() == requester)
+      return 1;
    return secure && secure->check_privilege(secure->query_protection(target, 1), 0);
 }
 

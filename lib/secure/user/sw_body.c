@@ -8,6 +8,7 @@ protected
 nomask void sw_body_handle_new_logon();
 
 void save_me();
+protected nomask void set_body_fname(string name, string new_body_fname);
 void remove();
 void initialize_user();
 void report_login_failures();
@@ -75,7 +76,7 @@ varargs nomask void switch_body(string new_body_fname, int permanent)
    if (permanent && new_body_fname)
    {
       body_fname = new_body_fname;
-      save_me();
+      set_body_fname(query_selected_body(), body_fname);
       // TBUG("Taking change as permanent");
    }
 

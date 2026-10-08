@@ -14,7 +14,7 @@ mapping get_snoop_info()
 {
    if (previous_object() != find_object(SNOOPS_CMD))
    {
-      return 0;
+      return nil;
    }
    // We trust the command, we can pass a reference.
    return snoops;
@@ -41,7 +41,7 @@ private
 int detect_cycle_recursive(object snooper)
 {
    object *snoopees;
-   int *cycles;
+   object *cycles;
    if (cycle_info[snooper])
    {
       return 1;
@@ -86,7 +86,7 @@ int unsnoop(object snooper, object snoopee)
    {
       return -1; // dumbass!
    }
-   snoops[snooper] -= ({snoopee, 0});
+   snoops[snooper] -= ({snoopee, nil});
    if (!sizeof(snoops[snooper]))
    {
       m_delete(snoops, snooper);
@@ -106,7 +106,7 @@ int unsnoop(object snooper, object snoopee)
 // -2 == go home
 int unsnoop_all(object snooper)
 {
-   if (previous_object() != find_object(UNSNOOP_CMD))
+   if (origin() != "local" && previous_object() != find_object(UNSNOOP_CMD))
       return -2;
    if (!snoops[snooper] || !sizeof(snoops[snooper]))
       return -1;
@@ -154,7 +154,7 @@ void remove()
 {
    object *snoopers;
 
-   snoopers = keys(snoops) - ({0});
+   snoopers = keys(snoops) - ({nil});
    snoopers->receive_private_msg("Whoops! SNOOP_D is being dested!\n");
    map(snoopers, ( : unsnoop_all:));
    map(values(dummy_objects), ( : destruct:));
@@ -167,7 +167,7 @@ void bye()
    object *snoopers;
 
    who = previous_object();
-   if (snoops[who] != 0)
+   if (snoops[who])
    {
       unsnoop_all(who);
    }
