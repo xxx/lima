@@ -91,13 +91,13 @@ mapping mail_forward = ([]);
 
 nomask void save_recent()
 {
-   unguarded(1, ( : rm, RECENT_FILE:));
-   unguarded(1, ( : write_file, RECENT_FILE, save_variable(recent_changes) :));
+   unguarded(1, &rm(RECENT_FILE));
+   unguarded(1, &write_file(RECENT_FILE, save_value(recent_changes)));
 }
 
 nomask void save_me()
 {
-   unguarded(1, ( : save_object, SAVE_FILE:));
+   unguarded(1, &save_object(SAVE_FILE));
    save_recent();
 }
 
@@ -152,7 +152,7 @@ nomask void create()
       return;
    }
 
-   restore_object(SAVE_FILE, 1);
+   restore_object(SAVE_FILE);
 
    if (sizeof(keys(data)) == 0)
    {
@@ -166,10 +166,15 @@ nomask void create()
       }
    }
 
-   if (rec = read_file(RECENT_FILE))
-      recent_changes = restore_variable(rec);
+   if (file_size(RECENT_FILE) > 0 && (rec = read_file(RECENT_FILE)))
+   {
+      mixed changes = restore_value(rec);
+      if (!mappingp(changes))
+         error("Invalid news journal: expected a mapping.\n");
+      recent_changes = changes;
+   }
    else
-      recent_changes = 0;
+      recent_changes = nil;
    if (!recent_changes)
    {
       recent_changes = ([]);
@@ -178,8 +183,9 @@ nomask void create()
    }
    else
    {
-      foreach (string key, mixed value in recent_changes)
+      foreach (string key in keys(recent_changes))
       {
+         mixed value = recent_changes[key];
          if (value == "#removed#")
          {
             m_delete(data, key);
@@ -195,10 +201,10 @@ nomask void create()
                removed[key] = ({});
 
             recent_changes[key] = ([]);
-            foreach (string key2 in keys(value))
+            foreach (mixed key2 in keys(value))
             {
                data[key][key2] = value[key2];
-               if (classp(value[key2]) && ((class news_msg)value[key2])->body == 0)
+               if (classp(value[key2]) && ((class news_msg)value[key2]).body == nil)
                   removed[key] += ({key2});
             }
          }
@@ -208,13 +214,18 @@ nomask void create()
    {
       if (mappingp(value))
       {
-         foreach (string key2, class news_msg msg in value)
+         foreach (mixed key2 in keys(value))
          {
-            if (classp(msg) && !msg.body)
+            mixed msg = value[key2];
+            if (classp(msg) && !((class news_msg)msg).body)
                m_delete(value, key2);
          }
       }
    }
+
+   recent_changes = ([]);
+   foreach (string group in keys(data))
+      recent_changes[group] = ([]);
 
    update_all_threads();
    save_me();
@@ -240,14 +251,14 @@ nomask void notify_users(string group, class news_msg msg)
 nomask mapping get_mail_forward()
 {
    if (!check_privilege("Mudlib:daemons"))
-      return 0;
+      return nil;
    return mail_forward;
 }
 
 nomask string *query_mail_forward(string group)
 {
    if (!check_privilege("Mudlib:daemons"))
-      return 0;
+      return nil;
    if (member_array(group, keys(mail_forward)) == -1)
       return ({});
    return mail_forward[group];
@@ -294,7 +305,7 @@ nomask void do_mail_forward(string group, class news_msg msg)
 nomask mapping list_restrictions()
 {
    if (!check_privilege("Mudlib:daemons"))
-      return 0;
+      return nil;
    return restrictions + additional_restrictions;
 }
 
@@ -454,7 +465,7 @@ varargs nomask void set_write_restriction(string prefix, string restriction)
    if (!check_privilege("Mudlib:daemons"))
       return;
    if (restriction == "0" || restriction == "")
-      restriction = 0;
+      restriction = nil;
    if (!restrictions[prefix])
       restrictions[prefix] = ({restriction, 0});
    else
@@ -469,7 +480,7 @@ varargs nomask void set_read_restriction(string prefix, string restriction)
    if (!check_privilege("Mudlib:daemons"))
       return;
    if (restriction == "0" || restriction == "")
-      restriction = 0;
+      restriction = nil;
    if (!restrictions[prefix])
       restrictions[prefix] = ({0, restriction});
    else
@@ -605,9 +616,9 @@ nomask int followup(string group, int id, string message)
    if (is_write_restricted(group))
       return 0;
    post_id = get_new_id(group);
-   subject = ">" + ((class news_msg)data[group][id])->subject;
+   subject = ">" + ((class news_msg)data[group][id]).subject;
 
-   id = ((class news_msg)data[group][id])->thread_id;
+   id = ((class news_msg)data[group][id]).thread_id;
 
    msg = new (class news_msg, time
               : time(), thread_id
@@ -635,13 +646,13 @@ nomask class news_msg get_message(string group, int id)
    class news_msg msg;
 
    if (!data[group])
-      return 0;
+      return nil;
 
    if (is_read_restricted(group))
-      return 0;
+      return nil;
    msg = data[group][id];
    if (!msg)
-      return 0;
+      return nil;
 
    /* sigh */
    // ### oops... can't do this yet... leave this unsafe for now
@@ -665,7 +676,7 @@ nomask void remove_post(string group, int id)
       error("* illegal attempt to remove post\n");
    }
 
-   msg.body = 0;
+   msg.body = nil;
    recent_changes[group][id] = msg;
    removed[group] += ({id});
    update_threads(group);
@@ -677,7 +688,7 @@ varargs nomask int *get_messages(string group, int no_removed)
    mixed *ret = keys(data[group]) - ({"next_id"});
 
    if (is_read_restricted(group))
-      return 0;
+      return nil;
    if (no_removed)
       ret -= removed[group];
 
@@ -693,23 +704,23 @@ nomask int get_thread_id(string group, int id)
    /* Check to make sure that the article exists */
    if (!data[group][id])
       return 0;
-   return ((class news_msg)data[group][id])->thread_id;
+   return ((class news_msg)data[group][id]).thread_id;
 }
 
 nomask int *get_thread(string group, int thread)
 {
    if (is_read_restricted(group))
-      return 0;
+      return nil;
    return filter(keys(data[group]),
                        (
-                           : $1 != "next_id" && ((class news_msg)data[$(group)][$1])->thread_id == $(thread)
+                           : $1 != "next_id" && ((class news_msg)data[$(group)][$1]).thread_id == $(thread)
                            :));
 }
 
 nomask int *get_thread_ids(string group)
 {
    if (is_read_restricted(group))
-      return 0;
+      return nil;
    return filter(get_messages(group, 1), ( : $1 != get_thread_id($(group), $1) :));
 }
 
@@ -852,7 +863,10 @@ nomask void change_header(string group, int id, string header)
       write("You cannot change the subjects of posts that don't belong to you\n");
    }
    else if (sizeof(header))
-      ((class news_msg)data[group][id])->subject = header;
+   {
+      msg.subject = header;
+      recent_changes[group][id] = msg;
+   }
    else
       write("Subject not changed.\n");
    save_recent();
@@ -890,7 +904,7 @@ mixed *search_for(string what)
          if (id == "next_id" || !post.body)
             continue;
 
-         if (regexp(post.body, what) && !is_read_restricted(group))
+         if (regmatch(post.body, what) != nil && !is_read_restricted(group))
             ret += ({({group, id})});
       }
    }
@@ -930,7 +944,7 @@ nomask int sort_messages_by_thread(int first, int second, string group)
    return 1;
 }
 
-nomask string *get_threads(string group)
+nomask int *get_threads(string group)
 {
    return threading_data[group];
 }
@@ -943,7 +957,7 @@ nomask mapping get_all_thread_data()
 private
 nomask void update_threads(string group)
 {
-   threading_data[group] = sort_array(get_messages(group, 1), ( : sort_messages_by_thread:), group);
+   threading_data[group] = sort_array(get_messages(group, 1), (: sort_messages_by_thread($1, $2, $(group)) :));
 }
 
 private
@@ -952,7 +966,6 @@ nomask void update_all_threads()
    threading_data = ([]);
    foreach (string group in get_groups())
    {
-      reset_eval_cost();
-      threading_data[group] = sort_array(get_messages(group, 1), ( : sort_messages_by_thread:), group);
+      threading_data[group] = sort_array(get_messages(group, 1), (: sort_messages_by_thread($1, $2, $(group)) :));
    }
 }
