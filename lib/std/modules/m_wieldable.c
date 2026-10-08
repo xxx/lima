@@ -21,7 +21,6 @@
 void unwield_me();
 void hook_state(string, mixed, int);
 void assign_flag(int which, int state);
-void clear_flag(int);
 
 private
 nosave object wielded_by;
@@ -116,11 +115,7 @@ mixed ob_state()
 void unwield_me()
 {
    if (wielded_by)
-   {
       wielded_by->do_unwield(this_object());
-      wielded_by = 0;
-      clear_flag(F_WIELDED);
-   }
 }
 
 void do_remove()

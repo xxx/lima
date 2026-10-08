@@ -29,9 +29,9 @@ int can_wield(string limb, object ob)
 string find_an_open_limb()
 {
    foreach (string limb in query_wielding_limbs())
-      if (can_wield(limb, 0))
+      if (can_wield(limb, nil))
          return limb;
-   return 0;
+   return nil;
 }
 
 private
@@ -39,7 +39,7 @@ string opposite_limb(string limb)
 {
    string limb2;
    if (!limb)
-      return 0;
+      return nil;
    if (strsrch(limb, "left") >= 0)
       limb2 = replace_string(limb, "left", "right");
    if (strsrch(limb, "right") >= 0)
@@ -60,7 +60,7 @@ varargs void wield(object ob, string limb, int force_dual_wield)
    // if limb is zero, we use an open limb, or a random one if we are "full"
    if (!limb)
    {
-      mixed *limbs = filter(query_wielding_limbs(), ( : query_health($1) > 0 && can_wield($1, 0) :));
+      mixed *limbs = filter(query_wielding_limbs(), ( : query_health($1) > 0 && can_wield($1, nil) :));
       // TBUG(limbs);
       if (sizeof(limbs))
          limb = choice(limbs);
@@ -98,6 +98,8 @@ varargs void wield(object ob, string limb, int force_dual_wield)
       {
          // Ah, we're dual wielding and want to change to 1 hand
          ob->unwield_me();
+         if (ob->query_wielded_by())
+            return;
          printf("(Swapping to a single hand)\n");
          do_wield(ob, limb, 0);
          return;
@@ -106,6 +108,8 @@ varargs void wield(object ob, string limb, int force_dual_wield)
       if (weapons[opposite_limb(limb)] == ob)
       {
          ob->unwield_me();
+         if (ob->query_wielded_by())
+            return;
          simple_action("$N $vflip $p $o from one hand to the other.", ob);
          quiet = 1;
       }
@@ -135,7 +139,11 @@ varargs void wield(object ob, string limb, int force_dual_wield)
 
    if (weapons[limb])
    {
-      weapons[limb]->mark_wielded_by(0);
+      object displaced = weapons[limb];
+      displaced->mark_wielded_by(nil, nil);
+      foreach (string occupied_limb in keys(weapons))
+         if (weapons[occupied_limb] == displaced)
+            m_delete(weapons, occupied_limb);
    }
 
    weapons[limb] = ob;
@@ -145,7 +153,7 @@ varargs void wield(object ob, string limb, int force_dual_wield)
    {
       if (weapons[limb2])
       {
-         weapons[limb2]->mark_wielded_by(0);
+         weapons[limb2]->mark_wielded_by(nil, nil);
       }
       weapons[limb2] = ob;
       ob->mark_wielded_by(this_object(), ({limb, limb2}));
@@ -216,12 +224,12 @@ varargs void unwield(string limb)
    if (weapons[limb])
    {
       int dual_wielded = weapons[limb]->query_dual_wielded();
-      weapons[limb]->mark_wielded_by(0);
+      weapons[limb]->mark_wielded_by(nil, nil);
       // TBUG("mark_wielded_by(0) on " + limb);
       if (dual_wielded)
       {
          limb2 = opposite_limb(limb);
-         weapons[limb2]->mark_wielded_by(0);
+         weapons[limb2]->mark_wielded_by(nil, nil);
          // TBUG("Removing seconds limb "+limb2);
       }
    }
