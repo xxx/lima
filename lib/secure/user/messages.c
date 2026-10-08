@@ -54,7 +54,7 @@ string frames_style()
    if (query_shell_ob())
    {
       object shell = query_shell_ob();
-      int simplify = shell->get_variable("simplify") != 0;
+      int simplify = !!shell->get_variable("simplify");
       if (simplify)
          return "none";
       mode = shell->get_variable("frames");
@@ -68,7 +68,7 @@ string frames_colour()
    if (query_shell_ob())
    {
       object shell = query_shell_ob();
-      int simplify = shell->get_variable("simplify") != 0;
+      int simplify = !!shell->get_variable("simplify");
       if (simplify)
          return "none";
       mode = shell->get_variable("frame_colour");

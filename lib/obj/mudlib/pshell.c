@@ -120,7 +120,7 @@ void execute_command(string original_input)
    // In some shells, this is the hook for doing username completion,
    // globbing, flag pre-parsing, etc...  In others, it's used to execute
    // code encased in ` `'s.
-   argv = map(argv, ( : expand_one_argument:));
+   argv = map(argv, expand_one_argument);
    if (!argv)
       return;
    argv -= ({""});

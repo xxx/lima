@@ -105,20 +105,21 @@ private
 void enter_game()
 {
    string selected = this_user()->query_selected_body();
-   string fname = this_user()->query_body_fname(selected);
-   USER_D->register_body(this_user()->query_userid(), selected);
+   string fname;
 
    if (!selected)
    {
       write("Select a character first.\n");
       return;
    }
+   fname = this_user()->query_fname(selected);
+   USER_D->register_body(this_user()->query_userid(), selected);
    if (autologin_tag)
    {
       remove_call_out(autologin_tag);
       autologin_tag = 0;
    }
-   remove_call_out();
+   foreach (mixed *timer in query_call_outs()) remove_call_out(timer[4]);
    modal_pop();
    this_user()->enter_game(selected, fname);
    destruct();
@@ -179,7 +180,7 @@ nomask int valid_name(string str)
    ** Note that this regex matches the restriction imposed by the
    ** SECURE_D.  Also note the name is in lower case right now.
    */
-   if (!regexp(str, "^[a-z]+$"))
+   if (!sizeof(regexp(({str}), "^[a-z]+$")))
    {
       write("Sorry, that name is forbidden by the implementors.  Please\n"
             "choose a name containing only letters.\n");
@@ -230,17 +231,30 @@ int confirm_decision(string dec)
    return 0;
 }
 
-private
-void do_select(string name)
+private string resolve_character(string input)
 {
    mapping bodies = this_user()->query_bodies();
-   string *sorted_bodies = sort_array(keys(bodies), 1);
-   int indexname = to_int(name) - 1;
-   if (indexname >= 0)
+   string name = lower_case(trim(input));
+   string *names = sort_array(keys(bodies), 1);
+   if (sizeof(regexp(({name}), "^[0-9]+$")))
    {
-      name = sorted_bodies[indexname];
+      int number;
+      if (catch(number = to_int(name)) || number < 1 || number > sizeof(names))
+         return nil;
+      name = names[number - 1];
    }
+   return member_array(name, names) == -1 ? nil : name;
+}
 
+private
+void do_select(string input)
+{
+   string name = resolve_character(input);
+   if (!name)
+   {
+      write("No such character.\n");
+      return;
+   }
    if (this_user()->set_selected_body(name))
       write("Selected character '" + capitalize(name) + "' for playing.\n");
    else
@@ -301,7 +315,7 @@ void select_char()
       write("Create a character to select one.\n");
       break;
    default:
-      input_one_arg("Name or [1-" + body_count + "]: ", ( : do_select:));
+      input_one_arg("Name or [1-" + body_count + "]: ", do_select);
       break;
    }
 }
@@ -320,19 +334,19 @@ void creation_done()
 }
 
 private
-void input_gender(int inputgender)
+void input_gender(string inputgender)
 {
    string race = DIR_RACES "/human";
    string format;
    string *races;
-   function when_done = ( : creation_done:);
+   function when_done = creation_done;
    int width = 0;
    int intconvert = to_int(inputgender);
 
    if (intconvert < 1 || intconvert > 3)
    {
       write("\nSorry? Try again, 1-3 only.\n");
-      input_one_arg("Gender: ", ( : input_gender:));
+      input_one_arg("Gender: ", input_gender);
       return;
    }
    gender = intconvert;
@@ -358,7 +372,7 @@ void input_gender(int inputgender)
       printf(format, implode(races, "\n"));
 
       write("Type 'help race' for a brief description.  Type 'list' to show the choices again.\n");
-      modal_push(( : got_entry, when_done:), "Race? ");
+      modal_push(&got_entry(when_done), "Race? ");
    }
 #endif /* USE_RACES */
 }
@@ -369,7 +383,7 @@ void char_name(string inputname)
    if (!strlen(inputname))
    {
       write("\nName is not optional ('quit' will abort).\n");
-      input_one_arg("Name: ", ( : char_name:));
+      input_one_arg("Name: ", char_name);
       return;
    }
    if (inputname == "quit")
@@ -378,20 +392,20 @@ void char_name(string inputname)
    }
    if (!valid_name(inputname))
    {
-      input_one_arg("Name: ", ( : char_name:));
+      input_one_arg("Name: ", char_name);
       return;
    }
    name = inputname;
    write("Gender for your character '" + capitalize(name) +
          "'? (Not your gender necessarily)\n\t1. Male\n\t2. Female\n\t3. Non-binary\n\n");
-   input_one_arg("Gender: ", ( : input_gender:));
+   input_one_arg("Gender: ", input_gender);
 }
 
 void create_char()
 {
    if (this_user()->query_num_bodies() < MAX_CHARACTERS_PER_USER)
    {
-      input_one_arg("Name: ", ( : char_name:));
+      input_one_arg("Name: ", char_name);
    }
    else
       write("The maximum number of characters on " + mud_name() + " is currently " + MAX_CHARACTERS_PER_USER +
@@ -419,19 +433,15 @@ void display_current_menu()
 #endif
 
 private
-void input_remove(string name)
+void input_remove(string input)
 {
-   mapping bodies = this_user()->query_bodies();
-   string *sorted_bodies = sort_array(keys(bodies), 1);
-   int indexname = to_int(name) - 1;
-   if (indexname >= 0)
+   string name = resolve_character(input);
+   if (!name)
    {
-      name = sorted_bodies[indexname];
+      write("No such character.\n");
+      return;
    }
-   else
-      name = lower_case(name);
-
-   input_one_arg("Are you sure? (Yes/no) ", ( : confirm_remove, name:));
+   input_one_arg("Are you sure? (Yes/no) ", &confirm_remove(name));
 }
 
 private
@@ -439,7 +449,7 @@ void remove_char()
 {
    string *sorted_bodies = list_chars();
    write("Confirmation will be required before removal.\n");
-   input_one_arg("Remove: ", ( : input_remove:));
+   input_one_arg("Remove: ", input_remove);
 }
 
 private
@@ -453,6 +463,22 @@ void quit_game()
    destruct();
 }
 
+private void run_menu_timer(object user, function callback)
+{
+   object previous_user = this_user();
+   mixed problem;
+   if (!user || !interactive(user))
+   {
+      destruct();
+      return;
+   }
+   set_this_user(user);
+   problem = catch(evaluate(callback));
+   set_this_user(previous_user);
+   if (problem)
+      error(problem);
+}
+
 void quit_idle_menu()
 {
    write("(Sorry, you've idled for too long)\n");
@@ -463,7 +489,7 @@ void create()
 {
    set_privilege(1);
    toplevel = new_menu(mud_name() + " User Menu");
-   quit_item = new_menu_item("Quit", ( : quit_game:), "q");
+   quit_item = new_menu_item("Quit", quit_game, "q");
    goto_main_menu_item = new_menu_item("Return to main menu", toplevel, "m");
 
    play = new_section("Play", "accent");
@@ -473,15 +499,12 @@ void create()
    add_section_item(toplevel, create);
    add_section_item(toplevel, other);
 
-   if (clonep())
-      call_out(( : quit_idle_menu:), USER_MENU_TIMEOUT);
-
    // Add items to the toplevel (main) menu.
-   add_menu_item(other, new_menu_item("See who's on (who)", ( : simple_cmd:), "w"));
-   add_menu_item(play, new_menu_item("Select character to play", ( : select_char:), "s"));
-   add_menu_item(create, new_menu_item("Create new character", ( : create_char:), "c"));
-   add_menu_item(create, new_menu_item("Remove a character", ( : remove_char:), "r"));
-   add_menu_item(play, new_menu_item("Enter the game", ( : enter_game:), "p"));
+   add_menu_item(other, new_menu_item("See who's on (who)", &simple_cmd("w"), "w"));
+   add_menu_item(play, new_menu_item("Select character to play", select_char, "s"));
+   add_menu_item(create, new_menu_item("Create new character", create_char, "c"));
+   add_menu_item(create, new_menu_item("Remove a character", remove_char, "r"));
+   add_menu_item(play, new_menu_item("Enter the game", enter_game, "p"));
    add_menu_item(other, quit_item);
 }
 
@@ -493,30 +516,18 @@ void user_is_active()
       autologin_tag = 0;
       write("(Cancelled autologin)\n");
    }
-   remove_call_out();
-   call_out(( : quit_idle_menu:), USER_MENU_TIMEOUT);
+   foreach (mixed *timer in query_call_outs()) remove_call_out(timer[4]);
+   call_out(&run_menu_timer(this_user(), quit_idle_menu), USER_MENU_TIMEOUT);
 }
 
 void auto_login()
 {
-   string selected;
-   string fname;
-
-   // Stop auto login here if user has disappeared.
-   if (!this_user() || !this_user()->query_selected_body())
+   string selected = this_user()->query_selected_body();
+   autologin_tag = 0;
+   if (!selected)
       return;
-
-   selected = this_user()->query_selected_body();
-   fname = this_user()->query_body_fname(selected);
-   if (selected)
-   {
-      modal_pop();
-      write("(Auto login with " + capitalize(selected) + " after " + AUTO_LOGIN_AFTER + " seconds ...)\n");
-      // In case they went away here ...
-      if (this_user())
-         this_user()->enter_game(selected, fname);
-      destruct();
-   }
+   write("(Auto login with " + capitalize(selected) + " after " + AUTO_LOGIN_AFTER + " seconds ...)\n");
+   enter_game();
 }
 
 void start_menu()
@@ -529,5 +540,9 @@ void start_menu()
    if (selected)
       write("\n(Auto login in " + AUTO_LOGIN_AFTER + " enabled, type anything to stop it)\n\n");
    init_menu_application(toplevel);
-   autologin_tag = call_out("auto_login", AUTO_LOGIN_AFTER);
+   foreach (mixed *timer in query_call_outs()) remove_call_out(timer[4]);
+   autologin_tag = 0;
+   call_out(&run_menu_timer(this_user(), quit_idle_menu), USER_MENU_TIMEOUT);
+   if (selected)
+      autologin_tag = call_out(&run_menu_timer(this_user(), auto_login), AUTO_LOGIN_AFTER);
 }

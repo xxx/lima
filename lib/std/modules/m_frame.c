@@ -52,7 +52,7 @@ private nosave int add_header, add_footer, left_header;
 
 // Colour configuration storage.
 private nosave string *hcolours = colours["none"];
-private nosave string *sections;
+private nosave mixed *sections;
 
 private mapping columns = ([]);
 private mapping column_functions = ([]);
@@ -80,7 +80,7 @@ mapping query_themes()
 // out of the width (typically screen width).
 string use_colour(string *cols, int position, int width)
 {
-   int col_index = floor(sizeof(cols) * ((0.0 + position) / (width || 1)));
+   int col_index = to_int(floor(sizeof(cols) * ((0.0 + position) / (width || 1))));
 
    col_index = clamp(col_index, 0, sizeof(cols) - 1);
    return cols[col_index] != "" ? "<" + cols[col_index] + ">" : "";
@@ -139,7 +139,7 @@ void set_frame_left_header()
 // has simplify turned on.
 nomask int frame_simplify()
 {
-   return get_user_variable("simplify") != 0;
+   return !!get_user_variable("simplify");
 }
 
 private string colour_str(string t, string col)
@@ -270,7 +270,7 @@ void set_frame_header(string hc)
    if (!hc)
    {
       add_header = 0;
-      header_content = 0;
+      header_content = nil;
       return;
    }
 
@@ -333,7 +333,7 @@ private string simple_header()
    return out;
 }
 
-void set_frame_sections(string *s, int width)
+void set_frame_sections(mixed *s, int width)
 {
    sections = s;
    section_width = width;
@@ -342,7 +342,7 @@ void set_frame_sections(string *s, int width)
 private string *create_section_header()
 {
    string *headers = ({});
-   string out;
+   string out = "";
    int first_header = 1;
    int len;
    foreach (string *data in sections)
@@ -352,7 +352,7 @@ private string *create_section_header()
       {
          headers += ({out + (first_header ? bits[TLD] : bits[TVL]) + "\n"});
          first_header = 0;
-         out = 0;
+         out = "";
       }
       if (data[1] == "accent")
          data[1] = "<" + raw_accent() + ">";
@@ -631,15 +631,18 @@ private string end_frame()
 
 varargs string h_colour_internal(string output, mixed colstring, string frames, int outwidth)
 {
-   mixed *pieces = pcre_assoc(output, ({"[" + frames + "]"}), ({1}));
+   string gradient = (arrayp(colstring) ? colstring[COL_GRADIENT] : colstring) || hcolours[COL_GRADIENT];
+   if (!gradient || gradient == "")
+      return output;
+   mixed *pieces = reg_assoc(output, ({"[" + frames + "]"}), ({1}));
    string *bits = pieces[0];
-   string *matches = pieces[1];
+   int *matches = pieces[1];
    string new_out = "";
    string *colours;
    int i = 0;
    int position = 0;
 
-   colours = explode((arrayp(colstring) ? colstring[COL_GRADIENT] : colstring) || hcolours[COL_GRADIENT], ",");
+   colours = explode(gradient, ",");
 
    if (!sizeof(colours))
       return output;
@@ -663,7 +666,7 @@ string colour_string(string str, string theme)
 
 varargs private string h_colours(string output, mixed colstring)
 {
-   string frames = implode(bits, "");
+   string frames = replace_string(implode(bits, ""), "-", "\\-");
 
    return h_colour_internal(output, colstring, frames, width);
 }
@@ -746,7 +749,7 @@ string frame_render()
    if (!bits)
       error("Need to set frame style before render() using frame->set_style().\n"
             "Current styles: " +
-            format_list(query_frame_styles()) +
+            format_list(query_frame_styles(), "and") +
             ".\n"
             "Did you forget to call frame_init_user() ?");
 

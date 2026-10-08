@@ -465,6 +465,7 @@ nomask varargs void login_handle_logon(int state, mixed extra, string arg)
    case GET_PASSWORD:
       if (matches_password(arg))
       {
+         foreach (mixed *timer in query_call_outs()) remove_call_out(timer[4]);
          start_authenticated_session();
          return;
       }
