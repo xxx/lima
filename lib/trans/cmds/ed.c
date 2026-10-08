@@ -14,18 +14,20 @@
 
 inherit CMD;
 
-private
-nosave mapping locks = ([]);
+private nosave mapping locks = ([]);
 
-private
-nomask void unlock(string fname)
+private nomask void unlock(string fname, object owner)
 {
-   m_delete(locks, fname);
+   if (locks[fname] == owner)
+      m_delete(locks, fname);
 }
 
-nomask private void main(string *argv)
+nomask private void main(mixed *argv)
 {
-   mixed fname;
+   mixed fname, problem;
+   object owner = this_user();
+   object session;
+   function release;
 
    if (sizeof(argv))
       fname = argv[0];
@@ -56,8 +58,35 @@ nomask private void main(string *argv)
       return;
    }
 
-   locks[fname] = this_user();
-   this_user()->query_shell_ob()->set_cwf(fname);
+   locks[fname] = owner;
+   release = &unlock(fname, owner);
+   problem = catch {
+      session = clone_object(ED_SESSION);
+      session->begin_editing(fname, 0, release, release);
+      owner->query_shell_ob()->set_cwf(fname);
+   };
+   if (problem)
+   {
+      if (session)
+         catch(session->remove());
+      unlock(fname, owner);
+      printf("Unable to start editor: %s\n", problem);
+   }
+}
 
-   clone_object (ED_SESSION)->begin_editing(fname, 0, ( : unlock($(fname)) :));
+protected varargs void dispatch_main(mixed raw, mixed argv, mixed flags, mixed implode_info)
+{
+   foreach (string word in this_user()->query_shell_ob()->argument_explode(raw)[0])
+      if (word == "|" || word == "<" || word == ">" || word == ">>")
+      {
+         out("The interactive editor does not support pipes or redirection.\n");
+         return;
+      }
+   main(argv);
+}
+
+protected void create()
+{
+   ::create();
+   no_redirection();
 }
