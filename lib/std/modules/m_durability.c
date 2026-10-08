@@ -60,7 +60,7 @@ nomask int max_durability()
 nomask
 void set_damaged_durability()
 {
-   durability = 1 + random(current_max_dura * 0.1);
+   durability = 1 + random(to_int(current_max_dura * 0.1));
 }
 
 //:FUNCTION reset_durability
@@ -79,7 +79,7 @@ void reset_durability()
 nomask
 void durability_after_repair()
 {
-   current_max_dura = current_max_dura * (1 - (random(5) / 100.0));
+   current_max_dura = to_int(current_max_dura * (1 - (random(5) / 100.0)));
    durability = max_durability();
 }
 
@@ -168,5 +168,5 @@ void increase_durability(int d)
 nomask
 void internal_setup()
 {
-   this_object()->add_save(({"durability", "current_max_dura"}));
+   add_save(({"durability", "current_max_dura"}));
 }
