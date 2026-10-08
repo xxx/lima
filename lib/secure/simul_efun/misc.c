@@ -123,7 +123,7 @@ int cmp(mixed a, mixed b)
       return 1;
    }
 
-   if (mapp(a) && mapp(b))
+   if (mappingp(a) && mappingp(b))
    {
 
       if (sizeof(a) != (i = sizeof(b)))
@@ -237,7 +237,7 @@ object parse_ref_into_obj(string Ref)
       if (find_body(noun))
          result = find_body(noun);
       else if (!(result = load_object(evaluate_path(noun))))
-         return 0;
+         return nil;
    }
 
    foreach (noun in pieces)
@@ -377,7 +377,7 @@ mixed *decompose(mixed *org)
 
    if (!arrayp(org))
       error("Bad type arg to decompose");
-   org = copy(org);
+   org = deep_copy(org);
 
    while (i < sizeof(org))
    {
@@ -502,7 +502,7 @@ mixed flatten_array(mixed arr)
 
    if (!arrayp(arr))
       error("Bad argument 1 to flatten_array");
-   arr = copy(arr);
+   arr = deep_copy(arr);
 
    while (i < sizeof(arr))
    {
@@ -809,7 +809,7 @@ varargs string identify(mixed a)
       a = replace_string(a, "\t", "\\t");
       return a;
    }
-   if (pointerp(a))
+   if (arrayp(a))
    {
       ret = "({ ";
       s = sizeof(a);
@@ -821,7 +821,7 @@ varargs string identify(mixed a)
       }
       return ret + (s ? " " : "") + "})";
    }
-   if (mapp(a))
+   if (mappingp(a))
    {
       ret = "([ ";
       real_map = (mapping)(a);
