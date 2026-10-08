@@ -318,7 +318,7 @@ nomask void deliver_string(string channel_name, string str)
    ci.history += ({str});
    if (sizeof(ci.history) > CHANNEL_HISTORY_SIZE)
       ci.history[0..0] = ({});
-   ci->listeners->channel_rcv_string(channel_name, str);
+   ci.listeners->channel_rcv_string(channel_name, str);
 }
 
 /*
@@ -347,7 +347,7 @@ nomask void deliver_raw_soul(string channel_name, mixed *data)
    if (sizeof(ci.history) > CHANNEL_HISTORY_SIZE)
       ci.history[0..0] = ({});
 
-   ci->listeners->channel_rcv_soul(channel_name, data);
+   ci.listeners->channel_rcv_soul(channel_name, data);
 }
 
 /*
@@ -362,7 +362,7 @@ nomask void deliver_data(string channel_name, string sender_name, string type, m
    if (!ci || sizeof(ci.listeners) == 0)
       return;
 
-   ci->listeners->channel_rcv_data(channel_name, sender_name, type, data);
+   ci.listeners->channel_rcv_data(channel_name, sender_name, type, data);
 }
 
 /*
@@ -407,7 +407,7 @@ nomask void deliver_soul(string channel_name, mixed *soul)
 {
    string user_channel_name;
 
-   deliver_data(channel_name, find_sender_name(0), "soul", soul);
+   deliver_data(channel_name, find_sender_name(nil), "soul", soul);
 
    user_channel_name = user_channel_name(channel_name);
    soul = ({soul[0]}) +
@@ -450,7 +450,7 @@ void create()
             register_one(0, ob, pair.channel_name);
       }
 
-      saved_listeners = 0;
+      saved_listeners = nil;
    }
    if (saved_hooks)
    {
@@ -462,7 +462,7 @@ void create()
             register_one(1, ob, pair.channel_name);
       }
 
-      saved_hooks = 0;
+      saved_hooks = nil;
    }
 
    foreach (string channel_name, int flags in permanent_channels)
@@ -495,7 +495,7 @@ void remove()
    {
       object ob;
 
-      foreach (ob in ci->listeners - ({0}))
+      foreach (ob in ci.listeners - ({nil}))
       {
          string fname = file_name(ob);
 
@@ -509,7 +509,7 @@ void remove()
          }
       }
 
-      foreach (ob in ci->hooked - ({0}))
+      foreach (ob in ci.hooked - ({nil}))
       {
          string fname = file_name(ob);
 
@@ -552,7 +552,7 @@ nomask object *query_listeners(string channel_name)
          return ci.listeners;
    }
 
-   return 0;
+   return nil;
 }
 
 /*
@@ -605,10 +605,10 @@ nomask string is_valid_channel(string which, string *list)
    if (list)
       if (sizeof(list) > 0)
          foreach (string name in list)
-            if (info[name] && ((class channel_info)info[name])->name == which)
+            if (info[name] && ((class channel_info)info[name]).name == which)
                return name;
    foreach (string name in keys(permanent_channels))
-      if (info[name] && ((class channel_info)info[name])->name == which)
+      if (info[name] && ((class channel_info)info[name]).name == which)
          return name;
-   return 0;
+   return nil;
 }

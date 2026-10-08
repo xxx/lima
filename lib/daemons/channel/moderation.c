@@ -30,10 +30,10 @@ nomask void print_mod_info(string channel_name)
    if (!ci.moderator)
       return;
 
-   printf("It is being moderated by %s.\n", ci->moderator->query_name());
+   printf("It is being moderated by %s.\n", ci.moderator->query_name());
 
    if (ci.speaker)
-      printf("The current speaker is %s.\n", ci->speaker->query_name());
+      printf("The current speaker is %s.\n", ci.speaker->query_name());
    else
       printf("There is no current speaker.\n");
 
@@ -61,13 +61,13 @@ nomask void moderation_signoff(string channel_name)
 
    if (this_body() == ci.moderator)
    {
-      ci.moderator = ci.speaker = ci.requestors = 0;
+      ci.moderator = ci.speaker = ci.requestors = nil;
 
       deliver_notice(channel_name, "This channel is now unmoderated");
    }
    else if (this_body() == ci.speaker)
    {
-      ci.speaker = 0;
+      ci.speaker = nil;
       deliver_notice(channel_name, sprintf("%s is no longer speaking", this_body()->query_name()));
    }
 }
@@ -94,7 +94,7 @@ nomask int cmd_moderation(string channel_name, string arg)
       {
          printf("Your raise your hand to speak on '%s'.\n", user_channel_name);
          ci.requestors += ({tb});
-         ci->moderator->channel_rcv_string(
+         ci.moderator->channel_rcv_string(
              channel_name, sprintf("[%s] (%s raises a hand to speak)\n", user_channel_name, sender_name));
       }
       else
@@ -112,7 +112,7 @@ nomask int cmd_moderation(string channel_name, string arg)
       {
          printf("Your lower your hand to avoid speaking on '%s'.\n", user_channel_name);
          ci.requestors -= ({tb});
-         ci->moderator->channel_rcv_string(channel_name,
+         ci.moderator->channel_rcv_string(channel_name,
                                            sprintf("[%s] (%s lowers a hand)\n", user_channel_name, sender_name));
       }
       else
@@ -141,7 +141,7 @@ nomask int cmd_moderation(string channel_name, string arg)
          {
             ci.speaker = ci.requestors[0];
             ci.requestors = ci.requestors[1..];
-            deliver_notice(channel_name, sprintf("%s will now speak", ci->speaker->query_name()));
+            deliver_notice(channel_name, sprintf("%s will now speak", ci.speaker->query_name()));
          }
       }
       else
@@ -157,7 +157,7 @@ nomask int cmd_moderation(string channel_name, string arg)
          {
             ci.speaker = spkr[0];
             ci.requestors -= ({spkr[0]});
-            deliver_notice(channel_name, sprintf("%s will now speak", ci->speaker->query_name()));
+            deliver_notice(channel_name, sprintf("%s will now speak", ci.speaker->query_name()));
          }
       }
    }

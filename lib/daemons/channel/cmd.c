@@ -236,14 +236,14 @@ varargs nomask void cmd_channel(string channel_name, string arg, int channel_typ
    }
    else if (arg == "/clear")
    {
-      if (adminp(user) || user = ci.moderator)
+      if (adminp(user) || (ci.moderator && this_body() == ci.moderator))
       {
          ci.history = ({});
          write("Channel cleared.\n");
       }
       else
          error("Illegal attempt to clear channel " + user_channel_name + " by " +
-               capitalize(this_body()->query_userid()) + ".");
+               capitalize(user->query_userid()) + ".");
    }
    else if (cmd_moderation(channel_name, arg))
    {
