@@ -29,6 +29,10 @@ void set_lit(int x)
 {
    m_lightable::set_lit(x);
    m_light_source::set_lit(x);
+   if (x)
+      internal_add_to_queue();
+   else
+      stop_decay();
 }
 
 int is_lit()
@@ -43,20 +47,12 @@ mixed check_fuel()
    return 1;
 }
 
-mixed extinguish()
-{
-   stop_decay();
-   return ::extinguish();
-}
-
 varargs mixed light(object with)
 {
    mixed tmp = check_fuel();
    if (tmp != 1)
       return tmp;
 
-   // Call internal_add_to_queue() to make the light_object stateful when lit.
-   internal_add_to_queue();
    return ::light();
 }
 
