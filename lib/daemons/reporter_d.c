@@ -97,7 +97,7 @@ varargs void begin_report(string type, string subject)
 
    printf("** %s report **\n", type);
    busy++;
-   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : done_ed, type, subject:));
+   clone_object (EDIT_OB, EDIT_TEXT, 0, &done_ed(type, subject));
 }
 
 /*
