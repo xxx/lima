@@ -147,7 +147,10 @@ void drop_corpse(object adversary)
 
       // Drop either, but not both.
       if (meaty && pelty)
-         random(2) ? meaty = 0 : pelty = 0;
+         if (random(2))
+            meaty = nil;
+         else
+            pelty = nil;
 
       if (sizeof(all_inventory(adversary)))
       {
@@ -225,82 +228,82 @@ object *loot_chest(int level, object env)
          break;
       case 7..16:
          count = x_dice(2, 6);
-         count *= level / 16.0;
+         count = to_int(count * (level / 16.0));
          loot += create_gems(count, 10);
          break;
       case 17..26:
          count = x_dice(2, 4);
-         count *= level / 16.0;
+         count = to_int(count * (level / 16.0));
          loot += create_art(count, 25);
          break;
       case 27..36:
          count = x_dice(2, 6);
-         count *= level / 16.0;
+         count = to_int(count * (level / 16.0));
          loot += create_gems(count, 50);
          break;
       case 37..44:
          count = x_dice(2, 6);
-         count *= level / 16.0;
+         count = to_int(count * (level / 16.0));
          loot += create_gems(count, 10);
          break;
       case 45..52:
          count = x_dice(2, 6);
-         count *= level / 16.0;
+         count = to_int(count * (level / 16.0));
          loot += create_art(x_dice(2, 4), 25);
          break;
       case 53..60:
          count = x_dice(2, 6);
-         count *= level / 16.0;
+         count = to_int(count * (level / 16.0));
          loot += create_gems(count, 50);
          break;
       case 61..65:
          count = x_dice(2, 6);
-         count *= level / 16.0;
+         count = to_int(count * (level / 16.0));
          loot += create_gems(count, 10);
          break;
       case 66..70:
          count = x_dice(2, 4);
-         count *= level / 16.0;
+         count = to_int(count * (level / 16.0));
          loot += create_art(count, 25);
          break;
       case 71..75:
          count = x_dice(2, 6);
-         count *= level / 16.0;
+         count = to_int(count * (level / 16.0));
          loot += create_gems(count, 50);
          break;
       case 76..78:
          count = x_dice(2, 6);
-         count *= level / 16.0;
+         count = to_int(count * (level / 16.0));
          loot += create_gems(count, 10);
          break;
       case 79..80:
          count = x_dice(2, 6);
-         count *= level / 16.0;
+         count = to_int(count * (level / 16.0));
          loot += create_art(count, 25);
          break;
       case 81..85:
          count = x_dice(2, 6);
-         count *= level / 16.0;
+         count = to_int(count * (level / 16.0));
          loot += create_gems(count, 50);
          break;
       case 86..92:
          count = x_dice(2, 6);
-         count *= level / 16.0;
+         count = to_int(count * (level / 16.0));
          loot += create_art(count, 25);
          break;
       case 93..97:
          count = x_dice(2, 6);
-         count *= level / 16.0;
+         count = to_int(count * (level / 16.0));
          loot += create_gems(count, 64);
          break;
       case 98..99:
          count = x_dice(2, 4);
-         count *= level / 16.0;
+         count = to_int(count * (level / 16.0));
          loot += create_art(count, 25);
          break;
       case 0:
          count = x_dice(2, 6);
-         count *= level / 16.0;
+         count = to_int(count * (level / 16.0));
          loot += create_gems(count, 64);
          break;
       }

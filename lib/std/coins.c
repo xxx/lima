@@ -23,7 +23,7 @@ string long_descr()
       }
    }
 
-   return "A pile of coins consisting of " + format_list(descr) + ".";
+   return "A pile of coins consisting of " + format_list(descr, nil) + ".";
 }
 
 private
@@ -55,8 +55,10 @@ void split_coins(float amount, string type)
       write("There aren't that many coins of that type here.\n");
 }
 
-mixed get(string amount_str, string type)
+mixed get(mixed args...)
 {
+   string amount_str = sizeof(args) > 0 ? args[0] : nil;
+   string type = sizeof(args) > 1 ? args[1] : nil;
    string denomination;
    int amount;
    string *types;
@@ -79,7 +81,7 @@ mixed get(string amount_str, string type)
          if (sizeof(types) == 1)
          {
             amount = to_int(amount_str);
-            split_coins(amount, types[0]);
+            split_coins(to_float(amount), types[0]);
          }
          else
             write("Which type of coins do you want to get?\n");
@@ -91,7 +93,7 @@ mixed get(string amount_str, string type)
          if (amount_str == "all")
             split_coins(coins[type], type);
          else
-            split_coins(to_int(amount_str), type);
+            split_coins(to_float(to_int(amount_str)), type);
       }
    }
 }
@@ -109,7 +111,7 @@ void setup(float amount, string type)
    add_adj(type);
    set_in_room_desc("A pile of coins");
    set_proper_name("coins");
-   set_long(( : long_descr:));
+   set_long(long_descr);
    set_gettable(1);
    set_plural(1);
 }
