@@ -21,4 +21,3 @@ inherit __DIR__ "simul_efun/misc";
 inherit __DIR__ "simul_efun/more";
 inherit __DIR__ "simul_efun/tell";
 inherit __DIR__ "simul_efun/goofy";
-inherit __DIR__ "simul_efun/json";
