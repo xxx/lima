@@ -265,6 +265,12 @@ protected nomask void cmd_read(int user_num, string outputfile, int supress_head
    int timestamp;
    string *output;
 
+   if (outputfile && !wizardp(this_user()))
+   {
+      write("Only wizards can export mail to files.\n");
+      return;
+   }
+
    if (!user_num)
       user_num = mailbox_ob->query_message_index() + 1;
 
