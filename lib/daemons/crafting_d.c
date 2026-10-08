@@ -435,9 +435,12 @@ float money_to_repair(object ob)
    return ob->missing_durability() / REPAIR_FACTOR;
 }
 
-string repair_cost_string(object ob)
+string repair_cost_string(mixed obs)
 {
-   return MONEY_D->currency_to_string(money_to_repair(ob), currency_type);
+   if (!obs || objectp(obs))
+      return MONEY_D->currency_to_string(money_to_repair(obs), currency_type);
+   mapping plan = repair_plan(nil, repair_objects(obs), 0);
+   return MONEY_D->currency_to_string(plan["money"], currency_type);
 }
 
 private object *repair_objects(mixed obs)

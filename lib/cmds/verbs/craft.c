@@ -21,7 +21,8 @@ void do_craft_str_on_obj(string str, object ob)
 {
    if (ob->is_crafting_station())
    {
-      return ob->simple_craft(this_body(), str);
+      ob->simple_craft(this_body(), str);
+      return;
    }
 
    write("Craft on what? Find a crafting station.\n");
@@ -33,7 +34,8 @@ void do_craft_str(string str)
    {
       if (ob->is_crafting_station())
       {
-         return do_craft_str_on_obj(str, ob);
+         do_craft_str_on_obj(str, ob);
+         return;
       }
    }
    write("To craft something you need to find a crafting station.\n");

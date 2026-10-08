@@ -9,7 +9,7 @@
 
 #include <verbs.h>
 
-string verb = split_path(file_name())[1];
+string verb = split_path(file_name(this_object()))[1];
 int flags = NEED_TO_SEE | NEED_TO_BE_ALIVE | NEED_TO_THINK;
 
 protected

@@ -18,37 +18,53 @@ void do_repair()
    write("Repair what with what?\n");
 }
 
-private
-nomask void repair_with_what(mixed what, string r)
+private int accessible(object body, object item)
 {
-   string result;
-   object bench = filter(all_inventory(environment(this_body())), ( : $1->is_crafting_bench() :));
-
-   r = lower_case(r);
-
-   if (r == "m")
+   if (!body || !item || !environment(body))
+      return 0;
+   object place = environment(item);
+   if (place == environment(body))
+      return 1;
+   while (place && place != environment(body))
    {
-      printf("Repairing using money.\n");
-      if (CRAFTING_D->pay_for_repair_with_money(this_body(), what))
-         printf("All repaired.\n");
-      else
-      {
-         printf("You didn't have the money?\n");
-      }
+      if (place == body)
+         return 1;
+      place = environment(place);
    }
-   else if (r == "r")
+   return 0;
+}
+
+private nomask void repair_with_what(object body, mixed what, string reply)
+{
+   string choice = lower_case(trim(reply));
+   if (choice != "m" && choice != "r")
    {
-      printf("Using materials for repairs.\n");
-      if (CRAFTING_D->pay_for_repair(this_body(), what))
-         printf("All repaired.\n");
-      else
+      write("Aborting.\n");
+      return;
+   }
+   if (!body || body != this_body())
+   {
+      write("The repair is no longer available.\n");
+      return;
+   }
+   object *items = objectp(what) ? ({what}) : what;
+   if (!arrayp(items) || !sizeof(items))
+      return;
+   foreach (object item in items)
+      if (!accessible(body, item) || (arrayp(what) && environment(item) != body))
       {
-         printf("You were missing parts?\n");
+         write("A repair item is no longer available.\n");
+         return;
       }
+   if (choice == "m")
+   {
+      write("Repairing using money.\n");
+      write(CRAFTING_D->pay_for_repair_with_money(body, what) ? "All repaired.\n" : "You didn't have the money?\n");
    }
    else
    {
-      printf("Aborting.\n");
+      write("Using materials for repairs.\n");
+      write(CRAFTING_D->pay_for_repair(body, what) ? "All repaired.\n" : "You were missing parts?\n");
    }
 }
 
@@ -78,27 +94,30 @@ void do_repair_obj(object ob)
    object *tools = ({});
    object tool;
 
+   object body = this_body();
+   if (!accessible(body, ob))
+      return;
+
    if (ob->missing_durability())
    {
-      mixed *estimate = CRAFTING_D->estimate_with_mats(this_body(), ob);
+      mixed *estimate = CRAFTING_D->estimate_with_mats(body, ob);
       write(estimate[1]);
       if (estimate[0])
       {
          write("\t%^MENU_CHOICE%^r%^RESET%^: Use materials to Repair " + ob->short() + "?\n" +
                "\t%^MENU_CHOICE%^m%^RESET%^: Use only money, " + CRAFTING_D->repair_cost_string(ob) + ", instead?\n" +
                "\t%^MENU_CHOICE%^Q%^RESET%^: Quit (default)");
-         modal_simple(( : repair_with_what, ob:));
+         modal_simple(&repair_with_what(body, ob));
       }
       else
       {
          printf("You do not have the funds to repair %s.\n", ob->the_short());
       }
-      CRAFTING_D->repair_obj(ob);
       return;
    }
 
-   if (all_inventory(this_body()))
-      tools = filter(all_inventory(this_body()), ( : $1->is_tool() :));
+   if (all_inventory(body))
+      tools = filter(all_inventory(body), ( : $1->is_tool() :));
 
    if (sizeof(tools))
    {
@@ -117,14 +136,13 @@ void do_repair_obs(object *obs)
 {
    object *filtered_obs = ({});
    mixed *estimate;
-   float only_money = 0.0;
+   object body = this_body();
 
    foreach (object ob in obs)
    {
-      if ((environment(ob) == this_body() && ob->missing_durability()))
+      if (ob && environment(ob) == body && ob->missing_durability() && member_array(ob, filtered_obs) == -1)
       {
          filtered_obs += ({ob});
-         only_money += CRAFTING_D->money_to_repair(ob);
       }
    }
    if (!sizeof(filtered_obs))
@@ -132,16 +150,16 @@ void do_repair_obs(object *obs)
       write("You find nothing in need of repair.\n");
       return;
    }
-   estimate = CRAFTING_D->estimate_with_mats(this_body(), filtered_obs);
-   printf(estimate[1]);
+   estimate = CRAFTING_D->estimate_with_mats(body, filtered_obs);
+   write(estimate[1]);
    if (estimate[0])
    {
       write("\t%^MENU_CHOICE%^r%^RESET%^: Use materials to Repair?\n"
             "\t%^MENU_CHOICE%^m%^RESET%^: Use only Money, " +
-            to_int(only_money) +
+            CRAFTING_D->repair_cost_string(filtered_obs) +
             ", instead?\n"
             "\t%^MENU_CHOICE%^Q%^RESET%^: Quit (default)");
-      modal_simple(( : repair_with_what, filtered_obs:));
+      modal_simple(&repair_with_what(body, filtered_obs));
    }
    else
    {

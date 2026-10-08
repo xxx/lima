@@ -76,7 +76,8 @@ void do_salvage_str_on_obj(string str, object ob)
 {
    if (ob->is_crafting_station())
    {
-      return ob->simple_salvage(this_body(), str);
+      ob->simple_salvage(this_body(), str);
+      return;
    }
 
    write("Salvage on what? Find a crafting bench.\n");
@@ -88,7 +89,8 @@ void do_salvage_str(string str)
    {
       if (ob->is_crafting_station())
       {
-         return do_salvage_str_on_obj(str, ob);
+         do_salvage_str_on_obj(str, ob);
+         return;
       }
    }
    write("That cannot be salvaged.\n");

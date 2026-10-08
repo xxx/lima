@@ -1,28 +1,16 @@
 /* Do not remove the headers from this file! see /USAGE for more info. */
 
-inherit M_INPUT; // We use modal_simple() from here.
+#include <move.h>
+inherit M_INPUT;
 
-//: MODULE
-// This module handles most of the crafting functionality.
+#define CRAFT_COST 5.0
+#define MAT_SALVAGE_COST 5.0
+#define MAT_CRAFT_COST 1.0
+#define MAX_COMPONENT_COUNT (9223372036854775807 / 10)
 
-#define CRAFT_COST 5
-#define MAT_SALVAGE_COST 5
-#define MAT_CRAFT_COST 1
-#define CAN_UPGRADE_DOWNGRADE
-
-// Words we shouldn't strip "es" from from the CRAFTING_D material names.
-#define ESSE_EXCEPTIONS ({"squares"})
-
-int craft_item(object body, string what);
-
-private
-string recipe_list;
-private
-mixed craft_currency_type = DOMAIN_D->query_currency();
-private
-mapping special_mats;
-private
-string station_filter;
+private string recipe_list;
+private string craft_currency_type = DOMAIN_D->query_currency();
+private string station_filter;
 
 string get_extra_long()
 {
@@ -34,440 +22,263 @@ int is_crafting_station()
    return 1;
 }
 
-int simple_craft(object body, string what)
+private int can_use_station(object body)
 {
-   string *parts = explode(what, " ");
-   string category;
-   string material;
-   mapping money;
-   object employee = present("employee", environment(body));
-   int exchange_rate = MONEY_D->query_exchange_rate(craft_currency_type);
-   int number = 1;
-   int challenge_rating = 10;
+   return body && body == this_body() && environment(body) && environment(body) == environment(this_object());
+}
 
-   if (CRAFTING_D->valid_crafting_recipe(what))
-   {
-      if (member_array(what, keys(CRAFTING_D->query_crafting_recipes(station_filter))) == -1)
+private mapping station_recipe(string what)
+{
+   return CRAFTING_D->query_crafting_recipes(station_filter)[what];
+}
+
+private int valid_recipe(mapping recipe)
+{
+   if (!mappingp(recipe))
+      return 0;
+   foreach (mixed name, mixed amount in recipe)
+      if (!stringp(name) || !CRAFTING_D->valid_material(name) || !intp(amount) || amount < 0)
+         return 0;
+   return 1;
+}
+
+private int has_resources(object body, mapping recipe, float cost)
+{
+   if (!MONEY_D->sufficient_money(body->query_amt_currency(craft_currency_type), cost))
+      return 0;
+   foreach (string name, int amount in recipe)
+      if (amount && !body->has_material(name, amount))
+         return 0;
+   return 1;
+}
+
+private void consume_resources(object body, mapping recipe, float cost)
+{
+   foreach (string name, int amount in recipe)
+      if (amount && !body->remove_material(name, amount))
+         error("Crafting material removal failed after preflight.");
+   MONEY_D->handle_subtract_money(body, cost, craft_currency_type);
+}
+
+private string material_named(string text)
+{
+   if (CRAFTING_D->valid_material(text))
+      return text;
+   string found;
+   foreach (string category in CRAFTING_D->query_material_categories())
+      foreach (string name in CRAFTING_D->query_materials(category))
+         if (M_GRAMMAR->pluralize(name) == text)
+         {
+            if (found && found != name)
+               return nil;
+            found = name;
+         }
+   return found;
+}
+
+private mixed *material_request(string what)
+{
+   if (!stringp(what))
+      return nil;
+   string *words = filter(explode(trim(what), " "), strlen);
+   if (!sizeof(words))
+      return nil;
+   string material = material_named(implode(words, " "));
+   if (material)
+      return ({material, 1});
+   if (sizeof(words) < 2)
+      return nil;
+   string count = words[0];
+   int number = 0;
+   if (member_array(count, ({"a", "an", "one"})) != -1)
+      number = 1;
+   else
+      for (int i = 0; i < strlen(count); i++)
       {
-         tell(body, "You cannot craft '" + what + "' at this station, sorry.\n");
-         return;
+         int digit = count[i] - '0';
+         if (digit < 0 || digit > 9 || number > (MAX_COMPONENT_COUNT - digit) / 10)
+            return nil;
+         number = number * 10 + digit;
       }
+   if (number <= 0)
+      return nil;
+   material = material_named(implode(words[1..], " "));
+   return material ? ({material, number}) : nil;
+}
 
-      return craft_item(body, what);
-   }
-
-#ifndef CAN_UPGRADE_DOWNGRADE
-   tell(body, "Craft what? Better look at the station again.\n");
-   return;
-#endif
-
-   // bad arguments
-   if (sizeof(parts) < 2)
+private int convert_material(object body, string what, int salvage)
+{
+   if (!can_use_station(body))
+      return 0;
+   mixed *request = material_request(what);
+   if (!request)
    {
-      tell(body, "Craft what? Better look at the station again.\n");
-      return;
+      tell(body, "Use a positive count and a complete material name.\n");
+      return 0;
    }
-
-   // Do some number parsing
-   if (sizeof(parts) == 3)
+   string material = request[0];
+   int number = request[1];
+   string category = CRAFTING_D->material_category(material);
+   string lower = CRAFTING_D->material_below(category, material);
+   if (!lower)
    {
-      if (parts[0] == "a" || parts[0] == "an" || parts[0] == "one")
-         parts[0] = "1";
-      number = to_int(parts[0]);
-      if (!number)
-      {
-         tell(body, "Craft how many? Better look at the station again.\n");
-         return;
-      }
-      parts = parts[1..2];
+      tell(body, "That material has no lower tier to convert.\n");
+      return 0;
    }
-
-   if (parts[1][ < 1] == 's')
-      parts[1] = parts[1][0.. < 2];
-
-   if (!CRAFTING_D->valid_material(parts[0] + " " + parts[1]))
+   int tier = member_array(material, CRAFTING_D->query_materials(category));
+   if (tier > 0 && number > (9223372036854775807 - 20) / tier)
+      return 0;
+   int difficulty = 20 + number * tier;
+   string source = salvage ? material : lower;
+   string result = salvage ? lower : material;
+   int amount = salvage ? number : number * 10;
+   int produced = salvage ? number * 10 : number;
+   float cost = salvage ? MAT_SALVAGE_COST : MAT_CRAFT_COST;
+   mapping recipe = ([source:amount]);
+   if (!has_resources(body, recipe, cost))
    {
-      tell(body, "Craft " + parts[0] + " " + parts[1] + "? You don't know how to do that.\n");
-      return;
+      tell(body, "You lack the money or materials for that conversion.\n");
+      return 0;
    }
-
-   material = parts[0] + " " + parts[1];
-   category = CRAFTING_D->material_category(material);
-
-   // We have a valid number, category and material, hooray! \o/
-   if (!CRAFTING_D->material_below(category, material))
-   {
-      tell(body, sprintf("They are too small to craft, but perhaps you can get some by salvaging %s?\n",
-                         CRAFTING_D->material_above(category, material)));
-      return;
-   }
-
-   if (MAT_CRAFT_COST > this_body()->query_amt_currency(craft_currency_type))
-   {
-      printf("Sorry, that costs %s, which you don't have!\n",
-             MONEY_D->currency_to_string(MAT_CRAFT_COST, craft_currency_type));
-      return;
-   }
-
-   if (!body->remove_material(CRAFTING_D->material_below(category, material), (number * 10)))
-   {
-      tell(body, sprintf("Crafting that, requires %d %s which you do not have.\n", number * 10,
-                         pluralize(CRAFTING_D->material_below(category, material))));
-      return;
-   }
-
-   // We have the materials and the money now! Hooray again! \o/
-
-   money = MONEY_D->handle_subtract_money(this_body(), MAT_CRAFT_COST, craft_currency_type);
-   body->add_material(material, number);
-   body->my_action("$N $vpay to craft a $o for " + MONEY_D->currency_to_string(MAT_CRAFT_COST, craft_currency_type) +
-                       ". You give " + MONEY_D->currency_to_string(money[0], craft_currency_type) +
-                       (sizeof(money[1])
-                            ? " and get " + MONEY_D->currency_to_string(money[1], craft_currency_type) + " as change"
-                            : "") +
-                       ".\n",
-                   "" + number + " " + material, this_object());
-
-   challenge_rating += challenge_rating + (number * (member_array(material, CRAFTING_D->query_materials(category))));
-
-   if (body->test_skill("misc/crafting/" + station_filter, challenge_rating))
+   consume_resources(body, recipe, cost);
+   if (!body->add_material(result, produced))
+      error("Converted material was rejected.");
+   body->my_action("$N $vpay " + MONEY_D->currency_to_string(cost, craft_currency_type) + " to convert materials.\n");
+   if (body->test_skill("misc/crafting/" + station_filter, difficulty))
    {
       tell(body, "You get a few materials back because you did well crafting.\n");
-      body->add_material(CRAFTING_D->material_below(category, material), random((number * 5)) + number);
+      body->add_material(lower, random(number * 5) + number);
    }
+   return 1;
+}
+
+int simple_craft(object body, string what)
+{
+   if (CRAFTING_D->valid_crafting_recipe(what))
+      return craft_item(body, what);
+   return convert_material(body, what, 0);
 }
 
 int simple_salvage(object body, string what)
 {
-   string *parts = explode(what, " ");
-   string category;
-   string material;
-   mapping money;
-   object employee = present("employee", environment(body));
-   int number = 1;
-   int challenge_rating = 10;
-
-   TBUG(what);
-
-   // bad arguments
-   if (sizeof(parts) < 2)
-   {
-      tell(body, "Salvage what? Better look at the station again.\n");
-      return 0;
-   }
-
-#ifndef CAN_UPGRADE_DOWNGRADE
-   tell(body, "Salvage what? Better look at the station again.\n");
-   return 0;
-#endif
-
-#ifdef 0
-   // No crafting without a employee
-   if (!employee || (employee && !employee->is_employee()))
-   {
-      tell(body, "Better not use the station without an employee present?\n");
-      return;
-   }
-#endif
-
-   // Do some number parsing
-   if (sizeof(parts) == 3)
-   {
-      if (parts[0] == "a" || parts[0] == "an" || parts[0] == "one")
-         parts[0] = "1";
-      number = to_int(parts[0]);
-      if (!number)
-      {
-         tell(body, "Salvage how many? Better look at the station again.");
-         return;
-      }
-      parts = parts[1..2];
-   }
-
-   if (parts[1][ < 2..] == "es" && member_array(parts[1], ESSE_EXCEPTIONS) == -1)
-      parts[1] = parts[1][0.. < 3];
-   if (parts[1][ < 1] == 's')
-      parts[1] = parts[1][0.. < 2];
-
-   if (!CRAFTING_D->valid_material(parts[0] + " " + parts[1]))
-   {
-      tell(body, "Salvage " + parts[0] + " " + parts[1] + "? You don't know how to do that.\n");
-      return;
-   }
-
-   material = parts[0] + " " + parts[1];
-   category = CRAFTING_D->material_category(material);
-
-   if (!CRAFTING_D->material_below(category, material))
-   {
-      tell(body, "The " + material + " cannot be salvaged further.\n");
-      return;
-   }
-
-   // We have a valid number, category and material, hooray! \o/
-
-   if (MAT_SALVAGE_COST > this_body()->query_amt_currency(craft_currency_type))
-   {
-      printf("Sorry, that costs %s to salvage, which you don't have!\n",
-             MONEY_D->currency_to_string(MAT_SALVAGE_COST, craft_currency_type));
-      return;
-   }
-
-   if (!body->remove_material(material, number))
-   {
-      tell(body, sprintf("Crafting that, requires %d %s which you do not have.\n", number,
-                         pluralize(category + " " + material)));
-      return;
-   }
-
-   // We have the materials and the money now! Hooray again! \o/
-
-   money = MONEY_D->handle_subtract_money(this_body(), MAT_SALVAGE_COST, craft_currency_type);
-   body->add_material(CRAFTING_D->material_below(category, material), number * 10);
-   body->my_action(
-       "$N $vpay to salvage a $o for " + MONEY_D->currency_to_string(MAT_SALVAGE_COST, craft_currency_type) +
-           ". You give " + MONEY_D->currency_to_string(money[0], craft_currency_type) +
-           (sizeof(money[1]) ? " and get " + MONEY_D->currency_to_string(money[1], craft_currency_type) + " as change"
-                             : "") +
-           ".\n",
-       "" + number + " " + category + " " + material, this_object(), employee);
-
-   challenge_rating += challenge_rating + (number * (member_array(material, CRAFTING_D->query_materials(category))));
-
-   if (body->test_skill("misc/crafting/" + station_filter, challenge_rating))
-   {
-      tell(body, "You get a few materials extra because you did well crafting.\n");
-      body->add_material(CRAFTING_D->material_below(category, material), random((number * 5)) + number);
-   }
+   return convert_material(body, what, 1);
 }
 
-int simple_salvage2(object body, string what)
+private void discard_craft(object craft)
 {
-   string *parts = explode(what, " ");
-   string category;
-   string material;
-   mapping money;
-   object smith = present("smith", environment(body));
-   int number = 1;
-   int challenge_rating = 10;
-
-   // bad arguments
-   if (sizeof(parts) < 2)
-   {
-      tell(body, "Salvage what? Better look at the bench again.\n");
+   if (!craft)
       return;
-   }
-
-   // No crafting without a smith
-   if (!smith || (smith && !smith->is_smith()))
-   {
-      tell(body, "Better not use the bench without the smith present?\n");
-      return;
-   }
-
-   // Do some number parsing
-   if (sizeof(parts) == 3)
-   {
-      if (parts[0] == "a" || parts[0] == "an" || parts[0] == "one")
-         parts[0] = "1";
-      number = to_int(parts[0]);
-      if (!number)
-      {
-         tell(body, "Salvage how many? Better look at the bench again.");
-         return;
-      }
-      parts = parts[1..2];
-   }
-
-   if (!CRAFTING_D->valid_category(parts[0]))
-   {
-      tell(body, "Salvage " + parts[0] + "? You don't know how to do that.\n");
-      return;
-   }
-   else
-      category = parts[0];
-
-   if (parts[1][ < 2..] == "es" && member_array(parts[1], ESSE_EXCEPTIONS) == -1)
-      parts[1] = parts[1][0.. < 3];
-   if (parts[1][ < 1] == 's')
-      parts[1] = parts[1][0.. < 2];
-
-   if (!CRAFTING_D->valid_material(parts[0] + " " + parts[1]))
-   {
-      tell(body, "Salvage " + parts[0] + " " + parts[1] + "? You don't know how to do that.\n");
-      return;
-   }
-   else
-      material = parts[1];
-
-   if (!CRAFTING_D->material_below(category, material))
-   {
-      tell(body, "The " + category + " " + material + " cannot be salvaged further.\n");
-      return;
-   }
-
-   // We have a valid number, category and material, hooray! \o/
-
-   if (MAT_SALVAGE_COST > this_body()->query_amt_currency(craft_currency_type))
-   {
-      printf("Sorry, that costs %s to salvage, which you don't have!\n",
-             MONEY_D->currency_to_string(MAT_SALVAGE_COST, craft_currency_type));
-      return;
-   }
-
-   if (!body->remove_material(category + " " + material, number))
-   {
-      tell(body, sprintf("Crafting that, requires %d %s which you do not have.\n", number,
-                         pluralize(category + " " + material)));
-      return;
-   }
-
-   // We have the materials and the money now! Hooray again! \o/
-
-   money = MONEY_D->handle_subtract_money(this_body(), MAT_SALVAGE_COST, craft_currency_type);
-   body->add_material(CRAFTING_D->material_below(category, material), number * 10);
-   body->my_action(
-       "$N $vpay to salvage a $o for " + MONEY_D->currency_to_string(MAT_SALVAGE_COST, craft_currency_type) +
-           ". You give " + MONEY_D->currency_to_string(money[0], craft_currency_type) + " to $o2" +
-           (sizeof(money[1]) ? " and get " + MONEY_D->currency_to_string(money[1], craft_currency_type) + " as change"
-                             : "") +
-           ".\n",
-       "" + number + " " + category + " " + material, this_object(), smith);
-
-   challenge_rating += challenge_rating + (number * (member_array(material, CRAFTING_D->query_materials(category))));
-
-   if (body->test_skill("misc/crafting", challenge_rating))
-   {
-      tell(body, "You get a few materials extra because you did well crafting.\n");
-      body->add_material(CRAFTING_D->material_below(category, material), random((number * 5)) + number);
-   }
+   craft->remove();
+   if (craft)
+      error("The crafted item refused cleanup.");
 }
 
 void craft_item_confirmed(object body, string what, string reply)
 {
-   mapping recipe;
-   int missing = 0;
-   mapping money;
-   object employee = present("employee", environment(body));
-
-   object craft;
-
-   if (!CRAFTING_D->valid_crafting_recipe(what))
-   {
-      write("Error while crafting, contact a wizard.\n");
-      return;
-   }
-
-   if (reply != "y" && reply != "Y")
+   if (lower_case(trim(reply)) != "y")
    {
       write("Craft aborted.\n");
       return;
    }
-
-   if (CRAFT_COST > this_body()->query_amt_currency(craft_currency_type))
+   if (!can_use_station(body))
    {
-      printf("Sorry, that costs %s, which you don't have!\n",
-             MONEY_D->currency_to_string(CRAFT_COST, craft_currency_type));
+      write("You can no longer use that station.\n");
       return;
    }
-
-   // We have the money now! Hooray again! \o/
-
-   money = MONEY_D->handle_subtract_money(this_body(), CRAFT_COST, craft_currency_type);
-   this_body()->my_action(
-       "$N $vpay to craft a $o for " + MONEY_D->currency_to_string(CRAFT_COST, craft_currency_type) + ". You give " +
-           MONEY_D->currency_to_string(money[0], craft_currency_type) + " to $o2" +
-           (sizeof(money[1]) ? " and get " + MONEY_D->currency_to_string(money[1], craft_currency_type) + " as change"
-                             : "") +
-           ".\n",
-       what, this_object(), employee);
-
-   recipe = CRAFTING_D->query_crafting_recipe(what);
-   foreach (string mat, int amount in recipe)
+   mapping recipe = deep_copy(station_recipe(what));
+   if (!valid_recipe(recipe) || !has_resources(body, recipe, CRAFT_COST))
    {
-      if (!body->remove_material(mat, amount))
-      {
-         TBUG("Failed to remove " + amount + " " + mat);
-         missing++;
-      }
+      write("The recipe, money or materials are no longer available.\n");
+      return;
    }
-
-   if (missing)
-      TBUG("Body: " + body + " crafting with missing materials? Count: " + missing);
-
-   craft = CRAFTING_D->create_material(what);
-
-   if (body->test_skill("misc/crafting/" + station_filter, craft->crafting_xp() * 10))
+   object craft = CRAFTING_D->create_material(what);
+   if (!craft)
    {
-      // Skill check succeeded
+      write("The item could not be created.\n");
+      return;
    }
-   else
+   mixed moved, xp;
+   mixed problem = catch(xp = craft->crafting_xp());
+   if (problem || !intp(xp) || xp < 0 || xp > MAX_COMPONENT_COUNT)
    {
-      // Skill check failed
+      discard_craft(craft);
+      if (problem)
+         throw(problem);
+      error("Invalid crafting experience value.");
    }
-
-   craft->move(body);
-   if (craft->crafting_xp())
-      body->add_experience(craft->crafting_xp());
+   problem = catch(moved = craft->move(body));
+   if (problem || moved != MOVE_OK || !craft || environment(craft) != body)
+   {
+      if (craft)
+         discard_craft(craft);
+      if (problem)
+         throw(problem);
+      write(stringp(moved) ? moved : "The crafted item could not be delivered.\n");
+      return;
+   }
+   if (!can_use_station(body) || !mappingp(station_recipe(what)) || !has_resources(body, recipe, CRAFT_COST))
+   {
+      discard_craft(craft);
+      write("The recipe, money or materials are no longer available.\n");
+      return;
+   }
+   // Caught payment failures can retain earlier resource mutations.
+   problem = catch(consume_resources(body, recipe, CRAFT_COST));
+   if (problem)
+   {
+      discard_craft(craft);
+      throw(problem);
+   }
+   body->test_skill("misc/crafting/" + station_filter, xp * 10);
+   if (xp)
+      body->add_experience(xp);
+   body->my_action("$N $vpay " + MONEY_D->currency_to_string(CRAFT_COST, craft_currency_type) + " to craft an item.\n");
    body->simple_action("$N $vcraft $o at the $o1.", add_article(what), this_object());
 }
 
 int craft_item(object body, string what)
 {
-   mapping recipe;
-   int missing = 0;
-   string missing_mats = "";
-   if (!CRAFTING_D->valid_crafting_recipe(what))
+   if (!can_use_station(body))
+      return 0;
+   mapping recipe = station_recipe(what);
+   if (!valid_recipe(recipe))
    {
+      tell(body, "That recipe is not available at this station.\n");
       return 0;
    }
-
-   recipe = CRAFTING_D->query_crafting_recipe(what);
-
-   foreach (string mat, int amount in recipe)
+   int missing = 0;
+   string materials = "";
+   foreach (string name, int amount in recipe)
    {
-      if (amount)
-      {
-         if (!body->has_material(mat, amount))
-         {
-            missing_mats += " %^RED%^-%^RESET%^ " + amount + " x " + mat + " (missing)\n";
-            missing++;
-         }
-         else
-            missing_mats += " %^GREEN%^+%^RESET%^ " + amount + " x " + mat + " (got it)\n";
-      }
+      if (!amount)
+         continue;
+      int available = body->has_material(name, amount);
+      materials += (available ? " %^GREEN%^+%^RESET%^ " : " %^RED%^-%^RESET%^ ") + amount + " x " + name +
+                   (available ? " (got it)\n" : " (missing)\n");
+      if (!available)
+         missing++;
    }
-
    if (missing)
    {
-      write("To craft " + what + ", you are missing " + missing + " types of materials:\n");
-      write(missing_mats);
+      write("To craft " + what + ", you are missing " + missing + " types of materials:\n" + materials);
       return 0;
    }
-
-   write("You have all materials needed! This craft will consume:\n");
-   write(missing_mats);
-   write("Craft item - costs " + CRAFT_COST + " " + craft_currency_type + "? (y/N) ");
-   modal_simple(( : craft_item_confirmed, body, what:));
+   if (!MONEY_D->sufficient_money(body->query_amt_currency(craft_currency_type), CRAFT_COST))
+   {
+      write("You need " + MONEY_D->currency_to_string(CRAFT_COST, craft_currency_type) + " to craft that item.\n");
+      return 0;
+   }
+   write("You have all materials needed! This craft will consume:\n" + materials);
+   write("Craft item - costs " + MONEY_D->currency_to_string(CRAFT_COST, craft_currency_type) + "? (y/N) ");
+   modal_simple(&craft_item_confirmed(body, what));
+   return 1;
 }
 
 void setup_recipes(string filter)
 {
-   string r = "%^YELLOW%^" + capitalize(filter) + " recipes:%^RESET%^\n";
-   string *mats;
-   mapping recs = CRAFTING_D->query_crafting_recipes(filter);
-   special_mats = ([]);
+   string text = "%^YELLOW%^" + capitalize(filter) + " recipes:%^RESET%^\n";
    station_filter = filter;
-
-   foreach (string cat in CRAFTING_D->query_salvage_categories())
-   {
-      mats = CRAFTING_D->query_materials(cat);
-      special_mats[cat] = mats;
-   }
-
-   foreach (string name, mapping recipe in recs)
-   {
-      r += "\tcraft " + name + "\n";
-   }
-   recipe_list = r;
+   foreach (string name in keys(CRAFTING_D->query_crafting_recipes(filter)))
+      text += "\tcraft " + name + "\n";
+   recipe_list = text;
 }
