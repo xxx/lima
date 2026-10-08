@@ -449,41 +449,35 @@ mixed array_sum(mixed *numbers)
 //: FUNCTION element_of_weighted
 // Returns a property from a mapping weighted by its value.
 // The higher the weight (value), the more likely it will be returned.
+// Weights must be nonnegative integers whose total fits an int.
+// Returns nil when no entry has a positive weight.
 // EXAMPLE:
 //   element_of_weighted( ([ "element1" : 10, "element2" : 5 ]) )
 // Return value will more likely be "element1" due to its higher weight.
 mixed element_of_weighted(mapping data)
 {
-   int roll_result, next_position, weight, max_weight;
-   mixed *elems = ({}), elem;
-   int *weights = ({}), *indices = ({}), index = 0;
-
-   foreach (elem, weight in data)
-   {
-      elems = ({elems..., elem});
-      weights = ({weights..., weight});
-      indices = ({indices..., index++});
-   }
-
-   indices = shuffle(indices);
-   next_position = 0;
-   max_weight = sum(weights...);
-   roll_result = random(max_weight);
-
-   foreach (index in indices)
-   {
-      // get that element's weight
-      weight = weights[index];
-
-      // our next_position is the point at which our next element
-      // will be available.
-      next_position += weight;
-
-      // if our random number (roll_result) falls before our next_position
-      // then that's our guy.
-      if (roll_result < next_position)
-         return elems[index];
-   }
+    if (!mappingp(data))
+        throw("element_of_weighted: argument must be a mapping.");
+    int total = 0;
+    foreach (mixed key, mixed weight in data)
+    {
+        if (!intp(weight) || weight < 0)
+            throw("element_of_weighted: weights must be nonnegative integers.");
+        int next = total + weight;
+        if (next < total)
+            throw("element_of_weighted: total weight overflows an integer.");
+        total = next;
+    }
+    if (!total)
+        return nil;
+    int ticket = random(total);
+    foreach (mixed key, int weight in data)
+    {
+        if (ticket < weight)
+            return key;
+        ticket -= weight;
+    }
+    return nil;
 }
 
 //: FUNCTION clamp
