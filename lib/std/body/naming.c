@@ -124,7 +124,7 @@ string query_long_name()
 nomask string query_userid()
 {
    if (!query_link())
-      return 0;
+      return nil;
    return query_link()->query_userid();
 }
 
@@ -146,7 +146,7 @@ string query_idle_string()
    if (test_flag(F_INACTIVE))
       result += " [INACTIVE] ";
 
-   if (interactive(link))
+   if (link && interactive(link))
       idle_time = query_idle(link);
    if (idle_time < 60)
       return result;

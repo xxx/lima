@@ -104,3 +104,12 @@ nomask void set_this_user(object ob)
 {
    set_this_player(ob);
 }
+
+nomask int query_idle(object ob)
+{
+   mapping info;
+
+   if (!ob || !(info = query_connection(ob)))
+      error("query_idle() of non-interactive object.\n");
+   return info["idle"];
+}
