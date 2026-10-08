@@ -134,7 +134,7 @@ int move_emote(string verb, string dest)
 {
    if (base_name(previous_object()) != CMD_MOVE_EMOTE)
       error("Illegal call to move_emote()\n");
-   if ((!emotes[verb]) || (!dest))
+   if ((!emotes[verb]) || (!dest) || (verb == dest))
       return 0;
    emotes[dest] = emotes[verb];
    m_delete(emotes, verb);
