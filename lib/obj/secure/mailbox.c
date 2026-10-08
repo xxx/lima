@@ -113,6 +113,9 @@ nomask int query_message_index()
 }
 nomask void set_message_index(int new_message_index)
 {
+   if (!this_user() || this_user()->query_userid() != owner)
+      error("security violation: you are not allowed to change this mailbox\n");
+
    message_index = new_message_index;
 }
 
@@ -131,6 +134,9 @@ nomask int query_message_read(int message_key)
 }
 nomask void set_message_read(int message_key)
 {
+   if (!this_user() || this_user()->query_userid() != owner)
+      error("security violation: you are not allowed to change this mailbox\n");
+
    if (mailbox[message_key])
    {
       mailbox[message_key] = 0;
