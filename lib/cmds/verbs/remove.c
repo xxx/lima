@@ -61,7 +61,7 @@ void do_remove_obs(object *obs)
    foreach (object ob in obs)
    {
       //        TBUG("Remove: "+ob);
-      if (typeof(ob) == T_STRING)
+      if (stringp(ob))
          continue;
       // Do not attempt to remove things not in inventory.
       if (environment(ob) != this_body())

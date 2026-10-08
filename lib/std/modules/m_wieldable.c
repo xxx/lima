@@ -25,7 +25,7 @@ void assign_flag(int which, int state);
 private
 nosave object wielded_by;
 private
-nosave function move_hook = ( : unwield_me:);
+nosave function move_hook = unwield_me;
 private
 string *wielding_limbs;
 private
@@ -135,7 +135,7 @@ mixed direct_wield_obj()
    if (who && who != this_body())
       return 0;
 
-   if (wielded_by != 0)
+   if (wielded_by)
       return "You're already wielding that!\n";
 
    return 1; /* Fall through */
@@ -153,7 +153,7 @@ mixed direct_unwield_obj()
    if (who && who != this_body())
       return 0;
 
-   if (wielded_by == 0)
+   if (!wielded_by)
       return "You're not wielding that!\n";
 
    return 1; /* Fall through */

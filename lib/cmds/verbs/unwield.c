@@ -24,7 +24,7 @@ void do_unwield_obs(object *obs)
 {
    foreach (object ob in obs)
    {
-      if (typeof(ob) == T_STRING)
+      if (stringp(ob))
          continue;
       // Do not attempt to unwield things not in inventory.
       if (environment(ob) != this_body())
