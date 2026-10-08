@@ -68,28 +68,29 @@ private int account_exists(string user)
    return !!account_object(user) || unguarded(1, &is_file(LINK_PATH(user) + __SAVE_EXTENSION__));
 }
 
-private mapping account_bodies(string user)
+private mapping account_bodies(string user, object online)
 {
-   object online = account_object(user);
    mapping data;
+   if (!online) online = account_object(user);
    if (online) data = online->query_bodies();
    else data = unguarded(1, &restore_map(LINK_PATH(user)))["bodies"];
    if (!mappingp(data)) error("USER_D: account has no body records");
    return data;
 }
 
-private void authorize_registry(string user)
+private object authorize_registry(string user)
 {
    object caller = previous_object();
    if (caller && (base_name(caller) == USER_OB || base_name(caller) == USER_OB_BAK)
        && caller == this_user() && interactive(caller) && caller->query_userid() == user)
-      return;
+      return caller;
    if (!check_privilege(1)) error("USER_D: registry permission denied");
+   return nil;
 }
 
-private void require_body_record(string user, string body)
+private void require_body_record(string user, string body, object account)
 {
-   mixed row = account_bodies(user)[body];
+   mixed row = account_bodies(user, account)[body];
    if (!arrayp(row) || sizeof(row) != 4 || !stringp(row[0]) || !intp(row[1])
        || !stringp(row[2]) || !intp(row[3]))
       error("USER_D: character is missing from account body records");
@@ -100,8 +101,8 @@ nomask void register_body(string user, string body)
    valid_name(user);
    if (!body) body = user;
    valid_name(body);
-   authorize_registry(user);
-   require_body_record(user, body);
+   object account = authorize_registry(user);
+   require_body_record(user, body, account);
    if (body != user && account_exists(body)) error("USER_D: character name conflicts with another account");
    if (has_key(body_owners, body))
    {
@@ -117,10 +118,10 @@ nomask void remove_body(string user, string body)
 {
    valid_name(user);
    valid_name(body);
-   authorize_registry(user);
+   object account = authorize_registry(user);
    if (!has_key(body_owners, body)) return;
    if (body_owners[body] != user) error("USER_D: character belongs to another account");
-   require_body_record(user, body);
+   require_body_record(user, body, account);
    user_names[user] -= ({body});
    if (!sizeof(user_names[user])) m_delete(user_names, user);
    m_delete(body_owners, body);
