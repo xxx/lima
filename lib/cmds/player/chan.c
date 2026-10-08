@@ -100,3 +100,8 @@ void main(string arg)
 
    CHANNEL_D->cmd_channel(channel_name, arg, chan_type);
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}
