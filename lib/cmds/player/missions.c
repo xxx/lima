@@ -24,7 +24,7 @@ inherit CLASS_MISSION_INFO;
 nomask private void main()
 {
    string c = "";
-   string domain = explode(base_name(environment(this_body())), "/")[1];
+   string domain = explode(base_name(environment(this_body())), "/")[2];
    class mission_info *missions = MISSION_D->live_missions(domain);
    int mission_count = sizeof(clean_array(flatten_array(map(missions, ( : $1.name:)))));
    int variant_count = sizeof(flatten_array(map(missions, ( : $1.variants:))));
@@ -53,4 +53,9 @@ nomask private void main()
 
    set_frame_content(c);
    outf(frame_render());
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main();
 }
