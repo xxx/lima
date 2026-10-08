@@ -60,7 +60,7 @@ void main(string which)
    }
    if (data["LIV LIV"])
    {
-      info = SOUL_D->get_soul(which, "LIV LIV", ({this_object(), load_object(CMD_DIR_PLAYER "/semote2")}));
+      info = SOUL_D->get_soul(which, "LIV LIV", ({this_object(), load_object("/obj/mudlib/semote_target")}));
       outf("%s somebody somebody :\n     You'll see: %sTarget will see: %sSecond will see: %sOthers will see: %s\n",
            which, info[1][0], info[1][1], info[1][2], info[1][3]);
    }
@@ -116,4 +116,9 @@ void player_menu_entry(string s)
    bare_init();
    main(s);
    done_outputing();
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
