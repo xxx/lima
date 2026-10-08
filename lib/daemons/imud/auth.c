@@ -29,11 +29,7 @@ class auth_data
 nosave private mapping auth_info = ([]);
 
 void auth_cleanup();
-nosave private function auth_cleanup_func = ( : auth_cleanup:);
 nosave private int auth_cleanup_running;
-
-// ### driver can't remove a func ptr callout. need a string
-#define auth_cleanup_func "auth_cleanup"
 
 /* the mudname should be in its canonical form */
 protected
@@ -67,7 +63,7 @@ nomask void rcv_auth_mud_req(string orig_mud, string orig_user, string target_us
 
    if (!auth_cleanup_running)
    {
-      call_out(auth_cleanup_func, AUTH_CLEANUP_TIME);
+      call_out(auth_cleanup, AUTH_CLEANUP_TIME);
       auth_cleanup_running = 1;
    }
 }
@@ -88,10 +84,10 @@ nomask void auth_cleanup()
 {
    auth_info = filter(
        auth_info,
-       function(string mudname, class auth_data auth) { return auth.timestamp + AUTH_EXPIRE_TIME > time(); });
+       (: [string mudname, class auth_data auth] auth.timestamp + AUTH_EXPIRE_TIME > time() :));
 
    if (sizeof(auth_info))
-      call_out(auth_cleanup_func, AUTH_CLEANUP_TIME);
+      call_out(auth_cleanup, AUTH_CLEANUP_TIME);
    else
       auth_cleanup_running = 0;
 }
