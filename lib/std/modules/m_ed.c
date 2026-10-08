@@ -11,7 +11,12 @@ private nosave string ed_filename = "";
 private nosave int ed_dirty;
 private nosave int ed_restricted;
 private nosave int ed_number;
+private nosave int ed_list;
+private nosave int ed_auto_print;
+private nosave int ed_shiftwidth = 4;
 private nosave int ed_scroll = 20;
+private nosave string *ed_help = ({});
+private nosave int ed_help_pos;
 private nosave mapping ed_marks = ([]);
 private nosave string ed_pattern = "";
 private nosave int ed_global;
@@ -352,7 +357,7 @@ private string ed_expand(string replacement, mixed *captures, int delimiter)
 
 private string ed_render(string text, int line, int list)
 {
-   if (list)
+   if (list || ed_list)
    {
       text = replace_string(text, "\\", "\\\\");
       text = replace_string(text, "\t", "\\t");
@@ -456,6 +461,8 @@ private string ed_substitute(int first, int last, int selected_only = 0)
    }
    if (!changed && !ed_global) ed_fail("pattern not found");
    if (last < sizeof(ed_lines)) next += ed_lines[last..];
+   if (!print && changed && ed_auto_print && !ed_global && cursor > 0)
+      output = ed_output("", ed_render(next[cursor-1], cursor, 0));
    {
       int delta = sizeof(next) - sizeof(ed_lines);
       foreach (string mark in keys(ed_marks))
@@ -550,6 +557,159 @@ private string ed_print(int first, int last, int list)
    return output;
 }
 
+private string ed_after_change()
+{
+   return ed_auto_print && !ed_global && ed_cursor > 0 ? ed_print(ed_cursor, ed_cursor, 0) : "";
+}
+
+private int ed_setup_code()
+{
+   // The legacy eightbit bit is always set because native strings retain Unicode.
+   return ed_shiftwidth | 0x80 | (ed_number ? 0x10 : 0) |
+          (ed_list ? 0x20 : 0) | (ed_auto_print ? 0x40 : 0);
+}
+
+private int ed_retrieve_setup()
+{
+   mixed code;
+   if (!efun::function_exists("query_ed_setup", this_object())) return 0x84;
+   code = this_object()->query_ed_setup();
+   if (!intp(code) || code < 0 || code > 0xff)
+      ed_fail("unsupported saved setup code");
+   if (!code) return 0x84;
+   if (!(code & 0x0f)) ed_fail("saved shiftwidth must be between 1 and 15");
+   return code;
+}
+
+private string ed_settings(int addressed)
+{
+   string option;
+   int begin;
+   int kind;
+   int value;
+   if (addressed || ed_global) ed_fail("set takes no address and is not a global command");
+   if (ed_scan_pos < sizeof(ed_scan) && ed_scan[ed_scan_pos] != ' ' && ed_scan[ed_scan_pos] != '\t')
+      ed_fail("expected space after set");
+   ed_skip_space();
+   if (ed_scan_pos == sizeof(ed_scan))
+      return sprintf("number:%s list:%s print:%s\nshiftwidth:%d scroll:%d\n",
+                     ed_number ? "on" : "off", ed_list ? "on" : "off",
+                     ed_auto_print ? "on" : "off", ed_shiftwidth, ed_scroll);
+   begin = ed_scan_pos;
+   while (ed_scan_pos < sizeof(ed_scan) && ed_scan[ed_scan_pos] != ' ' && ed_scan[ed_scan_pos] != '\t')
+      ed_scan_pos++;
+   option = ed_scan[begin..ed_scan_pos-1];
+   ed_skip_space();
+   if (option == "shiftwidth") kind = 1;
+   else if (option == "scroll") kind = 2;
+   if (kind)
+   {
+      if (ed_scan_pos == sizeof(ed_scan) || ed_scan[ed_scan_pos] < '0' || ed_scan[ed_scan_pos] > '9')
+         ed_fail("option requires an integer");
+      value = ed_decimal();
+      ed_skip_space();
+      if (ed_scan_pos != sizeof(ed_scan) || value < 1 || value > (kind == 1 ? 15 : 100))
+         ed_fail("option value out of range");
+      if (kind == 1) ed_shiftwidth = value;
+      else ed_scroll = value;
+      return "";
+   }
+   if (ed_scan_pos != sizeof(ed_scan)) ed_fail("unexpected option argument");
+   if (option == "number") ed_number = 1;
+   else if (option == "nonumber") ed_number = 0;
+   else if (option == "list") ed_list = 1;
+   else if (option == "nolist") ed_list = 0;
+   else if (option == "print") ed_auto_print = 1;
+   else if (option == "noprint") ed_auto_print = 0;
+   else if (option == "save")
+   {
+      if (ed_restricted) ed_fail("setup saving is restricted");
+      if (!efun::function_exists("query_ed_setup", this_object()) ||
+          !efun::function_exists("set_ed_setup", this_object()))
+         ed_fail("setup persistence is unavailable");
+      this_object()->set_ed_setup(ed_setup_code());
+      return "Setup handed to owner.\n";
+   }
+   else ed_fail("unsupported editor option");
+   return "";
+}
+
+private string ed_help_page()
+{
+   string output = "";
+   int end = ed_help_pos + ed_scroll;
+   if (end > sizeof(ed_help)) end = sizeof(ed_help);
+   while (ed_help_pos < end) output = ed_output(output, ed_help[ed_help_pos++] + "\n");
+   if (ed_help_pos < sizeof(ed_help))
+   {
+      ed_mode = -2;
+      output = ed_output(output, "--Return for more; q to leave help--\n");
+   }
+   else
+   {
+      ed_mode = 0;
+      ed_help = ({});
+      ed_help_pos = 0;
+   }
+   return output;
+}
+
+private string ed_show_help(string topic)
+{
+   if (!sizeof(topic))
+      ed_help = ({
+         "Line editor", "Addresses: numbers, ., $, +/-, marks 'a and /re/ or ?re?.",
+         "Ranges: first,last or first;last; % selects the whole buffer.",
+         "p prints; l lists controls; n toggles line numbers; = reports a count.",
+         "a appends, i inserts, c changes; a lone . ends line input.",
+         "d deletes; j joins; m moves; t copies; k sets a lowercase mark.",
+         "g selects matching lines; v selects nonmatching lines.",
+         "Global bodies support p, l, =, d and s; omitted bodies print.",
+         "s/re/replacement/ replaces the first match on each addressed line.",
+         "Substitution flags: g replaces all; p prints changed lines.",
+         "Replacement: & is the full match; \\1 through \\9 are captures.",
+         "Escaped delimiters are literal; empty patterns recall the last search.",
+         "e opens; E forces open; r reads into the buffer; f selects a filename.",
+         "w stages overwrite; W stages append; x stages overwrite and exits.",
+         "q refuses modified buffers; Q discards the buffer and exits.",
+         "z scrolls; set scroll changes the page size from 1 through 100.",
+         "set number/nonumber, list/nolist and print/noprint change output.",
+         "set shiftwidth stores 1 through 15 for future LPC indentation.",
+         "set save forwards preferences to optional owner setup methods.",
+         "Restricted editors cannot load other files or save preferences.",
+         "Limits: 8192 UTF-8 buffer bytes, 1000 lines, 2048 bytes per line.",
+         "Commands/filenames are capped at 1024 UTF-8 bytes; output at 8192.",
+         "File saves acknowledge staging; commit-time delivery may still fail.",
+         "h s, h g, h set, h files or h limits gives focused help.",
+         "Return advances help; q leaves help without exiting the editor.",
+         "I, autoindent and legacy regex options are not implemented yet."
+      });
+   else if (topic == "s")
+      ed_help = ({ "[range]s/re/replacement/[gp]", "g replaces all occurrences per line; p prints changed lines.",
+                  "& is the full match; \\1 through \\9 are captures; \\& is literal.",
+                  "\\n, \\r, \\t and \\b insert controls; \\n can split lines.",
+                  "Patterns use native Rust regex; empty patterns recall the last search." });
+   else if (topic == "g" || topic == "v")
+      ed_help = ({ "[range]g/re/command or [range]v/re/command", "Select original matching or nonmatching lines once.",
+                  "Bodies support p, l, =, d and s; inserted lines are not selected.",
+                  "Nested globals and file/input/exit commands are refused." });
+   else if (topic == "set")
+      ed_help = ({ "set reports current editor options.", "set number/nonumber, list/nolist or print/noprint changes output.",
+                  "set scroll 1..100 controls scrolling and help pages.", "set shiftwidth 1..15 stores a future indentation width.",
+                  "set save uses owner query_ed_setup/set_ed_setup methods.", "I and autoindent are not implemented; Unicode is always retained." });
+   else if (topic == "files")
+      ed_help = ({ "e/E open, r reads, f selects a filename.", "w stages overwrite; W stages append; x stages overwrite and exits.",
+                  "Partial writes and append preserve the modified flag.", "Native file policy authorizes the owning object and module.",
+                  "Staging does not acknowledge durable file delivery." });
+   else if (topic == "limits")
+      ed_help = ({ "8192 UTF-8 buffer bytes including LF per line; 1000 lines.", "2048 UTF-8 bytes per line; 1024 per command/filename.",
+                  "Output is capped at 8192 bytes after numbering/listing expansion.", "Refused commands restore editor state without truncation." });
+   else
+      ed_fail("unknown help topic");
+   ed_help_pos = 0;
+   return ed_help_page();
+}
+
 private string ed_name(string argument)
 {
    if (sizeof(argument))
@@ -568,6 +728,9 @@ private void ed_quit()
    ed_lines = ({});
    ed_marks = ([]);
    ed_cursor = ed_dirty = ed_number = ed_restricted = 0;
+   ed_list = ed_auto_print = ed_help_pos = 0;
+   ed_help = ({});
+   ed_shiftwidth = 4;
    ed_filename = ed_pattern = "";
    ed_global = 0;
    ed_selected = ({});
@@ -596,11 +759,19 @@ private string ed_execute(string command)
    }
    switch (operation)
    {
+   case 'h':
+      if (addressed) ed_fail("help takes no address");
+      return ed_show_help(argument);
    case 'g':
    case 'v':
       if (!addressed) { first = 1; last = sizeof(ed_lines); }
       return ed_select(first, last, operation == 'v');
    case 's':
+      if (ed_scan_pos + 1 < sizeof(ed_scan) && ed_scan[ed_scan_pos] == 'e' && ed_scan[ed_scan_pos+1] == 't')
+      {
+         ed_scan_pos += 2;
+         return ed_settings(addressed);
+      }
       return ed_substitute(first, last);
    case 'p':
    case 'l':
@@ -638,7 +809,7 @@ private string ed_execute(string command)
       ed_range(first, last);
       ed_replace(first, last, ({}));
       ed_cursor = first < sizeof(ed_lines) ? first : sizeof(ed_lines);
-      return "";
+      return ed_after_change();
    case 'j':
       if (sizeof(argument)) ed_fail("unexpected command argument");
       if (addressed < 2) last = first < sizeof(ed_lines) ? first + 1 : first;
@@ -646,7 +817,7 @@ private string ed_execute(string command)
       if (first != last)
          ed_replace(first, last, ({ implode(ed_lines[first-1..last-1], "") }));
       ed_cursor = first;
-      return "";
+      return ed_after_change();
    case 'k':
       if (addressed > 1 || sizeof(argument) != 1 || argument[0] < 'a' || argument[0] > 'z')
          ed_fail("mark requires one line and a lowercase letter");
@@ -680,7 +851,7 @@ private string ed_execute(string command)
          ed_replace(destination+1, destination, selected);
          foreach (string mark in keys(moved))
             ed_marks[mark] = destination + 1 + moved[mark];
-         return "";
+         return ed_after_change();
       }
    case 'e':
    case 'E':
@@ -756,12 +927,14 @@ private string ed_execute(string command)
 protected string ed_start(string path = "", int restricted = 0, int scroll = 20)
 {
    string *loaded;
+   int setup;
    if (ed_mode != -1) ed_fail("editor already active");
    if (!stringp(path)) ed_fail("filename must be a string");
    if (restricted != 0 && restricted != 1) ed_fail("restricted must be 0 or 1");
    if (scroll < 1 || scroll > 100) ed_fail("scroll must be between 1 and 100");
    if (ed_bytes(path) > ED_MAX_COMMAND_BYTES) ed_fail("filename too long");
    loaded = sizeof(path) ? ed_read(path, 1) : ({});
+   setup = ed_retrieve_setup();
    ed_lines = loaded;
    ed_filename = path;
    ed_marks = ([]);
@@ -769,14 +942,19 @@ protected string ed_start(string path = "", int restricted = 0, int scroll = 20)
    ed_global = 0;
    ed_selected = ({});
    ed_cursor = sizeof(loaded) ? 1 : 0;
-   ed_mode = ed_dirty = ed_number = 0;
+   ed_mode = ed_dirty = ed_help_pos = 0;
+   ed_help = ({});
+   ed_number = (setup & 0x10) != 0;
+   ed_list = (setup & 0x20) != 0;
+   ed_auto_print = (setup & 0x40) != 0;
+   ed_shiftwidth = setup & 0x0f;
    ed_restricted = restricted;
    ed_scroll = scroll;
    return sizeof(loaded) ? sprintf("%d lines\n", sizeof(loaded)) : "[New or empty file]\n";
 }
 
 //: FUNCTION query_ed_mode
-// Return -1 when inactive, 0 for commands, or the next input line number.
+// Return -2 during paged help, -1 when inactive, 0 for commands, or the next input line.
 protected int query_ed_mode()
 {
    return ed_mode;
@@ -792,6 +970,12 @@ protected string ed_cmd(string command)
    int saved_mode = ed_mode;
    int saved_dirty = ed_dirty;
    int saved_number = ed_number;
+   int saved_list = ed_list;
+   int saved_print = ed_auto_print;
+   int saved_shiftwidth = ed_shiftwidth;
+   int saved_scroll = ed_scroll;
+   string *saved_help = ed_help;
+   int saved_help_pos = ed_help_pos;
    string saved_filename = ed_filename;
    string saved_pattern = ed_pattern;
    int saved_global = ed_global;
@@ -802,9 +986,25 @@ protected string ed_cmd(string command)
    ed_marks = ed_marks + ([]);
    failure = catch {
       if (strindex(command, "\n") >= 0) ed_fail("input must be one line");
-      if (ed_mode > 0)
+      if (ed_mode == -2)
       {
-         if (command == ".") ed_mode = 0;
+         if (ed_bytes(command) > ED_MAX_COMMAND_BYTES) ed_fail("command exceeds 1024 UTF-8 bytes");
+         if (!sizeof(command)) output = ed_help_page();
+         else if (command == "q")
+         {
+            ed_help = ({});
+            ed_help_pos = 0;
+            ed_mode = 0;
+         }
+         else ed_fail("Return advances help; q leaves help");
+      }
+      else if (ed_mode > 0)
+      {
+         if (command == ".")
+         {
+            ed_mode = 0;
+            output = ed_after_change();
+         }
          else
          {
             if (ed_bytes(command) > ED_MAX_LINE_BYTES) ed_fail("line exceeds 2048 UTF-8 bytes");
@@ -826,6 +1026,12 @@ protected string ed_cmd(string command)
       ed_mode = saved_mode;
       ed_dirty = saved_dirty;
       ed_number = saved_number;
+      ed_list = saved_list;
+      ed_auto_print = saved_print;
+      ed_shiftwidth = saved_shiftwidth;
+      ed_scroll = saved_scroll;
+      ed_help = saved_help;
+      ed_help_pos = saved_help_pos;
       ed_filename = saved_filename;
       ed_pattern = saved_pattern;
       ed_global = saved_global;
