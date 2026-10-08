@@ -18,7 +18,7 @@ void mudlib_setup()
    set_combat_messages("combat-bludgeon");
    set_skill_used("combat/melee/club");
    set_salvageable((["wood":40, "textile":10, "metal":50]));
-   add_save(({"persist_flags"}));
+   add_save(({"persist_flags", "wielding_limbs"}));
 }
 
 int query_value()

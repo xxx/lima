@@ -137,12 +137,12 @@ nomask void init_stuff()
    foreach (object inv in all_inventory())
    {
       inv->restore_to_game();
-#ifdef WIELD_SINGLE
+#if WIELD_STYLE == WIELD_SINGLE
       if (inv->test_flag(F_WIELDED))
          do_wield(inv);
 #else
       if (inv->query_wielding() && sizeof(inv->query_wielding()))
-         this_object()->wield(inv, inv->query_wielding()[0]);
+         this_object()->wield(inv, inv->query_wielding()[0], inv->query_dual_wielded());
 #endif
       if (inv->test_flag(F_WORN))
          inv->do_wear();

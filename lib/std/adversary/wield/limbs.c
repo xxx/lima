@@ -94,7 +94,7 @@ varargs void wield(object ob, string limb, int force_dual_wield)
    else
    {
       // We have explicitly given a limb, a few checks we want to do here.
-      if (ob->query_dual_wielded())
+      if (ob->query_wielded_by() && ob->query_dual_wielded())
       {
          // Ah, we're dual wielding and want to change to 1 hand
          ob->unwield_me();
