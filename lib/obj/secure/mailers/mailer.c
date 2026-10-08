@@ -477,7 +477,12 @@ protected nomask void cmd_delete(string arg)
    for (i = sizeof(mail_keys) + 1; --i;)
       if (test_bit(whichones, i))
       {
-         mailbox_ob->delete_message(mail_keys[i - 1]);
+         mixed problem = catch(mailbox_ob->delete_message(mail_keys[i - 1]));
+         if (problem)
+         {
+            printf("Unable to delete message %d: %s\n", i, problem);
+            continue;
+         }
          printf("Message %d deleted.\n", i);
       }
 }

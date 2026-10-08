@@ -242,6 +242,16 @@ varargs nomask string *send_mail(string Sender, string Subject, mixed Body, stri
    return recip_list;
 }
 
+private nomask int valid_pending_owners(mixed owners)
+{
+   if (!arrayp(owners))
+      return 0;
+   foreach (mixed owner in owners)
+      if (!stringp(owner) || !sizeof(owner))
+         return 0;
+   return 1;
+}
+
 nomask mixed get_one_message(int message_key)
 {
    class mail_msg msg;
@@ -254,6 +264,9 @@ nomask mixed get_one_message(int message_key)
       LOG_D->log(LOG_MAIL_ERROR, sprintf("%s lost message #%d", this_user()->query_userid(), message_key));
       return nil;
    }
+
+   if (!valid_pending_owners(msg.dels_pending))
+      error("mail: invalid pending-owner metadata\n");
 
    if (member_array(this_user()->query_userid(), msg.dels_pending) == -1)
       error("security violation: illegal attempt to read mail\n");
@@ -272,6 +285,11 @@ nomask void delete_mail(int message_key, string user)
 
    if (!(msg = restore_msg(message_key)))
       error("lost the message\n");
+
+   if (!valid_pending_owners(msg.dels_pending))
+      error("mail: invalid pending-owner metadata\n");
+   if (member_array(user, msg.dels_pending) == -1)
+      error("mail: pending-owner metadata does not include this owner\n");
 
    msg.dels_pending -= ({user});
    if (!sizeof(msg.dels_pending))
