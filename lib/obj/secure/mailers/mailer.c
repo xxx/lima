@@ -177,7 +177,7 @@ protected nomask string *build_body_inclusion(string *body)
 **
 ** Send a mail message to the given people.
 */
-private nomask void send_mail_message(string subject, string *buf, mixed to_list, mixed cc_list, int use_dead_letter)
+private nomask int send_mail_message(string subject, string *buf, mixed to_list, mixed cc_list, int use_dead_letter)
 {
    string *name_list;
 
@@ -197,10 +197,11 @@ private nomask void send_mail_message(string subject, string *buf, mixed to_list
       write("No valid destination.\n");
       if (use_dead_letter)
          write_dead_letter(buf);
-      return;
+      return 0;
    }
 
    write(implode(format_name_list("Mail sent to: ", name_list), "\n") + "\n");
+   return 1;
 }
 
 /*------------------------------------------------------------------------
@@ -307,10 +308,26 @@ private nomask void mailer_get_cc_list(mixed to_list, string subject, string cc_
    string file;
 
    file = tmp_fname();
-   buf = explode(read_file(file), "\n");
-   send_mail_message(subject, buf, to_list, cc_list, 1);
-
-   rm(file);
+   string text;
+   mixed problem = catch(text = read_file(file));
+   if (problem || !stringp(text))
+   {
+      write("Mail draft is missing or unreadable; nothing was sent.\n");
+      return;
+   }
+   buf = explode(text, "\n");
+   int sent;
+   problem = catch(sent = send_mail_message(subject, buf, to_list, cc_list, 1));
+   if (problem)
+   {
+      write("Mail delivery failed; some recipients may already have received it. Check before resending.\n");
+      write("Mail draft retained; start another mail command to edit and resend.\n");
+      return;
+   }
+   if (sent)
+      rm(file);
+   else
+      write("Mail draft retained; start another mail command to edit and resend.\n");
 }
 
 private nomask void mailer_done_edit(mixed to_list, string subject, string fname)
@@ -329,6 +346,8 @@ private nomask void mailer_get_subject(string to_list, string arg)
 {
    string subject = arg ? arg : "<none>";
 
+   if (file_size(tmp_fname()) >= 0)
+      write("Resuming saved mail text; check the new recipient and subject.\n");
    clone_object(EDIT_OB, EDIT_FILE, tmp_fname(), &mailer_done_edit(to_list, subject));
 }
 
