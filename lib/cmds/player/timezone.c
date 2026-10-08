@@ -17,13 +17,14 @@ inherit CMD;
 private
 void main(string val)
 {
-   float actual = to_float(val);
-   if (!strlen(val))
+   float actual;
+   if (!val)
    {
-      actual = to_float(this_body()->query_tz());
+      actual = to_float(this_body()->query_tz() || 0);
       outf("Your timezone setting is %s\n", pround(actual, 1));
       return;
    }
+   actual = to_float(val);
    if (actual >= -12 || actual <= 12)
    {
       this_body()->set_tz(actual);
@@ -34,4 +35,9 @@ void main(string val)
    // Add handling for strings - eg "EST" -> -5.0
    write("Usage timezone <value>\n");
    write("valid values are GMT offsets in hours, from -12 to +12.\n");
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

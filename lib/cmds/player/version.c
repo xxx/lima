@@ -31,3 +31,8 @@ void main()
    outf("Host:      %s  Port: %d\n", __HOST__, __PORT__);
    outf("Admin:     %s\n", ADMIN_EMAIL);
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main();
+}
