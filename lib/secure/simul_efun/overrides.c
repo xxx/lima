@@ -3,6 +3,8 @@
 #include <commands.h>
 #include <playerflags.h>
 
+nomask object this_user() { return efun::this_player(); }
+
 object this_body();
 int check_privilege(mixed priv);
 int adminp(mixed m);
