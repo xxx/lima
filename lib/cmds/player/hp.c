@@ -155,3 +155,8 @@ void main(string arg)
    write("Current HP: " + this_body()->query_health() + "/" + this_body()->query_max_health() + "\n");
 }
 #endif
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}

@@ -245,12 +245,12 @@ string slider_red_green(int value, int max, int width)
 //: FUNCTION slider_colours_sum
 // A slider with multiple colours and cumulative ranges and a marker.
 // The colours mapping should be on the format:
-//   ([20:"040",50:"041",100:"042"])
+//   ([20.0:"040",50.0:"041",100.0:"042"])
 // where each number is bigger and strings are ANSI colours.
-string slider_colours_sum(int value, mapping colours, int width)
+string slider_colours_sum(float value, mapping colours, int width)
 {
    int marker;
-   int max = sort_array(keys(colours), -1)[0];
+   float max = sort_array(keys(colours), -1)[0];
    string return_string;
    int colour_add = 0;
    int next_pos = 0;
@@ -285,7 +285,7 @@ string slider_colours_sum(int value, mapping colours, int width)
    else
       return_string = (line_char * marker) + x_char + (line_char * (width - marker));
 
-   foreach (int val in sort_array(keys(colours), 1))
+   foreach (float val in sort_array(keys(colours), 1))
    {
       string col = colours[val];
       if (!next_pos)

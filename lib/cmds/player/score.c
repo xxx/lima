@@ -23,6 +23,7 @@
 inherit CMD;
 inherit M_WIDGETS;
 inherit M_FRAME;
+inherit M_GETOPT;
 
 #define FC "<bld>%-10.10s<res>"
 
@@ -44,10 +45,10 @@ string capacity_string(object body, int width)
 {
    string content = "";
    float capa = body->query_capacity();
-   float enc_capa = body->query_encumbered_capacity();
-   float enc_heavy_capa = body->query_heavy_capacity();
-   float no_move = body->query_no_move_capacity();
-   float max = body->query_max_capacity();
+   float enc_capa = to_float(body->query_encumbered_capacity());
+   float enc_heavy_capa = to_float(body->query_heavy_capacity());
+   float no_move = to_float(body->query_no_move_capacity());
+   float max = to_float(body->query_max_capacity());
    string capa_string;
    mapping colours =
        ([0.0 + enc_capa:"113", 0.0 + ((enc_heavy_capa * 0.8)):"119", 0.0 + ((enc_heavy_capa * 0.9)):"155", 0.0 +
@@ -75,7 +76,7 @@ string karma_string(object body, int width)
    string content = "";
    int karma = body->query_karma();
    string status = "";
-   int marker = 65 * ((karma + 1000) / 2000.0);
+   int marker = to_int(65 * ((karma + 1000) / 2000.0));
    int marker2 = 0;
 
    if (!i_simplify())
@@ -170,7 +171,7 @@ void main(mixed *args)
    frame_init_user();
    set_frame_left_header(); // This frame will use left header
    if (args && arrayp(args))
-      args -= ({0});
+      args -= ({nil});
 
    if (sizeof(args) == 2 && wizardp(this_user()))
    {
@@ -227,4 +228,20 @@ void main(mixed *args)
                     "\nWeight");
    set_frame_content(content);
    write(frame_render());
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   if (arrayp(arg))
+   {
+      main(arg);
+      return;
+   }
+   mixed parsed = getopt(stringp(arg) ? explode(arg, " ") - ({""}) : ({}), "t");
+   if (!arrayp(parsed))
+   {
+      out("Usage: score [-t theme]\n");
+      return;
+   }
+   main(parsed[1]);
 }

@@ -236,7 +236,7 @@ nomask string locate_access_member(string pname, int access)
       if (((class party)parties[pname]).members[name] == access)
          return name;
    }
-   return 0;
+   return nil;
 }
 
 // Because two users cannot have the same access levels, when one member's
@@ -329,7 +329,7 @@ nomask string locate_member_by_access(string pname, int access)
       if (((((class party)parties[pname]).members[s])) == access)
          return s;
    }
-   return 0;
+   return nil;
 }
 
 // The maximum number of members that can be active in one login.
