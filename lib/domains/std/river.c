@@ -13,7 +13,7 @@ void setup()
    set_size(TOO_LARGE);
 #endif
 #ifdef USE_MASS
-   set_mass(TOO_LARGE);
+   set_mass(to_float(TOO_LARGE));
 #endif
    set_attached(1);
    set_source_of(WATER);

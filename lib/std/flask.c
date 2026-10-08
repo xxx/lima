@@ -13,7 +13,7 @@ void setup()
    set_size(1);
 #endif
 #ifdef USE_MASS
-   set_mass(1);
+   set_mass(1.0);
 #endif
    add_relation("in", 1);
    set_default_relation("in");
