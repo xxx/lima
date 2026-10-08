@@ -1,345 +1,376 @@
 /* Do not remove the headers from this file! see /USAGE for more info. */
 
-// Effects system, idea based on the system used in Sorrows (ex Discworld?)
-
 inherit CLASS_EFFECT;
 
-private
-mixed *effects = ({});  // Queue of effects to call
-nosave private int tag; // Tag for call_out
+private mixed *effects = ({});
+nosave private int tag;
+nosave private class effect_class scheduled_effect;
+nosave private int processing;
+nosave private int clear_generation;
 
 //: MODULE
-// Handles effects (ie delayed/repeating events)
-// Each effect calls start_effect in the specified file when the effect starts
-// Calls reinstate_effect when it restarts (at login etc)
-// Calls do_effect periodically
-// Calls end_effect when it ends
-// Each of these functions takes arguments : effect sufferer, args, counter
-//  where counter is the number of times it will repeat
-//  args is a mixed set of args as appropriate to the effect
+// Relative-delay effects queue with one owned call_out.
+// Positive counters tick N times, then end on the following firing;
+// zero ends on the first firing and negative counters repeat indefinitely.
 
-//: FUNCTION time_to_next_effect
-// Returns time remaining in call_out to the next effect
-int time_to_next_effect()
+private int effect_position(class effect_class effect)
 {
-   foreach (mixed *callout in query_call_outs())
-   {
-      if (function_name(callout[1]) == "next_effect")
-         return callout[2] < 0 ? 0 : callout[2] / 1000;
-   }
+   for (int i = 0; i < sizeof(effects); i++)
+      if (effects[i] == effect)
+         return i;
    return -1;
 }
 
+private void cancel_timer()
+{
+   if (tag)
+      remove_call_out(tag);
+   tag = 0;
+   scheduled_effect = nil;
+}
+
+private void sync_queue()
+{
+   if (processing || !tag)
+      return;
+   mixed *timer = query_call_out(tag);
+   if (!timer)
+   {
+      cancel_timer();
+      if (sizeof(effects))
+         effects[0].delay = 0;
+      return;
+   }
+   // Stored delays are whole seconds; retain the live timer's finer deadline.
+   int remaining = timer[2] > 0 ? timer[2] : 0;
+   if (sizeof(effects))
+      effects[0].delay = remaining / 1000 + (remaining % 1000 != 0);
+}
+
+private void schedule_next()
+{
+   if (processing)
+      return;
+   if (sizeof(effects) && tag && scheduled_effect == effects[0] && query_call_out(tag))
+      return;
+   cancel_timer();
+   if (sizeof(effects))
+   {
+      scheduled_effect = effects[0];
+      tag = call_out(next_effect, effects[0].delay);
+   }
+}
+
+private void splice_effect(class effect_class effect, int pos)
+{
+   effects = (pos ? effects[0..pos - 1] : ({})) + ({effect}) + effects[pos..];
+}
+
+private void erase_effect(int pos)
+{
+   if (pos + 1 < sizeof(effects))
+      effects[pos + 1].delay += effects[pos].delay;
+   effects = (pos ? effects[0..pos - 1] : ({})) + effects[pos + 1..];
+}
+
+private void report_effect_error(class effect_class effect, mixed failure)
+{
+   catch(dump("Effect callback failed:", effect.effect_ob, failure));
+}
+
+//: FUNCTION time_to_next_effect
+// Returns whole seconds remaining, or -1 when no owned timer exists.
+int time_to_next_effect()
+{
+   mixed *timer = tag ? query_call_out(tag) : nil;
+   if (!timer)
+      return -1;
+   return timer[2] < 0 ? 0 : timer[2] / 1000;
+}
+
 //: FUNCTION actual_period
-// Converts period to an actual interval, with suitable randomisation
-// Formats : int val : period = val
-//           int *({ fixed, var}) : period = fixed + random(var)
-//           function : evaluate it
+// Accepts seconds, ({fixed, random_range}), or a function returning seconds.
 int actual_period(mixed val)
 {
    if (intp(val))
       return val;
-
-   if (arrayp(val))
-      if (sizeof(val) == 2)
-         if (intp(val[0]) && intp(val[1]))
-            return val[0] + random(val[1]);
-
+   if (arrayp(val) && sizeof(val) == 2 && intp(val[0]) && intp(val[1]))
+      return val[0] + random(val[1]);
    if (functionp(val))
-      return evaluate(val);
-
+   {
+      mixed period = evaluate(val);
+      if (!intp(period))
+         error("Effect interval callback must return an integer");
+      return period;
+   }
    return 0;
 }
 
-// ###TODO add "special case" for time adjustment for removal of first effect
-//  where call_out remaining should be used in place of delay
-
 //: FUNCTION remove_effect_at
-// Removes effect from queue at appropriate point
-void remove_effect_at(int pos)
+// Removes an entry without an end hook; returns 0 for an invalid index.
+int remove_effect_at(int pos)
 {
-   effects[pos - 1].delay += effects[pos].delay;
-   effects = effects[0..pos - 1] + effects[pos + 1..];
+   if (pos < 0 || pos >= sizeof(effects))
+      return 0;
+   sync_queue();
+   erase_effect(pos);
+   schedule_next();
+   return 1;
 }
 
 //: FUNCTION find_effect_index
-// Return position of effect with specified object in queue
-// Return -1 on failure
+// Returns the first object-path match, or -1.
 int find_effect_index(string ob)
 {
    if (ob)
       for (int i = 0; i < sizeof(effects); i++)
-      {
          if (effects[i].effect_ob == ob)
             return i;
-      }
    return -1;
 }
 
 //: FUNCTION find_effect_name_index
-// Return position of effect with specified name in queue
-// Return -1 on failure
+// Returns the first exact-name match, or -1.
 int find_effect_name_index(string name)
 {
    if (name)
       for (int i = 0; i < sizeof(effects); i++)
-      {
          if (effects[i].name == name)
             return i;
-      }
    return -1;
 }
 
 //: FUNCTION find_effect_indexes_matching
-// Return array of positions of effects (part-)matching specified name
-// Return ({})
+// Returns indexes matching a nonempty name prefix.
 int *find_effect_indexes_matching(string name)
 {
    int *res = ({});
    if (name)
       for (int i = 0; i < sizeof(effects); i++)
-      {
-         if (effects[i]->name[0..strlen(name)-1] == name)
+         if (effects[i].name[0..strlen(name) - 1] == name)
             res += ({i});
-      }
    return res;
 }
 
 //: FUNCTION find_effect
-// Return effect with specified object in queue
-// Return 0 on failure
-int find_effect(string ob)
+// Returns the live effect class, or integer zero when absent.
+mixed find_effect(string ob)
 {
    int idx = find_effect_index(ob);
-   if (idx > -1)
-      return effects[idx];
-   return 0;
+   return idx > -1 ? effects[idx] : 0;
 }
 
 //: FUNCTION query_effect_args
-// Return args of specified effect
+// Returns the live payload, or integer zero when absent.
 mixed query_effect_args(string ob)
 {
    int idx = find_effect_index(ob);
-   if (idx > -1)
-      return effects[idx].args;
-   return 0;
+   return idx > -1 ? effects[idx].args : 0;
 }
 
 //: FUNCTION remove_effect
-// Locate effect matching the specified ob and remove it
-// Return 1 on success, 0 on failure
+// Removes the first object-path match without an end hook.
 int remove_effect(string ob)
 {
-   int index = find_effect_index(ob);
-   if (index > -1)
-      if (remove_effect_at(index))
-         return 1;
-   return 0;
+   return remove_effect_at(find_effect_index(ob));
 }
 
 //: FUNCTION remove_effect_named
-// Locate effect matching the specified name and remove it
-// Return 1 on success, 0 on failure
+// Removes the first exact-name match without an end hook.
 int remove_effect_named(string name)
 {
-   int index = find_effect_name_index(name);
-   if (index > -1)
-      if (remove_effect_at(index))
-         return 1;
-   return 0;
+   return remove_effect_at(find_effect_name_index(name));
 }
 
 //: FUNCTION remove_effects_matching
-// Locate effects matching the specified name and remove them
-// Return 1 on success, 0 on failure
+// Removes all prefix matches and reports whether any were found.
 int remove_effects_matching(string name)
 {
    int *matches = find_effect_indexes_matching(name);
-   if (sizeof(matches))
-   {
-      foreach (int idx in sort_array(matches, -1))
-         remove_effect_at(idx);
-      return 1;
-   }
-   return 0;
+   if (!sizeof(matches))
+      return 0;
+   sync_queue();
+   foreach (int idx in sort_array(matches, -1))
+      erase_effect(idx);
+   schedule_next();
+   return 1;
 }
 
 //: FUNCTION insert_effect_at
-// Inserts effect into queue at appropriate point
+// Low-level positional splice; the supplied delay is relative to its predecessor.
 void insert_effect_at(class effect_class effect, int pos)
 {
-   effects = effects[0..pos - 1] + ({effect}) + effects[pos..];
+   if (!effect || pos < 0 || pos > sizeof(effects) || effect_position(effect) >= 0)
+      error("insert_effect_at: invalid position or duplicate effect");
+   sync_queue();
+   if (effect.delay < 0)
+      effect.delay = 0;
+   splice_effect(effect, pos);
+   schedule_next();
 }
 
 //: FUNCTION insert_effect
-// Finds appropriate point in queue to insert effect
-// Adjusts delay to following effect
-// Returns 1 on success, 0 on failure.
+// Inserts a delay measured from now, preserving arrival order at equal deadlines.
 int insert_effect(class effect_class effect)
 {
-   class effect_class this_effect = new (class effect_class);
-   int cum_delay, prev_delay;
-
-   // If queue is empty, just put this effect in the queue
-   if (!effects || !sizeof(effects))
+   if (!effect || effect_position(effect) >= 0)
+      return 0;
+   sync_queue();
+   int delay = effect.delay > 0 ? effect.delay : 0;
+   int pos;
+   while (pos < sizeof(effects) && delay >= effects[pos].delay)
    {
-      effects = ({effect});
-      return 1;
+      delay -= effects[pos].delay;
+      pos++;
    }
+   effect.delay = delay;
+   if (pos < sizeof(effects))
+      effects[pos].delay -= delay;
+   splice_effect(effect, pos);
+   schedule_next();
+   return 1;
+}
 
-   // Walk through queue, calculating cumulative delay
-   // and when this exceeds delay required for the effect to be inserted
-   // insert the effect
-   for (int i = 0; i < sizeof(effects); i++)
+private mixed *invoke_effect(class effect_class effect)
+{
+   object ob = load_object(effect.effect_ob);
+   if (!ob)
+      error("Cannot load effect: " + effect.effect_ob);
+   if (!effect.counter)
    {
-      this_effect = effects[i];
-      prev_delay = cum_delay;
-      cum_delay += this_effect.delay;
-      if (effect.delay < cum_delay)
-      {
-         insert_effect_at(effect, i);
-
-         // If there is an effect following this in the queue,
-         // adjust its relative delay
-         if (sizeof(effects) > i + 1)
-         {
-            this_effect.delay -= (effect.delay - cum_delay);
-            effects[i + 1] = this_effect;
-         }
-
-         // If there is an effect before this one in the queue,
-         // adjust the relative delay of this effect
-         if (sizeof(effects) > 1)
-         {
-            this_effect = effects[i];
-            this_effect.delay -= prev_delay;
-            effects[i] = this_effect;
-         }
-         return 1;
-      }
+      ob->end_effect(this_object(), effect.args, 0);
+      return ({0});
    }
-   return 0;
+   if (effect.counter > 0)
+      effect.counter--;
+   mixed args = ob->do_effect(this_object(), effect.args, effect.counter);
+   int delay = actual_period(effect.interval);
+   return ({1, args, delay});
 }
 
 //: FUNCTION next_effect
-// Call the function specified in the function at the head of the queue
-// Move it to appropriate place in queue
-// Then call out to next effect in the queue
+// Fires one entry; a direct call also consumes the pending timer.
 void next_effect()
 {
-   class effect_class this_effect;
-   object ob;
-
-   // Finish if the queue is empty
-   if (!effects || !sizeof(effects))
+   if (processing)
       return;
-
-   // Do whatever the current head of the queue wants
-   this_effect = effects[0];
-
-   ob = load_object(this_effect.effect_ob);
-   if (!ob)
+   cancel_timer();
+   if (!sizeof(effects))
       return;
-
-   // Remove head of queue
-   effects = effects[1..];
-
-   // If counter is not zero, move current effect to later in the queue
-   if (this_effect.counter != 0)
+   class effect_class effect = effects[0];
+   effect.delay = 0;
+   int ending = !effect.counter;
+   if (ending)
+      erase_effect(0);
+   processing++;
+   mixed *result;
+   mixed failure = catch(result = invoke_effect(effect));
+   int pos = effect_position(effect);
+   if (!ending && pos >= 0)
    {
-      // If counter >0, decrease it
-      if (this_effect.counter > 0)
-         this_effect.counter--;
-
-      this_effect.args = ob->do_effect(this_object(), this_effect.args, this_effect.counter);
-
-      // Calculate delay to next occurence
-      this_effect.delay = actual_period(this_effect.interval);
-
-      // Put it into queue again
-      insert_effect(this_effect);
+      erase_effect(pos);
+      if (!stringp(failure))
+      {
+         effect.args = result[1];
+         effect.delay = result[2];
+         insert_effect(effect);
+      }
    }
-   else
-   {
-      ob->end_effect(this_object(), this_effect.args);
-   }
-   // If there is anything in the queue, do a callout to it
-   if (sizeof(effects))
-   {
-      this_effect = effects[0];
-      tag = call_out(next_effect, this_effect.delay);
-   }
-   else
-      tag = 0;
+   if (stringp(failure))
+      report_effect_error(effect, failure);
+   processing--;
+   schedule_next();
 }
 
 //: FUNCTION clear_effects
-// Clears the effects queue
+// Detaches the queue before end hooks; effects those hooks add survive the clear.
 void clear_effects()
 {
-   object ob;
-   foreach (class effect_class effect in effects)
-   {
-      ob = load_object(effect.effect_ob);
-      if (ob)
-         if (function_exists("end_effect", ob))
-            ob->end_effect(this_object(), effect.args, effect.counter);
-   }
+   cancel_timer();
+   clear_generation++;
+   mixed *removed = effects;
    effects = ({});
-   tag = 0;
+   processing++;
+   foreach (class effect_class effect in removed)
+   {
+      object ob = load_object(effect.effect_ob);
+      if (ob && function_exists("end_effect", ob))
+      {
+         mixed failure = catch(ob->end_effect(this_object(), effect.args, effect.counter));
+         if (stringp(failure))
+            report_effect_error(effect, failure);
+      }
+   }
+   processing--;
+   schedule_next();
 }
 
 //: FUNCTION query_effects
-// Returns copy of the effects queue
+// Returns a deep copy with the head delay synchronized to the live timer.
 mixed *query_effects()
 {
+   sync_queue();
    return deep_copy(effects);
 }
 
 //: FUNCTION add_effect
-// Adds the specified effect
-// Usage: add_effect(string ob, mixed args, int repeats, mixed interval)
-// repeats will default to ob->query_repeats()
-// interval will default to ob->query_interval()
+// Omitted repeats/interval use effect defaults; explicit zeros remain zeros.
 void add_effect(string ob, mixed args = nil, mixed *options...)
 {
-   if (sizeof(options) > 2) error("add_effect: too many arguments");
-   int repeats;
-   mixed interval;
-   class effect_class this_effect = new (class effect_class);
+   if (sizeof(options) > 2)
+      error("add_effect: too many arguments");
    object obj = load_object(ob);
    if (!obj)
       return;
-   repeats = sizeof(options) ? (int)options[0] : ob->query_repeats();
-   interval = sizeof(options) > 1 ? options[1] : ob->query_interval();
-
-   this_effect.effect_ob = ob;
-   this_effect.name = ob->query_name();
-   this_effect.args = args;
-   this_effect.interval = interval;
-   this_effect.counter = repeats;
-   this_effect.delay = actual_period(interval);
-
+   int generation = clear_generation;
+   int repeats = sizeof(options) ? (int)options[0] : obj->query_repeats();
+   mixed interval = sizeof(options) > 1 ? options[1] : obj->query_interval();
+   class effect_class effect = new(class effect_class,
+      effect_ob: ob, name: obj->query_name(), args: args,
+      interval: interval, counter: repeats, delay: actual_period(interval));
    if (function_exists("start_effect", obj))
-      this_effect.args = obj->start_effect(this_object(), args, repeats, interval);
-   insert_effect(this_effect);
-   if (!tag)
-      tag = call_out(next_effect, this_effect.delay);
+      effect.args = obj->start_effect(this_object(), args, repeats, interval);
+   if (generation == clear_generation)
+      insert_effect(effect);
 }
 
 //: FUNCTION reinstate_effects
-// Called on relogging to restart effects.
+// Restored queues tick immediately; active or reentrant reinstatement is a no-op.
 void reinstate_effects()
 {
-   object ob;
-   foreach (class effect_class effect in effects)
+   if (processing || (tag && query_call_out(tag)))
+      return;
+   cancel_timer();
+   int generation = clear_generation;
+   mixed *restored = effects + ({});
+   processing++;
+   foreach (class effect_class effect in restored)
    {
-      ob = load_object(effect.effect_ob);
-      if (!ob)
+      if (effect_position(effect) < 0)
          continue;
-      if (function_exists("reinstate_effect", ob))
-         effect.args = ob->reinstate_effect(this_object(), effect.args, effect.counter, );
+      object ob = load_object(effect.effect_ob);
+      mixed args;
+      mixed failure;
+      if (!ob)
+         failure = "Cannot load effect: " + effect.effect_ob;
+      else if (function_exists("reinstate_effect", ob))
+         failure = catch(args = ob->reinstate_effect(this_object(), effect.args, effect.counter));
+      else
+         args = effect.args;
+      int pos = effect_position(effect);
+      if (pos >= 0)
+      {
+         if (stringp(failure))
+            erase_effect(pos);
+         else
+            effect.args = args;
+      }
+      if (stringp(failure))
+         report_effect_error(effect, failure);
    }
-   next_effect();
+   processing--;
+   if (generation == clear_generation)
+      next_effect();
+   else
+      schedule_next();
 }
