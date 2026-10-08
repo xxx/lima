@@ -40,7 +40,7 @@ void do_digging(object arg)
          arg = o[0];
          break;
       default:
-         modal_push(( : answer_question:), "What do you want to dig in? ");
+         modal_push(answer_question, "What do you want to dig in? ");
          return;
       }
    }

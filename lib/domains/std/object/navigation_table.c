@@ -15,12 +15,12 @@ void setup()
    set_size(LARGE);
 #endif
 #ifdef USE_MASS
-   set_mass(LARGE);
+   set_mass(to_float(LARGE));
 #endif
    set_objects((["/domains/std/object/shovel":1, ]), "on");
 }
 
-mixed indirect_get_obj_from_obj(object ob1, object ob2)
+mixed indirect_get_obj_from_obj(object ob1, string wrd, object ob2)
 {
    return 1;
 }

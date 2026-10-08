@@ -63,7 +63,9 @@ mixed direct_read_word_str_word_obj(string p1, string str, string p2, object ob)
 void set_text(string t)
 {
    string file = absolute_path(t, this_object());
-   if (file_size(file) >= 0)
+   int size;
+   mixed lookup_error = catch(size = file_size(file));
+   if (!lookup_error && size >= 0)
       read_text = read_file(file);
    else
       read_text = t;

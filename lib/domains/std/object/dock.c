@@ -12,6 +12,6 @@ void setup()
    set_size(VERY_LARGE);
 #endif
 #ifdef USE_MASS
-   set_mass(VERY_LARGE);
+   set_mass(to_float(VERY_LARGE));
 #endif
 }

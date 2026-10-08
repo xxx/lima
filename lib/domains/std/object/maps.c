@@ -13,6 +13,6 @@ void setup()
    set_size(SMALL);
 #endif
 #ifdef USE_MASS
-   set_mass(SMALL);
+   set_mass(to_float(SMALL));
 #endif
 }
