@@ -110,20 +110,26 @@ mixed *argument_explode(string text)
          quote = text[i++];
          while (i < length)
          {
-            if (text[i] == '\\' && i + 1 < length)
+            int character = text[i];
+            if (character == '\\' && i + 1 < length)
                i += 2;
-            else if (text[i++] == quote)
-               break;
+            else
+            {
+               i++;
+               if (character == quote)
+                  break;
+            }
          }
       }
       else
       {
          while (i < length)
          {
-            if (text[i] == '\\' && i + 1 < length)
+            int character = text[i];
+            if (character == '\\' && i + 1 < length)
                i += 2;
-            else if (text[i] == ' ' || text[i] == '|' || text[i] == '<' || text[i] == '>' ||
-                     text[i] == '"' || text[i] == '`')
+            else if (character == ' ' || character == '|' || character == '<' || character == '>' ||
+                     character == '"' || character == '`')
                break;
             else
                i++;
