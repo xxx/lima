@@ -58,8 +58,8 @@ private
 nomask void save_msg(int message_key, class mail_msg msg)
 {
    saved_msg = msg;
-   unguarded(1, ( : save_object, get_fname(message_key) :));
-   saved_msg = 0;
+   unguarded(1, (: save_object(get_fname(message_key)) :));
+   saved_msg = nil;
 }
 
 private
@@ -67,13 +67,13 @@ nomask class mail_msg restore_msg(int message_key)
 {
    class mail_msg msg;
 
-   if (!unguarded(1, ( : restore_object, get_fname(message_key), 1 :)))
-      return 0;
+   if (!unguarded(1, (: restore_object(get_fname(message_key)) :)))
+      return nil;
 
    msg = saved_msg;
 
    /* don't leave the message sitting around in our variables */
-   saved_msg = 0;
+   saved_msg = nil;
 
    return msg;
 }
@@ -84,7 +84,7 @@ nomask int get_message_key()
    int message_key;
 
    message_key = time();
-   while (unguarded(1, ( : is_file, get_fname(message_key) + __SAVE_EXTENSION__:)))
+   while (unguarded(1, (: is_file(get_fname(message_key) + __SAVE_EXTENSION__) :)))
       message_key--;
    return message_key;
 }
@@ -116,9 +116,9 @@ nomask mixed clean_addresses(string *list)
    string *recips = ({});
    string listitem;
 
+   list = clean_array(map(list, lower_case));
    foreach (listitem in list)
    {
-      listitem = lower_case(listitem);
       if (!sscanf(listitem, "%s@%s", user, mudname))
       {
          if (user_exists(listitem))
@@ -149,6 +149,7 @@ string *ungroup(string *list)
 {
    mixed to;
 
+   list = filter(list, (: sizeof($1) :));
    foreach (string addressee in list)
    {
       to = GROUP_D->get_group(addressee);
@@ -251,7 +252,7 @@ nomask mixed get_one_message(int message_key)
    if (!(msg = restore_msg(message_key)))
    {
       LOG_D->log(LOG_MAIL_ERROR, sprintf("%s lost message #%d", this_user()->query_userid(), message_key));
-      return 0;
+      return nil;
    }
 
    if (member_array(this_user()->query_userid(), msg.dels_pending) == -1)
@@ -274,7 +275,7 @@ nomask void delete_mail(int message_key, string user)
 
    msg.dels_pending -= ({user});
    if (!sizeof(msg.dels_pending))
-      unguarded(1, ( : rm, get_fname(message_key) + __SAVE_EXTENSION__:));
+      unguarded(1, (: rm(get_fname(message_key) + __SAVE_EXTENSION__) :));
    else
       save_msg(message_key, msg);
 }
@@ -292,7 +293,7 @@ nomask void process_message(string fname)
 
 nomask void rebuild_mailboxes()
 {
-   string *messages = unguarded(1, ( : get_dir, MAIL_PATH "*.o" :));
+   string *messages = unguarded(1, (: get_dir(MAIL_PATH "*.o") :));
 
    map(messages, process_message);
 }
