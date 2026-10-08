@@ -49,7 +49,7 @@ varargs string tail(string fname, int nlines)
       }
       str = read_bytes(fname, offset, chunk) + str;
       p = -1;
-      while (p < sizeof(str) - 1 &&p = member_array('\n', str, p + 1))
+      while (p < sizeof(str) - 1 && (p = member_array('\n', str, p + 1)))
          num_nl++;
    }
    skip = num_nl - nlines;
