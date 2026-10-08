@@ -58,16 +58,6 @@ nomask int exec(object target, object src)
    error("exec() not available\n");
 }
 
-//: FUNCTION debug_info
-// The debug_info efun is temporarily denied, until the driver is altered
-// to use the valid_bind() apply.
-nomask string debug_info(int operation, object ob)
-{
-   if (!check_privilege(1))
-      error("debug_info() not available right now\n");
-   return efun::debug_info(operation, ob);
-}
-
 //: FUNCTION input_to
 // input_to should not be used; the stackable input system should be used
 // instead.  See the modal_push() and modal_func() routines.
@@ -140,12 +130,12 @@ nomask object query_snooping(object ob)
    error("Lima doesn't use regular snoop.\n");
 }
 
-void snoop(object snooper, object snoopee)
+void start_snoop(object snooper, object snoopee)
 {
    if (previous_object() == find_object(SNOOP_D))
       efun::snoop(snooper, snoopee);
    else
-      error("Only SNOOP_D may call snoop.\n");
+      error("Only SNOOP_D may call start_snoop.\n");
 }
 
 varargs void tell_object()

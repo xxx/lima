@@ -383,5 +383,5 @@ void run_script(string name)
 
 varargs add_script(mixed args...)
 {
-   debug_info("Don't you wish this function wasn't missing? What did it do? It is a mystery.");
+   error("add_script() is not implemented.\n");
 }
