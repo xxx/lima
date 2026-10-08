@@ -15,25 +15,20 @@ mapping body_types = ([]);
 
 class limb upgrade_limb_data_to_limb(class limb_data ld)
 {
-   mixed *dis = disassemble_class(ld);
-   dis = dis[0..1] + ({0, 0}) + dis[2..];
-   return assemble_class(dis);
+   return new(class limb, health: ld.health, max_health: ld.max_health,
+              parent: ld.parent, flags: ld.flags);
 }
 
 mapping get_body(string type)
 {
    if (has_key(body_types, type))
    {
-#ifdef LIMB_SHIELDS
       mapping tmp = ([]);
       foreach (string limb, class limb_data ld in body_types[type])
       {
          tmp[limb] = upgrade_limb_data_to_limb(ld);
       }
       return tmp;
-#else
-      return copy(body_types[type]);
-#endif
    }
    else
       return ([]);
@@ -43,7 +38,7 @@ mapping get_body_size(string type)
 {
    mapping body = get_body(type);
    mapping sizes = ([]);
-   foreach (string limb, class limb_data l in body)
+   foreach (string limb, class limb l in body)
    {
       if (l.max_health > 0)
          sizes[limb] = l.max_health;

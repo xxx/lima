@@ -27,36 +27,24 @@ nomask int default_num()
 
 varargs string tail(string fname, int nlines)
 {
-   int chunk, offset, num_nl, p, skip;
-   string str = "";
-
    if (!stringp(fname))
       error("tail: No file name supplied.");
    if (nlines < 1)
       nlines = 10;
 
-   chunk = nlines * 80;
-   offset = file_size(fname);
-
-   while (offset > 0 && num_nl <= nlines)
+   mixed input = read_bytes(fname);
+   if (input == nil)
+      return "";
+   bytes data = input;
+   int pos = sizeof(data) - 1;
+   if (pos >= 0 && data[pos] == '\n')
+      pos--;
+   for (; pos >= 0; pos--)
    {
-      num_nl = 0;
-      offset -= chunk;
-      if (offset < 0)
-      {
-         chunk += offset; /* negative */
-         offset = 0;
-      }
-      str = read_bytes(fname, offset, chunk) + str;
-      p = -1;
-      while (p < sizeof(str) - 1 && (p = member_array('\n', str, p + 1)))
-         num_nl++;
+      if (data[pos] == '\n' && --nlines == 0)
+         return to_text(data[pos + 1..], "UTF-8");
    }
-   skip = num_nl - nlines;
-   p = -1;
-   while (skip--)
-      p = member_array('\n', str, p + 1);
-   return str[p..];
+   return to_text(data, "UTF-8");
 }
 
 //: FUNCTION more

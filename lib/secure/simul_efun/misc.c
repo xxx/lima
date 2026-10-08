@@ -850,7 +850,7 @@ varargs string get_stack(int x)
 // Create a copy of an existing class.
 mixed clone_class(mixed x)
 {
-   return assemble_class(disassemble_class(x));
+   return copy_class(x);
 }
 
 //: FUNCTION pround

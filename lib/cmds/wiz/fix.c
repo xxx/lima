@@ -55,16 +55,11 @@ varargs void fix_body(object body, int step)
 
       // Check 2, is torso limb still valid.
       {
-         class limb torso = (class limb)body->get_health()["torso"];
-         class limb nl = new (class limb);
-         mixed dl = disassemble_class(torso);
-         mixed dnl = disassemble_class(nl);
+         class limb torso;
+         mixed invalid = catch(torso = (class limb)body->get_health()["torso"]);
+         wrfix("Torso limb has the expected class identity.", !invalid && !!torso);
 
-         wrfix("Torso limb has " + sizeof(dl) + " class members, a new limb has " + sizeof(dnl) +
-                   ". Did you change to or from LIMB_SHIELDS in <config.h>?",
-               sizeof(dl) == sizeof(dnl));
-
-         if (sizeof(dl) != sizeof(dnl))
+         if (invalid || !torso)
          {
             body->update_body_style(body->query_body_style());
             wrfix(body->query_name() + " body style: " + body->query_body_style() + " broken, giving a new one.",
