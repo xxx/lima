@@ -109,7 +109,7 @@ string read_entry(string entry)
       this_body()->simple_action("$N $vread the $o.", this_object());
       return entry_contents;
    }
-   return 0;
+   return nil;
 }
 
 //: FUNCTION has_entries

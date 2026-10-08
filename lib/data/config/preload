@@ -3,8 +3,8 @@
 #comments must have the # in the very first column.
 #
 /secure/user
-/obj/secure/shell
-/std/body/cmd
+/obj/mudlib/pshell
+/trans/obj/wish
 /std/body
 /daemons/xterm256_d
 /daemons/help_d
@@ -28,3 +28,18 @@
 #/secure/daemons/http_d
 #/secure/daemons/ftp_d
 #/secure/daemons/rcp_d
+# Starting-room objects load in separate transactions before player entry.
+/std/stairs
+/std/elevator_door
+/std/elevator_call_button
+/domains/std/object/large_oak_door
+/domains/std/object/portal
+/domains/std/monster/greeter
+/domains/std/object/map
+/obj/mudlib/simple_ob
+/std/elevator
+/std/elevator_button
+/domains/std/room/Church
+/domains/std/room/elevator
+/domains/std/room/Quiet_Room
+/domains/std/room/Wizroom

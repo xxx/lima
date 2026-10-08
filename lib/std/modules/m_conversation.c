@@ -370,7 +370,8 @@ void continue_conversation(object ob, string input)
 
    if (input == "q" || !current[ob])
    {
-      return bye(ob);
+      bye(ob);
+      return;
    }
    if (sscanf(input, "%d%s", num, tmp) != 2 || tmp != "")
    {
@@ -398,7 +399,7 @@ void continue_conversation(object ob, string input)
    if (sizeof(current[ob]))
       show_menu(ob);
    else
-      return bye(ob);
+      bye(ob);
 }
 
 //: FUNCTION filter_start

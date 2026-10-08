@@ -563,7 +563,19 @@ nomask void preload(string file)
 
 string *epilog(int eflag)
 {
-   return filter(explode(read_file(PRELOAD_FILE), "\n") - ({""}), ( : $1[0] != '#' :));
+   string *files = filter(explode(read_file(PRELOAD_FILE), "\n") - ({""}), (: $1[0] != '#' :));
+   string *expanded = ({});
+   foreach (string file in files)
+   {
+      if (file == "/daemons/verb_d")
+         expanded += map(get_dir("/cmds/verbs/*.c"), (: "/cmds/verbs/" + $1 :));
+      if (file == "/daemons/crafting_d")
+         expanded += map(get_dir("/domains/std/crafting/*.c"), (: "/domains/std/crafting/" + $1 :));
+      expanded += ({file});
+      if (file == "/std/body")
+         expanded += map(get_dir("/std/race/*.c"), (: "/std/race/" + $1 :));
+   }
+   return expanded;
 }
 
 string object_name(object ob)

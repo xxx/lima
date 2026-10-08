@@ -270,7 +270,7 @@ void remove()
 
    save_me();
 
-   LAST_LOGIN_D->register_last(query_userid());
+   LAST_LOGIN_D->register_last(lower_case(query_name()));
    SNOOP_D->bye();
    ::remove();
 }

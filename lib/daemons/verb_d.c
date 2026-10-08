@@ -50,5 +50,5 @@ void create()
    string *files;
 
    files = get_dir(CMD_DIR_VERBS "/*.c");
-   map(files, reload_verb);
+   map(filter(files, (: !find_object(CMD_DIR_VERBS "/" + $1) :)), reload_verb);
 }

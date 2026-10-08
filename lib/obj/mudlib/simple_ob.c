@@ -30,14 +30,15 @@ inherit BASE_OBJ;
 private
 nosave mapping msgs = ([]);
 
-varargs void create(mapping long, string *ids, object dest)
+void create(mixed args...)
 {
    if (!clonep())
       return;
    ::create();
 
    set_attached(1);
-   msgs = long;
+   msgs = args[0];
+   string *ids = args[1];
 
    if (msgs["look"])
       set_long(msgs["look"][ < 1] == '\n' ? msgs["look"] : msgs["look"] + "\n");

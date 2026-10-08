@@ -195,7 +195,7 @@ string add_article(string str)
 string the_short()
 {
    if (!is_visible())
-      return invis_name();
+      return this_object()->invis_name();
 
    if (!proper_name)
       return "the " + short();
@@ -207,7 +207,7 @@ string the_short()
 string a_short()
 {
    if (!is_visible())
-      return invis_name();
+      return this_object()->invis_name();
 
    if (plural || unique)
       return the_short();

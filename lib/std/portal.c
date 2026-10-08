@@ -44,7 +44,7 @@ string get_destination()
    return query_method_destination("enter");
 }
 
-int direct_look_str_obj()
+int direct_look_str_obj(string prep, object ob)
 {
    return 1;
 }
