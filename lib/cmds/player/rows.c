@@ -33,3 +33,8 @@ void main(mixed rows)
    this_user()->query_shell_ob()->set_variable("MORE", rows);
    printf("Setting number of rows to %d\n", rows);
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}
