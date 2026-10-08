@@ -112,6 +112,25 @@ private nomask int valid_message_body(string *body)
    return valid;
 }
 
+private nomask int valid_message_metadata(class mail_msg msg)
+{
+   if (!stringp(msg.sender) || !stringp(msg.subject) || !intp(msg.date))
+      return 0;
+   return !catch(ctime(msg.date));
+}
+
+private nomask int valid_message_recipients(mixed names)
+{
+   if (nilp(names))
+      return 1;
+   if (!arrayp(names))
+      return 0;
+   foreach (mixed name in names)
+      if (!stringp(name))
+         return 0;
+   return 1;
+}
+
 /*
 ** build_message()
 **
@@ -132,6 +151,11 @@ protected nomask string *build_message(int mail_key, int supress_header)
    output = ({});
    if (!supress_header)
    {
+      if (!valid_message_metadata(msg) || !valid_message_recipients(msg.to_list) || !valid_message_recipients(msg.cc_list))
+      {
+         write("*** ERROR: message metadata is missing or invalid!\n");
+         return nil;
+      }
       output += format_name_list("To     : ", msg.to_list);
       output += format_name_list("Cc     : ", msg.cc_list);
       output += ({"From   : " + capitalize(msg.sender)});
@@ -298,6 +322,8 @@ protected nomask void cmd_headers(string rangestr)
 
       if (!msg)
          output += ({sprintf("  %-3d %-15s  %10s  %s", nums[key], "", "", "*** LOST MESSAGE ***")});
+      else if (!valid_message_metadata(msg))
+         output += ({sprintf("%c %-3d *** INVALID MESSAGE METADATA ***", mailbox_ob->query_message_read(key) ? 'N' : ' ', nums[key])});
       else
          output += ({sprintf("%c %-3d %-15s (%s) %s", mailbox_ob->query_message_read(key) ? 'N' : ' ', nums[key],
                              capitalize(msg.sender), ctime(msg.date)[0..9], msg.subject)});
@@ -412,6 +438,13 @@ protected nomask void cmd_reply(int user_num, int reply_all)
    if (!valid_message_body(msg.body))
       return;
 
+   if (!valid_message_metadata(msg) ||
+       (reply_all && (!valid_message_recipients(msg.to_list) || !valid_message_recipients(msg.cc_list))))
+   {
+      write("*** ERROR: message metadata is missing or invalid!\n");
+      return;
+   }
+
    body = build_body_inclusion(msg.body);
    body = explode(sprintf("On %s %s wrote:\n%s\n", ctime(msg.date), capitalize(msg.sender), implode(body, "\n")), "\n");
    body = body[0..<2];
@@ -420,7 +453,7 @@ protected nomask void cmd_reply(int user_num, int reply_all)
 
    to_list = ({msg.sender});
    if (reply_all)
-      to_list = clean_array(to_list + msg.to_list + msg.cc_list);
+      to_list = clean_array(to_list + (nilp(msg.to_list) ? ({}) : msg.to_list) + (nilp(msg.cc_list) ? ({}) : msg.cc_list));
 
    if (file_size(tmp_fname()) >= 0)
       write("Saved mail text will be replaced only if you finish this reply.\n");
@@ -495,6 +528,12 @@ protected nomask void cmd_forward(int user_num, string newto)
 
    if (!valid_message_body(msg.body))
       return;
+
+   if (!valid_message_metadata(msg))
+   {
+      write("*** ERROR: message metadata is missing or invalid!\n");
+      return;
+   }
 
    body = build_body_inclusion(msg.body);
    body = ({"Begin forwarded message:", sprintf("On %s %s wrote:", ctime(msg.date), capitalize(msg.sender))}) + body;
