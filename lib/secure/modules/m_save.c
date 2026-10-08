@@ -1,216 +1,218 @@
 /* Do not remove the headers from this file! see /USAGE for more info. */
 
-/*
-** Inheritable for persistance.
-** Beek for nightmare, ported by Rust.
-** could use helper funs that save directly to
-** a file, and some security (when programatic security arrives)
-** save() and restore() or save_to_file(), etc....
-**
-** Beek - protected a bunch of things which shouldn't be called externally
-*/
+/* Inheritable persistence by Beek for Nightmare, ported by Rust. */
 
 #include <mudlib.h>
 
-//: MODULE
-// This module implements persistence
+private nosave int save_recurse;
+private nosave mixed *saved = ({});
+private nosave string *old_fnames = ({"/obj/shells/wish", "/obj/pshell"});
 
-private
-nosave int save_recurse;
-private
-nosave mixed *saved = ({});
-
-// ###These filenames can legally be remapped to other objects (these moved)
-private
-nosave string *old_fnames = ({"/obj/shells/wish", "/obj/pshell"});
-
-//: FUNCTION add_save
-// Mark a variable as one that gets saved.
-protected
-void add_save(mixed *vars)
+private int omitted(mixed value)
 {
-   saved += vars;
-   //  saved = clean_array(saved + vars);
+   return nilp(value) || (intp(value) && value == 0);
 }
 
-//: FUNCTION get_saved
-// returns the array of variables that get saved.
-
-// ###Security problem here - Beek.  What is it used for anyway?
-string *get_saved()
+private void check_name(mixed name)
 {
-   return saved;
+   if (!stringp(name) || name == "" || name[0] == '#')
+      error("M_SAVE: invalid variable name\n");
 }
 
-//: FUNCTION set_save_recurse
-// sets whether or not a save is recursive.
-protected
-void set_save_recurse(int flag)
+protected void add_save(mixed *vars)
+{
+   mixed *pending = ({});
+   foreach (mixed entry in vars)
+   {
+      if (omitted(entry))
+         continue;
+      if (!functionp(entry))
+         check_name(entry);
+      if (member_array(entry, saved) == -1 && member_array(entry, pending) == -1)
+         pending += ({entry});
+   }
+   saved += pending;
+}
+
+protected mixed *get_saved()
+{
+   return saved + ({});
+}
+
+protected void set_save_recurse(int flag)
 {
    save_recurse = flag;
 }
 
-//: FUNCTION save_to_string
-// saves an object into a string representation. You can skip an
-// object from being saved by adding::
-//    int do_not_restore() { return 1; }
-// in the object.
-varargs string save_to_string(int recursep)
+private mapping *save_variables(string state)
 {
-   string *tmpsaved;
-   string var;
-   mapping map = ([]);
-
-   // ### setting a property based on a function arg?  Gross.
-   if (recursep)
-      set_save_recurse(1);
-
-   tmpsaved = decompose(map(saved, ( : functionp($1) ? evaluate($1, "saving") : $1:)));
-   tmpsaved -= ({0});
-   foreach (var in tmpsaved)
-      map[var] = fetch_variable(var);
-
-   map["#base_name#"] = base_name(this_object());
-   if (save_recurse)
-      map["#inventory#"] = filter(all_inventory(), ( : !$1->do_not_restore() :))->save_to_string(1) - ({0});
-
-   return save_variable(map);
-}
-
-//: FUNCTION save_things_to_string
-// saves an object into a string representation. You can skip an
-// object from being saved by adding::
-//    int do_not_restore() { return 1; }
-// in the object. This function is identical to save_to_string(),
-// but skips players and monsters (is_living()).
-varargs string save_things_to_string(int recursep)
-{
-   string *tmpsaved;
-   string var;
-   mapping map = ([]);
-
-   // ### setting a property based on a function arg?  Gross.
-   if (recursep)
-      set_save_recurse(1);
-
-   tmpsaved = decompose(map(saved, ( : functionp($1) ? evaluate($1, "saving") : $1:)));
-   tmpsaved -= ({0});
-   foreach (var in tmpsaved)
-      map[var] = fetch_variable(var);
-
-   map["#base_name#"] = base_name(this_object());
-   if (save_recurse)
-      map["#inventory#"] = filter(all_inventory(), (
-                                                       : !$1->do_not_restore() && !$1->is_living()
-                                                       :))
-                               ->save_to_string(1) -
-                           ({0});
-
-   return save_variable(map);
-}
-
-//: FUNCTION load_from_string
-// loads an object from a string representation.
-
-// ### obsolete code
-void old_load_from_string(mixed value, int recurse)
-{
-   string obj;
-   object ob;
-   int i;
-   string *tmpsaved;
-
-   if (!stringp(value))
-      return;
-   value = restore_variable(value);
-   if (value[0] != base_name(this_object()))
+   string *names = ({});
+   mapping declarations = ([]);
+   mapping *result = ({});
+   foreach (mixed entry in saved)
    {
-      /*
-      ** If the saved fname is not a "legal" old name, then raise an
-      ** error.  There are certain files that have moved, so we must
-      ** deal appropriately with errors.
-      */
-      if (member_array(value[0], old_fnames) == -1)
-         error("Invalid save string (ob)\n");
-   }
-
-   tmpsaved = decompose(map(saved, ( : functionp($1) ? evaluate($1, "loading") : $1:)));
-   tmpsaved -= ({0});
-   if (sizeof(tmpsaved) != sizeof(value[1]))
-      error("Invalid save string (size)\n");
-   for (i = 0; i < sizeof(tmpsaved); i++)
-      store_variable(tmpsaved[i], value[1][i]);
-   if (sizeof(value) == 3)
-   {
-      foreach (obj in value[2])
+      mixed value = functionp(entry) ? evaluate(entry, state) : entry;
+      mixed *expanded = arrayp(value) ? value : ({value});
+      foreach (mixed name in expanded)
       {
-         value = restore_variable(obj);
-         ob = clone_object (value[0]);
-         ob->load_from_string(value, 1);
+         if (omitted(name))
+            continue;
+         check_name(name);
+         if (member_array(name, names) == -1)
+            names += ({name});
       }
    }
-   if (recurse)
+   foreach (mapping info in variable_info(this_object()))
+      declarations[info["name"]] = has_key(declarations, info["name"]) ? 0 : info;
+   foreach (string name in names)
+   {
+      if (!mappingp(declarations[name]))
+         error("M_SAVE: missing or ambiguous variable " + name + "\n");
+      result += ({declarations[name]});
+   }
+   return result;
+}
+
+private string save_state(int recursep, int things_only)
+{
+   mapping data = ([]);
+   if (recursep)
+      save_recurse = 1;
+   foreach (mapping info in save_variables("saving"))
+      data[info["name"]] = info["value"];
+   data["#base_name#"] = base_name(this_object());
+   if (save_recurse)
+   {
+      string *children = ({});
+      foreach (object child in all_inventory())
+      {
+         mixed value;
+         if (child->do_not_restore() || (things_only && child->is_living()))
+            continue;
+         value = child->save_to_string(1);
+         if (omitted(value))
+            continue;
+         if (!stringp(value))
+            error("M_SAVE: invalid child save result\n");
+         children += ({value});
+      }
+      data["#inventory#"] = children;
+   }
+   return save_value(data);
+}
+
+varargs string save_to_string(int recursep)
+{
+   return save_state(recursep, 0);
+}
+
+varargs string save_things_to_string(int recursep)
+{
+   return save_state(recursep, 1);
+}
+
+// Validate the complete tree's structure before writes or child creation.
+private mapping decode_state(mixed value, int depth)
+{
+   mixed base;
+   mixed inventory = ({});
+   mapping data;
+   if (depth > 128)
+      error("M_SAVE: inventory nesting too deep\n");
+   if (stringp(value))
+      value = restore_value(value);
+   if (arrayp(value))
+   {
+      if ((sizeof(value) != 2 && sizeof(value) != 3) || !arrayp(value[1]))
+         error("M_SAVE: invalid positional save\n");
+      base = value[0];
+      data = (["values":value[1], "legacy":1]);
+      if (sizeof(value) == 3)
+         inventory = value[2];
+   }
+   else if (mappingp(value))
+   {
+      mapping fields = ([]);
+      base = value["#base_name#"];
+      foreach (mixed name, mixed field in value)
+      {
+         if (name == "#base_name#" || name == "#inventory#")
+            continue;
+         check_name(name);
+         fields[name] = field;
+      }
+      data = (["values":fields, "legacy":0]);
+      if (has_key(value, "#inventory#"))
+         inventory = value["#inventory#"];
+   }
+   else
+      error("M_SAVE: expected a mapping or positional save\n");
+   if (!stringp(base) || base == "" || base[0] != '/')
+      error("M_SAVE: invalid base name\n");
+   if (omitted(inventory))
+      inventory = ({});
+   if (!arrayp(inventory))
+      error("M_SAVE: invalid inventory\n");
+   data["base"] = base;
+   data["children"] = ({});
+   foreach (mixed child in inventory)
+      data["children"] += ({decode_state(child, depth + 1)});
+   return data;
+}
+
+private mixed encoded_state(mapping state)
+{
+   mixed *children = map(state["children"], encoded_state);
+   if (state["legacy"])
+      return ({state["base"], state["values"], children});
+   return state["values"] + (["#base_name#":state["base"], "#inventory#":children]);
+}
+
+private void restore_state(mapping state, int recurse)
+{
+   mapping *variables;
+   mapping fields = ([]);
+   mapping allowed = ([]);
+   if (state["base"] != base_name(this_object()) && member_array(state["base"], old_fnames) == -1)
+      error("Invalid save string (ob)\n");
+   variables = save_variables("loading");
+   foreach (mapping info in variables)
+      allowed[info["name"]] = info;
+   if (state["legacy"])
+   {
+      mixed *values = state["values"];
+      if (sizeof(values) != sizeof(variables))
+         error("Invalid save string (size)\n");
+      for (int i = 0; i < sizeof(variables); i++)
+         fields[variables[i]["name"]] = values[i];
+   }
+   else
+      fields = state["values"];
+   foreach (string name in keys(fields))
+      if (!has_key(allowed, name))
+         error("M_SAVE: unregistered variable " + name + "\n");
+   // Declaration order also preserves positional partial-restore behavior.
+   foreach (mapping info in variables)
+      if (has_key(fields, info["name"]))
+         store_variable(this_object(), info["name"], fields[info["name"]], info["program"]);
+   foreach (mapping child in state["children"])
+   {
+      object ob = clone_object(child["base"]);
+      ob->load_from_string(encoded_state(child), state["legacy"] ? (child["legacy"] ? 1 : 2) : recurse + 1);
+   }
+   if (state["legacy"] ? recurse != 0 : recurse > 1)
       move_object(previous_object());
 }
 
 void load_from_string(mixed value, int recurse)
 {
-   mixed data;
-   mixed *tmpsaved;
-   string var;
-   mixed val;
-   string obj;
-   object ob;
+   restore_state(decode_state(value, 0), recurse);
+}
 
-   if (!mappingp(value))
-      data = restore_variable(value);
-   else
-      data = value;
-   if (arrayp(data))
-   {
-      old_load_from_string(value, recurse);
-      return;
-   }
-
-   if (data["#base_name#"] != base_name(this_object()))
-   {
-      /*
-      ** If the saved fname is not a "legal" old name, then raise an
-      ** error.  There are certain files that have moved, so we must
-      ** deal appropriately with errors.
-      **
-      ** use throw() so we don't get a trace; this is a normal exception
-      ** in some situations.
-      */
-      if (member_array(data["#base_name#"], old_fnames) == -1)
-         throw("Invalid save string (ob)\n");
-   }
-
-   tmpsaved = decompose(map(saved, ( : functionp($1) ? evaluate($1, "loading") : $1:)));
-   tmpsaved -= ({0});
-
-   foreach (var, val in data)
-   {
-      if (var[0] == '#')
-         continue;
-      store_variable(var, val);
-   }
-   if (data["#inventory#"])
-   {
-      foreach (obj in data["#inventory#"])
-      {
-         val = restore_variable(obj);
-         if (!(ob = clone_object (val["#base_name#"])))
-            continue;
-         ob->load_from_string(val, recurse + 1);
-      }
-   }
-   // We don't want to move the object we're restoring into the
-   // previous_object ()  (happens at the end)...  When you restored the body,
-   // the body moved into the user object, but couldn't move out! -- Rust
-
-   if (recurse > 1)
-   {
-      move_object(previous_object());
-   }
+void old_load_from_string(mixed value, int recurse)
+{
+   mapping state = decode_state(value, 0);
+   if (!state["legacy"])
+      error("M_SAVE: expected a positional save\n");
+   restore_state(state, recurse);
 }

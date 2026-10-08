@@ -35,10 +35,10 @@ varargs void add_alias_to_mapping(mapping m, string a, string template, int glob
    m[a] = new (class alias);
    if (strsrch(template, "$*") == -1)
       template += " $*";
-   ((class alias)m[a])->template = template;
-   ((class alias)m[a])->defaults = arrayp(defaults) ? defaults : ({""});
-   ((class alias)m[a])->num_args = sizeof(((class alias)m[a])->defaults) - 1;
-   ((class alias)m[a])->global_alias_status = global_status;
+   ((class alias)m[a]).template = template;
+   ((class alias)m[a]).defaults = arrayp(defaults) ? defaults : ({""});
+   ((class alias)m[a]).num_args = sizeof(((class alias)m[a]).defaults) - 1;
+   ((class alias)m[a]).global_alias_status = global_status;
 }
 
 varargs void add_default_alias(string name, string expansion, int xalias, int devalias)

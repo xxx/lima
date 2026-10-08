@@ -25,14 +25,7 @@ void call_user_func(string, mixed);
 // Sets up M_SAVE to save some variables
 void setup_for_save()
 {
-   /*
-   ** Use the call_other() interface so that we are not statically
-   ** bound to require M_SAVE.  This object this modules is applied
-   ** to may save natively rather than via M_SAVE.
-   ** Hmm, I don't think saving personal_bindings here is going to do
-   ** any good... =)
-   */
-   this_object()->add_save(({"personal_bindings", "modules"}));
+   add_save(({"personal_bindings", "modules"}));
 }
 
 protected
@@ -66,8 +59,8 @@ int bind(string command, string *argv)
       return -2;
 
    personal_bindings[command] = fname;
-   dispatch[command] = ( : call_user_func, command:);
-   this_object()->save();
+   dispatch[command] = &call_user_func(fname);
+   save_me();
 }
 
 protected
@@ -83,7 +76,7 @@ void unbind(string *argv)
 
    m_delete(personal_bindings, command);
    m_delete(dispatch, command);
-   this_object()->save();
+   save_me();
 }
 
 protected
@@ -104,30 +97,13 @@ void call_user_func(string fname, mixed argv)
 protected
 int load_module(mixed argv)
 {
-   string *flist;
-   mapping finfo = ([]);
-   mixed item;
    object module_ob;
-   string *funcnames = ({});
-
    if (!(stringp(argv) || (arrayp(argv) && sizeof(argv) == 1 && stringp(argv = argv[0]))))
       return 0;
-
-   if (!module_ob = load_object(argv))
+   if (!(module_ob = load_object(argv)))
       return 0;
-
    module_objects[argv] = module_ob;
-
-   flist = functions(module_ob, 1);
-
-   foreach (item in flist)
-   {
-      if (strsrch(item[2], "protected") != -1 || strsrch(item[2], "private") != -1)
-         continue;
-      finfo[item[0]];
-      funcnames += ({item[0]});
-   }
-   module_func_names[argv] = funcnames;
+   module_func_names[argv] = functions(module_ob);
    return 1;
 }
 
@@ -135,5 +111,21 @@ protected
 void set_module_path(string *mpath)
 {
    modules = mpath;
-   map(modules, ( : load_module:));
+   map(modules, load_module);
+}
+
+protected void restore_shell_bindings()
+{
+   foreach (mixed module in modules)
+   {
+      if (!stringp(module) || module == "")
+         error("Invalid saved shell module");
+      load_module(module);
+   }
+   foreach (mixed command, mixed fname in personal_bindings)
+   {
+      if (!stringp(command) || !stringp(fname) || command == "" || fname == "")
+         error("Invalid saved shell binding");
+      dispatch[command] = &call_user_func(fname);
+   }
 }

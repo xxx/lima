@@ -10,7 +10,7 @@ inherit M_INPUT;
 inherit M_HISTORY;
 inherit M_ALIAS;
 inherit M_SHELLFUNCS;
-inherit M_SAVE;
+protected inherit M_SAVE;
 inherit M_SCROLLBACK;
 
 private
@@ -23,11 +23,10 @@ string query_save_path(string userid);
 protected
 function arg_to_words_func = ( : explode($1, " ") :);
 
-// ### goofy fucking hack cuz the shell doesn't save for shit. only M_SAVE,
-// ### even though in the alias code it professes to "not require it to be
-// ### bound to M_SAVE" ... this is bunk...
+// Explicit registration includes nosave fields in the nested payload.
 private
 string save_info;
+private nosave int save_setup;
 
 void setup_for_save()
 {
@@ -37,6 +36,14 @@ void setup_for_save()
    */
    alias::setup_for_save();
    shellfuncs::setup_for_save();
+}
+
+private void initialize_save()
+{
+   if (save_setup)
+      return;
+   setup_for_save();
+   save_setup = 1;
 }
 
 void save_me()
@@ -49,18 +56,19 @@ void save_me()
    if (strlen(name) > 5 && name[0..4] == "guest")
       return;
 
-   setup_for_save();
+   initialize_save();
    save_info = save_to_string();
-   unguarded(1, ( : save_object, query_save_path(owner->query_userid()) :));
+   unguarded(1, (: save_object(query_save_path(owner->query_userid())) :));
 }
 protected
 void restore_me(string userid)
 {
-   unguarded(1, ( : restore_object, query_save_path(userid) :));
+   initialize_save();
+   unguarded(1, (: restore_object(query_save_path(userid)) :));
    if (save_info)
    {
       load_from_string(save_info, 0);
-      save_info = 0;
+      save_info = nil;
    }
 }
 
@@ -162,6 +170,7 @@ void create()
       restore_me(owner->query_userid());
 
    alias::create();
+   restore_shell_bindings();
    history::create();
 }
 
@@ -171,7 +180,7 @@ void add_admincmds()
    // Best way to call this since defined in /trans/obj/wish
    string *paths = this_object()->query_path();
 
-   if (sizeof(paths) && adminp() && member_array(TRANS_ADMINCMD_DIR, paths) == -1)
+   if (sizeof(paths) && adminp(this_user()) && member_array(TRANS_ADMINCMD_DIR, paths) == -1)
    {
       paths += ({TRANS_ADMINCMD_DIR});
       this_object()->set_variable("path", paths);
@@ -188,7 +197,7 @@ protected
 void prepare_shell()
 {
    shell_bind_if_undefined("alias", ( : cmd_alias:));
-   shell_bind_if_undefined("unalias", ( : cmd_remove_alias($1, 1) :));
+   shell_bind_if_undefined("unalias", ( : cmd_remove_alias($1) :));
    shell_bind_if_undefined("history", ( : cmd_history:));
    shell_bind_if_undefined("scrollback", ( : cmd_scrollback:));
    //    shell_bind_if_undefined("exit",	(: cmd_exit :));

@@ -13,12 +13,7 @@ nosave mapping set_var_hooks = ([]);
 // Sets up M_SAVE to save some variables
 void setup_for_save()
 {
-   /*
-   ** Use the call_other() interface so that we are not statically
-   ** bound to require M_SAVE.  This object this modules is applied
-   ** to may save natively rather than via M_SAVE.
-   */
-   this_object()->add_save(({"variables"}));
+   add_save(({"variables"}));
 }
 
 int is_variable(string var)
@@ -40,7 +35,7 @@ void set_variable(string var, mixed value)
    if (!variables)
       default_variables();
    variables[var] = value;
-   this_object()->save();
+   save_me();
    if (set_var_hooks[var])
       evaluate(set_var_hooks[var], value);
 }
@@ -50,7 +45,7 @@ void unset_variable(string var)
    if (!variables)
       default_variables();
    m_delete(variables, var);
-   this_object()->save();
+   save_me();
 }
 
 protected

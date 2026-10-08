@@ -144,7 +144,7 @@ nomask void add_alias_simple(string alias_name, class alias the_alias)
    aliases[alias_name] = the_alias;
 
    // ### really do this? it was in here... leaving it (DB)
-   this_object()->save();
+   save_me();
 }
 
 private
@@ -203,12 +203,14 @@ string *prep_aliases_for_save(string state)
 // Sets up M_SAVE to save some variables
 void setup_for_save()
 {
-   /*
-   ** Use the call_other() interface so that we are not protectedally
-   ** bound to require M_SAVE.  This object this modules is applied
-   ** to may save natively rather than via M_SAVE.
-   */
-   this_object()->add_save(({( : prep_aliases_for_save:)}));
+   add_save(({prep_aliases_for_save}));
+}
+
+private int alias_argument_number(string s)
+{
+   int d;
+   sscanf(s, "%d%s", d, s);
+   return d;
 }
 
 //: FUNCTION add_alias
@@ -233,17 +235,13 @@ varargs void add_alias(string name, string template, string *defaults, int xverb
    new_alias.template = template;
    new_alias.defaults = defaults;
    new_alias.num_args = max(map(
-       explode(template[strsrch(template, "$")..], "$"), function(string s) {
-          int d;
-          sscanf(s, "%d%s", d, s);
-          return d;
-       }));
+       explode(template[strsrch(template, "$")..], "$"), alias_argument_number));
 
    // Pad the default array with empty strings if there aren't enough
    // defaults provided to us.
    if (!arrayp(new_alias.defaults))
       new_alias.defaults = ({});
-   i = new_alias->num_args - (sizeof(defaults) - 1);
+   i = new_alias.num_args - (sizeof(defaults) - 1);
    while (i--)
       new_alias.defaults += ({""});
 
@@ -253,7 +251,7 @@ varargs void add_alias(string name, string template, string *defaults, int xverb
    }
    aliases[name] = new_alias;
 
-   this_object()->save();
+   save_me();
 }
 
 //: FUNCTION expand_alias
@@ -351,17 +349,17 @@ varargs protected void cmd_alias(mixed argv, string *implode_info)
       if (strlen(argv[1]) > 1 && argv[1][0] == '$')
       {
          if (implode_info)
-            add_alias(argv[1][1..], implode_by_arr(argv[2..], implode_info[2..])[1..], 0, 1);
+            add_alias(argv[1][1..], implode_by_arr(argv[2..], implode_info[2..])[1..], nil, 1);
          else
-            add_alias(argv[1][1..], implode(argv[2..], " "), 0, 1);
-         printf("Xverb alias '%s' set to: %s.\n", argv[1][1..], ((class alias)aliases[argv[1][1..]])->template);
+            add_alias(argv[1][1..], implode(argv[2..], " "), nil, 1);
+         printf("Xverb alias '%s' set to: %s.\n", argv[1][1..], ((class alias)aliases[argv[1][1..]]).template);
          return;
       }
       if (implode_info)
          add_alias(argv[1], implode_by_arr(argv[2..], implode_info[2..])[1..]);
       else
          add_alias(argv[1], implode(argv[2..], " "));
-      printf("Alias '%s' set to: %s.\n", argv[1], ((class alias)aliases[argv[1]])->template);
+      printf("Alias '%s' set to: %s.\n", argv[1], ((class alias)aliases[argv[1]]).template);
    }
 }
 

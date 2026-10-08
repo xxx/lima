@@ -206,14 +206,14 @@ string history_command(mixed input)
    {
    case 1:
       display_history();
-      return 0;
+      return nil;
    case 2:
       if (input[1] == HISTORY_CHAR)
       {
          if (!lastcmdnum)
          {
             write("Invalid history item.\n");
-            return 0;
+            return nil;
          }
          return get_nth_item(lastcmdnum);
       }
@@ -225,15 +225,15 @@ string history_command(mixed input)
          if (cmdnumber < 1 || cmdnumber > command_number || (input = get_nth_item(cmdnumber)) == -1)
          {
             write("History index out of range.\n");
-            return 0;
+            return nil;
          }
          return input;
       }
 
-      if (!input = pattern_history_match(input[1..]))
+      if (!(input = pattern_history_match(input[1..])))
       {
          write("No pattern matches found.\n");
-         return 0;
+         return nil;
       }
 
       return input;

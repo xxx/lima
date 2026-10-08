@@ -124,9 +124,6 @@ void create()
 
    set_privilege(1);
 
-   /* set up to save variables through the M_SAVE api */
-   setup_for_save();
-
    arg_to_words_func = ( : argument_explode:);
 }
 

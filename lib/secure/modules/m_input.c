@@ -46,7 +46,7 @@ nomask void modal_pop()
 {
    if (input_user)
       input_user->modal_pop();
-   input_user = 0;
+   input_user = nil;
 }
 
 protected
