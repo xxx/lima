@@ -6,9 +6,9 @@
 #include <security.h>
 
 private
-nosave mixed privilege;
+nosave mixed privilege = 0;
 private
-nosave mixed unguarded_privilege;
+nosave mixed unguarded_privilege = 0;
 private
 nosave mixed *security_handle;
 

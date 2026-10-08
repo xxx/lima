@@ -31,6 +31,8 @@ mapping domains; // maps domains.mappings of members/lords
 private
 mapping domainlists; // wizard.domains
 
+private nosave int initialized;
+
 int valid_name(string s)
 {
    // replace valid chars by '*', and compare to a string of all '*'s
@@ -40,30 +42,105 @@ int valid_name(string s)
 private
 void save_data()
 {
-   unguarded(1, ( : save_object, ACCESS_SAVE:));
-   unguarded(1, ( : save_object, ACCESS_SAVE_BAK:));
+   unguarded(1, &save_object(ACCESS_SAVE));
+   unguarded(1, &save_object(ACCESS_SAVE_BAK));
 }
 
 private
 void syslog(string text)
 {
    unguarded(1,
-             (
-                 : write_file, ACCESS_LOG, (this_user() ? this_user()->query_userid() : "<Server>") + ": " + text + "\n"
-                 :));
+             &write_file(ACCESS_LOG, (this_user() ? this_user()->query_userid() : "<Server>") + ": " + text + "\n"));
+}
+
+private int valid_access_tree(mixed tree)
+{
+   if (!mappingp(tree))
+      return 0;
+   foreach (mixed directory, mixed entry in tree)
+   {
+      if (!stringp(directory) || directory == "" || directory == "." ||
+          directory == ".." || strindex(directory, "/") >= 0 ||
+          !arrayp(entry) || sizeof(entry) != 2)
+         return 0;
+      if (intp(entry[0]))
+      {
+         if (entry[0] < -1 || entry[0] > 1)
+            return 0;
+      }
+      else if (!stringp(entry[0]) || entry[0] == "")
+         return 0;
+      if (nilp(entry[1]) || (intp(entry[1]) && entry[1] == 0))
+         continue;
+      if (!valid_access_tree(entry[1]))
+         return 0;
+   }
+   return 1;
+}
+
+private void validate_saved_data()
+{
+   if (!mappingp(privileges))
+      error("Invalid security database: privileges must be a mapping");
+   foreach (mixed owner, mixed list in privileges)
+   {
+      if (!stringp(owner) || owner == "" || strindex(owner, ":") >= 0 || !mappingp(list))
+         error("Invalid security database: privilege owner");
+      foreach (mixed suffix, mixed grants in list)
+      {
+         if (!stringp(suffix) || (suffix != "" && suffix[0] != ':') || !arrayp(grants))
+            error("Invalid security database: privilege suffix or grants");
+         foreach (mixed grant in grants)
+            if (!stringp(grant) || grant == "")
+               error("Invalid security database: privilege grant");
+      }
+   }
+   if (!valid_access_tree(read_access))
+      error("Invalid security database: read_access tree");
+   if (!valid_access_tree(write_access))
+      error("Invalid security database: write_access tree");
+   if (!mappingp(wizards))
+      error("Invalid security database: wizards must be a mapping");
+   foreach (mixed wizard, mixed level in wizards)
+      if (!stringp(wizard) || wizard == "" || !intp(level) || level != 1)
+         error("Invalid security database: wizard entry");
+   if (!mappingp(domains) || !mappingp(domainlists))
+      error("Invalid security database: domains and domainlists must be mappings");
+   foreach (mixed domain, mixed members in domains)
+   {
+      if (!stringp(domain) || domain == "" || !mappingp(members))
+         error("Invalid security database: domain entry");
+      foreach (mixed member, mixed level in members)
+      {
+         if (!stringp(member) || !has_key(wizards, member) ||
+             !intp(level) || (level != 1 && level != 2))
+            error("Invalid security database: domain member");
+         if (!mappingp(domainlists[member]) || !has_key(domainlists[member], domain))
+            error("Invalid security database: missing reverse membership");
+      }
+   }
+   foreach (mixed wizard, mixed memberships in domainlists)
+   {
+      if (!stringp(wizard) || !has_key(wizards, wizard) || !mappingp(memberships))
+         error("Invalid security database: wizard memberships");
+      foreach (mixed domain, mixed present in memberships)
+         if (!stringp(domain) || !mappingp(domains[domain]) ||
+             !has_key(domains[domain], wizard) || !intp(present) || present != 1)
+            error("Invalid security database: reverse membership");
+   }
 }
 
 void create()
 {
-   if (clonep(this_object()))
+   if (initialized || strindex(file_name(this_object()), "#") >= 0)
       return;
    set_privilege(1);
-   // The following call is handled specially in the master.
-   // Using unguarded() is impossible, since variables are not yet
-   // initialized.
-   if (!restore_object(ACCESS_SAVE))
+   // The master permits this probe before the security database is initialized.
+   int saved_size = file_size(ACCESS_SAVE + __SAVE_EXTENSION__);
+   if (saved_size == -1)
    {
-      // The mudlib requires these defaults or it won't work. If restore_object() fails, we go back to something sane.
+      if (file_size(ACCESS_SAVE_BAK + __SAVE_EXTENSION__) != -1)
+         error("Missing primary security database; preserve backup for manual recovery");
       privileges = //
           (["Approval":(["":({}), ":":({}), ]),
                        "Admin":(["":({}), ":intermud":({}), ":news":({}), ":":({}), ]),
@@ -234,13 +311,15 @@ void create()
       domains = (["mail":([]), "admin":([]), "admin-channels":([]), "approval":([]), "std":([]), "mudlib":([]), ]);
       domainlists = ([]);
       wizards = ([]);
+      validate_saved_data();
       save_data();
+      initialized = 1;
       return;
    }
-   if (!sizeof(read_access))
-      read_access = ([]);
-   if (!sizeof(write_access))
-      write_access = ([]);
+   if (saved_size < 0 || !restore_object(ACCESS_SAVE))
+      error("Unable to restore security database: " + ACCESS_SAVE);
+   validate_saved_data();
+   initialized = 1;
 }
 
 int query_allow_shadow()
@@ -260,9 +339,9 @@ mixed *walk_path(string file, int write)
    int i;
    path = explode(file, "/") - ({"", "."});
    if (!sizeof(path))
-      return 0;
+      return nil;
    if (member_array("..", path) >= 0)
-      return 0;
+      return nil;
    result = allocate(sizeof(path));
    node = write ? write_access : read_access;
    result[0] = !!write;
@@ -358,14 +437,14 @@ nomask string set_protection(string file, int write, mixed prot)
       for (i = 0; i < sizeof(path) - 1; i++)
       {
          if (!has_key(node, path[i]))
-            node[path[i]] = ({-1, subnode = allocate_mapping(1)});
+            node[path[i]] = ({-1, subnode = ([])});
          else if (!(subnode = node[path[i]][1]))
-            node[path[i]][1] = subnode = allocate_mapping(1);
+            node[path[i]][1] = subnode = ([]);
          node = subnode;
       }
       node[path[ < 1]] = ({prot, 0});
       save_data();
-      return 0;
+      return nil;
    }
    else
    {
@@ -375,9 +454,9 @@ nomask string set_protection(string file, int write, mixed prot)
       path = desc[1];
       for (i = 0; i < sizeof(path) - 1; i++)
          node = node[path[i]][1];
-      map_delete(node, path[ < 1]);
+      m_delete(node, path[ < 1]);
       save_data();
-      return 0;
+      return nil;
    }
 }
 
@@ -402,7 +481,7 @@ nomask varargs string create_domain(string domain)
    privileges[capitalize(domain)] = (["":({}), ":":({})]);
    save_data();
    syslog("Created domain " + domain);
-   return 0;
+   return nil;
 }
 
 nomask string delete_domain(string domain)
@@ -420,12 +499,12 @@ nomask string delete_domain(string domain)
    {
       mapping m;
       m = domainlists[members[i]];
-      map_delete(m, domain);
+      m_delete(m, domain);
    }
-   map_delete(domains, domain);
+   m_delete(domains, domain);
    save_data();
    syslog("Deleted domain " + domain);
-   return 0;
+   return nil;
 }
 
 nomask string add_domain_member(string domain, string member, int lord)
@@ -448,7 +527,7 @@ nomask string add_domain_member(string domain, string member, int lord)
       syslog("Made " + member + " lord of " + domain);
    else
       syslog("Made " + member + " member of " + domain);
-   return 0;
+   return nil;
 }
 
 nomask string remove_domain_member(string domain, string member)
@@ -461,11 +540,11 @@ nomask string remove_domain_member(string domain, string member)
       return ERR_PRIV;
    // if (eval_cost()<1000)
    // for (;;);
-   map_delete(domains[domain], member);
-   map_delete(domainlists[member], domain);
+   m_delete(domains[domain], member);
+   m_delete(domainlists[member], domain);
    save_data();
    syslog("Removed " + member + " from domain " + domain);
-   return 0;
+   return nil;
 }
 
 nomask string create_wizard(string wizard)
@@ -488,7 +567,7 @@ nomask string create_wizard(string wizard)
    privileges[wizard] = (["":({}), ":":({})]);
    save_data();
    syslog("Created wizard " + wizard);
-   return 0;
+   return nil;
 }
 
 nomask string delete_wizard(string wizard)
@@ -498,23 +577,20 @@ nomask string delete_wizard(string wizard)
       return ERR_NOWIZ;
    if (!check_privilege(1))
       return ERR_PRIV;
-   if (eval_cost() < 10000)
-      for (;;)
-         ;
-   map_delete(wizards, wizard);
-   map_delete(privileges, wizard);
+   m_delete(wizards, wizard);
+   m_delete(privileges, wizard);
    d = domainlists[wizard];
    if (d)
    {
       int i;
       d = keys(d);
       for (i = 0; i < sizeof(d); i++)
-         map_delete(domains[d[i]], wizard);
+         m_delete(domains[d[i]], wizard);
    }
-   map_delete(domainlists, wizard);
+   m_delete(domainlists, wizard);
    save_data();
    syslog("Deleted wizard " + wizard);
-   return 0;
+   return nil;
 }
 
 private
@@ -522,12 +598,12 @@ string get_priv_owner(string priv)
 {
    int n;
    if (!stringp(priv))
-      return 0;
+      return nil;
    n = member_array(':', priv);
    if (n >= 0)
       priv = priv[0..n - 1];
    if (!privileges[priv])
-      return 0;
+      return nil;
    return priv;
 }
 
@@ -545,7 +621,7 @@ nomask string define_privilege(string priv)
       // for (;;);
       privileges[priv] = (["":({}), ":":({})]);
       save_data();
-      return 0;
+      return nil;
    }
    if (!check_privilege(owner))
       return ERR_PRIV;
@@ -556,7 +632,7 @@ nomask string define_privilege(string priv)
       return "attempt to redefine privilege";
    privileges[owner][priv] = ({});
    save_data();
-   return 0;
+   return nil;
 }
 
 nomask string undefine_privilege(string priv)
@@ -578,17 +654,17 @@ nomask string undefine_privilege(string priv)
    // if (eval_cost()<1000)
    // for (;;);
    if (owner == priv)
-      map_delete(privileges, priv);
+      m_delete(privileges, priv);
    else
    {
       mapping list;
       list = privileges[owner];
       if (!list[priv[strlen(owner)..]])
          return "invalid privilege identifier";
-      map_delete(list, priv[strlen(owner)..]);
+      m_delete(list, priv[strlen(owner)..]);
    }
    save_data();
-   return 0;
+   return nil;
 }
 
 nomask string *query_privilege_owners()
@@ -603,7 +679,7 @@ nomask mapping query_privilege_list(string priv)
    int i;
 
    if (!(list = privileges[priv]))
-      return 0;
+      return nil;
    result = ([]);
    subs = keys(list);
    for (i = 0; i < sizeof(subs); i++)
@@ -624,13 +700,13 @@ nomask mapping query_access_tree(string path, int write)
    else
       result = read_access;
    if (!sizeof(p))
-      return copy(result);
+      return deep_copy(result);
    for (i = 0; i < sizeof(p) - 1 && sizeof(result); i++)
       result = result[p[i]] ? result[p[i]][1] : 0;
    if (sizeof(result) && has_key(result, p[ < 1]))
    {
       tmp = result[p[ < 1]];
-      return ([p[ < 1]:({tmp[0] == -1 ? query_protection(path + "/foo", write) : tmp[0], copy(tmp[1])})]);
+      return ([p[ < 1]:({tmp[0] == -1 ? query_protection(path + "/foo", write) : tmp[0], deep_copy(tmp[1])})]);
    }
    else
       return ([p[ < 1]:({query_protection(path + "/foo", write), 0})]);
@@ -660,7 +736,7 @@ nomask string extend_access(string priv, string add)
    privileges[owner][priv] -= ({add});
    privileges[owner][priv] += ({add});
    save_data();
-   return 0;
+   return nil;
 }
 
 nomask string restrict_access(string priv, string remove)
@@ -686,12 +762,12 @@ nomask string restrict_access(string priv, string remove)
       return "invalid privilege identifier";
    privileges[owner][priv] -= ({remove});
    save_data();
-   return 0;
+   return nil;
 }
 
 nomask int query_is_wizard(string name)
 {
-   return wizards[name];
+   return !!wizards[name];
 }
 
 nomask int query_is_domain(string name)
@@ -713,12 +789,12 @@ nomask string *query_domain_lords(string domain)
    int i;
    members = domains[domain];
    if (!members)
-      return 0;
+      return nil;
    list = keys(members);
    for (i = 0; i < sizeof(list); i++)
       if (members[list[i]] < 2)
-         list[i] = 0;
-   return list - ({0});
+         list[i] = nil;
+   return list - ({nil});
 }
 
 nomask varargs string *query_domains(string wizard)
@@ -727,7 +803,7 @@ nomask varargs string *query_domains(string wizard)
    if (!wizard)
       return keys(domains);
    if (!wizards[wizard])
-      return 0;
+      return nil;
    d = domainlists[wizard];
    return d ? keys(d) : ({});
 }
@@ -738,6 +814,8 @@ nomask int valid_privilege(mixed p)
    mapping list;
    if (intp(p))
       return p == 0 || p == 1;
+   if (!stringp(p))
+      return 0;
    n = member_array(':', p);
    if (n < 0)
       n = strlen(p);
@@ -775,7 +853,7 @@ nomask int higher_privilege(mixed a, mixed b)
       n = strlen(b);
    a = ({a[0..m - 1], a[m..]});
    b = ({b[0..n - 1], b[n..]});
-   if (a[0] == b[0] && strlen(a[1]) < strlen(b[1]) && b[1][0..strlen(a[1]) - 1] == a[1])
+   if (a[0] == b[0] && strlen(a[1]) < strlen(b[1]) && strindex(b[1], a[1]) == 0)
       return 1;
    switch (b[0][0])
    {

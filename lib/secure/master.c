@@ -611,12 +611,54 @@ int valid_read(string path, string call_fun, object caller, string program)
 {
    object secure;
 
-   // Includes have no executing object and await a compiler-access policy.
-   if (call_fun == "include" || !objectp(caller))
+   if (call_fun == "include")
+      return member_array(path, ({
+          "/include/audit.h",
+          "/include/classes.h",
+          "/include/combat_modules.h",
+          "/include/config.h",
+          "/include/custom_mudlib.h",
+          "/include/daemons.h",
+          "/include/dirs.h",
+          "/include/driver/origin.h",
+          "/include/driver/runtime_config.h",
+          "/include/flags.h",
+          "/include/global.h",
+          "/include/msgtypes.h",
+          "/include/mudlib.h",
+          "/include/security.h",
+          "/include/setbit.h",
+          "/include/size.h"
+       })) >= 0
+          && member_array(program, ({
+          "/include/audit.h",
+          "/include/classes.h",
+          "/include/combat_modules.h",
+          "/include/config.h",
+          "/include/custom_mudlib.h",
+          "/include/daemons.h",
+          "/include/dirs.h",
+          "/include/driver/origin.h",
+          "/include/driver/runtime_config.h",
+          "/include/flags.h",
+          "/include/global.h",
+          "/include/msgtypes.h",
+          "/include/mudlib.h",
+          "/include/security.h",
+          "/include/setbit.h",
+          "/include/size.h",
+          "/secure/daemons/secure_d.c",
+          "/secure/modules/m_access.c"
+       })) >= 0;
+   if (!objectp(caller))
       return 0;
    if (caller == this_object())
       return 1;
-   if (file_name(caller) == SECURE_D && call_fun == "restore_object")
+   if (file_name(caller) == SECURE_D &&
+       (call_fun == "restore_object" ||
+        (call_fun == "file_size" &&
+         (path == ACCESS_SAVE + __SAVE_EXTENSION__ ||
+          path == ACCESS_SAVE_BAK + __SAVE_EXTENSION__))))
       return 1;
    secure = find_object(SECURE_D);
    if (!secure)
@@ -691,4 +733,23 @@ int valid_recompile(object prototype, object caller, string program)
       && program == "/trans/admincmds/master.c"
       && objectp(this_user())
       && check_privilege(1);
+}
+
+// Security initialization has a fixed dependency set.
+int valid_load(string path, string func, object caller, string program)
+{
+   return caller == this_object() && program == "/secure/master.c"
+       && func == "call_other" && path == "/secure/daemons/secure_d.c";
+}
+
+int valid_inherit(string path, string from)
+{
+   return from == "/secure/daemons/secure_d.c" && path == "/secure/modules/m_access.c";
+}
+
+void create()
+{
+   // A direct call preserves initialization errors that load_object would hide.
+   if (SECURE_D->query_privilege() != 1)
+      error("Security daemon bootstrap failed: " + SECURE_D);
 }
