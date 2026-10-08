@@ -83,26 +83,36 @@ nomask object this_player(string str)
 }
 
 //: FUNCTION destruct
-// The destruct simul_efun guarantees that an object will always have remove()
-// called in it if it is destructed by another object.  destruct() with no
-// arguments destructs this_object WITHOUT calling remove, which is the
-// correct way to destruct an object from within a remove() function.
-// destruct() can also be passed an optional second arg, which is passed
-// to the remove() routine.  The update command passes 1 as the second
-// argument to indicate that a new copy will be reloaded immediately.
-nomask void destruct(mixed *args...) {
-    object ob;
-    if (sizeof(args) > 2) throw("destruct: too many arguments");
-    if (!sizeof(args)) {
-        ob = previous_object();
-    } else {
-        mixed value = args[0];
-        if (value == nil || (intp(value) && value == 0)) return;
-        if (!objectp(value)) throw("destruct: expected an object");
-        ob = value;
-        catch(ob->remove(sizeof(args) > 1 ? args[1] : nil));
-    }
-    if (ob) efun::destruct(ob);
+// Authorized explicit targets receive remove() before native destruction.
+// Omitted targets remove the requester without calling remove() recursively.
+// An optional second argument is forwarded to remove(); update supplies 1.
+// Cleanup errors propagate and return values are ignored.
+nomask void destruct(mixed *args...)
+{
+   object ob;
+   if (sizeof(args) > 2)
+      throw("destruct: too many arguments");
+   if (!sizeof(args))
+      ob = previous_object();
+   else
+   {
+      mixed value = args[0];
+      if (value == nil || (intp(value) && value == 0))
+         return;
+      if (!objectp(value))
+         throw("destruct: expected an object");
+      ob = value;
+   }
+   if (!ob)
+      return;
+   if (!master()->valid_destruct_request(ob))
+      throw("destruct: permission denied");
+   if (sizeof(args) > 1)
+      ob->remove(args[1]);
+   else if (sizeof(args))
+      ob->remove();
+   if (ob)
+      efun::destruct(ob);
 }
 
 //: FUNCTION shutdown

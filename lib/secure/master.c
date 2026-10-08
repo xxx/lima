@@ -557,8 +557,8 @@ void remove()
 private
 nomask void preload(string file)
 {
-   if (!objectp(load_object(file)))
-      error("preload: failed to load " + file);
+   // A constructor may finish by destroying its own object.
+   call_other(file, "");
 }
 
 string *epilog(int eflag)
@@ -731,6 +731,41 @@ string author_file(string file)
    else
       return "mudlib";
 }
+private int destruct_allowed(object requester, object target)
+{
+   object secure;
+   if (!requester || !target)
+      return 0;
+   secure = find_object(SECURE_D);
+   if (target == this_object() || target == find_object(SIMUL_OB) || target == secure)
+      return secure && secure->check_privilege(1, 0);
+   if (requester == target)
+      return 1;
+   return secure && secure->check_privilege(secure->query_protection(target, 1), 0);
+}
+
+// The simul's external caller is the original requester.
+int valid_destruct_request(object target)
+{
+   if (previous_object() != find_object(SIMUL_OB))
+      return 0;
+   return destruct_allowed(previous_object(1), target);
+}
+
+int valid_destruct(object caller, object target, string program)
+{
+   object requester = caller;
+   if (caller != previous_object())
+      return 0;
+   if (caller == find_object(SIMUL_OB))
+   {
+      if (program != "/secure/simul_efun/overrides.c")
+         return 0;
+      requester = previous_object(1);
+   }
+   return destruct_allowed(requester, target);
+}
+
 int valid_snoop(object caller, object observer, object target, string operation, string program)
 {
    return operation == "start"
