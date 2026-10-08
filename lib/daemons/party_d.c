@@ -217,9 +217,10 @@ nomask int remove_member(string member, string pname)
       return 0; // no such member
    else
    {
+      int access = ((class party)parties[pname]).members[member];
       m_delete(((class party)parties[pname]).members, member);
       ((class party)parties[pname]).members =
-          move_access(((class party)parties[pname]).members, ((class party)parties[pname]).members[member]);
+          move_access(((class party)parties[pname]).members, access);
    }
 
    save_me();

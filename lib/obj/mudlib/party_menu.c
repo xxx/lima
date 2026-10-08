@@ -262,7 +262,7 @@ void kick_member(string member)
    mapping members = party.members;
 
    // Check if member is a number > 0
-   if (to_int(member))
+   if (member && to_int(member))
    {
       int k = to_int(member);
       if (k > 0 && k <= sizeof(sort_array(keys(members), 1)))
@@ -283,7 +283,7 @@ void kick_member(string member)
       write(warning("Invalid entry."));
    }
 
-   if (lower_case(member) == "q" || member == "")
+   if ((member && lower_case(member) == "q") || member == "")
    {
       write("Ok, no kicks.");
       return;
@@ -503,7 +503,7 @@ void give_lead(string member)
    mapping members = party.members;
 
    // Check if member is a number > 0
-   if (to_int(member))
+   if (member && to_int(member))
    {
       int k = to_int(member);
       if (k > 0 && k <= sizeof(sort_array(keys(members), 1)))
@@ -525,7 +525,7 @@ void give_lead(string member)
       write(warning("Invalid entry."));
    }
 
-   if (lower_case(member) == "q" || member == "")
+   if ((member && lower_case(member) == "q") || member == "")
    {
       write("Ok, no management changes.");
       return;
@@ -559,7 +559,7 @@ void set_party_theme(string t)
    int count = 0;
 
    // Check if member is a number > 0
-   if (to_int(t))
+   if (t && to_int(t))
    {
       int k = to_int(t);
       if (k > 0 && k <= sizeof(sort_array(themes, 1)))
@@ -572,7 +572,7 @@ void set_party_theme(string t)
       write(warning("Invalid entry."));
    }
 
-   if (lower_case(t) == "q" || t == "")
+   if ((t && lower_case(t) == "q") || t == "")
    {
       write("Ok, no theme changes.");
       return;
