@@ -94,8 +94,10 @@ nomask int cmd_moderation(string channel_name, string arg)
       {
          printf("Your raise your hand to speak on '%s'.\n", user_channel_name);
          ci.requestors += ({tb});
-         ci.moderator->channel_rcv_string(
-             channel_name, sprintf("[%s] (%s raises a hand to speak)\n", user_channel_name, sender_name));
+         object moderator_user = ci.moderator->query_link();
+         if (moderator_user)
+            moderator_user->channel_rcv_string(
+                channel_name, sprintf("[%s] (%s raises a hand to speak)\n", user_channel_name, sender_name));
       }
       else
       {
@@ -112,8 +114,10 @@ nomask int cmd_moderation(string channel_name, string arg)
       {
          printf("Your lower your hand to avoid speaking on '%s'.\n", user_channel_name);
          ci.requestors -= ({tb});
-         ci.moderator->channel_rcv_string(channel_name,
-                                           sprintf("[%s] (%s lowers a hand)\n", user_channel_name, sender_name));
+         object moderator_user = ci.moderator->query_link();
+         if (moderator_user)
+            moderator_user->channel_rcv_string(channel_name,
+                                               sprintf("[%s] (%s lowers a hand)\n", user_channel_name, sender_name));
       }
       else
       {
