@@ -16,7 +16,7 @@ void add_save(string *);
 
 void mudlib_setup()
 {
-   add_save(({"num_eats"}));
+   add_save(({"num_eats", "original_eats", "poison_strength"}));
 }
 
 //: FUNCTION set_eat_action

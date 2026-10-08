@@ -121,6 +121,11 @@ int decay_it()
    return 1;
 }
 
+varargs int is_stateful(mixed extra)
+{
+   return num_decays != 0;
+}
+
 int state_update()
 {
    if (decays)
@@ -137,5 +142,5 @@ void stop_decay()
 void mudlib_setup()
 {
    m_stateful::mudlib_setup();
-   add_save(({"num_decays"}));
+   add_save(({"num_decays", "decay_begun"}));
 }

@@ -9,6 +9,7 @@ void mudlib_setup()
 {
    food::mudlib_setup();
    m_decay::mudlib_setup();
+   add_save(({"state_cnt", "adjs", "primary_adj", "long"}));
 }
 
 void setup()
