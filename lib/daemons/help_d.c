@@ -56,6 +56,8 @@ mapping restrict;
 private
 nosave int pending_count;
 private
+nosave mixed rebuild_error;
+private
 nosave object initiator;
 
 private
@@ -140,7 +142,7 @@ void process_file(string path, string file)
    {
       pathname += "/";
       /* Ack. Avoid execution cost errors. */
-      call_out(( : process_dir:), (1 * TOO_GREEDY_DAEMONS), pathname);
+      call_out(&process_dir(pathname), (1 * TOO_GREEDY_DAEMONS));
       ++pending_count;
    }
 
@@ -175,31 +177,62 @@ void process_file(string path, string file)
    }
 }
 
+private void finish_rebuild()
+{
+   string message;
+   object recipient;
+
+   if (pending_count)
+      return;
+
+   if (!rebuild_error)
+      rebuild_error = catch(save_me());
+
+   if (rebuild_error)
+      message = "HELP_D rebuild failed; the previous saved index was retained.\n" +
+                sprintf("%O\n", rebuild_error);
+   else
+      message = "HELP_D has finished the rebuild.\n" +
+                sprintf("  %5.5s", "" + fun_total) + " functions added to index.\n" +
+                sprintf("  %5.5s", "" + sizeof(clean_array(flatten_array(values(topics))))) + " help files known.\n" +
+                sprintf("  %5.5s", "" + sizeof(keys(topics))) + " topics found in index.\n";
+
+   recipient = initiator;
+   initiator = nil;
+   if (recipient)
+   {
+      if (catch(tell(recipient, message)))
+         debug_message(message);
+   }
+   else if (rebuild_error)
+      debug_message(message);
+}
+
 nomask void process_dir(string path)
 {
+   mixed failure;
+
    if (member_array(path, ignore) == -1)
-      map(get_dir(path + "*"), &process_file(path));
+      failure = catch(map(get_dir(path + "*"), &process_file(path)));
+   if (failure && !rebuild_error)
+      rebuild_error = failure;
 
-   if (!--pending_count)
-   {
-      save_me();
+   --pending_count;
+   finish_rebuild();
+}
 
-      if (initiator)
-      {
-         tell(initiator,
-              "HELP_D has finished the rebuild.\n" + //
-                  sprintf("  %5.5s", "" + fun_total) + " functions added to index.\n" +
-                  sprintf("  %5.5s", "" + sizeof(clean_array(flatten_array(values(topics))))) + " help files known.\n" +
-                  sprintf("  %5.5s", "" + sizeof(keys(topics))) + " topics found in index.\n");
-         initiator = 0;
-      }
-   }
+private void scan_help_root()
+{
+   string *lines = explode(read_file(DIR_HELP "/_restrict"), "\n");
+   map(lines, f_restrict);
+
+   string *dirs = filter(get_dir(DIR_HELP "/*"), ( : $(restrict)[$1] != 99 :));
+   map(dirs, &process_file(DIR_HELP "/"));
 }
 
 nomask void rebuild_data()
 {
-   string *lines;
-   string *dirs;
+   mixed failure;
 
    if (pending_count)
    {
@@ -207,35 +240,35 @@ nomask void rebuild_data()
       return;
    }
 
-   write("HELP_D is beginning the rebuild...\n");
+   pending_count = 1;
    initiator = this_user();
+   rebuild_error = nil;
+   write("HELP_D is beginning the rebuild...\n");
 
    topics = ([]);
    tags = ([]);
    restrict = ([]);
    fun_total = 0;
 
-   lines = explode(read_file(DIR_HELP "/_restrict"), "\n");
-   map(lines, f_restrict);
-
-   dirs = filter(get_dir(DIR_HELP "/*"), ( : $(restrict)[$1] != 99 :));
-
-   pending_count = 0;
-   map(dirs, &process_file(DIR_HELP "/"));
+   failure = catch(scan_help_root());
+   if (failure)
+      rebuild_error = failure;
+   --pending_count;
+   finish_rebuild();
 }
 
 nomask void create()
 {
    ::create();
 
-   if (topics == 0)
+   if (!topics)
       rebuild_data();
 }
 
 /*
 ** find_topic()
 **
-** Will return 0 if the topic does not exist (within the current
+** Will return nil if the topic does not exist (within the current
 ** player's level).  Otherwise, an array of pathnames will be
 ** returned.
 */
@@ -245,10 +278,10 @@ nomask string *find_topic(string name)
    int lvl;
 
    if (!this_body())
-      return 0;
+      return nil;
    result = topics[lower_case(name)];
    if (!result)
-      return 0;
+      return nil;
 
    // ### simulate the old levels
    lvl = adminp(this_user()) ? 5 : wizardp(this_user()) ? 1 : 0;

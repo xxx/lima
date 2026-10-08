@@ -37,6 +37,8 @@ mapping events = ([]);
 private
 nosave string *day_names;
 
+private nosave int scheduler_id;
+
 //: FUNCTION week_day
 // If given an integer argument, returns the name of the day.
 // If given a string name, returns the day number (0-X) - see *config/time.h*.
@@ -219,8 +221,8 @@ void run_scheduler()
          else
             write("** Not scheduling jobs for file '" + file + "' since it does not exist.");
       }
-   if (find_call_out("run_scheduler") == -1)
-      call_out("run_scheduler", 86400 / 24);
+   if (!query_call_out(scheduler_id))
+      scheduler_id = call_out(run_scheduler, 86400 / 24);
 }
 
 mapping query_events()
