@@ -342,6 +342,26 @@ private nomask void mailer_done_edit(mixed to_list, string subject, string fname
    modal_simple(&mailer_get_cc_list(to_list, subject));
 }
 
+private nomask void mailer_done_reply(mixed to_list, string subject, string *body)
+{
+   if (nilp(body))
+      return;
+
+   string file = tmp_fname();
+   string text = sizeof(body) ? implode(body, "\n") + "\n" : "";
+   mixed problem = catch {
+      if (!write_file(file, text, 1))
+         error("Unable to save reply draft.\n");
+   };
+   if (problem)
+   {
+      write("Unable to save reply draft; continue editing.\n");
+      clone_object(EDIT_OB, EDIT_TEXT, body, &mailer_done_reply(to_list, subject));
+      return;
+   }
+   mailer_done_edit(to_list, subject, file);
+}
+
 private nomask void mailer_get_subject(string to_list, string arg)
 {
    string subject = arg ? arg : "<none>";
@@ -369,10 +389,9 @@ protected nomask void cmd_reply(int user_num, int reply_all)
 {
    int key;
    class mail_msg msg;
-   mixed body;
+   string *body;
    string *to_list;
    string subject;
-   string file;
 
    key = get_message_key(user_num);
    if (!key)
@@ -389,8 +408,8 @@ protected nomask void cmd_reply(int user_num, int reply_all)
       return;
 
    body = build_body_inclusion(msg.body);
-   body = implode(body, "\n");
-   body = sprintf("On %s %s wrote:\n%s\n", ctime(msg.date), capitalize(msg.sender), body);
+   body = explode(sprintf("On %s %s wrote:\n%s\n", ctime(msg.date), capitalize(msg.sender), implode(body, "\n")), "\n");
+   body = body[0..<2];
 
    subject = "Re: " + msg.subject;
 
@@ -398,10 +417,9 @@ protected nomask void cmd_reply(int user_num, int reply_all)
    if (reply_all)
       to_list = clean_array(to_list + msg.to_list + msg.cc_list);
 
-   file = tmp_fname();
-   write_file(file, body, 1);
-
-   clone_object(EDIT_OB, EDIT_FILE, tmp_fname(), &mailer_done_edit(to_list, subject));
+   if (file_size(tmp_fname()) >= 0)
+      write("Saved mail text will be replaced only if you finish this reply.\n");
+   clone_object(EDIT_OB, EDIT_TEXT, body, &mailer_done_reply(to_list, subject));
 }
 
 protected nomask void cmd_delete(string arg)
