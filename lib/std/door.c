@@ -35,12 +35,33 @@ mixed door_check(string dir, object who)
 {
    if (query_closed())
    {
-      this_body()->other_action("$N $vtry to go $o, but the $o1 is closed.", dir, this_object());
+      who->other_action("$N $vtry to go $o, but the $o1 is closed.", dir, this_object());
       return sprintf("You try to go %s, but the %s is closed.\n", query_obvious_description(), the_short());
    }
-   if (!load_object(query_method_destination("go")))
-      return "Error, the destination does not exist, please mail the creator of this room";
    return 1;
+}
+
+mixed resolve_method_destination(string method)
+{
+   mixed destination = query_method_destination(method);
+   object room = objectp(destination) ? destination :
+      (stringp(destination) ? load_object(destination) : nil);
+   if (!room)
+      write("Error, the destination does not exist, please mail the creator of this room\n");
+   return room;
+}
+
+void sync_door_visibility()
+{
+#ifndef CLOSED_DOORS_ARE_OBVIOUS_EXITS
+   set_hidden(query_closed());
+#endif
+}
+
+void internal_setup()
+{
+   m_openable::internal_setup();
+   m_sibling::internal_setup();
 }
 
 //: FUNCTION update_state
@@ -49,26 +70,27 @@ mixed door_check(string dir, object who)
 void update_state(object ob)
 {
    m_openable::set_closed(ob->query_closed());
-   ::set_locked(ob->query_locked(), ob->query_key_type());
+   m_lockable::set_locked(ob->query_locked(), ob->query_key_type());
+   sync_door_visibility();
 }
 
 //: FUNCTION update_sibling
-// After a door is opened or closed, this is called, and in turn calls
-// do_on_open/close() in the door and its sibling.
-// See also m_sibling::update_sibling()
+// Copy state to the sibling, notifying it only of open/closed transitions.
 void update_sibling()
 {
    object sibling = get_sibling();
-   // Needed for initial load ...\
-    if( !sibling )
-   return;
+   if (!sibling)
+      return;
 
-   // Magic ...
-   if (is_open())
-      sibling->do_on_open();
-   else
-      sibling->do_on_close();
-   ::update_sibling();
+   // Sibling callbacks inspect the old state before it is copied.
+   if (query_closed() != sibling->query_closed())
+   {
+      if (is_open())
+         sibling->do_on_open();
+      else
+         sibling->do_on_close();
+   }
+   sibling->update_state(this_object());
 }
 
 //: FUNCTION do_on_close
@@ -98,8 +120,6 @@ varargs void on_clone(string dir, mixed rest...)
    object sib;
    if (!dir)
       dir = query_direction();
-   if (!sizeof(rest))
-      rest += ({query_method_destination("go")});
    complex_exit_obj::on_clone(dir, rest...);
    sib = get_sibling();
    if (sib)
@@ -136,9 +156,7 @@ void set_door_destination(mixed dest)
    {
       dest = ( : absolute_path($(dest), environment()) :);
    }
-   set_method("go", dest,
-              (
-                  : door_check:),
+   set_method("go", dest, door_check,
               ({sprintf("$N $vleave through the $o.")}), ({sprintf("$N $venter through the $o.")}));
 
    set_sibling_room(dest);
@@ -151,7 +169,7 @@ mixed query_door_destination()
    return query_method_destination("go");
 }
 
-varargs void set_locked(string x, string y)
+varargs void set_locked(string x, string y = x)
 {
    m_lockable::set_locked(x, y);
    update_sibling();
@@ -159,7 +177,8 @@ varargs void set_locked(string x, string y)
 
 void set_closed(int x)
 {
-   ::set_closed(x);
+   m_openable::set_closed(x);
+   sync_door_visibility();
    update_sibling();
 }
 

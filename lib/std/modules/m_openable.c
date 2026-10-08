@@ -224,6 +224,6 @@ void internal_setup()
 {
    set_closed(1);
 
-   add_hook("extra_long", ( : extra_long_stuff:));
+   add_hook("extra_long", extra_long_stuff);
    add_hook("prevent_look_in", ( : query_closed() ? "It is closed.\n" : (mixed)1 :));
 }

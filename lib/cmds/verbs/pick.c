@@ -28,7 +28,10 @@ void do_pick_obj(object ob)
 
 void do_pick_obj_with_obj(object ob1, object ob2)
 {
-   ob1->open_with(ob2);
+   if (ob1->is_lockable())
+      ob1->do_pick(ob2);
+   else
+      ob1->open_with(ob2);
 }
 
 void create()

@@ -12,14 +12,9 @@ void do_hidden_stuff()
       set_hidden(0);
 }
 
-void set_closed(int x)
+void sync_door_visibility()
 {
-   object sib = get_sibling();
-
-   ::set_closed(x);
    do_hidden_stuff();
-   if (sib)
-      sib->do_hidden_stuff();
 }
 
 varargs void on_clone(string dir, string room, mixed rest...)

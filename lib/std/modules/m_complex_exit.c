@@ -326,6 +326,12 @@ mixed query_method_destination(string method)
    return ret;
 }
 
+// Resolve the execution destination after permission succeeds.
+mixed resolve_method_destination(string method)
+{
+   return query_method_destination(method);
+}
+
 //: FUNCTION set_method_enter_messages
 // Set the enter messages to be used by the given method.
 // Acceptable arguments are strings, or function pointers, or an array of
@@ -547,11 +553,14 @@ int complex_exit_do_verb_rule(string verb, string rule, mixed args...)
       return 0;
 
    data = deep_copy(methods[match]);
-   data.destination = query_method_destination(match);
+   data.destination = resolve_method_destination(match);
+   if (!data.destination)
+      return 0;
+   sibling = this_object()->get_sibling(data.destination);
    if (objectp(data.destination))
       data.destination = file_name(data.destination);
    data.exit_messages = query_method_exit_message(match);
-   if (sibling = this_object()->get_sibling())
+   if (sibling)
       data.enter_messages = sibling->query_method_enter_message(match);
    else
       data.enter_messages = query_method_enter_message(match);

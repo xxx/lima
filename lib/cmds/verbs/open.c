@@ -53,12 +53,12 @@ void do_open_obj_with_obj(object ob1, object ob2)
 
 void do_open_up_obj(object ob)
 {
-   open(ob, 0);
+   open(ob, nil);
 }
 
 void do_open_obj(object ob)
 {
-   open(ob, 0);
+   open(ob, nil);
 }
 
 void create()

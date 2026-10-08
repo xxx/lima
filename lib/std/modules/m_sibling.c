@@ -20,7 +20,7 @@
 private
 string our_ident;
 private
-function sibling_room;
+mixed sibling_room;
 private
 object cached_sibling;
 
@@ -36,7 +36,7 @@ void setup_sibling(string ident, mixed room)
    else
       sibling_room = room;
 
-   cached_sibling = 0;
+   cached_sibling = nil;
 }
 
 //: FUNCTION set_sibling_ident
@@ -46,7 +46,7 @@ void set_sibling_ident(string ident)
    if (ident)
       our_ident = ident;
 
-   cached_sibling = 0;
+   cached_sibling = nil;
 }
 
 //: FUNCTION set_sibling_room
@@ -59,7 +59,7 @@ void set_sibling_room(mixed room)
    else
       sibling_room = room;
 
-   cached_sibling = 0;
+   cached_sibling = nil;
 }
 
 //: FUNCTION respond_to_sibling_ident
@@ -67,35 +67,38 @@ void set_sibling_room(mixed room)
 // true if the ident matches.
 int respond_to_sibling_ident(string id)
 {
-   return our_ident == id;
+   return !!our_ident && our_ident == id;
 }
 
 //: FUNCTION get_sibling
-// From a given object, return the sibling object. Usefor for responding to things
-// that happens to the sibling object or vice versa.
-object get_sibling()
+// Find the peer, optionally reusing an already resolved movement destination.
+varargs object get_sibling(mixed destination)
 {
-   if (!environment())
+   if (!environment() || !our_ident)
+      return nil;
+
+   if (nilp(destination))
+      destination = evaluate(sibling_room);
+   object room = objectp(destination) ? destination :
+      (stringp(destination) ? load_object(destination) : nil);
+   if (!room)
    {
-      return 0;
+      cached_sibling = nil;
+      return nil;
    }
-   if (!cached_sibling)
+
+   if (cached_sibling && cached_sibling != this_object() &&
+       environment(cached_sibling) == room &&
+       cached_sibling->respond_to_sibling_ident(our_ident))
+      return cached_sibling;
+
+   cached_sibling = nil;
+   foreach (object ob in all_inventory(room))
    {
-      object ob;
-      if (!sibling_room || !evaluate(sibling_room))
-         return 0;
-      ob = load_object(evaluate(sibling_room));
-
-      if (!ob)
-         return 0;
-
-      foreach (object ob2 in all_inventory(ob))
+      if (ob != this_object() && ob->respond_to_sibling_ident(our_ident))
       {
-         if (ob2->respond_to_sibling_ident(our_ident))
-         {
-            cached_sibling = ob2;
-            break;
-         }
+         cached_sibling = ob;
+         break;
       }
    }
    return cached_sibling;
@@ -120,8 +123,12 @@ private
 void initial_move()
 {
    object ob;
-   // when we initially get moved to a room, check if our sibling already
-   // exists, and if so, get it's state.
+   cached_sibling = nil;
    if (ob = get_sibling())
       update_state(ob);
+}
+
+void internal_setup()
+{
+   this_object()->add_hook("move", initial_move);
 }

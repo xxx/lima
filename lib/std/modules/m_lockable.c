@@ -11,7 +11,7 @@
 #include <hooks.h>
 
 string the_short();
-void hook_state(string, function, mixed);
+void hook_state(string, mixed, int);
 mixed call_hooks(string, int);
 
 private
@@ -42,7 +42,7 @@ varargs void set_locked(string x, string y = x)
 {
    locked = x;
    key_type = y;
-   hook_state("prevent_open", my_open_hook, locked);
+   hook_state("prevent_open", my_open_hook, !!locked);
 }
 
 #ifdef USE_SKILLS
@@ -101,17 +101,20 @@ mixed magic_unlock()
    }
 #endif
 
-   set_locked(nil, "magic");
+   set_locked(nil, key_type);
    return 1;
 }
 
-mixed do_pick()
+varargs mixed do_pick(object tool)
 {
    mixed ex;
    int i;
 
    if (!locked)
+   {
       write("It's not locked.\n");
+      return;
+   }
 
    //: HOOK prevent_picking
    // A yes/no/error hook which can prevent an object from being picked
@@ -137,13 +140,18 @@ mixed do_pick()
    }
 #endif
 
-   set_locked(nil, "picked");
+   set_locked(nil, key_type);
    this_body()->simple_action(pick_msg, this_object());
 }
 
 void do_unlock(object *keys...)
 {
    if (sizeof(keys) > 1) error("do_unlock: too many keys");
+   if (!locked)
+   {
+      write("It isn't locked.\n");
+      return;
+   }
    object ob = sizeof(keys) ? keys[0] : nil;
    //: HOOK prevent_unlock
    // A yes/no/error hook which can prevent an object from being unlocked.
@@ -157,16 +165,19 @@ void do_unlock(object *keys...)
    }
 
    if (!sizeof(keys))
-   {
       ob = present("key", this_body());
-      write("(with " + ob->the_short() + ")\n");
+   if (!ob)
+   {
+      write("With what?\n");
+      return;
    }
+   if (!sizeof(keys))
+      write("(with " + ob->the_short() + ")\n");
 
-   if (ob->get_key_type() == key_type)
+   if (key_type && ob->get_key_type() == key_type)
    {
       this_body()->simple_action(unlock_msg, this_object(), ob);
       set_locked(nil, key_type);
-      hook_state("prevent_open", my_open_hook, locked);
    }
    else
    {
@@ -177,6 +188,16 @@ void do_unlock(object *keys...)
 void do_lock(object *keys...)
 {
    if (sizeof(keys) > 1) error("do_lock: too many keys");
+   if (!this_object()->query_closed())
+   {
+      write("Perhaps you should close it first.\n");
+      return;
+   }
+   if (locked)
+   {
+      write("It is already locked.\n");
+      return;
+   }
    object ob = sizeof(keys) ? keys[0] : nil;
    //: HOOK prevent_lock
    // A yes/no/error hook which can prevent an object from being locked.
@@ -190,18 +211,20 @@ void do_lock(object *keys...)
    }
 
    if (!sizeof(keys))
-   {
       ob = present("key", this_body());
-      write("(with " + ob->the_short() + ")\n");
+   if (!ob)
+   {
+      write("With what?\n");
+      return;
    }
+   if (!sizeof(keys))
+      write("(with " + ob->the_short() + ")\n");
 
-   if (ob->get_key_type() == key_type)
+   if (key_type && ob->get_key_type() == key_type)
    {
       this_body()->simple_action(lock_msg, this_object(), ob);
       set_locked(key_type);
    }
-   //: FIXME if the lock type is picked or magic, it should probably
-   // open.
    else
    {
       this_body()->simple_action(lock_fail, this_object(), ob);
