@@ -72,7 +72,7 @@ class event_info sink_modify_event(class event_info evt)
    if (reduced && evt.weapon)
    {
       this_object()->decrease_durability(reduced);
-      evt->weapon->decrease_durability(reduced);
+      evt.weapon->decrease_durability(reduced);
    }
    // TBUG("Outgoing dmg: " + evt.data[1] + " reduced: " + reduced);
    return evt;
