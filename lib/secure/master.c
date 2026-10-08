@@ -607,10 +607,23 @@ int valid_write(string path, string call_fun, object caller, string program)
    return 0;
 }
 
+private int source_readable(string path)
+{
+   object secure = find_object(SECURE_D);
+   if (!secure)
+      return 0;
+   // Compiler applies retain the original loader in previous_object().
+   if (previous_object() == this_object())
+      return 1;
+   return secure->check_privilege(secure->query_protection(path, 0), 0);
+}
+
 int valid_read(string path, string call_fun, object caller, string program)
 {
    object secure;
 
+   if (call_fun == "include" && find_object(SECURE_D))
+      return source_readable(path);
    if (call_fun == "include")
       return member_array(path, ({
           "/include/audit.h",
@@ -738,12 +751,16 @@ int valid_recompile(object prototype, object caller, string program)
 // Security initialization has a fixed dependency set.
 int valid_load(string path, string func, object caller, string program)
 {
+   if (find_object(SECURE_D))
+      return source_readable(path);
    return caller == this_object() && program == "/secure/master.c"
        && func == "call_other" && path == "/secure/daemons/secure_d.c";
 }
 
 int valid_inherit(string path, string from)
 {
+   if (find_object(SECURE_D))
+      return source_readable(path);
    return from == "/secure/daemons/secure_d.c" && path == "/secure/modules/m_access.c";
 }
 
