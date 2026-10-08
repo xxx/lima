@@ -35,7 +35,7 @@ void add_readied(object ob)
 {
    readied -= ({ob});
    readied += ({ob});
-   readied -= ({0});
+   readied = filter(readied, objectp);
 }
 
 void remove_readied(object ob)
@@ -110,7 +110,7 @@ int query_asleep()
 
 void stun(string limb, int period)
 {
-   int stance_impact = 1;
+   float stance_impact = 1.0;
    string drunk_action;
    int train_limit = should_cap_skill("combat/defense/stance");
    period = clamp(period, 5, 30);
@@ -120,15 +120,15 @@ void stun(string limb, int period)
    case 0..29:
       break;
    case 30..49:
-      stance_impact = STANCE_IMPACT_AT_30;
+      stance_impact = to_float(STANCE_IMPACT_AT_30);
       drunk_action = "$P $vare %^COMBAT_CONDITION%^tipsy%^RESET%^ so $p reflexes fail $n.";
       break;
    case 50..79:
-      stance_impact = STANCE_IMPACT_AT_30;
+      stance_impact = to_float(STANCE_IMPACT_AT_30);
       drunk_action = "$P $vare %^COMBAT_CONDITION%^drunk%^RESET%^ and $n can barely stand.";
       break;
    default:
-      stance_impact = STANCE_IMPACT_AT_80;
+      stance_impact = to_float(STANCE_IMPACT_AT_80);
       drunk_action = "$P $vare in a %^COMBAT_CONDITION%^drunken stupor%^RESET%^ fighting cross-eyed.";
       break;
    }
@@ -136,7 +136,7 @@ void stun(string limb, int period)
    // Vital limbs
    if (member_array(limb, query_vital_limbs()) != -1)
    {
-      if (!test_skill("combat/defense/stance", period * 10 * stance_impact, train_limit))
+      if (!test_skill("combat/defense/stance", to_int(period * 10 * stance_impact), train_limit))
       {
          if (drunk_action)
             simple_action(drunk_action, limb);
@@ -156,31 +156,29 @@ void stun(string limb, int period)
    {
       if (!test_skill("combat/defense/disarm", period * 5, train_limit))
       {
-         filtered_simple_action("$P $o $vare stunned.", ( : message_filter:), "simple_stun", limb);
+         filtered_simple_action("$P $o $vare stunned.", message_filter, "simple_stun", limb);
 
          do_unwield(limb);
       }
       else
       {
-         filtered_simple_action("$P $o is stunned but $n $vretain contol.", ( : message_filter:), "simple_stun", limb);
+         filtered_simple_action("$P $o is stunned but $n $vretain contol.", message_filter, "simple_stun", limb);
       }
    }
    // Mobile limbs
    else if (member_array(limb, query_mobile_limbs()) != -1)
    {
-      if (!test_skill("combat/defense/stance", period * 10 * stance_impact, train_limit))
+      if (!test_skill("combat/defense/stance", to_int(period * 10 * stance_impact), train_limit))
       {
          filtered_simple_action("$P $o $vare stunned and $n $vfall to the ground.",
-                                (
-                                    : message_filter:),
+                                message_filter,
                                 "simple_stun", limb);
          prone = 1;
       }
       else
       {
          filtered_simple_action("$P $o $vare stunned, $n $vstagger but $vremain standing.",
-                                (
-                                    : message_filter:),
+                                message_filter,
                                 "simple_stun", limb);
       }
    }
@@ -201,7 +199,7 @@ string condition_string()
       condi += ({"sitting"});
 
    if (sizeof(condi))
-      return " [%^COMBAT_CONDITION%^" + format_list(condi) + "%^RESET%^]";
+      return " [%^COMBAT_CONDITION%^" + format_list(condi, "and") + "%^RESET%^]";
    return "";
 }
 
