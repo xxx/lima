@@ -235,7 +235,7 @@ void process_file(string fname)
       if (type == "mudlib")
          type = "functions for the mudlib";
       rstout = file_info[FILE_PRETTY];
-      rstout += repeat_string("*", strlen(file_info[FILE_PRETTY])) + "\n\n";
+      rstout += ("*" * (strlen(file_info[FILE_PRETTY]))) + "\n\n";
       rstout += "Documentation for the " + file_info[FILE_NAME] + " " + type + " in *" + fname + "*.\n\n";
    }
 
@@ -354,7 +354,7 @@ void process_file(string fname)
    {
       string moduleh = "Module Information";
 
-      rstout += moduleh + "\n" + repeat_string("=", strlen(moduleh)) + "\n\n";
+      rstout += moduleh + "\n" + ("=" * (strlen(moduleh))) + "\n\n";
       foreach (string mi in module_info)
       {
          rstout += mi;
@@ -376,7 +376,7 @@ void process_file(string fname)
       int todoi = 1;
       int usage = 0;
 
-      rstout += cfun + "\n" + repeat_string("=", strlen(cfun)) + "\n\n";
+      rstout += cfun + "\n" + ("=" * (strlen(cfun))) + "\n\n";
       foreach (string cinf in cmd_info)
       {
          if (strlen(cinf) > 2 && (cinf[0..6] == "$$ see:" || cinf[0..5] == "$$see:"))
@@ -420,7 +420,7 @@ void process_file(string fname)
    {
       string hookh = "Hooks";
 
-      rstout += hookh + "\n" + repeat_string("=", strlen(hookh)) + "\n\n";
+      rstout += hookh + "\n" + ("=" * (strlen(hookh))) + "\n\n";
       foreach (string hookline in hook)
       {
          rstout += hookline + "\n";
@@ -431,7 +431,7 @@ void process_file(string fname)
    {
       string cfun = "Functions";
 
-      rstout += cfun + "\n" + repeat_string("=", strlen(cfun)) + "\n";
+      rstout += cfun + "\n" + ("=" * (strlen(cfun))) + "\n";
       foreach (string cfunc in c_functions)
       {
          rstout += cfunc;
@@ -443,7 +443,7 @@ void process_file(string fname)
       string todoh = "TODO list";
       int todoi = 1;
 
-      rstout += todoh + "\n" + repeat_string("=", strlen(todoh)) + "\n\n";
+      rstout += todoh + "\n" + ("=" * (strlen(todoh))) + "\n\n";
 
       foreach (string t in todo)
       {
@@ -478,9 +478,9 @@ void process_file(string fname)
 void make_index(string header, string type, string *files, string filename)
 {
    string output;
-   output = repeat_string("*", strlen(header)) + "\n";
+   output = ("*" * (strlen(header))) + "\n";
    output += header + "\n";
-   output += repeat_string("*", strlen(header)) + "\n\n.. TAGS: RST\n";
+   output += ("*" * (strlen(header))) + "\n\n.. TAGS: RST\n";
 
    if (sizeof(files))
       foreach (string file in files)

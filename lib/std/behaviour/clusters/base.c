@@ -612,7 +612,7 @@ private varargs string print_children(class node node, int level, int has_siblin
       }
 
       out += sprintf("\n%-20.20s %s%s %s", node_type(child.type),
-                     repeat_string(" ", level * 2) + "<050>" + bend + "─ <res>", name,
+                     (" " * (level * 2)) + "<050>" + bend + "─ <res>", name,
                      member_array(child.name, query_last_failed_leaves()) != -1 ? status(5) : status(child.status));
 
       if (sizeof(child.children))

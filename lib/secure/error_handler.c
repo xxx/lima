@@ -22,7 +22,7 @@ July 03, 2023 - Jezu@SpaceMUD
 
 #define BORDER_CHARACTER "-"
 #define BORDER_WIDTH 60
-#define BORDER repeat_string(BORDER_CHARACTER, BORDER_WIDTH)
+#define BORDER (BORDER_CHARACTER * BORDER_WIDTH)
 
 #define HIW "%^BOLD%^%^WHITE%^"
 #define HIR "%^BOLD%^%^RED%^"

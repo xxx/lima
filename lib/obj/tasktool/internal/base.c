@@ -87,7 +87,7 @@ void write_menu()
 
       if (comm.status)
       {
-         desc += repeat_string(" ", 65 - maxkeylen - maxlen - strlen(desc) - strlen(comm.status));
+         desc += (" " * (65 - maxkeylen - maxlen - strlen(desc) - strlen(comm.status)));
          desc += "%^TASK_STATUS%^" + comm.status;
       }
 

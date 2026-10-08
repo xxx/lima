@@ -79,7 +79,7 @@ void main(string arg)
       }
       if (count || arg == "all")
       {
-         header += capitalize(category) + repeat_string("\n", line_count);
+         header += capitalize(category) + ("\n" * line_count);
          content += mat_line;
       }
    }

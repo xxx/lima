@@ -513,7 +513,7 @@ protected void goto_previous_menu()
 
 string generate_section_output(class section *sections, int largest_section, int leftwidth, int rightwidth, int columns)
 {
-   string output = repeat_string(" ", (columns * (leftwidth + rightwidth + 4))) + "\n";
+   string output = (" " * ((columns * (leftwidth + rightwidth + 4)))) + "\n";
    string format = accent("%" + leftwidth + "s") + (frame_simplify() ? ", " : "") + " %-" + rightwidth + "s   ";
    class menu_item this_item;
    class menu_item empty_item = new_menu_item("", "", " ");
@@ -556,7 +556,7 @@ string generate_section_output(class section *sections, int largest_section, int
          // We might need to move columns in.
          if (picked_col > printed_columns)
          {
-            output += repeat_string(" ", ((picked_col - printed_columns) * (leftwidth + rightwidth + 4)));
+            output += (" " * (((picked_col - printed_columns) * (leftwidth + rightwidth + 4))));
             printed_columns++;
          }
          if (!stringp(this_item.choice_name) && strlen(this_item.choice_name))
@@ -585,11 +585,11 @@ string generate_section_output(class section *sections, int largest_section, int
 
       if (printed_columns < columns)
       {
-         output += repeat_string(" ", (columns - printed_columns) * (leftwidth + rightwidth + 4));
+         output += (" " * ((columns - printed_columns) * (leftwidth + rightwidth + 4)));
       }
       output += "\n";
    }
-   return output + repeat_string(" ", (columns * (leftwidth + rightwidth + 4))) + "\n";
+   return output + (" " * ((columns * (leftwidth + rightwidth + 4)))) + "\n";
 }
 
 private int section_sort(class section s, class section t)

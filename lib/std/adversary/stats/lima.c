@@ -499,7 +499,7 @@ string pretty_bonus(int b)
       out = "(<001>" + b + "<res>)";
 
    if (colour_strlen(out) < 6)
-      out += repeat_string(" ", 6 - colour_strlen(out));
+      out += (" " * (6 - colour_strlen(out)));
 
    return out;
 }

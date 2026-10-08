@@ -24,11 +24,11 @@ nomask void list_skills()
       return;
    }
 
-   result = ({sprintf("%-20s %s", "Skill", "Internal name"), repeat_string("-", 40)}) +
+   result = ({sprintf("%-20s %s", "Skill", "Internal name"), ("-" * 40)}) +
             map(
                 skills, function(string name) {
                    string *parts = explode(name, "/");
-                   return sprintf("%-20s %s", repeat_string("   ", sizeof(parts) - 1) + parts[ < 1], name);
+                   return sprintf("%-20s %s", ("   " * (sizeof(parts) - 1)) + parts[ < 1], name);
                 });
 
    more(result);

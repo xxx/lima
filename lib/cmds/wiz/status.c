@@ -7,7 +7,7 @@
 //
 // .. TAGS: RST
 
-#define DELIM write(repeat_string("-", 70) + "\n")
+#define DELIM write(("-" * 70) + "\n")
 
 inherit CMD;
 

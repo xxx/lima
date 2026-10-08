@@ -259,7 +259,7 @@ string simple_divider(int width)
    string barchar = uses_unicode() ? "─" : "-";
    if (frame_simplify())
       return "";
-   return repeat_string(barchar, width);
+   return (barchar * width);
 }
 
 private

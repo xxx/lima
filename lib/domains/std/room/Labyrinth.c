@@ -46,7 +46,7 @@ void create()
    data = allocate(SIZE);
    for (int i = 0; i < SIZE; i++)
    {
-      data[i] = repeat_string(".", SIZE);
+      data[i] = ("." * SIZE);
    }
 
    data[0][0] = '@';

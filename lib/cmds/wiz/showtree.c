@@ -46,12 +46,12 @@ varargs string print_tree(string file, string func, int indent)
 
    if (!ob)
    {
-      return repeat_string("  ", indent) + "Couldn't find object: " + file + "\n";
+      return ("  " * indent) + "Couldn't find object: " + file + "\n";
    }
-   result = repeat_string("  ", indent) + file + ":\n";
+   result = ("  " * indent) + file + ":\n";
    if (func && (function_exists(func, ob) + ".c") == file)
    {
-      result += repeat_string("  ", indent) + "  [defined]\n";
+      result += ("  " * indent) + "  [defined]\n";
       found = 1;
    }
    else if (!func)

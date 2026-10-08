@@ -186,7 +186,7 @@ string ljust(string s, int width)
    if (n <= 0)
       return s;
 
-   return s + repeat_string(" ", n);
+   return s + (" " * n);
 }
 
 //: FUNCTION ljust
@@ -198,7 +198,7 @@ string rjust(string s, int width)
    n = width - strlen(s);
    if (n <= 0)
       return s;
-   return repeat_string(" ", n) + s;
+   return (" " * n) + s;
 }
 
 string center(string s, int width)
@@ -211,7 +211,7 @@ string center(string s, int width)
    half = n >> 1;
    if (n % 2 && width % 2)
       half++;
-   return repeat_string(" ", half) + s + repeat_string(" ", n - half);
+   return (" " * half) + s + (" " * (n - half));
 }
 
 //: FUNCTION truncate

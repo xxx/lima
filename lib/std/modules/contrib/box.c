@@ -28,12 +28,12 @@ varargs string quote_box(string quote, int width, string author, string frame, s
    if (!corner)
    {
       s = frame + frame;
-      s += repeat_string(frame, width);
+      s += (frame * width);
    }
    else
    {
       s = corner;
-      s += repeat_string(frame, width);
+      s += (frame * width);
       s += corner;
    }
    quote = wrap(quote, width);
@@ -62,12 +62,12 @@ varargs string box(string text, int width, string frame, string sframe, string c
    if (!corner)
    {
       s = frame + frame;
-      s += repeat_string(frame, width);
+      s += (frame * width);
    }
    else
    {
       s = corner;
-      s += repeat_string(frame, width);
+      s += (frame * width);
       s += corner;
    }
    text = wrap(text, width - 2);

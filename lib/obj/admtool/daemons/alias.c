@@ -72,7 +72,7 @@ nomask void handle_l(string cmd)
    }
 
    output = sprintf("Alias:%9sExpansion:%29sDefaults:\n", "", "");
-   output += repeat_string("-", 77) + "\n";
+   output += ("-" * 77) + "\n";
 
    //    foreach (a, val in aliases)
    foreach (a in sort_array(keys(aliases), 1))

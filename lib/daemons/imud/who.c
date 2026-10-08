@@ -61,12 +61,12 @@ nomask void rcv_who_reply(string orig_mud, string orig_user, string targ_user, m
    {
       string s;
 
-      s = sprintf("[%s] %d users connected\n%s\n", orig_mud, sizeof(message[0]), repeat_string("-", 78));
+      s = sprintf("[%s] %d users connected\n%s\n", orig_mud, sizeof(message[0]), ("-" * 78));
       s += implode(map(message[0], (
                                              : sprintf("%-15s%-10s%s", $1[0], convert_time(to_int($1[1]), 3), $1[2])
                                              :)),
                    "\n");
-      s += "\n" + repeat_string("-", 78) + "\n";
+      s += "\n" + ("-" * 78) + "\n";
       tell(p, s);
    }
 }

@@ -86,7 +86,7 @@ void main(string arg)
    set_frame_title("HP");
 #ifdef LIMB_SHIELDS
    hp_bar -= strlen(shield) + 8;
-   extra_space = repeat_string(" ", 7+strlen(shield));
+   extra_space = (" " * (7+strlen(shield)));
 
    set_frame_header(sprintf("%14s %6-s %5s/%5-s %5s/%5-s %5-s %s", "Limb", "Type", "HP", "Max", shield, "Max", "Armour",
                             i_simplify() ? "" : "Bar"));
@@ -100,7 +100,7 @@ void main(string arg)
       class limb limb = limbs[name];
       string *parts = explode(name, "/");
       string *type = ({});
-      string name2 = repeat_string("   ", sizeof(parts) - 1) + parts[ < 1];
+      string name2 = ("   " * (sizeof(parts) - 1)) + parts[ < 1];
       int ac_total = 0;
       int level = sizeof(parts);
       if (limb.max_health <= 0)

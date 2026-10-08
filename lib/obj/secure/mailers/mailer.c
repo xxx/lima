@@ -118,7 +118,7 @@ protected nomask string *build_message(int mail_key, int supress_header)
       output += ({"From   : " + capitalize(msg.sender)});
       output += ({"Date   : " + ctime(msg.date)});
       output += explode("Subject: " + msg.subject, "\n");
-      output += ({repeat_string("-", 39)});
+      output += ({("-" * 39)});
    }
 
    output += msg.body;

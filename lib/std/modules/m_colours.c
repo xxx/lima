@@ -19,7 +19,7 @@ int colour_strlen(string str)
 string colour_center(string str)
 {
    int len = colour_strlen(str);
-   return repeat_string(" ", (this_user()->query_screen_width() - len) / 2) + str;
+   return (" " * ((this_user()->query_screen_width() - len) / 2)) + str;
 }
 
 //: FUNCTION colour_truncate
@@ -126,7 +126,7 @@ varargs string colour_table(string *items, int width, int num_horiz)
       }
       else
       {
-         tmp = items[i] + repeat_string(" ", size_horiz - lens[i]);
+         tmp = items[i] + (" " * (size_horiz - lens[i]));
       }
       lists[i % num_vert][i / num_vert] = tmp;
    }

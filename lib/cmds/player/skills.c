@@ -99,7 +99,7 @@ void main(string arg)
          int bonus = target->query_skill_bonus(name);
          int level = sizeof(parts);
          int next_level = (i + 1) < sizeof(names) ? sizeof(explode(names[i + 1], "/")) : 0;
-         string name2 = repeat_string("   ", sizeof(parts) - 1) + parts[ < 1];
+         string name2 = ("   " * (sizeof(parts) - 1)) + parts[ < 1];
          string pretty_name = target->is_body() ? SKILL_D->skill_rank_pretty(target, name)
                                                 : SKILL_D->monster_skill_rank_pretty(target, name);
          int percentage = target->is_body() ? SKILL_D->percent_for_next_rank(target, name)
@@ -128,18 +128,18 @@ void main(string arg)
          else if ((percentage || target->is_body()) && width > 50)
             content += sprintf("%-25s " + (bonus > 0 ? "<010>+<res>" : (bonus < 0 ? "<009>-<res>" : " ")) +
                                    " %3.3s [<040>%s<238>%s<res>]\n",
-                               repeat_string(" " + (level == next_level ? contbend : bend), level - 2) + pretty_name,
+                               ((" " + (level == next_level ? contbend : bend)) * (level - 2)) + pretty_name,
 #ifdef SKILL_CONFIG_USES_TRAINING_PTS
                                target->is_body() ? "" + (skill.training_points ? skill.training_points : "") : "",
 #else
                                "",
 #endif
-                               repeat_string(barchar, green), repeat_string(nobarchar, red));
+                               (barchar * green), (nobarchar * red));
          // Screen width < 50
          else if ((percentage || target->is_body()) && width <= 50)
             content += sprintf(
                 "%-25s " + (bonus > 0 ? "<010>+<res>" : (bonus < 0 ? "<009>-<res>" : " ")) + "%4s(%-3s)\n",
-                repeat_string(" " + (level == next_level ? contbend : bend), level - 2) + pretty_name, percentage + "%",
+                ((" " + (level == next_level ? contbend : bend)) * (level - 2)) + pretty_name, percentage + "%",
 #ifdef SKILL_CONFIG_USES_TRAINING_PTS
                 target->is_body() ? accent(skill.training_points) : ""
 #else
@@ -168,7 +168,7 @@ void main(string arg)
          class skill skill = skills[name];
          int percentage = SKILL_D->percent_for_next_rank(this_body(), name);
          string *parts = explode(name, "/");
-         string name2 = repeat_string("   ", sizeof(parts) - 1) + parts[ < 1];
+         string name2 = ("   " * (sizeof(parts) - 1)) + parts[ < 1];
          if (strlen(arg) && strsrch(name, arg) != 0)
             continue;
 

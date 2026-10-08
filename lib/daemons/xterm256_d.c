@@ -399,7 +399,7 @@ string xterm256_wrap(string str, int wrap_at, int indent_at)
           if (running["length"] >= max)
           {
              running["length"] = sizeof(plain) + indent;
-             return "\n" + repeat_string(" ", indent) + part;
+             return "\n" + (" " * indent) + part;
           }
 
           return part;

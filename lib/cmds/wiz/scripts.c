@@ -27,7 +27,7 @@ void main(string str)
    {
       string name = s->short();
       string env = environment(s) ? environment(s)->short() : "Nowhere";
-      string bar = repeat_string(" ", 30);
+      string bar = (" " * 30);
       string script = "";
       string type;
       int *status = s->status();

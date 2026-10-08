@@ -151,6 +151,6 @@ void main(string str)
    if (strlen(pattern) > 0)
       header += " matching '" + pattern + "'";
 
-   out(DID_D->get_did_info(time() - ndays * 24 * 60 * 60, ({header, repeat_string("-", sizeof(header)), ""}), pattern,
+   out(DID_D->get_did_info(time() - ndays * 24 * 60 * 60, ({header, ("-" * (sizeof(header))), ""}), pattern,
                            0, version));
 }

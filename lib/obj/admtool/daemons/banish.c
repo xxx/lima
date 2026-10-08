@@ -54,7 +54,7 @@ nomask void receive_banish_site(string name, string reason)
 private
 nomask void show_banishes(string header, class banish_data *list)
 {
-   string result = header + "\n" + repeat_string("-", 73) + "\n";
+   string result = header + "\n" + ("-" * 73) + "\n";
 
    foreach (class banish_data b in list)
    {

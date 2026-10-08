@@ -111,7 +111,7 @@ nomask string *query_message_lines()
 private
 nomask string list_headers()
 {
-   return "ID    TITLE                               POSTER      TIME\n" + repeat_string("-", 78) + "\n" +
+   return "ID    TITLE                               POSTER      TIME\n" + ("-" * 78) + "\n" +
           implode(query_message_lines(), "\n");
 }
 

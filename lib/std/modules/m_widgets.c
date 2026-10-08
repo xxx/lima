@@ -80,7 +80,7 @@ varargs string simple_divider(int width)
       width = default_user_width();
    if (i_simplify())
       return "";
-   return repeat_string(barchar, width) + "\n";
+   return (barchar * width) + "\n";
 }
 
 //: FUNCTION green_bar
@@ -105,7 +105,7 @@ string green_bar(int value, int max, int width)
    // TBUG("green: "+green+" white: "+white+ " value: "+value+" max: "+max);
 
    return sprintf("[" + (white <= 0 ? "<040>" : "<024>") + "%s<res><" + (uses_unicode() ? "238" : "007") + ">%s<res>]",
-                  repeat_string(barchar, green), repeat_string(nobarchar, white));
+                  (barchar * green), (nobarchar * white));
 }
 
 //: FUNCTION critical_bar
@@ -137,7 +137,7 @@ string critical_bar(int value, int max, int width)
    white = width - 1 - green;
 
    return sprintf("[" + bar_colour + "%s<res><" + (uses_unicode() ? "238" : "007") + ">%s<res>]",
-                  repeat_string(barchar, green), repeat_string(nobarchar, white));
+                  (barchar * green), (nobarchar * white));
 }
 
 //: FUNCTION critical_bar_2stacked
@@ -173,7 +173,7 @@ string critical_bar_2stacked(int value, int shield, int max, int width)
    white = width - 1 - green - blue;
 
    return sprintf("[" + bar_colour + "%s" + shield_colour + "%s<res><" + (uses_unicode() ? "238" : "007") + ">%s<res>]",
-                  repeat_string(barchar, green), repeat_string(barchar, blue), repeat_string(nobarchar, white));
+                  (barchar * green), (barchar * blue), (nobarchar * white));
 }
 
 //: FUNCTION reverse_critical_bar
@@ -206,7 +206,7 @@ string reverse_critical_bar(int value, int max, int width)
    white = width - 1 - green;
 
    return sprintf("[" + bar_colour + "%s<res><" + (uses_unicode() ? "238" : "007") + ">%s<res>]",
-                  repeat_string(barchar, green), repeat_string(nobarchar, white));
+                  (barchar * green), (nobarchar * white));
 }
 
 //: FUNCTION slider_red_green
@@ -235,7 +235,7 @@ string slider_red_green(int value, int max, int width)
    width = width - 2; // [, X and ]
    marker = width * ((value + (max / 2.0)) / (max * 1.0));
 
-   return_string = repeat_string(line_char, marker) + x_char + repeat_string(line_char, width - marker);
+   return_string = (line_char * marker) + x_char + (line_char * (width - marker));
    return_string = return_string[0..(width / 2)] + return_string[(width / 2 + 1)..];
    return_string = gradient_string(return_string, slider_colours);
    return_string = replace_string(return_string, x_char, "<015>" + x_char + "<res>");
@@ -279,11 +279,11 @@ string slider_colours_sum(int value, mapping colours, int width)
    width = width - 3; // [ and ]
    marker = width * (1.0 * value / max);
    if (marker == 0)
-      return_string = x_char + repeat_string(line_char, width - 1);
+      return_string = x_char + (line_char * (width - 1));
    else if (marker == (width - 1))
-      return_string = repeat_string(line_char, width) + x_char;
+      return_string = (line_char * width) + x_char;
    else
-      return_string = repeat_string(line_char, marker) + x_char + repeat_string(line_char, width - marker);
+      return_string = (line_char * marker) + x_char + (line_char * (width - marker));
 
    foreach (int val in sort_array(keys(colours), 1))
    {

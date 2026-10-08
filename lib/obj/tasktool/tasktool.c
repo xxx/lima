@@ -101,7 +101,7 @@ class command_info *module_commands()
 
          name = TASK_D->query_title(task_id);
          status = TASK_D->query_status(task_id);
-         status = repeat_string(".", 12 - sizeof(status)) + status;
+         status = ("." * (12 - sizeof(status))) + status;
          status = "[" + status + "]";
 
          ret += ({new (class command_info, key

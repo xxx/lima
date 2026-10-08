@@ -164,7 +164,7 @@ string show_big_finger()
                                      get_level($2), get_idle($2), query_ip_name($2))
                       :),
                   sprintf("\n[%s] %d user%s presently connected (%s)\n%s\n", mud_name(), sizeof(u),
-                          sizeof(u) == 1 ? "" : "s", ctime(time()), repeat_string("-", 75)));
+                          sizeof(u) == 1 ? "" : "s", ctime(time()), ("-" * 75)));
 }
 
 string show_big_html_finger()

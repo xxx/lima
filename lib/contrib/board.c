@@ -191,7 +191,7 @@ nomask string list_headers()
       return "You do not have permission.\n";
 
    return (can_switch ? "Group: " + linked_group + "\n" : "") +
-          "ID    TITLE                                            POSTER      TIME\n" + repeat_string("-", 78) + "\n" +
+          "ID    TITLE                                            POSTER      TIME\n" + ("-" * 78) + "\n" +
           implode(query_message_lines(), "\n");
 }
 
