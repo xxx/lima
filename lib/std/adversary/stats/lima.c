@@ -109,28 +109,39 @@ nomask int query_stat(string stat)
    case "wis":
    case "cha":
    case "man":
-      return stats["cur_" + stat] + skill_stat_sum(stat);
+      return ::query_stat(stat) + skill_stat_sum(stat);
    }
 
-   return stats["cur_" + stat];
+   return ::query_stat(stat);
 }
 
 void set_mod_stat(string stat, int s)
 {
-   stats["mod_" + stat] = s;
+   ::set_mod_stat(stat, s);
    recompute_derived();
 }
 
 void inc_mod_stat(string stat)
 {
-   stats["mod_" + stat]++;
+   ::inc_mod_stat(stat);
+   recompute_derived();
+}
+
+void reset_stat_increases()
+{
+   mapping mods = stat_type("mod");
+
+   foreach (string s, int value in mods)
+      stats[s] = 0;
+   foreach (string s in stat_names())
+      stats["mod_" + s] = 0;
    recompute_derived();
 }
 
 int spare_points()
 {
    int total_pts = this_object()->query_level() * STAT_PTS_PER_LEVEL;
-   total_pts -= stats["mod_str"] + stats["mod_agi"] + stats["mod_int"] + stats["mod_wil"];
+   total_pts -= ::query_mod_stat("str") + ::query_mod_stat("agi") + ::query_mod_stat("int") + ::query_mod_stat("wil");
    return total_pts;
 }
 
@@ -141,10 +152,10 @@ int stat_component(int STAT, int PART)
    int ccur_str, ccur_agi, ccur_int, ccur_wil;
    int *stats_ar;
 
-   ccur_str = stats["stat_str"] + stats["mod_str"] + (adj_str = call_hooks("str_bonus", HOOK_SUM));
-   ccur_agi = stats["stat_agi"] + stats["mod_agi"] + (adj_agi = call_hooks("agi_bonus", HOOK_SUM));
-   ccur_int = stats["stat_int"] + stats["mod_int"] + (adj_int = call_hooks("int_bonus", HOOK_SUM));
-   ccur_wil = stats["stat_wil"] + stats["mod_wil"] + (adj_wil = call_hooks("wil_bonus", HOOK_SUM));
+   ccur_str = ::query_stat_pure("str") + ::query_mod_stat("str") + (adj_str = call_hooks("str_bonus", HOOK_SUM));
+   ccur_agi = ::query_stat_pure("agi") + ::query_mod_stat("agi") + (adj_agi = call_hooks("agi_bonus", HOOK_SUM));
+   ccur_int = ::query_stat_pure("int") + ::query_mod_stat("int") + (adj_int = call_hooks("int_bonus", HOOK_SUM));
+   ccur_wil = ::query_stat_pure("wil") + ::query_mod_stat("wil") + (adj_wil = call_hooks("wil_bonus", HOOK_SUM));
    stats_ar = ({ccur_str, ccur_agi, ccur_int, ccur_wil});
 
    // Need to /4 the constant_vector to not add the bonus 4 times.
@@ -172,56 +183,56 @@ void refresh_stats()
    // Used to modify willpower
    int adj_str, adj_agi, adj_int, adj_wil;
 
-   stats["cur_str"] = stats["stat_str"] + stats["mod_str"] + (adj_str = call_hooks("str_bonus", HOOK_SUM));
-   stats["cur_agi"] = stats["stat_agi"] + stats["mod_agi"] + (adj_agi = call_hooks("agi_bonus", HOOK_SUM));
-   stats["cur_int"] = stats["stat_int"] + stats["mod_int"] + (adj_int = call_hooks("int_bonus", HOOK_SUM));
-   stats["cur_wil"] = stats["stat_wil"] + stats["mod_wil"] + (adj_wil = call_hooks("wil_bonus", HOOK_SUM));
+   stats["cur_str"] = ::query_stat_pure("str") + ::query_mod_stat("str") + (adj_str = call_hooks("str_bonus", HOOK_SUM));
+   stats["cur_agi"] = ::query_stat_pure("agi") + ::query_mod_stat("agi") + (adj_agi = call_hooks("agi_bonus", HOOK_SUM));
+   stats["cur_int"] = ::query_stat_pure("int") + ::query_mod_stat("int") + (adj_int = call_hooks("int_bonus", HOOK_SUM));
+   stats["cur_wil"] = ::query_stat_pure("wil") + ::query_mod_stat("wil") + (adj_wil = call_hooks("wil_bonus", HOOK_SUM));
 
    // optimize common case
    if (!(adj_str || adj_agi || adj_int || adj_wil))
    {
-      stats["cur_con"] = stats["stat_con"];
-      stats["cur_wis"] = stats["stat_wis"];
-      stats["cur_cha"] = stats["stat_cha"];
-      stats["cur_man"] = stats["stat_man"];
+      stats["cur_con"] = ::query_stat_pure("con");
+      stats["cur_wis"] = ::query_stat_pure("wis");
+      stats["cur_cha"] = ::query_stat_pure("cha");
+      stats["cur_man"] = ::query_stat_pure("man");
       return;
    }
 
-   stats["cur_con"] = stats["stat_con"] + (trans_matrix[CON][STR] * adj_str + trans_matrix[CON][AGI] * adj_agi +
+   stats["cur_con"] = ::query_stat_pure("con") + (trans_matrix[CON][STR] * adj_str + trans_matrix[CON][AGI] * adj_agi +
                                            trans_matrix[CON][INT] * adj_int + trans_matrix[CON][WIL] * adj_wil + 5000) /
                                               10000;
-   stats["cur_wis"] = stats["stat_wis"] + (trans_matrix[WIS][STR] * adj_str + trans_matrix[WIS][AGI] * adj_agi +
+   stats["cur_wis"] = ::query_stat_pure("wis") + (trans_matrix[WIS][STR] * adj_str + trans_matrix[WIS][AGI] * adj_agi +
                                            trans_matrix[WIS][INT] * adj_int + trans_matrix[WIS][WIL] * adj_wil + 5000) /
                                               10000;
-   stats["cur_cha"] = stats["stat_cha"] + (trans_matrix[CHA][STR] * adj_str + trans_matrix[CHA][AGI] * adj_agi +
+   stats["cur_cha"] = ::query_stat_pure("cha") + (trans_matrix[CHA][STR] * adj_str + trans_matrix[CHA][AGI] * adj_agi +
                                            trans_matrix[CHA][INT] * adj_int + trans_matrix[CHA][WIL] * adj_wil + 5000) /
                                               10000;
-   stats["cur_man"] = stats["stat_man"] + (trans_matrix[MAN][STR] * adj_str + trans_matrix[MAN][AGI] * adj_agi +
+   stats["cur_man"] = ::query_stat_pure("man") + (trans_matrix[MAN][STR] * adj_str + trans_matrix[MAN][AGI] * adj_agi +
                                            trans_matrix[MAN][INT] * adj_int + trans_matrix[MAN][WIL] * adj_wil + 5000) /
                                               10000;
 }
 
 void recompute_derived()
 {
-   stats["stat_con"] = (constant_vector[CON] * 10000 + trans_matrix[CON][STR] * (stats["stat_str"] + stats["mod_str"]) +
-                        trans_matrix[CON][AGI] * (stats["stat_agi"] + stats["mod_agi"]) +
-                        trans_matrix[CON][INT] * (stats["stat_int"] + stats["mod_int"]) +
-                        trans_matrix[CON][WIL] * (stats["stat_wil"] + stats["mod_wil"]) + 5000) /
+   stats["stat_con"] = (constant_vector[CON] * 10000 + trans_matrix[CON][STR] * (::query_stat_pure("str") + ::query_mod_stat("str")) +
+                        trans_matrix[CON][AGI] * (::query_stat_pure("agi") + ::query_mod_stat("agi")) +
+                        trans_matrix[CON][INT] * (::query_stat_pure("int") + ::query_mod_stat("int")) +
+                        trans_matrix[CON][WIL] * (::query_stat_pure("wil") + ::query_mod_stat("wil")) + 5000) /
                        10000;
-   stats["stat_wis"] = (constant_vector[WIS] * 10000 + trans_matrix[WIS][STR] * (stats["stat_str"] + stats["mod_str"]) +
-                        trans_matrix[WIS][AGI] * (stats["stat_agi"] + stats["mod_agi"]) +
-                        trans_matrix[WIS][INT] * (stats["stat_int"] + stats["mod_int"]) +
-                        trans_matrix[WIS][WIL] * (stats["stat_wil"] + stats["mod_wil"]) + 5000) /
+   stats["stat_wis"] = (constant_vector[WIS] * 10000 + trans_matrix[WIS][STR] * (::query_stat_pure("str") + ::query_mod_stat("str")) +
+                        trans_matrix[WIS][AGI] * (::query_stat_pure("agi") + ::query_mod_stat("agi")) +
+                        trans_matrix[WIS][INT] * (::query_stat_pure("int") + ::query_mod_stat("int")) +
+                        trans_matrix[WIS][WIL] * (::query_stat_pure("wil") + ::query_mod_stat("wil")) + 5000) /
                        10000;
-   stats["stat_cha"] = (constant_vector[CHA] * 10000 + trans_matrix[CHA][STR] * (stats["stat_str"] + stats["mod_str"]) +
-                        trans_matrix[CHA][AGI] * (stats["stat_agi"] + stats["mod_agi"]) +
-                        trans_matrix[CHA][INT] * (stats["stat_int"] + stats["mod_int"]) +
-                        trans_matrix[CHA][WIL] * (stats["stat_wil"] + stats["mod_wil"]) + 5000) /
+   stats["stat_cha"] = (constant_vector[CHA] * 10000 + trans_matrix[CHA][STR] * (::query_stat_pure("str") + ::query_mod_stat("str")) +
+                        trans_matrix[CHA][AGI] * (::query_stat_pure("agi") + ::query_mod_stat("agi")) +
+                        trans_matrix[CHA][INT] * (::query_stat_pure("int") + ::query_mod_stat("int")) +
+                        trans_matrix[CHA][WIL] * (::query_stat_pure("wil") + ::query_mod_stat("wil")) + 5000) /
                        10000;
-   stats["stat_man"] = (constant_vector[MAN] * 10000 + trans_matrix[MAN][STR] * (stats["stat_str"] + stats["mod_str"]) +
-                        trans_matrix[MAN][AGI] * (stats["stat_agi"] + stats["mod_agi"]) +
-                        trans_matrix[MAN][INT] * (stats["stat_int"] + stats["mod_int"]) +
-                        trans_matrix[MAN][WIL] * (stats["stat_wil"] + stats["mod_wil"]) + 5000) /
+   stats["stat_man"] = (constant_vector[MAN] * 10000 + trans_matrix[MAN][STR] * (::query_stat_pure("str") + ::query_mod_stat("str")) +
+                        trans_matrix[MAN][AGI] * (::query_stat_pure("agi") + ::query_mod_stat("agi")) +
+                        trans_matrix[MAN][INT] * (::query_stat_pure("int") + ::query_mod_stat("int")) +
+                        trans_matrix[MAN][WIL] * (::query_stat_pure("wil") + ::query_mod_stat("wil")) + 5000) /
                        10000;
    refresh_stats();
 }
@@ -381,13 +392,13 @@ class stat_roll_mods query_roll_mods()
 mixed *query_transformation_matrix()
 {
    // should be overloaded
-   return ({allocate(4), allocate(4), allocate(4), allocate(4)});
+   return ({({0, 0, 0, 0}), ({0, 0, 0, 0}), ({0, 0, 0, 0}), ({0, 0, 0, 0})});
 }
 
 int *query_constant_vector()
 {
    // should be overloaded
-   return allocate(4);
+   return ({0, 0, 0, 0});
 }
 
 private
@@ -401,7 +412,7 @@ nomask int roll_stat(int adjust, int range)
 
 int max_stat()
 {
-   return max(({stats["stat_str"], stats["stat_agi"], stats["stat_int"], stats["stat_wil"]}));
+   return max(({::query_stat_pure("str"), ::query_stat_pure("agi"), ::query_stat_pure("int"), ::query_stat_pure("wil")}));
 }
 
 //: FUNCTION init_stats
@@ -423,9 +434,6 @@ nomask void init_stats()
    stats["stat_wil"] = roll_stat(mods.wil_adjust, mods.wil_range);
 
    reset_stat_increases();
-
-   recompute_derived();
-   refresh_stats();
 }
 
 /*
