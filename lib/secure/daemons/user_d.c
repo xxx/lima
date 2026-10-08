@@ -1,254 +1,228 @@
 /* Do not remove the headers from this file! see /USAGE for more info. */
 
-/*
-** user_d.c -- user/body information access
-**
-** Interface:
-**
-**   mixed * query_variable(string userid, string * varlist)
-**
-**     Return an array of variable values.  0 is returned if
-**     the specified user does not exist.
-**
-**
-**   void set_variable(string userid, string varname, mixed value)
-**
-**     Set a variable to some value in the specified user.  An
-**     error is thrown if the user does not exist.
-**
-**
-** The calls are not orthogonal (one queries multiple, one sets a
-** single value).  This is because we do not want to error() on the
-** query of a non-existent user.  If the query returned a single
-** value, then there would be no way to represent "no such user."
-** Further, requesting multiple values with individual requests
-** would be dog slow.
-**
-** NOTE: On both calls, you must have privilege 1 for them to succeed.
-**       This is because bind() is used to access user/body objects and
-**       because the save files for the user/body are read-protected.
-**       In both cases, privilege 1 is required to fulfill the request.
-**
-** 950823, Deathblade: created
-*/
-
 #include <config/user_menu.h>
 #include <mudlib.h>
 #include <security.h>
 
 inherit M_DAEMON_DATA;
 
+#include <user_data.h>
+
 private mapping user_names = ([]);
+private nosave mapping body_owners = ([]);
+private nosave string *user_queries = ({"failures", "email", "real_name", "password", "url", "bodies"});
+private nosave string *user_sets = ({"failures", "password"});
+private nosave string *body_queries = ({"nickname", "plan", "wiz_position", "title"});
+private nosave string *body_sets = ({"plan", "wiz_position"});
 
-nosave private string *legal_user_query = ({
-    "failures",
-    "email",
-    "real_name",
-    "password",
-    "url",
-    "bodies",
-});
-nosave private string *legal_user_set = ({
-    "failures",
-    "password",
-});
-
-nosave private string *legal_body_query = ({
-    "nickname", "plan",      /* only when EVERYONE_HAS_A_PLAN */
-    "wiz_position", "title", /* only when USE_TITLES */
-});
-nosave private string *legal_body_set = ({
-    "plan", /* only when EVERYONE_HAS_A_PLAN */
-    "wiz_position",
-});
-
-class var_info
+private string valid_name(string name)
 {
-   object ob;
-   string fname;
-   string *lines;
+   if (!name || !sizeof(regexp(({name}), "^[a-z][a-z0-9]*$")))
+      error("USER_D: invalid canonical name");
+   return name;
 }
 
-nomask void register_body(string user, string body)
+private void rebuild_owners()
 {
-   if (!body)
-      body = user;
-   if (!arrayp(user_names[user]))
-      user_names[user] = ({});
-   if (member_array(body, user_names[user]) == -1)
-      user_names[user] += ({body});
-   save_me();
-}
-
-nomask void remove_body(string user, string body)
-{
-   if (!arrayp(user_names[user]))
-      user_names[user] = ({});
-   if (member_array(body, user_names[user]) != -1)
-      user_names[user] -= ({body});
-   save_me();
-}
-
-string find_real_user(string body)
-{
-   object *online_bodies;
-
-   foreach (string user, string * sbodies in user_names)
+   mapping owners = ([]);
+   foreach (mixed user, mixed names in user_names)
    {
-      if (member_array(body, sbodies) != -1)
-         return user;
+      if (!stringp(user)) error("USER_D: invalid registry account");
+      valid_name(user);
+      if (!arrayp(names)) error("USER_D: invalid registry body list");
+      foreach (mixed name in names)
+      {
+         if (!stringp(name)) error("USER_D: invalid registry character");
+         valid_name(name);
+         if (has_key(owners, name))
+            error("USER_D: duplicate character ownership: " + name);
+         owners[name] = user;
+      }
    }
-
-   // Try to find the user by name or nickname.
-   online_bodies = bodies();
-   online_bodies -= ({0});
-
-   //Don't give away invisible bodies.
-   //This is to prevent people from using this function to find out if a body exists.
-   online_bodies = filter(online_bodies, ( : $1->is_visible() :));
-
-   foreach (object ob in online_bodies)
-   {
-      if (lower_case(ob->query_name()) == body)
-         return ob->query_userid();
-      if (ob->query_nickname() && ob->query_nickname() == body)
-         return ob->query_userid();
-   }
-
-   // If we didn't find a user now, return 0, and give up.
-   return 0;
+   body_owners = owners;
 }
 
 void create()
 {
    ::create();
-   set_privilege(1);
-
+   rebuild_owners();
 }
 
-private nomask mixed query_online_object(object ob, string varname)
+private object account_object(string user)
 {
-   return evaluate(bind(( : fetch_variable, varname:), ob));
-}
-
-private nomask mixed set_online_object(object ob, string varname, mixed value)
-{
-   evaluate(bind(( : store_variable, varname, value:), ob));
-}
-
-private nomask mixed query_filed_object(string *lines, string varname)
-{
-   lines = regexp(lines, "^" + varname + " ");
-   if (!sizeof(lines))
-      return 0;
-   return restore_variable(lines[0][sizeof(varname) + 1..]);
-}
-
-nomask mixed *query_variable(string userid, string *vlist)
-{
-   class var_info user;
-   class var_info body;
-   class var_info which;
-   mixed *results;
-   string var;
-
-#ifdef USE_USER_MENU
-   userid = find_real_user(userid);
-   if (!userid)
-      return 0;
-#endif
-
-   if (!check_privilege(1))
-      error("insufficient privilege to query variables\n");
-
-   results = ({});
-
-   foreach (var in vlist)
+   object *found = ({});
+   foreach (string path in ({USER_OB, USER_OB_BAK}))
    {
-      if (member_array(var, legal_user_query) != -1)
-      {
-         if (!user)
-         {
-            user = new(class var_info);
-            user.ob = find_user(userid);
-            user.fname = LINK_PATH(userid) + __SAVE_EXTENSION__;
-         }
-
-         which = user;
-      }
-      else if (member_array(var, legal_body_query) != -1)
-      {
-         if (!body)
-         {
-            body = new(class var_info);
-            body.ob = find_body(userid);
-            body.fname = USER_PATH(userid) + __SAVE_EXTENSION__;
-         }
-
-         which = body;
-      }
-      else
-         error("illegal variable request\n");
-
-      if (which.ob)
-      {
-         results += ({query_online_object(which.ob, var)});
-      }
-      else
-      {
-         if (!which.lines)
-         {
-            if (!is_file(which.fname))
-            {
-               /* no such player */
-               return 0;
-            }
-
-            which.lines = explode(read_file(which.fname), "\n");
-         }
-
-         results += ({query_filed_object(which.lines, var)});
-      }
+      object prototype = find_object(path);
+      if (prototype)
+         foreach (object candidate in object_clones(prototype))
+            if (candidate->query_userid() == user)
+               found += ({candidate});
    }
-
-   return results;
+   if (sizeof(found) > 1) error("USER_D: multiple live account objects: " + user);
+   return sizeof(found) ? found[0] : nil;
 }
 
-nomask void set_variable(string userid, string varname, mixed value)
+private int account_exists(string user)
 {
-   string fname;
+   return !!account_object(user) || unguarded(1, &is_file(LINK_PATH(user) + __SAVE_EXTENSION__));
+}
+
+private mapping account_bodies(string user)
+{
+   object online = account_object(user);
+   mapping data;
+   if (online) data = online->query_bodies();
+   else data = unguarded(1, &restore_map(LINK_PATH(user)))["bodies"];
+   if (!mappingp(data)) error("USER_D: account has no body records");
+   return data;
+}
+
+private void authorize_registry(string user)
+{
+   object caller = previous_object();
+   if (caller && (base_name(caller) == USER_OB || base_name(caller) == USER_OB_BAK)
+       && caller == this_user() && interactive(caller) && caller->query_userid() == user)
+      return;
+   if (!check_privilege(1)) error("USER_D: registry permission denied");
+}
+
+private void require_body_record(string user, string body)
+{
+   mixed row = account_bodies(user)[body];
+   if (!arrayp(row) || sizeof(row) != 4 || !stringp(row[0]) || !intp(row[1])
+       || !stringp(row[2]) || !intp(row[3]))
+      error("USER_D: character is missing from account body records");
+}
+
+nomask void register_body(string user, string body)
+{
+   valid_name(user);
+   if (!body) body = user;
+   valid_name(body);
+   authorize_registry(user);
+   require_body_record(user, body);
+   if (body != user && account_exists(body)) error("USER_D: character name conflicts with another account");
+   if (has_key(body_owners, body))
+   {
+      if (body_owners[body] != user) error("USER_D: character already belongs to another account");
+      return;
+   }
+   user_names[user] = (user_names[user] || ({})) + ({body});
+   body_owners[body] = user;
+   save_me();
+}
+
+nomask void remove_body(string user, string body)
+{
+   valid_name(user);
+   valid_name(body);
+   authorize_registry(user);
+   if (!has_key(body_owners, body)) return;
+   if (body_owners[body] != user) error("USER_D: character belongs to another account");
+   require_body_record(user, body);
+   user_names[user] -= ({body});
+   if (!sizeof(user_names[user])) m_delete(user_names, user);
+   m_delete(body_owners, body);
+   save_me();
+}
+
+string find_real_user(string body)
+{
+   valid_name(body);
+   return body_owners[body];
+}
+
+private string resolve_account(string name)
+{
+   string owner = body_owners[name];
+   int account = account_exists(name);
+   if (account && owner && owner != name)
+      error("USER_D: ambiguous account and character name: " + name);
+   return account ? name : owner;
+}
+
+private object live_body(string account, string name)
+{
+   object user = account_object(account);
+   object body = user && user->query_body();
+   if (body && lower_case(body->query_name()) == name && body->query_link() == user)
+      return body;
+   return nil;
+}
+
+private mixed query_field(string identity, string account, string field, int user_field)
+{
    object ob;
-   mixed *lines;
-
-   if (!check_privilege(1))
-      error("insufficient privilege to set variables\n");
-
-   if (member_array(varname, legal_user_set) != -1)
+   string path;
+   if (user_field)
    {
-      fname = LINK_PATH(userid);
-      ob = find_user(userid);
+      ob = account_object(account);
+      path = LINK_PATH(account);
    }
-   else if (member_array(varname, legal_body_set) != -1)
+   else
    {
-      fname = USER_PATH(userid);
-      ob = find_body(userid);
+      if (!has_key(body_owners, identity)) error("USER_D: body fields require a character name");
+      ob = live_body(account, identity);
+      path = USER_PATH(identity);
    }
-
-   if (!fname)
-      error("illegal variable assignment\n");
-
-   if (ob)
-      return set_online_object(ob, varname, value);
-
-   fname += __SAVE_EXTENSION__;
-   if (!is_file(fname))
-      error("no such user\n");
-
-   lines = regexp(explode(read_file(fname), "\n"), "^" + varname + " ", 2);
-   write_file(fname, implode(lines, "\n") + sprintf("\n%s %s\n", varname, save_variable(value)), 1);
+   if (ob) return ob->query_user_data(field);
+   return restore_map(path)[field];
 }
 
-nomask int user_exists(string s)
+nomask mixed *query_variable(string identity, string *fields)
 {
-   return unguarded(1, ( : is_file(LINK_PATH($(s)) + __SAVE_EXTENSION__) :));
+   mixed *result = ({});
+   string account;
+   if (!check_privilege(1)) error("insufficient privilege to query variables\n");
+   valid_name(identity);
+   foreach (string field in fields)
+      if (member_array(field, user_queries) == -1 && member_array(field, body_queries) == -1)
+         error("illegal variable request\n");
+   account = resolve_account(identity);
+   if (!account) return nil;
+   foreach (string field in fields)
+      result += ({query_field(identity, account, field, member_array(field, user_queries) != -1)});
+   return result;
+}
+
+nomask void set_variable(string identity, string field, mixed value)
+{
+   int user_field = member_array(field, user_sets) != -1;
+   string account;
+   string path;
+   object ob;
+   mapping data;
+   if (!check_privilege(1)) error("insufficient privilege to set variables\n");
+   valid_name(identity);
+   if (!user_field && member_array(field, body_sets) == -1) error("illegal variable assignment\n");
+   validate_user_data(field, value);
+   account = resolve_account(identity);
+   if (!account) error("no such user\n");
+   if (user_field)
+   {
+      ob = account_object(account);
+      path = LINK_PATH(account);
+   }
+   else
+   {
+      if (!has_key(body_owners, identity)) error("USER_D: body fields require a character name");
+      ob = live_body(account, identity);
+      path = USER_PATH(identity);
+   }
+   if (ob)
+   {
+      ob->set_user_data(field, value);
+      return;
+   }
+   if (!is_file(path + __SAVE_EXTENSION__)) error("no such user\n");
+   data = restore_map(path);
+   data[field] = deep_copy(value);
+   save_map(data, path);
+}
+
+nomask int user_exists(string user)
+{
+   valid_name(user);
+   return unguarded(1, &is_file(LINK_PATH(user) + __SAVE_EXTENSION__));
 }

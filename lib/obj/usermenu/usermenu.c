@@ -113,7 +113,7 @@ void enter_game()
       return;
    }
    fname = this_user()->query_fname(selected);
-   USER_D->register_body(this_user()->query_userid(), selected);
+   this_user()->register_body(selected);
    if (autologin_tag)
    {
       remove_call_out(autologin_tag);
@@ -324,7 +324,6 @@ private
 void creation_done()
 {
    write("Character '" + capitalize(name) + "' has been created.\n");
-   USER_D->register_body(this_user()->query_userid(), name);
    this_user()->set_body(name, fname, race, gender);
 #ifndef USE_USER_MENU
    modal_pop();
@@ -419,7 +418,6 @@ confirm_remove(string name, string input)
    if (confirm_decision(input) && strlen(input) > 0)
    {
       this_user()->remove_body(name);
-      USER_D->remove_body(this_user()->query_userid(), name);
       write(capitalize(name) + " exists no longer.\n");
    }
    else

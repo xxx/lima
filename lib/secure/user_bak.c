@@ -10,6 +10,8 @@
 
 #include <security.h>
 
+inherit "/secure/modules/m_user_data";
+
 inherit M_ACCESS;
 
 inherit __DIR__ "user/login";

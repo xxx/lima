@@ -19,6 +19,8 @@
 #include <size.h>
 
 // Files we need to inherit --
+inherit "/secure/modules/m_user_data";
+
 inherit ADVERSARY;
 inherit M_ACCESS;
 inherit M_SMARTMOVE;

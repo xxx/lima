@@ -19,29 +19,56 @@ mapping bodies = ([]);
 private
 string selected;
 
+string query_userid();
+object query_body();
+
+private void authorize_body_change()
+{
+   object caller = previous_object();
+   if (this_user() != this_object() || !interactive(this_object()))
+      error("user bodies: not the owning user");
+   if (caller && caller != this_object() && base_name(caller) != USER_MENU)
+      error("user bodies: caller is not the user menu");
+}
+
+void register_body(string name)
+{
+   authorize_body_change();
+   USER_D->register_body(query_userid(), name);
+}
+
 void set_body(string name, string fname, string race, int gender)
 {
-   if (!mappingp(bodies))
-      bodies = ([]);
-   bodies[name] = ({fname, 1, race, gender});
-
-   // Don't save guests
-   if (strlen(name) > 5 && name[0..4] == "guest")
-      return;
-
-   // Save all others here.
+   mapping before;
+   mixed problem;
+   authorize_body_change();
+   if (!mappingp(bodies)) bodies = ([]);
+   before = bodies;
+   bodies = bodies + ([name:({fname, 1, race, gender})]);
+   problem = catch(USER_D->register_body(query_userid(), name));
+   if (problem)
+   {
+      bodies = before;
+      error(problem);
+   }
+   if (strlen(name) > 5 && name[0..4] == "guest") return;
    save_me();
 }
 
 void remove_body(string name)
 {
-   if (USER_D->find_real_user(name) != this_user()->query_userid())
-      error("fail to remove " + name + " as it does not belong to " + this_user()->query_userid());
-   if (!mappingp(bodies) || !stringp(name) || strlen(name) < 1)
-      return;
+   object current = query_body();
+   authorize_body_change();
+   if (!mappingp(bodies) || !has_key(bodies, name)) error("user bodies: no such character");
+   if (USER_D->find_real_user(name) != query_userid()) error("user bodies: ownership mismatch");
+   if (current && lower_case(current->query_name()) == name) error("user bodies: character is active");
+   unguarded(1, &call_other(LAST_LOGIN_D, "remove_user", name, 0));
+   if (unguarded(1, &is_file(USER_PATH(name) + __SAVE_EXTENSION__)))
+      unguarded(1, &rm(USER_PATH(name) + __SAVE_EXTENSION__));
+   USER_D->remove_body(query_userid(), name);
    m_delete(bodies, name);
-   unguarded(1, ( : rm, USER_PATH(name) + __SAVE_EXTENSION__:));
-   unguarded(1, ( : call_other, LAST_LOGIN_D, "remove_user", name, 0 :));
+   if (selected == name) selected = nil;
+   save_me();
 }
 
 string query_selected_body()
@@ -59,10 +86,12 @@ int query_num_bodies()
 
 int set_selected_body(string name)
 {
+   authorize_body_change();
    name = lower_case(name);
    if (member_array(name, keys(bodies)) != -1)
    {
       selected = name;
+      save_me();
       return 1;
    }
    return 0;
@@ -73,12 +102,14 @@ mapping query_bodies()
    if (!mappingp(bodies))
       bodies = ([]);
 
-   return bodies;
+   return deep_copy(bodies);
 }
 
 int update_body(object body)
 {
-   string name = lower_case(body->query_name());
+   string name;
+   if (previous_object() != body || body != query_body()) error("user bodies: not the current body");
+   name = lower_case(body->query_name());
    if (arrayp(bodies[name]))
    {
       bodies[name][BODY_LEVEL] = body->query_level();

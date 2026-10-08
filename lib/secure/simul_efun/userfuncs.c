@@ -8,7 +8,7 @@ mixed base_name(mixed val);
 
 nomask object *bodies()
 {
-   return users()->query_body() - ({0});
+   return filter(users()->query_body(), objectp);
 }
 
 nomask object this_body()

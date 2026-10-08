@@ -145,7 +145,7 @@ nomask void initialize_user()
 
 void enter_game(string name, string fname)
 {
-   USER_D->register_body(name, name);
+   USER_D->register_body(query_userid(), name);
    if (!arrayp(LAST_LOGIN_D->query_last(name)))
    {
       sw_body_handle_new_logon(name, fname);
