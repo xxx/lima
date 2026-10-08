@@ -23,9 +23,14 @@ void main(string message)
       out("You can't see any exits.\n");
       return;
    default:
-      str += format_list(exits);
+      str += format_list(exits, nil);
    }
    str += ".\n";
    out(str);
    return;
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

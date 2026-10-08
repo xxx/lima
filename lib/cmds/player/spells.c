@@ -49,8 +49,8 @@ void spell_lookup(string spell)
 {
    frame_init_user();
    set_frame_title(sprintf("Spell details for %s", spell));
-   set_frame_header(0);
-   set_frame_footer(0);
+   set_frame_header(nil);
+   set_frame_footer(nil);
    set_frame_content(load_object(SPELL_D->query_spell_obname(spell))->query_description());
    out(frame_render());
 }
@@ -61,8 +61,8 @@ void list_spells(mixed arg)
    mixed *spells = values(SPELL_D->query_spell_table());
    mapping ranks = ([]);
    int num_spells;
-   spells = map(spells, ( : load_object($1) :));
-   spells = sort_array(spells, ( : spell_sort:));
+   spells = map(spells, load_object);
+   spells = sort_array(spells, spell_sort);
 
    if (member_array(arg, keys(SPELL_D->query_spell_table())) != -1)
    {
@@ -103,7 +103,7 @@ void list_spells(mixed arg)
    frame_init_user();
    set_frame_title(sprintf("Available Spells - %d ", num_spells));
 
-   frame_add_column("Name", spells->query_name(), ( : spell_name_colour:));
+   frame_add_column("Name", spells->query_name(), spell_name_colour);
    frame_add_column("S", map(spells->query_name(), ( : $(ranks)[$1] :)));
    frame_add_column("Level", map(spells->query_level(), ( : !$1 ? "Cantrip" : "" + $1:)));
    frame_add_column("Category", map(spells->query_category(), ( : capitalize($1) :)));
@@ -123,5 +123,10 @@ private
 void main(string arg)
 {
    list_spells(arg);
-   return 0;
+   return;
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
