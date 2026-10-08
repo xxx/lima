@@ -35,10 +35,10 @@ void delete_directory(string directory)
 {
    if (file_size(directory) == -1)
       return;
-   foreach (mixed *file in get_dir(sprintf("%s/", directory), -1))
+   foreach (string file in get_dir(directory))
    {
-      string target = sprintf("%s/%s", directory, file[0]);
-      if (file[1] == -2)
+      string target = sprintf("%s/%s", directory, file);
+      if (file_size(target) == -2)
          delete_directory(target);
       else
          rm(target);
@@ -53,7 +53,7 @@ int make_directories()
 
    /* Assume that if the filesize is -1 that a directory needs to be created */
    if (file_size(RST_DIR) == -1)
-      unguarded(1, ( : mkdir, RST_DIR:));
+      unguarded(1, &mkdir(RST_DIR));
 
    // Still no success? Then abort here.
    if (file_size(RST_DIR) == -1)
@@ -62,7 +62,7 @@ int make_directories()
    foreach (string d in directories)
    {
       if (file_size(RST_DIR + "/" + d) == -1)
-         unguarded(1, ( : mkdir, RST_DIR + "/" + d:));
+         unguarded(1, &mkdir(RST_DIR + "/" + d));
    }
 
    return 1;
@@ -100,19 +100,18 @@ void complete_rebuild()
    scan_mudlib();
 }
 
-// Everything below here is
-private:
 // ---------------------------------------------------------------------
 
 nosave private string *filtered_dirs =
     ({"/data/", "/ftp/", "/help/", "/include/", "/log/", "/open/", "/tmp/", "/user/", WIZ_DIR + "/", "/contrib/"});
 
+private
 string *mod_name(string file)
 {
    string *file_info;
    string clean_file;
 
-   string subdir = 0;
+   string subdir = nil;
    if (strlen(file) > 9 && file[0..8] == "/daemons/")
       subdir = "daemon";
    else if (strlen(file) > 16 && file[0..15] == "/secure/daemons/")
@@ -171,12 +170,14 @@ string *mod_name(string file)
    return file_info;
 }
 
+private
 string func_name(string bar)
 {
    sscanf(bar, "%s(", bar);
    return bar;
 }
 
+private
 string command_link(string cmd, string type, int same_level)
 {
    string name;
@@ -201,6 +202,7 @@ string command_link(string cmd, string type, int same_level)
       return ":doc:`Module: " + name + " <" + (same_level ? "" : "module/") + cmd + ">`";
 }
 
+private
 void process_file(string fname)
 {
    string file = read_file(fname);
@@ -219,7 +221,7 @@ void process_file(string fname)
    int i, len;
    int write_file = 0;
 
-   if (last_time && get_dir(fname, -1)[0][2] < last_time)
+   if (last_time && file_time(fname) < last_time)
       return;
 
    if (!file)
@@ -242,11 +244,11 @@ void process_file(string fname)
    len = sizeof(lines);
    while (i < len)
    {
-      if (regexp(lines[i], "^[ \t]*//###"))
+      if (regmatch(lines[i], "^[ \t]*//###"))
       {
-         while (sscanf(lines[i], "%*(^[ \t]*//###)%s", line))
+         while (i < len && (line = regmatch(lines[i], "^[ \t]*//###")))
          {
-            fixme += ({trim(line) + " (line " + (i + 1) + ")"});
+            fixme += ({trim(lines[i][sizeof(line)..]) + " (line " + (i + 1) + ")"});
             i++;
          }
          write_file = 1;
@@ -310,7 +312,7 @@ void process_file(string fname)
          else if (sscanf(line, "FUNCTION %s", line) == 1)
          {
             string prototype;
-            string match;
+            mixed *match;
 
             while ((i < sizeof(lines)) && (lines[i][0..1] == "//"))
             {
@@ -321,14 +323,13 @@ void process_file(string fname)
                   description += "\n" + lines[i][2..];
                i++;
             }
-            // ### regexp() doesn't match any ";", had to replace_string() them
-            match = regexp(map(lines[i..i + 19], ( : replace_string($1, ";", "#") :)), "\\<" + line + "\\>", 1);
-            if (sizeof(match) > 0)
+            match = regexp(lines[i..i + 19], "\\b" + line + "\\b", 1);
+            if (sizeof(match))
             {
-               if (sscanf(implode(lines[i + match[1] - 1..i + match[1] + 4], "\n"),
-                          "%([ \t]*([a-zA-Z_][a-zA-Z0-9_* \t\n]*|)\\<" + line +
-                              "\\>[ \t\n]*\\([ \t\na-zA-Z_0-9*,.]*(\\)|))",
-                          prototype))
+               prototype = regmatch(implode(lines[i + match[0] - 1..i + match[0] + 4], "\n"),
+                  "[ \t]*([a-zA-Z_][a-zA-Z0-9_* \t\n]*|)\\b" + line +
+                  "\\b[ \t\n]*\\([ \t\na-zA-Z_0-9*,.]*(\\)|)");
+               if (prototype)
                {
                   c_functions += ({".. c:function:: " + prototype + "\n" + description + "\n\n\n"});
                   write_file = 1;
@@ -475,6 +476,7 @@ void process_file(string fname)
    }
 }
 
+private
 void make_index(string header, string type, string *files, string filename)
 {
    string output;
@@ -497,6 +499,7 @@ void make_index(string header, string type, string *files, string filename)
    write_file(filename, output);
 }
 
+private
 void write_indices()
 {
    /* Player commands index */
@@ -527,32 +530,33 @@ void write_indices()
    files = get_dir(RST_DIR + "/mudlib/*.rst");
    make_index("Mudlib", "mudlib", files, RST_DIR + "/Mudlib.rst");
 
-   cp("/USAGE", RST_DIR + "/Usage.rst");
+   write_file(RST_DIR + "/Usage.rst", read_file("/USAGE"), 1);
 }
 
+private
 void continue_scan()
 {
-   mixed *files;
-   mixed *item;
+   string *files;
+   string item;
 
    for (int i = 0; i < 10; i++)
    {
       if (sizeof(dirs_to_do))
       {
          // printf("RST_D: Scanning %s ...\n", dirs_to_do[0]);
-         files = get_dir(dirs_to_do[0], -1);
+         files = get_dir(dirs_to_do[0]);
          foreach (item in files)
          {
-            if (item[1] == -2)
+            if (file_size(dirs_to_do[0] + item) == -2)
             {
-               string dir = dirs_to_do[0] + item[0] + "/";
+               string dir = dirs_to_do[0] + item + "/";
                if (member_array(dir, filtered_dirs) != -1)
                   continue;
                dirs_to_do += ({dir});
             }
-            else if (item[2] > last_time && item[0][ < 2.. < 1] == ".c")
+            else if (item[<2..] == ".c" && file_time(dirs_to_do[0] + item) > last_time)
             {
-               files_to_do += ({dirs_to_do[0] + item[0]});
+               files_to_do += ({dirs_to_do[0] + item});
             }
          }
          dirs_to_do[0..0] = ({});
@@ -566,13 +570,13 @@ void continue_scan()
           ** off the stack and fail.  Note that we don't actually hit priv
           ** 1, but the maximum allowed.
           */
-         unguarded(1, ( : process_file, files_to_do[0] :));
+         unguarded(1, &process_file(files_to_do[0]));
          files_to_do[0..0] = ({});
       }
       else
       {
          printf("RST_D: Done with sub pages.\nWriting indices.\n");
-         unguarded(1, ( : write_indices:));
+         unguarded(1, write_indices);
          printf("RST_D: Done.\n");
          last_time = time();
          save_me();
@@ -580,15 +584,17 @@ void continue_scan()
          return;
       }
    }
-   call_out(( : continue_scan:), (1*TOO_GREEDY_DAEMONS));
+   call_out(continue_scan, (1*TOO_GREEDY_DAEMONS));
 }
 
+private
 void do_sweep()
 {
    scan_mudlib();
-   call_out(( : do_sweep:), 86000);
+   call_out(do_sweep, 86000);
 }
 
+private
 void create()
 {
    if (clonep())
@@ -600,5 +606,5 @@ void create()
    if (!last_time)
       do_sweep();
    else
-      call_out(( : do_sweep:), 86000);
+      call_out(do_sweep, 86000);
 }
