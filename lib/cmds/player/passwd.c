@@ -40,7 +40,7 @@ nomask void get_new_password(string s)
    }
    else
    {
-      modal_simple(( : confirm_new_password, s:), "Again to confirm: ", 1);
+      modal_simple(&confirm_new_password(s), "Again to confirm: ", 1);
    }
 }
 
@@ -55,7 +55,7 @@ nomask void confirm_current_password(string s)
    }
    else
    {
-      modal_simple(( : get_new_password:), "New password: ", 1);
+      modal_simple(get_new_password, "New password: ", 1);
    }
 }
 
@@ -69,5 +69,10 @@ void main()
       return;
    }
 
-   modal_simple(( : confirm_current_password:), "Enter your current password: ", 1);
+   modal_simple(confirm_current_password, "Enter your current password: ", 1);
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main();
 }
