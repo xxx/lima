@@ -6,7 +6,7 @@ void setup()
 {
    set_id("greataxe", "axe");
    set_weight(3.2);
-   set_value(30);
+   set_value(30.0);
    set_weapon_class(12);
    set_combat_messages("combat-sword");
    set_damage_type("slashing");

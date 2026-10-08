@@ -29,7 +29,7 @@ void do_dualwield_obs(object *obs)
    {
       int force_dual_wield = 0;
       string limb;
-      if (typeof(ob) == T_STRING)
+      if (stringp(ob))
          continue;
       if (ob->is_living() || environment(ob) != this_body())
          continue;

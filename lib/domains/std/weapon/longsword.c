@@ -7,7 +7,7 @@ void setup()
    set_weapon_class(8);
    set_id("longsword");
    set_weight(1.3);
-   set_value(15);
+   set_value(15.0);
    set_skill_used("combat/melee/blade");
    set_skill_restriction("combat/melee/blade", 1);
    set_skill_restriction_message(
