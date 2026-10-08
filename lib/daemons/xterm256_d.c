@@ -29,6 +29,18 @@ nosave mapping client_compat = ([]);
 
 private
 void load_all_colours();
+private string *colour_data_lines(string filename, int expected)
+{
+   string text = read_file(filename);
+   string *lines;
+   if (!stringp(text))
+      error("Cannot read colour data: " + filename);
+   lines = filter(map(explode(text, "\n"), trim), (: $1 != "" :));
+   if (!sizeof(lines) || (expected && sizeof(lines) != expected))
+      error("Invalid colour data row count: " + filename);
+   return lines;
+}
+
 private
 void load_client_compat();
 public
@@ -64,22 +76,32 @@ int colour_code(string s)
    return strlen(s) == 3 && to_int(s) > 0 && to_int(s) < 256;
 }
 
+private string *colour_data_lines(string filename, int expected)
+{
+   string text = read_file(filename);
+   string *lines;
+   if (!stringp(text))
+      error("Cannot read colour data: " + filename);
+   lines = filter(map(explode(text, "\n"), trim), (: $1 != "" :));
+   if (!sizeof(lines) || (expected && sizeof(lines) != expected))
+      error("Invalid colour data row count: " + filename);
+   return lines;
+}
+
 private
 void load_client_compat()
 {
-   string *clients = explode(read_file("/data/xterm256/client_data"), "\n");
+   string *clients = colour_data_lines("/data/xterm256/client_data", 0);
    foreach (string line in clients)
    {
-      string *data = explode(line, ":");
-      string client;
-      string compat;
-
-      sscanf(line, "%s:%s", client, compat);
-      if (client && compat)
-      {
-         client_compat[client] = compat;
-      }
+      string client, compat;
+      if (sscanf(line, "%s:%s", client, compat) != 2 || client == "" ||
+          member_array(compat, ({"plain", "vt100", "ansi", "xterm"})) == -1)
+         error("Invalid client colour mode: " + line);
+      client_compat[client] = compat;
    }
+   if (!has_key(client_compat, "default"))
+      error("Missing default client colour mode");
 }
 
 string client_compatibility(string client)
@@ -118,37 +140,44 @@ void load_all_colours()
                  "BLD":sprintf("%c[1m", 27),  // bold on
    ]);
 
-   lines = explode(read_file("/data/xterm256/256_to_16_fallback.txt"), "\n");
+   lines = colour_data_lines("/data/xterm256/256_to_16_fallback.txt", 256);
    i = 256;
    fallback_codes = allocate(i);
    while (i--)
    {
-      string fallback;
-
-      sscanf(lines[i], "%*s,%s", fallback);
-
+      string source, fallback;
+      if (sscanf(lines[i], "%s,%s", source, fallback) != 2 ||
+          source != sprintf("%03d", i) || to_int(fallback) < 0 || to_int(fallback) > 15 ||
+          fallback != sprintf("%03d", to_int(fallback)))
+         error("Invalid colour fallback row: " + lines[i]);
       fallback_codes[i] = fallback;
    }
 
-   lines = explode(read_file("/data/xterm256/xterm_ansi_16_fg.txt"), "\n");
+   lines = colour_data_lines("/data/xterm256/xterm_ansi_16_fg.txt", 16);
    i = 16;
    while (i--)
    {
       string xterm;
       string fallback;
 
-      sscanf(lines[i], "%s,%s", xterm, fallback);
+      if (sscanf(lines[i], "%s,%s", xterm, fallback) != 2 || xterm != sprintf("%03d", i) ||
+          fallback != sprintf("%d", to_int(fallback)) ||
+          member_array(to_int(fallback), ({30,31,32,33,34,35,36,37,90,91,92,93,94,95,96,97})) == -1)
+         error("Invalid ANSI foreground row: " + lines[i]);
       x256_to_16_fg[xterm] = sprintf("%c[%sm", 27, fallback);
    }
 
-   lines = explode(read_file("/data/xterm256/xterm_ansi_16_bg.txt"), "\n");
+   lines = colour_data_lines("/data/xterm256/xterm_ansi_16_bg.txt", 16);
    i = 16;
    while (i--)
    {
       string xterm;
       string fallback;
 
-      sscanf(lines[i], "%s,%s", xterm, fallback);
+      if (sscanf(lines[i], "%s,%s", xterm, fallback) != 2 || xterm != sprintf("%03d", i) ||
+          fallback != sprintf("%d", to_int(fallback)) ||
+          member_array(to_int(fallback), ({40,41,42,43,44,45,46,47,100,101,102,103,104,105,106,107})) == -1)
+         error("Invalid ANSI background row: " + lines[i]);
       x256_to_16_bg[xterm] = sprintf("%c[%sm", 27, fallback);
    }
 }
@@ -166,7 +195,7 @@ varargs string substitute_ansi(string text = "", string mode)
    if (text == "")
       return "";
 
-   assoc = pcre_assoc(text, ({PINKFISH_COLOURS}), ({1}));
+   assoc = reg_assoc(text, ({PINKFISH_COLOURS}), ({1}));
    parts = assoc[0];
    matched = assoc[1];
    sz = sizeof(parts);
@@ -227,10 +256,10 @@ varargs string substitute_ansi(string text = "", string mode)
             if (strlen(part) > 6 && part[0..4] == "BOLD,")
             {
                part = part[5..];
-               parts[sz] = ansi["BOLD"] + ansi[part];
+               parts[sz] = ansi["BOLD"] + (ansi[part] || "");
             }
             else
-               parts[sz] = ansi[part];
+               parts[sz] = ansi[part] || "";
          }
       }
       break;
@@ -265,7 +294,7 @@ varargs string substitute_colour(string text = "", string mode)
    if (ansip(text))
       text = substitute_ansi(text, mode);
 
-   assoc = pcre_assoc(text, ({XTERM256_COLOURS}), ({1}));
+   assoc = reg_assoc(text, ({XTERM256_COLOURS}), ({1}));
    parts = assoc[0];
    matched = assoc[1];
    sz = sizeof(parts);
@@ -411,10 +440,10 @@ string xterm256_wrap(string str, int wrap_at, int indent_at)
 
 int ansip(string text)
 {
-   return pcre_match(text, PINKFISH_COLOURS);
+   return sizeof(regexp(({text}), PINKFISH_COLOURS)) != 0;
 }
 
 int colourp(string text)
 {
-   return pcre_match(text, XTERM256_COLOURS);
+   return sizeof(regexp(({text}), XTERM256_COLOURS)) != 0;
 }

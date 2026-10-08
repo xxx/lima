@@ -17,7 +17,7 @@ inherit M_REGEX;
    ({CMD_DIR_NO_RESTRICT "/", CMD_DIR_RESTRICT "/", CMD_DIR_CREATE "/", CMD_DIR_PLAYER "/", CMD_DIR_ADMIN "/"})
 
 private
-nosave string path;
+nosave string *path;
 int expand_vars;
 
 void set_expand_vars(int i)
@@ -30,7 +30,7 @@ int is_variable(string name);
 private
 void cmd_rehash()
 {
-   CMD_D->cache(map(path, ( : evaluate_path:)));
+   CMD_D->cache(map(path, evaluate_path));
    write("Okay.\n");
 }
 
@@ -74,7 +74,7 @@ nomask string *expand_arguments(string *argv)
       if (strlen(argv[i]) > 2 && argv[i][0] == '`' && argv[i][ < 1] == '`')
       {
          if (catch (argv[i] = evaluate_code(argv[i][1.. < 2])))
-            return 0;
+            return nil;
       }
    }
    return argv;
@@ -85,12 +85,17 @@ private
 void set_path(string *arg)
 {
    if (!arrayp(arg))
+   {
+      if (arg)
+         error("Invalid shell command path");
+      path = ({});
       return;
-   arg = filter(arg, ( : stringp:));
-   path = map(arg, ( : evaluate_path:));
+   }
+   arg = filter(arg, stringp);
+   path = map(arg, evaluate_path);
 }
 
-string query_path()
+string *query_path()
 {
    // New shells need to query this to get the saved value
    if (!path)
@@ -119,34 +124,30 @@ void create()
    if (!clonep())
       return;
 
-   ::create();
+   shell::create();
    prompt::create();
 
    set_privilege(1);
 
-   arg_to_words_func = ( : argument_explode:);
+   arg_to_words_func = argument_explode;
 }
 
 protected
 void prepare_shell()
 {
-   ::prepare_shell();
-
-   set_if_undefined("path", WIZ_CMD_DIRS);
-
-   if (query_owner() && adminp(query_owner()))
-      set_if_undefined("path", ADMIN_CMD_DIRS);
-
    set_if_undefined("pwd", "/");
    set_if_undefined("cwf", 0);
+   add_variable_hook("path", set_path);
+   set_if_undefined("path", adminp(query_owner()) ? ADMIN_CMD_DIRS : WIZ_CMD_DIRS);
+   set_path(get_variable("path"));
+   shell::prepare_shell();
 
-   shell_bind_if_undefined("resetpath", ( : fix_path:));
-   shell_bind_if_undefined("?", ( : show_shell_help:));
-   shell_bind_if_undefined("set", ( : cmd_set:));
-   shell_bind_if_undefined("unset", ( : cmd_unset:));
-   shell_bind_if_undefined("rehash", ( : cmd_rehash:));
+   shell_bind_if_undefined("resetpath", fix_path);
+   shell_bind_if_undefined("?", show_shell_help);
+   shell_bind_if_undefined("set", cmd_set);
+   shell_bind_if_undefined("unset", cmd_unset);
+   shell_bind_if_undefined("rehash", cmd_rehash);
 
-   add_variable_hook("path", ( : set_path:));
 }
 
 string query_shellname()
@@ -200,13 +201,13 @@ varargs protected void execute_command(string original_input)
       if (sizeof(argv) == 3)
          set_variable(argv[0][1..], expand_if_variable(argv[2]));
       else
-         set_variable(argv[0][1..], implode_by_arr(map(argv[2..], ( : expand_if_variable:)), implode_info[2..]));
+         set_variable(argv[0][1..], implode_by_arr(map(argv[2..], expand_if_variable), implode_info[2..]));
       return;
    }
 
    // Expand variables
    if (expand_vars)
-      argv = map(argv, ( : expand_if_variable:));
+      argv = map(argv, expand_if_variable);
 
    // ### wtf is this?
    // Hmm, I might undo this one...  the only reason this is here is to
@@ -302,7 +303,7 @@ void set_cwf(string fname)
 
 void setup_for_save()
 {
-   ::setup_for_save();
+   shell::setup_for_save();
 
    shellvars::setup_for_save();
 }
@@ -310,7 +311,7 @@ void setup_for_save()
 protected
 mixed what_prompt()
 {
-   return ( : get_prompt:);
+   return get_prompt;
 }
 
 protected

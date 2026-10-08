@@ -196,10 +196,10 @@ void add_admincmds()
 protected
 void prepare_shell()
 {
-   shell_bind_if_undefined("alias", ( : cmd_alias:));
+   shell_bind_if_undefined("alias", cmd_alias);
    shell_bind_if_undefined("unalias", ( : cmd_remove_alias($1) :));
-   shell_bind_if_undefined("history", ( : cmd_history:));
-   shell_bind_if_undefined("scrollback", ( : cmd_scrollback:));
+   shell_bind_if_undefined("history", cmd_history);
+   shell_bind_if_undefined("scrollback", cmd_scrollback);
    //    shell_bind_if_undefined("exit",	(: cmd_exit :));
    add_admincmds();
 }
@@ -215,7 +215,7 @@ void start_shell()
    if (owner != this_user() || previous_object() != owner)
       error("illegal attempt to take over shell\n");
 
-   modal_push(( : shell_input:), what_prompt());
+   modal_push(shell_input, what_prompt());
 
    prepare_shell();
 }

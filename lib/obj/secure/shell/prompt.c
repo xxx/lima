@@ -29,7 +29,7 @@ void set_prompt(string s)
    s = replace_string(s, "%_", "\n");
    s = replace_string(s, "%m", mud_name());
    s = replace_string(s, "%N", this_user()->query_userid());
-   if (s[0] == '"' && s[ < 1] == '"')
+   if (strlen(s) >= 2 && s[0] == '"' && s[ < 1] == '"')
       s = s[1.. < 2];
    prompt = s;
 
@@ -176,5 +176,5 @@ string get_prompt()
 protected
 void create()
 {
-   this_object()->add_variable_hook("PROMPT", ( : set_prompt:));
+   this_object()->add_variable_hook("PROMPT", set_prompt);
 }

@@ -261,7 +261,7 @@ nomask mixed query_history()
 }
 
 protected
-void cmd_history(string input)
+void cmd_history(mixed input)
 {
    mixed stuff = history_command(input);
    if (stuff)

@@ -26,7 +26,7 @@ private
 nosave object input_user;
 
 protected
-varargs nomask void modal_push(function input_func, mixed prompt_func, function secure, function return_to_func)
+varargs nomask void modal_push(function input_func, mixed prompt_func, int secure, function return_to_func)
 {
    if (input_user && this_user() != input_user)
       error("user mismatch -- already assigned to a user\n");

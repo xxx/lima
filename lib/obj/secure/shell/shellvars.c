@@ -107,7 +107,7 @@ varargs protected mixed expand_if_variable(string arg, int only_expand_if_string
 
 mixed *substitute_variables(mixed *argv)
 {
-   return map(argv, ( : expand_if_variable:));
+   return map(argv, expand_if_variable);
 }
 
 /*
