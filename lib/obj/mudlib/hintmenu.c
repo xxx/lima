@@ -60,7 +60,7 @@ void view_question(string area, string file, string question)
 {
    class menu question_menu = new_menu("");
    set_menu_prompt(question_menu, "[<enter>, (p)revious hint, (b)ack, (q)uit] ");
-   set_no_match_function(question_menu, ( : show_next_hint:));
+   set_no_match_function(question_menu, show_next_hint);
    hints = explode(read_file("/help/hints/" + area + "/" + file), "\n")[1..] - ({""});
    hints_read = 0;
    show_next_hint("");
@@ -89,7 +89,7 @@ void view_dir(string s)
    add_menu_item(m, goto_main_menu_item);
    add_menu_item(m, blank_seperator);
    allow_empty_selection(m);
-   set_no_match_function(m, ( : quit_if_cr:));
+   set_no_match_function(m, quit_if_cr);
    set_menu_prompt(m, "[#mq] ");
    previous_menu = current_menu;
    current_menu = m;
@@ -106,7 +106,7 @@ void create()
    // Since we'll use these things more than once, we can just
    // call new_menu_item once, and insert them wherever we want
    // to use them.
-   quit_item = new_menu_item("Quit", ( : quit_menu_application:), "q");
+   quit_item = new_menu_item("Quit", quit_menu_application, "q");
    goto_main_menu_item = new_menu_item("Return to main menu", toplevel, "m");
 
    main_seperator = new_seperator(simple_divider());
@@ -130,7 +130,7 @@ void create()
    // add_menu_item(toplevel, main_seperator);
    set_menu_prompt(toplevel, "[#q] ");
    allow_empty_selection(toplevel);
-   set_no_match_function(toplevel, ( : quit_if_cr:));
+   set_no_match_function(toplevel, quit_if_cr);
 }
 
 void start_menu()

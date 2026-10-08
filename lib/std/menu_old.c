@@ -276,22 +276,22 @@ void new_parse_menu_input(string input)
          if (menu_after_selection)
          {
             goto_menu(menu_after_selection);
-            menu_after_selection = 0;
+            menu_after_selection = nil;
          }
          return;
       }
       matched_item =
           filter(current_menu.items,
                        (
-                           : intp(((class menu_item)$1)->choice_name) ? sprintf("%d", ((class menu_item)$1)->choice_name) == $2
-                                                                : ((class menu_item)$1)->choice_name == $2:),
+                           : intp(((class menu_item)$1).choice_name) ? sprintf("%d", ((class menu_item)$1).choice_name) == $2
+                                                                : ((class menu_item)$1).choice_name == $2:),
                        matches[0])[0];
       if (functionp(matched_item.action))
       {
          if (menu_after_selection)
          {
             goto_menu(menu_after_selection);
-            menu_after_selection = 0;
+            menu_after_selection = nil;
          }
          evaluate(matched_item.action, input);
          need_refreshing = 1;
@@ -307,9 +307,9 @@ void new_parse_menu_input(string input)
       set_menu_items(completion_menu,
                      filter(current_menu.items,
                                   (
-                                      : intp(((class menu_item)$1)->choice_name)
-                                            ? member_array(sprintf("%d", ((class menu_item)$1)->choice_name), $2) != -1
-                                            : member_array(((class menu_item)$1)->choice_name, $2) != -1
+                                      : intp(((class menu_item)$1).choice_name)
+                                            ? member_array(sprintf("%d", ((class menu_item)$1).choice_name), $2) != -1
+                                            : member_array(((class menu_item)$1).choice_name, $2) != -1
                                       :),
                                   matches));
       add_menu_item(completion_menu, new_menu_item("Return to previous menu", current_menu));
@@ -384,7 +384,7 @@ string get_current_prompt()
       {
          if (item.disabled || item.seperator || (item.constraint && !evaluate(item.constraint)))
             continue;
-         if (!c = item.choice_name)
+         if (!(c = item.choice_name))
          {
             counter++;
             continue;
@@ -412,7 +412,7 @@ string get_current_prompt()
 protected
 void init_menu_application(class menu toplevel)
 {
-   modal_push(( : parse_menu_input:), ( : get_current_prompt:));
+   modal_push(parse_menu_input, get_current_prompt);
    current_menu = toplevel;
    goto_menu(toplevel);
 }
@@ -473,17 +473,17 @@ void display_current_menu()
       return;
    }
    rightwidth = max(map(filter(current_menu.items, (
-                                                             : !(((class menu_item)$1)->seperator)
+                                                             : !(((class menu_item)$1).seperator)
                                                              :)),
                         (
-                            : strlen(((class menu_item)$1)->description)
+                            : strlen(((class menu_item)$1).description)
                             :)));
    // This stuff is getting as ugly as Amylaar closures =P
    leftwidth = max(map(filter(current_menu.items, (
-                                                            : stringp(((class menu_item)$1)->choice_name)
+                                                            : stringp(((class menu_item)$1).choice_name)
                                                             :)),
                        (
-                           : strlen(((class menu_item)$1)->choice_name)
+                           : strlen(((class menu_item)$1).choice_name)
                            :)) +
                    ({3}));
 
@@ -588,7 +588,7 @@ varargs protected void complete_choice(string input, string *choices, function f
                "-----------------------\n";
       for (i = 1; i <= sizeof(matches); i++)
          output += sprintf("%=3d)  %s\n", i, matches[i - 1]);
-      modal_simple(( : finish_completion, f, matches:), "[Enter number or r to return to menu] ");
+      modal_simple(&finish_completion(f, matches), "[Enter number or r to return to menu] ");
       more(output);
       break;
    }
