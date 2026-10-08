@@ -67,7 +67,7 @@ int query_didlog_off()
 // Primarily used in the login process.
 void display_didlog()
 {
-   if (wizardp(this_object()))
+   if (wizardp(this_object()) && !didlog_off)
    {
       DID_D->dump_did_info(query_didlog_time(),
                            ({"", "Changes since you last logged in", "--------------------------------", ""}), 0);

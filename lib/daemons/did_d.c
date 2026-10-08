@@ -24,6 +24,8 @@ string curver()
 
 void set_version(string s)
 {
+   if (!check_privilege("Mudlib:daemons"))
+      error("Only Admins may set didlog versions.\n");
    version = s;
    did[s] = ({});
    save_me();
@@ -48,7 +50,7 @@ int someone_did(string str)
    if (!curver())
    {
       write(implode(help_me(), "\n"));
-      return;
+      return 0;
    }
 
    str = capitalize(this_user()->query_userid()) + " " + str;
@@ -97,7 +99,7 @@ nomask string *get_entries(int after, string *header, string pattern, string v)
       did[v] = ({});
 
    if (index >= sizeof(did[v]))
-      return 0;
+      return nil;
 
    if (!header)
       output = ({"Change Log", "**********", ""});
@@ -107,14 +109,14 @@ nomask string *get_entries(int after, string *header, string pattern, string v)
 
    for (; index < sizeof(did[v]); index++)
    {
-      if (!pattern || regexp(did[v][index][1], pattern))
+      if (!pattern || sizeof(regexp(({did[v][index][1]}), pattern)))
          output += explode(sprintf("%s: %s", ctime(did[v][index][0]), did[v][index][1]), "\n") + ({""});
    }
 
    return output;
 }
 
-string *dump_entries()
+mixed *dump_entries()
 {
    return did[curver()];
 }
@@ -169,21 +171,22 @@ varargs string get_did_info(int after, string *header, string pattern, function 
 
 varargs void print_changelog_to_file(string file, int after, int show_date)
 {
+   mixed *entries = did[curver()];
    int index = start_index(curver(), after);
    string output = "";
 
    if (show_date)
    {
-      for (; index < sizeof(did); index++)
+      for (; index < sizeof(entries); index++)
       {
-         output += sprintf("%s: %s\n", ctime(did[index][0]), did[index][1]) + "\n";
+         output += sprintf("%s: %s\n", ctime(entries[index][0]), entries[index][1]) + "\n";
       }
    }
    else
    {
-      for (; index < sizeof(did); index++)
+      for (; index < sizeof(entries); index++)
       {
-         output += sprintf("%s\n", did[index][1]) + "\n";
+         output += sprintf("%s\n", entries[index][1]) + "\n";
       }
    }
    write_file(file, output);
