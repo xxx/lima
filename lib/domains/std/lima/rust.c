@@ -5,7 +5,7 @@ inherit M_CONVERSATION;
 
 void handle_help()
 {
-   new (__DIR__ "directory")->move(this_body());
+   clone_object (__DIR__ "directory")->move(this_body());
    targetted_action("$N $vgive $t a directory.\n", this_body());
    set_start(({"forever"}), this_body());
 }

@@ -59,7 +59,7 @@ nomask private void main()
       out("Entering converse mode. Type '**' or '.' to quit.\n");
       if (!simplify())
          out("-------------------------------------------------\n");
-      new (base_name())->start_cmd();
+      clone_object (base_name())->start_cmd();
       return;
    }
    destruct();

@@ -15,5 +15,5 @@ inherit CMD;
 private
 void main()
 {
-   new (PLAYER_MENU)->start_menu();
+   clone_object (PLAYER_MENU)->start_menu();
 }

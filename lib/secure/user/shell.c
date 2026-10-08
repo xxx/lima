@@ -29,7 +29,7 @@ nomask void start_shell(int init_only)
 {
    if (!shell_ob)
    {
-      shell_ob = new (wizardp(query_userid()) ? WIZ_SHELL : PLAYER_SHELL);
+      shell_ob = clone_object (wizardp(query_userid()) ? WIZ_SHELL : PLAYER_SHELL);
    }
 
    if (!init_only)

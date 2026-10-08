@@ -983,7 +983,7 @@ int run_mission(int tier, string name, string guild)
 {
    if (guild_mission_obs[tier] && guild_mission_obs[tier][name])
    {
-      object mission_ob = new (base_name(guild_mission_obs[tier][name]), guild);
+      object mission_ob = clone_object (base_name(guild_mission_obs[tier][name]), guild);
       add_log(guild, "Tier " + tier + " mission '" + name + "'");
       TBUG("Mission: " + base_name(guild_mission_obs[tier][name]));
       if (mission_ob)
@@ -1005,7 +1005,7 @@ varargs int start_favour(int tier, string name, string guild, int end_time)
       favour_cost = favour_ob->query_favour();
       filename = base_name(favour_ob);
       favour_length = favour_ob->query_length();
-      buff_ob = new (filename, guild);
+      buff_ob = clone_object (filename, guild);
       if (end_time)
          buff_ob->set_ends_at(end_time);
       if (!buff_list[tier])

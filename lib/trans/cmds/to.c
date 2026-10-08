@@ -34,5 +34,5 @@ nomask void main(string arg)
    }
 
    printf("** Enter args to \"%s\". **\n", arg);
-   new (EDIT_OB, EDIT_TEXT, 0, ( : done_editing, arg:));
+   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : done_editing, arg:));
 }

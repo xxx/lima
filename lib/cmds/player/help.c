@@ -27,7 +27,7 @@ inherit CMD;
 private
 void main(string arg)
 {
-   new (HELPSYS)->begin_help(arg);
+   clone_object (HELPSYS)->begin_help(arg);
 }
 
 void player_menu_entry()

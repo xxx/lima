@@ -59,5 +59,5 @@ nomask private void main(string *argv)
    locks[fname] = this_user();
    this_user()->query_shell_ob()->set_cwf(fname);
 
-   new (ED_SESSION)->begin_editing(fname, 0, ( : unlock($(fname)) :));
+   clone_object (ED_SESSION)->begin_editing(fname, 0, ( : unlock($(fname)) :));
 }

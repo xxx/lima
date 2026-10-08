@@ -305,7 +305,7 @@ private nomask void mailer_get_subject(string to_list, string arg)
 {
    string subject = arg ? arg : "<none>";
 
-   new(EDIT_OB, EDIT_FILE, tmp_fname(), ( : mailer_done_edit, to_list, subject:));
+   clone_object(EDIT_OB, EDIT_FILE, tmp_fname(), ( : mailer_done_edit, to_list, subject:));
 }
 
 protected nomask void cmd_mail(string to_list)
@@ -355,7 +355,7 @@ protected nomask void cmd_reply(int user_num, int reply_all)
    file = tmp_fname();
    write_file(file, body);
 
-   new(EDIT_OB, EDIT_FILE, tmp_fname(), ( : mailer_done_edit, to_list, subject:));
+   clone_object(EDIT_OB, EDIT_FILE, tmp_fname(), ( : mailer_done_edit, to_list, subject:));
 }
 
 protected nomask void cmd_delete(string arg)

@@ -35,7 +35,7 @@ int drink_from_it(mixed fluid)
    object fluid_ob;
    int cntinue = 1;
 
-   fluid_ob = new (is_source_of());
+   fluid_ob = clone_object (is_source_of());
 
    if (functionp(drink_action))
       cntinue = evaluate(drink_action);

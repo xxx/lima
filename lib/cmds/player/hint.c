@@ -17,5 +17,5 @@ inherit CMD;
 private
 void main()
 {
-   new (HINT_MENU)->start_menu();
+   clone_object (HINT_MENU)->start_menu();
 }

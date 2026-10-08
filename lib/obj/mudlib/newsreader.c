@@ -589,7 +589,7 @@ nomask void receive_post_subject(mixed subject)
       return;
    }
 
-   new (EDIT_OB, EDIT_TEXT, 0, ( : receive_post_text, subject:));
+   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : receive_post_text, subject:));
 }
 
 private
@@ -625,7 +625,7 @@ nomask void reply_to_message()
       write("You may not reply to that message -- it was removed.\n");
       return;
    }
-   new (EDIT_OB, EDIT_TEXT, 0, ( : receive_reply_text:));
+   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : receive_reply_text:));
 }
 
 private
@@ -641,7 +641,7 @@ nomask void reply_with_message()
    lines = ({sprintf("On %s %s wrote post %s in %s:", intp(msg.time) ? ctime(msg.time) : msg.time, msg.poster,
                      msg.subject, current_group)});
    lines += map_array(explode(msg.body, "\n"), ( : "> " + $1:));
-   new (EDIT_OB, EDIT_TEXT, lines, ( : receive_reply_text:));
+   clone_object (EDIT_OB, EDIT_TEXT, lines, ( : receive_reply_text:));
 }
 
 nomask void receive_followup_text(string *text)
@@ -676,7 +676,7 @@ nomask void followup_to_message()
       write("You may not post to " + current_group + ".\n");
       return;
    }
-   new (EDIT_OB, EDIT_TEXT, 0, ( : receive_followup_text:));
+   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : receive_followup_text:));
 }
 
 private
@@ -698,7 +698,7 @@ nomask void followup_with_message()
 
    lines += map_array(explode(msg.body, "\n"), ( : "> " + $1:));
 
-   new (EDIT_OB, EDIT_TEXT, lines, ( : receive_followup_text:));
+   clone_object (EDIT_OB, EDIT_TEXT, lines, ( : receive_followup_text:));
 }
 
 private

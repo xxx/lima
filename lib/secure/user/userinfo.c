@@ -175,7 +175,7 @@ nomask varargs void userinfo_handle_logon(int state, mixed extra, string arg)
 #ifndef USE_USER_MENU
       this_object()->enter_game(this_object()->query_userid());
 #else
-      tmp = new (USER_MENU);
+      tmp = clone_object (USER_MENU);
       tmp->start_menu();
 #endif
       return;

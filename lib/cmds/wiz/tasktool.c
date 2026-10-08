@@ -13,5 +13,5 @@ inherit CMD;
 private
 void main(string arg)
 {
-   new (TASKTOOL);
+   clone_object (TASKTOOL);
 }

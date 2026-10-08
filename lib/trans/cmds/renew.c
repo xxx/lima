@@ -34,7 +34,7 @@ void main(mixed *arg)
    outf("Updating '" + file + "' ...\n");
    if (CMD_OB_UPDATE->do_update(file, 3) < time())
       out(file + ": No update necessary.\n");
-   ob = new (file);
+   ob = clone_object (file);
    ob->load_from_string(data, 1);
    ob->move(env);
 }

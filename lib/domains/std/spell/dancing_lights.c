@@ -35,7 +35,7 @@ void cast_spell(object ob, object reagent, int success)
    }
 
    // Create the dancing lights object, it's unique to the caster.
-   dl = new (DANCING_LIGHTS_OBJ, duration);
+   dl = clone_object (DANCING_LIGHTS_OBJ, duration);
    this_body()->simple_action("$N $vsummon a swarm " + (success ? "of bright " : "") + "of dancing lights.");
    dl->move(environment(this_body()));
    dl->set_tamed_by(this_body());

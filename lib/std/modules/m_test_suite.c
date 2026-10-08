@@ -98,7 +98,7 @@ object clone(string file)
    object ob;
    string err;
 
-   err = catch (ob = new (file));
+   err = catch (ob = clone_object (file));
    if (err)
    {
       debug("Failed to clone " + file);
@@ -132,7 +132,7 @@ object *std_clone(mixed *items)
 
    foreach (string item in items)
    {
-      err = catch (ob = new ("/domains/std/" + item));
+      err = catch (ob = clone_object ("/domains/std/" + item));
       if (err)
       {
          debug("Failed to clone " + item);

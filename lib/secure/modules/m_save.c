@@ -145,7 +145,7 @@ void old_load_from_string(mixed value, int recurse)
       foreach (obj in value[2])
       {
          value = restore_variable(obj);
-         ob = new (value[0]);
+         ob = clone_object (value[0]);
          ob->load_from_string(value, 1);
       }
    }
@@ -200,7 +200,7 @@ void load_from_string(mixed value, int recurse)
       foreach (obj in data["#inventory#"])
       {
          val = restore_variable(obj);
-         if (!(ob = new (val["#base_name#"])))
+         if (!(ob = clone_object (val["#base_name#"])))
             continue;
          ob->load_from_string(val, recurse + 1);
       }

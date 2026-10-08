@@ -14,7 +14,7 @@ inherit LIVING;
 string long_func()
 {
    if (!present("beekjr", environment()))
-      new ("/domains/std/beekjr")->move(environment());
+      clone_object ("/domains/std/beekjr")->move(environment());
    return "As you look at the crowd, you notice Beekjr standing off to one side.";
 }
 

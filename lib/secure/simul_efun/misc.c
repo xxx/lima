@@ -874,5 +874,5 @@ string pround(float f, int p)
 //     nnew(3,"/domains/std/consumable/beer")->move(this_body());
 object *nnew(int count, string file, string args...)
 {
-   return ({new (file, args...)}) + (--count > 0 ? nnew(count, file, args...) : ({}));
+   return ({clone_object (file, args...)}) + (--count > 0 ? nnew(count, file, args...) : ({}));
 }

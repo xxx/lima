@@ -26,9 +26,9 @@ nomask object query_mailer()
    if (!mailer)
    {
       if (default_mailer)
-         mailer = new (default_mailer);
+         mailer = clone_object (default_mailer);
       else
-         mailer = new (valid_mailers[0]);
+         mailer = clone_object (valid_mailers[0]);
    }
    return mailer;
 }

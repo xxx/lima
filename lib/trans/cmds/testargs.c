@@ -65,6 +65,6 @@ nomask void main(mixed *arg, mapping flags, string stdin)
    }
    else
    {
-      new (file_name())->start_cmd(arg[0]);
+      clone_object (file_name())->start_cmd(arg[0]);
    }
 }

@@ -442,7 +442,7 @@ nomask varargs void login_handle_logon(int state, mixed extra, string arg)
          modal_pop();
 #ifdef USE_USER_MENU
          start_shell(1);
-         new (USER_MENU)->start_menu();
+         clone_object (USER_MENU)->start_menu();
          return;
 #else
          initialize_user();

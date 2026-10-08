@@ -26,5 +26,5 @@ inherit CMD;
 
 void main(string arg)
 {
-   new (PARTY_MENU)->join_party(arg);
+   clone_object (PARTY_MENU)->join_party(arg);
 }

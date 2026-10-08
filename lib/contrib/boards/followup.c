@@ -74,5 +74,5 @@ void main(string arg)
       return;
    }
 
-   new (EDIT_OB, EDIT_TEXT, 0, ( : receive_body, brd, ids[id - 1] :));
+   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : receive_body, brd, ids[id - 1] :));
 }

@@ -81,7 +81,7 @@ int press(string name)
       state = INACTIVE;
       this_body()->simple_action("$N $vpush the play button on $p recorder, and a transcript magically appears before "
                                  "$n, in lieu of an actual playback.");
-      new (__DIR__ "transcript", transcript)->move(this_body());
+      clone_object (__DIR__ "transcript", transcript)->move(this_body());
       at_beginning = 0;
       return 1;
    case "rewind":

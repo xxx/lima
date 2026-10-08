@@ -40,7 +40,7 @@ nomask object get_mailbox(string the_owner)
 
    if (!(mailbox = mailboxes[the_owner]))
    {
-      mailbox = mailboxes[the_owner] = new (MAILBOX, the_owner);
+      mailbox = mailboxes[the_owner] = clone_object (MAILBOX, the_owner);
       if (!mailbox)
          error("mailbox wasn't created");
    }

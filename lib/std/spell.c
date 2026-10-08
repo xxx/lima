@@ -458,7 +458,7 @@ int cast_action(mixed *args)
 // Returns: The created transient spell object.
 object transient(string name, mixed *args...)
 {
-   object t = new ("/domains/std/spell/transient/" + replace_string(name, " ", "_"), args...);
+   object t = clone_object ("/domains/std/spell/transient/" + replace_string(name, " ", "_"), args...);
    if (!t)
       error("Failed to load transient spell object.");
    return t;

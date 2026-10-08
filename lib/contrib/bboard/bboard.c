@@ -185,7 +185,7 @@ int note(string what)
       return 1;
    }
    new_header = what;
-   new (EDIT_OB, EDIT_TEXT, 0, ( : done_wri:));
+   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : done_wri:));
 }
 
 // Strictly for historical purposes

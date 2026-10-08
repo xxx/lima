@@ -27,7 +27,7 @@ object find_home(string name)
    if (homes[name])
       return homes[name];
 
-   homes[name] = new (TEMP_WORKROOM);
+   homes[name] = clone_object (TEMP_WORKROOM);
    homes[name]->set_owner(name);
    return homes[name];
 }

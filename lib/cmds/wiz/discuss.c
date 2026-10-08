@@ -18,5 +18,5 @@ void main(mixed *arg)
       out("You can't discuss a user, just objects.\n");
       return;
    }
-   new (ANNO_MENU, arg[0])->start_menu();
+   clone_object (ANNO_MENU, arg[0])->start_menu();
 }

@@ -33,9 +33,9 @@ void setup_buttons()
    {
       string key;
       if (sscanf(dest, "%s/%s", key, dest) == 2)
-         new ("/std/elevator_button", dest, key)->move(this_object());
+         clone_object ("/std/elevator_button", dest, key)->move(this_object());
       else
-         new ("/std/elevator_button", dest, 0)->move(this_object());
+         clone_object ("/std/elevator_button", dest, 0)->move(this_object());
    }
    generate_panel_item();
 }

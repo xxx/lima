@@ -93,7 +93,7 @@ object virtual_create(string arg)
 
    if (sscanf(arg, "%d,%d", x, y) != 2)
       return 0;
-   return new (__DIR__ "Labroom", x, y, value(x, y - 1), value(x + 1, y), value(x, y + 1), value(x - 1, y));
+   return clone_object (__DIR__ "Labroom", x, y, value(x, y - 1), value(x + 1, y), value(x, y + 1), value(x - 1, y));
 }
 
 int entrance_has_east()

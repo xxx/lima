@@ -161,11 +161,11 @@ private string spawn_clan_room(string clan_name, string room_type)
 
    if (is_file(specific_room_blueprint + ".c"))
    {
-      new_room = new(specific_room_blueprint);
+      new_room = clone_object(specific_room_blueprint);
    }
    else
    {
-      new_room = new(base_room_object_path);
+      new_room = clone_object(base_room_object_path);
    }
 
    if (!new_room)
@@ -188,7 +188,7 @@ private string spawn_clan_room(string clan_name, string room_type)
 // Spawns the Clan Stone inside the main hall.
 private object spawn_clan_stone(string clan_name, string room_path)
 {
-   object clan_stone = new("/domain/std/clan/clan_stone");
+   object clan_stone = clone_object("/domain/std/clan/clan_stone");
    if (clan_stone)
    {
       clan_stone->set_clan_owner(clan_name);
@@ -211,7 +211,7 @@ void load_all_clan_rooms(string clan_name)
       if (!find_object(room_path))
       {
          // Re-clone the base, assuming the room object handles its own data loading
-         room = new("/obj/clan_room_base");
+         room = clone_object("/obj/clan_room_base");
          if (room)
          {
             // room->restore_object(room_path); // If rooms save unique data
@@ -327,7 +327,7 @@ string create_clan_doorway(string clan_name, object player_obj, object current_r
       return 0; // Doorway already exists
 
    doorway_path = sprintf("/domains/clan/doorways/clan_doorway/%s_doorway_%d", clan_name, time());
-   doorway_obj = new("/domains/std/clan/clan_doorway");
+   doorway_obj = clone_object("/domains/std/clan/clan_doorway");
 
    if (!doorway_obj)
    {

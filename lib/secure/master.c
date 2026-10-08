@@ -86,7 +86,7 @@ object connect(int port)
    object ob;
    string ret;
 
-   ret = catch (ob = new (get_player_fname()));
+   ret = catch (ob = clone_object (get_player_fname()));
 
 #ifdef DEBUG_CONNECTIONS
    call_out(( : debug_connections($(ob)) :), 2);

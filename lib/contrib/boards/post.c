@@ -44,7 +44,7 @@ void receive_subject(object brd, mixed subj)
    }
 
    modal_pop();
-   new (EDIT_OB, EDIT_TEXT, 0, ( : receive_body, brd, subj:));
+   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : receive_body, brd, subj:));
 }
 
 private
@@ -73,5 +73,5 @@ void main(string arg)
    if (arg == "" || !arg)
       modal_push(( : receive_subject, brd:), "Subject: ");
    else
-      new (EDIT_OB, EDIT_TEXT, 0, ( : receive_body, brd, arg:));
+      clone_object (EDIT_OB, EDIT_TEXT, 0, ( : receive_body, brd, arg:));
 }

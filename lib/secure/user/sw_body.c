@@ -84,7 +84,7 @@ varargs nomask void switch_body(string new_body_fname, int permanent)
    // TBUG("Body filename: "+new_body_fname);
 
    old_body = body;
-   body = new (new_body_fname, query_selected_body());
+   body = clone_object (new_body_fname, query_selected_body());
    // TBUG(body);
    master()->refresh_parse_info();
 
@@ -110,7 +110,7 @@ nomask void incarnate(string name, int is_new, string new_fname)
    string body_fname = query_fname(name);
    if (strlen(new_fname))
       body_fname = new_fname;
-   body = new (body_fname, name);
+   body = clone_object (body_fname, name);
    master()->refresh_parse_info();
 
    LAST_LOGIN_D->register_last(name, query_ip_name(this_object()));

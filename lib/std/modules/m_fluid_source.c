@@ -31,7 +31,7 @@ void set_source_of(string what)
    object ob;
    string *ids;
 
-   ob = new (what);
+   ob = clone_object (what);
    ids = ob->query_id();
 
    foreach (string id in ids)
@@ -83,7 +83,7 @@ mixed fill_up(object bottle)
 {
    object fluid;
 
-   fluid = new (is_source_of());
+   fluid = clone_object (is_source_of());
 
    if (bottle->fill_with(fluid))
 

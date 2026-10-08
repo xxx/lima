@@ -87,7 +87,7 @@ nosave string *xalias_save = ({});
 protected
 void init_alias_editor()
 {
-   new (ALIASMENU)->begin_menu(this_object());
+   clone_object (ALIASMENU)->begin_menu(this_object());
 }
 
 /*

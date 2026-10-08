@@ -92,7 +92,7 @@ mixed direct_use_obj()
 
 void do_use()
 {
-   object artefact_menu = new (ARTEFACT_MENU, level);
+   object artefact_menu = clone_object (ARTEFACT_MENU, level);
    object *modules = all_inventory();
    if (sizeof(modules))
       artefact_menu->init_guild_modules(modules);

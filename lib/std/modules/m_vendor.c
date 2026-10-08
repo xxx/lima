@@ -174,7 +174,7 @@ varargs void add_sell(string file, int amt, mixed *setup_args)
       amt = 1;
    if (file)
    {
-      if (ob = new (file, setup_args...))
+      if (ob = clone_object (file, setup_args...))
       {
          item = init_item(ob, setup_args);
          item.amount = amt;
@@ -596,7 +596,7 @@ int sell_object(object ob, int value)
    }
    if (ob->query_default_container())
    {
-      cont = new (ob->query_default_container());
+      cont = clone_object (ob->query_default_container());
       ob->move(cont);
       ob = cont;
    }
@@ -637,7 +637,7 @@ void sell_items(int key, int amount)
       if (item.objects)
          ob = item.objects[0];
       else
-         ob = new (item.file, item.args...);
+         ob = clone_object (item.file, item.args...);
       if (sell_object(ob, item.value))
       {
          if (item.objects)

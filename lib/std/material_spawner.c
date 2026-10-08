@@ -105,7 +105,7 @@ void give_material()
       for (int i = 0; i < y; i++)
       {
          string mat = evaluate_path(choice(material), 0, 1);
-         object m = new (mat);
+         object m = clone_object (mat);
          if (m)
             mats += ({m});
          else

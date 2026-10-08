@@ -72,7 +72,7 @@ void play()
       return;
    }
    object_event("The recorder spits out a transcript, in lieu of an actual playback" + pop_up("play"));
-   new (__DIR__ "recorder/transcript", transcript)->move(this_body());
+   clone_object (__DIR__ "recorder/transcript", transcript)->move(this_body());
    at_beginning = 0;
 }
 

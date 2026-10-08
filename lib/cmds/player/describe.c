@@ -92,5 +92,5 @@ void main(string s)
        "Type '~q' to abort this description.\n"
        "-----------------------------------------\n");
 
-   new (CMD_OB_DESCRIBE)->begin_describing();
+   clone_object (CMD_OB_DESCRIBE)->begin_describing();
 }

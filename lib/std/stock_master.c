@@ -25,7 +25,7 @@ void setup(string guildname)
    set_max_health(10);
    set_which_guild(guildname);
 
-   sword = new ("/domains/std/weapon/sword");
+   sword = clone_object ("/domains/std/weapon/sword");
    sword->move(this_object());
    do_wield(sword);
 }

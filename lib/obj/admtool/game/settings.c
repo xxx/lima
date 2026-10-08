@@ -175,7 +175,7 @@ void select_file()
 nomask class command_info *module_commands()
 {
    configs = sort_array(get_dir(CONFIG_FILES + "*.h"), 1);
-   config_ed = new (CONFIG_EDITOR);
+   config_ed = clone_object (CONFIG_EDITOR);
 
    return ({
        new (class command_info, key

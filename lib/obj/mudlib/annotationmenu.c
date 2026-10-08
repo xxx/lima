@@ -70,7 +70,7 @@ private
 void rcv_title(string title)
 {
    new_annotation.title = title;
-   new (EDIT_OB, EDIT_TEXT, 0, ( : end_edit:));
+   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : end_edit:));
 }
 
 private

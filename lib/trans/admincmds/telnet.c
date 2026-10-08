@@ -88,6 +88,6 @@ void main()
    else
    {
       write("Type /help or /? for help on telnet.\n");
-      new (TELNET_OB)->init_telnet();
+      clone_object (TELNET_OB)->init_telnet();
    }
 }

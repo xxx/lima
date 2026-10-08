@@ -14,7 +14,7 @@ inherit CMD;
 private
 void main(string arg)
 {
-   new (NEWSREADER)->begin_reading(arg);
+   clone_object (NEWSREADER)->begin_reading(arg);
 }
 
 void player_menu_entry()

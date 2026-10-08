@@ -145,7 +145,7 @@ private
 nomask void prospectus(string name)
 {
    write("Prospectus for guild " + name + ":\n");
-   new (EDIT_OB, EDIT_TEXT, 0, ( : send_prospectus, name:));
+   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : send_prospectus, name:));
 }
 
 private

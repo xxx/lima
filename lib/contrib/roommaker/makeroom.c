@@ -11,5 +11,5 @@ inherit CMD;
 private
 void main()
 {
-   new (MAKER)->start_menu();
+   clone_object (MAKER)->start_menu();
 }

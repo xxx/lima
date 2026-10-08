@@ -616,10 +616,10 @@ mixed *make_objects_if_needed()
                doublear = 1;
             if (doublear)
             {
-               ob = new (absolute_path(file), rest[0]);
+               ob = clone_object (absolute_path(file), rest[0]);
             }
             else
-               ob = new (absolute_path(file), rest...);
+               ob = clone_object (absolute_path(file), rest...);
             if (!ob)
                error("Couldn't find file '" + file + "' to clone!\n");
             ret = ob->move(this_object(), "#CLONE#");
@@ -682,7 +682,7 @@ mixed *make_unique_objects_if_needed()
          while (sizeof(matches) < num)
          {
             int ret;
-            object ob = new (absolute_path(file), rest...);
+            object ob = clone_object (absolute_path(file), rest...);
             if (!ob)
                error("Couldn't find file '" + file + "' to clone!\n");
             /* Test for uniqueness in the object by calling test_unique() */

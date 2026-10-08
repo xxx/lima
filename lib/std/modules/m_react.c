@@ -372,7 +372,7 @@ void compile_script(string fname)
 
    if (ob = find_object("/tmp/m_react"))
       destruct(ob);
-   script = new ("/tmp/m_react", this_object());
+   script = clone_object ("/tmp/m_react", this_object());
    script->main();
 }
 

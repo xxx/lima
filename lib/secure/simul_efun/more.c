@@ -88,7 +88,7 @@ varargs nomask void more(mixed arg, int num, function continuation, int output_f
       return;
    }
 
-   new (MORE_OB, MORE_LINES, arg, num, continuation, output_flags);
+   clone_object (MORE_OB, MORE_LINES, arg, num, continuation, output_flags);
 }
 
 //: FUNCTION more_file
@@ -107,5 +107,5 @@ varargs nomask void more_file(mixed arg, int num, function continuation, int out
    if (!num)
       num = default_num();
 
-   new (MORE_OB, MORE_FILES, arg, num, continuation, output_flags);
+   clone_object (MORE_OB, MORE_FILES, arg, num, continuation, output_flags);
 }

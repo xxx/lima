@@ -8,5 +8,5 @@ inherit OBJ;
 
 object virtual_create(string args)
 {
-   return new (base_name(), args);
+   return clone_object (base_name(), args);
 }

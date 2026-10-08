@@ -380,7 +380,7 @@ void receive_subject(mixed subj)
    }
 
    modal_pop();
-   new (EDIT_OB, EDIT_TEXT, 0, ( : receive_post, subj:));
+   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : receive_post, subj:));
 }
 
 nomask void do_post(string subj)
@@ -388,7 +388,7 @@ nomask void do_post(string subj)
    if (subj == "" || !subj)
       modal_push(( : receive_subject:), "Subject: ");
    else
-      new (EDIT_OB, EDIT_TEXT, 0, ( : receive_post, subj:));
+      clone_object (EDIT_OB, EDIT_TEXT, 0, ( : receive_post, subj:));
 }
 
 mixed direct_post_on_obj_about_str(string str, object ob)
@@ -424,7 +424,7 @@ nomask void do_followup(int id)
 
    ids = sort_array(filter_array(NEWS_D->get_messages(linked_group), ( : filter_removed:)), 1);
 
-   new (EDIT_OB, EDIT_TEXT, 0, ( : receive_followup, ids[id - 1] :));
+   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : receive_followup, ids[id - 1] :));
 }
 
 nomask void do_followup_with_message(int id)
@@ -447,7 +447,7 @@ nomask void do_followup_with_message(int id)
 
    lines += map_array(explode(msg.body, "\n"), ( : "> " + $1:));
 
-   new (EDIT_OB, EDIT_TEXT, lines, ( : receive_followup, ids[id - 1] :));
+   clone_object (EDIT_OB, EDIT_TEXT, lines, ( : receive_followup, ids[id - 1] :));
 }
 
 mixed direct_post_wrd_to_wrd_on_obj(string wrd1, string wrd2, object ob)
@@ -498,7 +498,7 @@ nomask void do_reply(int id)
 
    ids = sort_array(filter_array(NEWS_D->get_messages(linked_group), ( : filter_removed:)), 1);
 
-   new (EDIT_OB, EDIT_TEXT, 0, ( : receive_reply, ids[id - 1] :));
+   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : receive_reply, ids[id - 1] :));
 }
 
 mixed direct_answer_to_wrd_on_obj(string wrd, object ob)

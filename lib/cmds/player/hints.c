@@ -37,7 +37,7 @@ void main(string arg)
    {
       object tmp;
       this_user()->query_shell_ob()->set_variable("hints", 1);
-      tmp = new ("/domains/std/item/hint_token");
+      tmp = clone_object ("/domains/std/item/hint_token");
       tmp->move(this_body());
       out("Turning hints on - you received a hint token.\n");
       tmp->hook_func();

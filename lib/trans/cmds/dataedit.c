@@ -61,5 +61,5 @@ inherit CMD;
 private
 void main(mixed *arg)
 {
-   new (DATAEDIT)->start_menu(arg[0]);
+   clone_object (DATAEDIT)->start_menu(arg[0]);
 }

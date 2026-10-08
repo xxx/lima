@@ -75,5 +75,5 @@ void main(string arg)
    }
    id = ids[id - 1];
 
-   new (EDIT_OB, EDIT_TEXT, 0, ( : receive_body, brd, id:));
+   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : receive_body, brd, id:));
 }

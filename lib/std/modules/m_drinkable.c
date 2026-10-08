@@ -138,7 +138,7 @@ varargs void drink_it(object drinkee)
 
    if (query_poisonous())
    {
-      object p = new ("/std/transient/poison", query_poisonous(), query_poisonous(),
+      object p = clone_object ("/std/transient/poison", query_poisonous(), query_poisonous(),
                       "$N $vbend over in pain. Must be something $n drank.")
                      ->move(drinkee);
    }

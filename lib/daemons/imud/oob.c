@@ -574,7 +574,7 @@ nomask void oob_startup()
 {
    string err;
 
-   err = catch (oob_socket = new (SOCKET, SKT_STYLE_LISTEN_M, PORT_I3_TCP_OOB,
+   err = catch (oob_socket = clone_object (SOCKET, SKT_STYLE_LISTEN_M, PORT_I3_TCP_OOB,
                                   (
                                       : oob_callback_read:),
                                   (

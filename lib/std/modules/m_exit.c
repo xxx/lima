@@ -419,7 +419,7 @@ void delete_exit(mixed direction)
 varargs void add_exit(mixed direction, mixed destination)
 {
 #ifdef USE_COMPLEX_EXITS
-   object exit_ob = new (EXIT_OBJ);
+   object exit_ob = clone_object (EXIT_OBJ);
    exit_ob->add_method(direction, destination);
    return;
 #else

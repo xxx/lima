@@ -28,7 +28,7 @@ void dig(object o)
    switch (number_times_dug++)
    {
    case 0:
-      my_hole = new (HOLE);
+      my_hole = clone_object (HOLE);
       my_hole->move(environment(this_object()));
       this_body()->simple_action("$N $vseem to be digging a hole here...");
       my_hole->change_desc("There is a small hole in the sand.");

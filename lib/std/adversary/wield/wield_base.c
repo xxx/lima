@@ -8,7 +8,7 @@ int do_wield(object);
 //  weapon object from within the setup() function of your monster.
 int set_wielding(string wep)
 {
-   object ob = new (evaluate_path(wep, 0, 1));
+   object ob = clone_object (evaluate_path(wep, 0, 1));
 
    if (!ob)
       return 0;
@@ -27,7 +27,7 @@ varargs void add_equipment(string file, int num)
       num = 1;
    for (int i = 0; i < num; i++)
    {
-      object ob = new (file);
+      object ob = clone_object (file);
       ob->move(this_object());
    }
 }

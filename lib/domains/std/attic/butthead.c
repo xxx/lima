@@ -19,7 +19,7 @@ void initiate_beavis()
    object beavis = present("beavis", environment(this_object()));
    if (!beavis)
    {
-      beavis = new (__DIR__ "beavis");
+      beavis = clone_object (__DIR__ "beavis");
       beavis->move(environment(this_object()));
       simple_action("Beavis strolls out of the shadows, laughing about "
                     "his nads.");

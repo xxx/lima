@@ -600,7 +600,7 @@ nomask void remove()
 nomask void create()
 {
    string ret;
-   ret = catch (http_sock = new (SOCKET, SKT_STYLE_LISTEN_B, PORT_HTTP, ( : http_read:), ( : http_close:)));
+   ret = catch (http_sock = clone_object (SOCKET, SKT_STYLE_LISTEN_B, PORT_HTTP, ( : http_read:), ( : http_close:)));
    if (ret)
    {
       if (http_sock)

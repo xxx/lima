@@ -243,14 +243,14 @@ object create_material(string m)
 
    if (recipe_file[m])
    {
-      mat = new (CRAFTING_ITEMS + recipe_file[m]);
+      mat = clone_object (CRAFTING_ITEMS + recipe_file[m]);
       return mat;
    }
    else if (!valid_material(m))
       return 0;
 
    if (!mat)
-      mat = new (MATERIAL, m);
+      mat = clone_object (MATERIAL, m);
    return mat;
 }
 

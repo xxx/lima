@@ -76,7 +76,7 @@ void party_maint()
 void party_help()
 {
    write(accent("Calling 'help parties':"));
-   new (HELPSYS)->begin_help("parties");
+   clone_object (HELPSYS)->begin_help("parties");
    return;
 }
 

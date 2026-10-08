@@ -146,11 +146,11 @@ varargs object give_new_obj(object target, string obj, int recurse, mixed args)
 {
    object ob;
    if (undefinedp(args))
-      ob = new (absolute_path(obj));
+      ob = clone_object (absolute_path(obj));
    else if (arrayp(args))
-      ob = new (absolute_path(obj), args...);
+      ob = clone_object (absolute_path(obj), args...);
    else
-      ob = new (absolute_path(obj), args);
+      ob = clone_object (absolute_path(obj), args);
 
    if (!ob)
       error("give_new_obj() failed: Object could not be created: " + obj + ".\n");

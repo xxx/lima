@@ -26,7 +26,7 @@ object get_dummy_object(object snoopee)
    object ob = dummy_objects[snoopee];
    if (!ob)
    {
-      ob = new (SNOOP_DUMMY, capitalize(snoopee->query_userid()));
+      ob = clone_object (SNOOP_DUMMY, capitalize(snoopee->query_userid()));
       snoop(ob, snoopee->query_link());
       dummy_objects[snoopee] = ob;
    }

@@ -118,11 +118,11 @@ void do_drop_wrd_str(string amount_str, string type)
 #ifdef USE_MONEY
          ob->merge_money(amount, type);
       else
-         new (MONEY, amount, type)->move(environment(this_body()));
+         clone_object (MONEY, amount, type)->move(environment(this_body()));
 #else
          ob->merge_coins(amount, type);
       else
-         new (COINS, amount, type)->move(environment(this_body()));
+         clone_object (COINS, amount, type)->move(environment(this_body()));
 #endif
       this_body()->simple_action("$N $vdrop " + MONEY_D->denomination_to_string(amount, type) + ".");
    }

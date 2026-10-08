@@ -218,7 +218,7 @@ nomask void listen_callback(int fd)
    SKTLOG("listen_callback: self", this_object());
    SKTLOG("listen_callback: fd", fd);
    fd = socket_accept(fd, ( : read_callback:), ( : write_callback:));
-   s = new (OLD_SOCKET, SKT_STYLE_INT_ACQUIRE, read_func, close_func);
+   s = clone_object (OLD_SOCKET, SKT_STYLE_INT_ACQUIRE, read_func, close_func);
    SKTLOG("listen_callback: new sock", s);
    err = socket_release(fd, s, "release_callback");
    SKTLOG("listen_callback: err", err);

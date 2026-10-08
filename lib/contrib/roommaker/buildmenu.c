@@ -143,7 +143,7 @@ void make_long(string *long)
 void change_long()
 {
    write("** Enter long description now **\n");
-   new (EDIT_OB, EDIT_TEXT, 0, ( : make_long:));
+   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : make_long:));
 }
 
 void idesc(string key, string *item)
@@ -157,7 +157,7 @@ void idesc(string key, string *item)
 void change_idesc(string key)
 {
    write("** Enter item description now **\n");
-   new (EDIT_OB, EDIT_TEXT, tems[key], ( : idesc, key:));
+   clone_object (EDIT_OB, EDIT_TEXT, tems[key], ( : idesc, key:));
 }
 
 int is_in_ikey(string check, string key)
@@ -242,7 +242,7 @@ void xdesc(string key, string *item)
 void change_exit(string key)
 {
    write("** Edit path to room now **\n");
-   new (EDIT_OB, EDIT_TEXT, xits[key], ( : xdesc, key:));
+   clone_object (EDIT_OB, EDIT_TEXT, xits[key], ( : xdesc, key:));
 }
 
 void prompt_change_exit()

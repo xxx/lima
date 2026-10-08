@@ -159,7 +159,7 @@ void test_msg(string msg)
    }
 
    if (!troll)
-      troll = new ("/domains/std/monster/troll");
+      troll = clone_object ("/domains/std/monster/troll");
    foreach (string t in combat_msgs)
    {
       if (stringp(messages[t][msg]))

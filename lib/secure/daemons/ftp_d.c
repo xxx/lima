@@ -382,7 +382,7 @@ void FTP_close(object socket)
 private
 void create()
 {
-   sock = new (SOCKET, SKT_STYLE_LISTEN, PORT_FTP, ( : FTP_read:), ( : FTP_close:));
+   sock = clone_object (SOCKET, SKT_STYLE_LISTEN, PORT_FTP, ( : FTP_read:), ( : FTP_close:));
    resolve(__HOST__, ( : iphost = $2:));
 }
 
@@ -543,7 +543,7 @@ void FTP_CMD_pasv(class ftp_session info, string arg)
    case 0:
       while (!listen_socket && tries < MAX_TRIES)
          listen_socket = unguarded(1, (
-                                          : new (SOCKET, SKT_STYLE_LISTEN, next_port(),
+                                          : clone_object (SOCKET, SKT_STYLE_LISTEN, next_port(),
                                                  (
                                                      : FTP_PASV_read, $(info)
                                                      :),
@@ -559,7 +559,7 @@ void FTP_CMD_pasv(class ftp_session info, string arg)
          next_port();
          FTPLOGF("PASV trying PORT %d\n", lastport);
          if (catch (listen_socket = unguarded(1, (
-                                                     : new (SOCKET, SKT_STYLE_LISTEN_B, lastport,
+                                                     : clone_object (SOCKET, SKT_STYLE_LISTEN_B, lastport,
                                                             (
                                                                 : FTP_PASV_read_kobol:),
                                                             (
@@ -632,7 +632,7 @@ void FTP_CMD_port(class ftp_session info, string arg)
    {
    case 0:
       info.dataPipe = unguarded(1, (
-                                       : new (SOCKET, SKT_STYLE_CONNECT, sprintf("%s %d", $(ip), $(port)),
+                                       : clone_object (SOCKET, SKT_STYLE_CONNECT, sprintf("%s %d", $(ip), $(port)),
                                               (
                                                   : FTP_DATA_read:),
                                               (
@@ -641,7 +641,7 @@ void FTP_CMD_port(class ftp_session info, string arg)
       break;
    case 1:
       info.dataPipe = unguarded(1, (
-                                       : new (SOCKET, SKT_STYLE_CONNECT_B, sprintf("%s %d", $(ip), $(port)),
+                                       : clone_object (SOCKET, SKT_STYLE_CONNECT_B, sprintf("%s %d", $(ip), $(port)),
                                               (
                                                   : FTP_DATA_read:),
                                               (

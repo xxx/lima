@@ -42,7 +42,7 @@ nomask void send_mail(string destination, string subject, string message)
       return;
    reply_to = unguarded(1, ( : call_other, USER_D, "query_variable", this_user()->query_userid(), ({"email"}) :))[0];
    //socket = new (OLD_SOCKET, SKT_STYLE_CONNECT, "127.0.0.1 25", ( : mail_socket_read:), ( : mail_socket_close:));
-   socket = new (SOCKET);
+   socket = clone_object (SOCKET);
    socket->set_read_callback(( : mail_socket_read:));
    socket->set_listen_callback(( : mail_socket_close:));
    socket->setup_connect("127.0.0.1", 25);

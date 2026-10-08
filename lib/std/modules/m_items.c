@@ -29,7 +29,7 @@ void add_item(mixed *stuff...)
 {
    if (mapp(stuff[ < 1]))
    {
-      new (SIMPLE_OB, stuff[ < 1], stuff[0.. < 2]);
+      clone_object (SIMPLE_OB, stuff[ < 1], stuff[0.. < 2]);
       return;
    }
 
@@ -42,5 +42,5 @@ void add_item(mixed *stuff...)
     * Kept for compatability purposes with the old fake_item_mgr, but
     * should not be used anymore
     */
-   new (SIMPLE_OB, (["look":stuff[ < 1]]), stuff[0.. < 2]);
+   clone_object (SIMPLE_OB, (["look":stuff[ < 1]]), stuff[0.. < 2]);
 }

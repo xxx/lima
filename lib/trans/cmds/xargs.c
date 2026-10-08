@@ -62,8 +62,8 @@ nomask void main(mixed *arg, mapping flags, string stdin, string *implode_inf)
    else
    {
       if (flags["!"])
-         new (file_name())->start_cmd(arg, 1);
+         clone_object (file_name())->start_cmd(arg, 1);
       else
-         new (file_name())->start_cmd(arg);
+         clone_object (file_name())->start_cmd(arg);
    }
 }

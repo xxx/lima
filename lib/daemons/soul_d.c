@@ -173,7 +173,7 @@ mixed *internal_get_soul(string verb, string rule, mixed *args, int add_imud_msg
 
    who = ({this_body()});
    if (add_imud_msg)
-      imud_who = ({new (IMUD_CHANNELT_DUMMY, this_body(), 3)});
+      imud_who = ({clone_object (IMUD_CHANNELT_DUMMY, this_body(), 3)});
 
    if (strsrch(rule, "LIV") != -1)
    {
@@ -186,7 +186,7 @@ mixed *internal_get_soul(string verb, string rule, mixed *args, int add_imud_msg
             who += ({args[i]});
 
             if (add_imud_msg)
-               imud_who += ({new (IMUD_CHANNELT_DUMMY, args[i], 2)});
+               imud_who += ({clone_object (IMUD_CHANNELT_DUMMY, args[i], 2)});
 
             args[i..i] = ({});
          }
@@ -433,7 +433,7 @@ mixed *parse_imud_soul(string str)
 
       tmp = sprintf("%s@%s", user, matches[0]);
 
-      temp = new (IMUD_CHANNELT_DUMMY, tmp);
+      temp = clone_object (IMUD_CHANNELT_DUMMY, tmp);
 
       if (temp)
       {

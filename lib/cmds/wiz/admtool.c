@@ -12,5 +12,5 @@ inherit CMD;
 
 private void main(string arg)
 {
-   new("/obj/admtool/admtool3");
+   clone_object("/obj/admtool/admtool3");
 }

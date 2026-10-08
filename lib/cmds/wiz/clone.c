@@ -21,7 +21,7 @@ void main(mixed *arg)
 
    if (!size)
       arg[0] = get_user_variable("cwf");
-   o = new (arg[0]);
+   o = clone_object (arg[0]);
    if (!o)
    {
       out("Failed to load file.\n");

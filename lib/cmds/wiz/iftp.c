@@ -56,5 +56,5 @@ void main(string arg)
       return;
    }
 
-   new (IFTP_OB, mudname);
+   clone_object (IFTP_OB, mudname);
 }

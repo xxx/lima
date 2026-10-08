@@ -172,7 +172,7 @@ void handle_escape(string str)
    case 'e':
       tmp_file = tmp_fname();
       write_file(tmp_file, build_string());
-      new (ED_SESSION)->begin_editing(tmp_file, !this_user()->query_privilege(), ( : end_ed:));
+      clone_object (ED_SESSION)->begin_editing(tmp_file, !this_user()->query_privilege(), ( : end_ed:));
       return;
    }
 }

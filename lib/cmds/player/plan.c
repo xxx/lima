@@ -31,7 +31,7 @@ void main()
 {
 #ifdef EVERYONE_HAS_A_PLAN
    out("Enter your plan, Stan.\n");
-   new (EDIT_OB, EDIT_TEXT, 0, ( : set_plan:));
+   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : set_plan:));
 #else
    out("Sorry, plans are not available.\n");
 #endif

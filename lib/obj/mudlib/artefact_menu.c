@@ -43,7 +43,7 @@ mapping dispatch = (["o":"Options", "?":"help", ]);
 
 void start_player_menu()
 {
-   new (PLAYER_MENU)->start_menu();
+   clone_object (PLAYER_MENU)->start_menu();
 }
 
 class menu build_guild_menu(string guild)
