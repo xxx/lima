@@ -170,7 +170,7 @@ int query_banned_guild(string name)
 
 string *guilds_belong()
 {
-   return keys(filter_mapping(guilds, ( : ((class guild_info)$2)->member_level:)));
+   return keys(filter(guilds, ( : ((class guild_info)$2).member_level:)));
 }
 
 void clear_guilds()
