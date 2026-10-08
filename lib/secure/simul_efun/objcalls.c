@@ -310,3 +310,29 @@ mixed parser_root_environment(object ob)
       ob = tmp;
    return ob;
 }
+
+object *children(string path)
+{
+   if (!stringp(path) || path == "")
+      return ({});
+
+   int suffix = strindex(path, "#");
+   if (suffix == 0)
+      return ({});
+   if (suffix > 0)
+      path = path[0..suffix - 1];
+   if (path[0] != '/')
+      path = "/" + path;
+
+   object prototype = find_object(path);
+   if (!prototype)
+      return ({});
+
+   object *clones = object_clones(prototype);
+   int count = sizeof(clones);
+   object *result = allocate(count + 1);
+   result[0] = prototype;
+   for (int i = 0; i < count; i++)
+      result[i + 1] = clones[count - i - 1];
+   return result;
+}

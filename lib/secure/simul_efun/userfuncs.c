@@ -4,7 +4,7 @@
 #include <mudlib.h>
 #include <security.h>
 
-string base_name(mixed val);
+mixed base_name(mixed val);
 
 nomask object *bodies()
 {
@@ -31,7 +31,7 @@ varargs nomask object find_user(string str, int even_linkdead)
    if (sizeof(choices))
       return choices[0];
 
-   return 0;
+   return nil;
 }
 
 varargs nomask object find_body(string str, int even_linkdead)
@@ -40,7 +40,7 @@ varargs nomask object find_body(string str, int even_linkdead)
 
    if (!str || str == "")
    {
-      return 0;
+      return nil;
    }
    if (u && (u = u->query_body()))
       return u;
@@ -53,7 +53,7 @@ varargs nomask object find_body(string str, int even_linkdead)
          return b;
    }
 
-   return 0;
+   return nil;
 }
 
 nomask int wizardp(mixed m)
