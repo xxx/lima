@@ -35,8 +35,7 @@ int do_fill_it(object bottle, object fluid)
       fluid = present("fill_source", environment(this_body()));
       if (fluid)
       {
-         fluid->fill_up(bottle);
-         return 1;
+         return fluid->fill_up(bottle);
       };
 
       fluid = present("fluid", environment(this_body())) || present("fluid", this_body()); // This should never be!
@@ -48,8 +47,7 @@ int do_fill_it(object bottle, object fluid)
       }
    };
    write("(with " + fluid->short() + ")\n");
-   bottle->fill_with(fluid); // fluid_obj: check to see if it is in presence of source.
-   return 1;
+   return bottle->part_fill_with(fluid);
 }
 
 // This function looks for an object with id ("<string>_source")
@@ -72,7 +70,7 @@ int source(object bottle, string fluid)
 
 void do_fill_obj(object ob)
 {
-   do_fill_it(ob, 0);
+   do_fill_it(ob, nil);
 }
 
 void do_fill_obj_with_obj(object ob1, object ob2)

@@ -12,7 +12,7 @@ void setup()
    set_size(TOO_LARGE);
 #endif
 #ifdef USE_MASS
-   set_mass(TOO_LARGE);
+   set_mass(to_float(TOO_LARGE));
 #endif
    set_source_of(__DIR__ "ale");
    set_in_room_desc("A keg of ale stands against one wall.");

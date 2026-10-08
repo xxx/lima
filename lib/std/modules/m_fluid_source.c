@@ -1,132 +1,66 @@
 /* Do not remove the headers from this file! see /USAGE for more info. */
 
-//: MODULE
-// Inherit this module into anything that is a source for fluid.  Rivers, fountains,
-// bee-hives, volcanoes, corpses, etc. Fill and drink look for a fluid source.
-// To be able to drink directly from the source, also
-//
-// .. code-block:: c
-//
-//     inherit M_DRINK_SOURCE;
-//
-// in the environment.
-//
-// .. TAGS: RST
-#define PATH_TO_OBJECTS __DIR__
-
-void add_id(string x);
-string *query_id();
-string query_primary_id();
-
+// Renewable sources own the temporary clones used for filling and ID discovery.
 string source_of;
 mixed fluid_disturb = "The $o1 ripples gently as you disturb it.";
 mixed fill_action = "$N $vdip $p $o into $o1 and $vwithdraw some $o2.";
 
-//: FUNCTION set_source_of
-// x must be a path name to a fluid object.
-// new(x) is what is moved into a container
-// when the container is filled from here.
 void set_source_of(string what)
 {
-   object ob;
+   object ob = clone_object(what);
    string *ids;
-
-   ob = clone_object (what);
-   ids = ob->query_id();
-
+   mixed failure = catch(ids = ob->query_id());
+   ob->remove();
+   if (failure) error(failure);
    foreach (string id in ids)
-      add_id(id + "_source");
-   add_id("fluid_source");
-   add_id("fill_source");
-   add_id("drink_source");
-
+      this_object()->add_id(id + "_source");
+   this_object()->add_id("fluid_source", "fill_source", "drink_source");
    source_of = what;
 }
 
-string is_source_of()
-{
-   return source_of;
-}
-// this is the function that is queried
-// when the fluid object is cloned.
-// A clever coder in need could have several fluids
-// from the same source by overriding this function.
-// Note that all of the ids would need to have been a part of
-// the id of the object is set_source_of.
+string is_source_of() { return source_of; }
+void set_fluid_disturb_action(mixed x) { fluid_disturb = x; }
+mixed get_fluid_disturb_action() { return fluid_disturb; }
+void set_fill_action(mixed x) { fill_action = x; }
 
-//: FUNCTION set_fluid_disturb_action
-//'x' is evaluated whenever the fluid is
-// disturbed.  As a string, x is passed
-// to my_action.  If you don't want any
-// disturb_action, set x to 0.
-void set_fluid_disturb_action(mixed x)
+private int fill_container(object bottle, object fluid)
 {
-   fluid_disturb = x;
-}
-
-mixed get_fluid_disturb_action()
-{
-   return fluid_disturb;
+   object actor = this_body();
+   string name = fluid->short();
+   if (!bottle->fill_with(fluid))
+      return 0;
+   if (functionp(fill_action))
+      evaluate(fill_action, bottle, this_object());
+   else if (fill_action && actor)
+      actor->simple_action(fill_action, bottle->short(), this_object()->the_short(), name);
+   if (functionp(fluid_disturb))
+      evaluate(fluid_disturb);
+   else if (fluid_disturb && actor)
+      actor->my_action(fluid_disturb, name, this_object());
+   return 1;
 }
 
-//: FUNCTION set_fill_action
-//'x' is passed to simple_action.
-//$o in the string represents the fluid container.
-//$o1 represents the fluid source.
-//$o2 represents the fluid itself.
-void set_fill_action(string x)
-{
-   fill_action = x;
-}
-
-mixed fill_up(object bottle)
+int fill_up(object bottle)
 {
    object fluid;
-
-   fluid = clone_object (is_source_of());
-
-   if (bottle->fill_with(fluid))
-
-   {
-      this_body()->simple_action(fill_action, bottle->short(), this_object()->the_short(), fluid);
-
-      if (fluid_disturb)
-         this_body()->my_action(fluid_disturb, fluid, this_object());
-
-      return 1;
-   }
-
-   else
-      return 0;
+   int result;
+   mixed failure;
+   if (!bottle) return 0;
+   fluid = clone_object(this_object()->is_source_of());
+   failure = catch(result = fill_container(bottle, fluid));
+   if (fluid && !environment(fluid))
+      fluid->remove();
+   if (failure) error(failure);
+   return result;
 }
 
-// Verb stuff:
-
-mixed direct_drink_obj()
-{
-   return "#You cannot drink an entire " + query_primary_id();
-}
-
+mixed direct_drink_obj() { return "#You cannot drink an entire " + this_object()->query_primary_id(); }
 mixed indirect_drink_str_from_obj(string fluid, object ob)
 {
-   if (!member_array(fluid + "_source", query_id()))
+   if (member_array(fluid + "_source", this_object()->query_id()) < 0)
       return "You cannot drink " + fluid + " from that.\n";
    return 1;
 }
-
-mixed direct_drink_str_from_obj(string fluid, object ob)
-{
-   if (!member_array(fluid + "_source", query_id()))
-      return "You cannot drink " + fluid + " from that.\n";
-   return 1;
-}
-
-int indirect_fill_obj_from_obj()
-{
-   return 1;
-}
-
-mixed indirect_drink_obj_from_obj()
-{
-   return 1;
-}
+mixed direct_drink_str_from_obj(string fluid, object ob) { return indirect_drink_str_from_obj(fluid, ob); }
+int indirect_fill_obj_from_obj() { return 1; }
+mixed indirect_drink_obj_from_obj() { return 1; }

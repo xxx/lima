@@ -1,98 +1,60 @@
 /* Do not remove the headers from this file! see /USAGE for more info. */
-// The drink source module.
-//  Coded by Uae of Zork.  2/20/98.
 
-//: MODULE
-// This module picks up where m_fluid_source
-// leaves off.  It allows drinking from a source.
-
+// Source drinks use a disposable sample for their taste action.
 mixed drink_action = "$N $vdrink some $o from $o1.";
-mixed fluid_disturb;
 
-void remove_id(string *id...);
-object is_source_of();
-mixed get_fluid_disturb_action();
-string query_primary_id();
-string *query_id();
-
-//: FUNCTION set_drink_action
-// x is a simple_action string or
-// a function that is evaluated whenever
-// this source of fluid is drunk from.
-// x can contain $o to represent the fluid.
-//$o1 can represent the drink source.
 void set_drink_action(mixed x)
 {
    if (!x)
-      remove_id("drink_source");
+      this_object()->remove_id("drink_source");
+   else
+      this_object()->add_id("drink_source");
    drink_action = x;
 }
 
-int drink_from_it(mixed fluid)
+private int sample_drink(object fluid_ob)
 {
-
-   mixed taste_action;
-   object fluid_ob;
-   int cntinue = 1;
-
-   fluid_ob = clone_object (is_source_of());
-
+   mixed action;
+   object actor = this_body();
    if (functionp(drink_action))
-      cntinue = evaluate(drink_action);
-   else
-      this_body()->simple_action(drink_action, fluid_ob->query_primary_name(), this_object()->the_short());
-
-   if (!cntinue)
-      return 0;
-
-   fluid_disturb = get_fluid_disturb_action();
-
-   if (fluid_disturb)
    {
-      if (functionp(fluid_disturb))
-         cntinue = evaluate(fluid_disturb);
-      else
-         this_body()->my_action(fluid_disturb, fluid, this_object());
-   };
-
-   if (!cntinue)
-      return 0;
-
-   taste_action = fluid_ob->get_taste_action();
-
-   if (taste_action)
+      if (!evaluate(drink_action)) return 0;
+   }
+   else if (actor)
+      actor->simple_action(drink_action, fluid_ob->query_primary_name(), this_object()->the_short());
+   action = this_object()->get_fluid_disturb_action();
+   if (functionp(action))
    {
-      if (functionp(taste_action))
-         return evaluate(taste_action);
-      this_body()->my_action(taste_action, fluid_ob);
-   };
-
+      if (!evaluate(action)) return 0;
+   }
+   else if (action && actor)
+      actor->my_action(action, fluid_ob, this_object());
+   action = fluid_ob->get_taste_action();
+   if (functionp(action)) return evaluate(action);
+   if (action && actor) actor->my_action(action, fluid_ob);
    return 1;
 }
 
-int is_drink_source()
+varargs int drink_from_it(mixed fluid)
 {
-   return 1;
+   object sample;
+   int result;
+   mixed failure;
+   if (!drink_action) return 0;
+   sample = clone_object(this_object()->is_source_of());
+   failure = catch(result = sample_drink(sample));
+   if (sample) sample->remove();
+   if (failure) error(failure);
+   return result;
 }
 
-mixed direct_drink_obj()
-{
-   return "#You cannot drink an entire " + query_primary_id();
-}
-
+int is_drink_source() { return !!drink_action; }
+mixed direct_drink_obj() { return "#You cannot drink an entire " + this_object()->query_primary_id(); }
+mixed direct_drink_from_obj() { return drink_action ? 1 : "Try putting the fluid into something.\n"; }
 mixed direct_drink_str_from_obj(string fluid)
 {
-   if (!member_array(fluid + "_source", query_id()))
+   if (!drink_action || member_array(fluid + "_source", this_object()->query_id()) < 0)
       return "You cannot drink " + fluid + " from that.\n";
    return 1;
 }
-
-mixed indirect_drink_obj_from_obj()
-{
-   return 1;
-}
-
-mixed direct_drink_from_obj()
-{
-   return 1;
-}
+mixed indirect_drink_obj_from_obj() { return direct_drink_from_obj(); }

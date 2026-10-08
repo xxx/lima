@@ -54,9 +54,9 @@ void do_drink_str(string fluid)
    source_find(fluid)->drink_from_it(fluid);
 }
 
-mixed can_drink_str_from_obj(string fluid)
+mixed can_drink_str_from_obj(string fluid, object source)
 {
-   return source_find(fluid);
+   return source && source->id("drink_source") && source->id(fluid + "_source") ? 1 : "You cannot drink that from there.";
 }
 
 int can_drink_obj_from_obj()
@@ -64,9 +64,9 @@ int can_drink_obj_from_obj()
    return 1;
 }
 
-void do_drink_str_from_obj(string fluid)
+void do_drink_str_from_obj(string fluid, object source)
 {
-   source_find(fluid)->drink_from_it(fluid);
+   source->drink_from_it(fluid);
 }
 
 void do_drink_obj(object ob)
@@ -76,7 +76,7 @@ void do_drink_obj(object ob)
 
 void do_drink_from_obj(object ob)
 {
-   ob->drink_from_it(0);
+   ob->drink_from_it(nil);
 }
 
 void do_drink_obj_from_obj(object ob1, object ob2)
