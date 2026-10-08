@@ -197,8 +197,10 @@ void craft_item_confirmed(object body, string what, string reply)
       write("The item could not be created.\n");
       return;
    }
-   mixed moved, xp;
-   mixed problem = catch(xp = craft->crafting_xp());
+   mixed moved, xp = 0;
+   mixed problem;
+   if (function_exists("crafting_xp", craft))
+      problem = catch(xp = craft->crafting_xp());
    if (problem || !intp(xp) || xp < 0 || xp > MAX_COMPONENT_COUNT)
    {
       discard_craft(craft);

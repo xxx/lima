@@ -12,7 +12,7 @@ void setup()
             "without using the key.");
    set_lockpick_strength(50);
    set_break_chance(30);
-   set_value(50);
+   set_value(50.0);
 }
 
 int nobody_will_buy()
