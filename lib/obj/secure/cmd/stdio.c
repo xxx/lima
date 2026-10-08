@@ -3,7 +3,7 @@
 #include <more.h>
 
 private
-nosave string stdoutstr = 0;
+nosave string stdoutstr = nil;
 private
 nosave string buf;
 private
@@ -37,8 +37,8 @@ mixed get_rest_of_args()
 {
    mixed tmp = ({next_cmd, next_implode_info});
 
-   next_cmd = 0;
-   next_implode_info = 0;
+   next_cmd = nil;
+   next_implode_info = nil;
    return tmp;
 }
 
@@ -93,10 +93,11 @@ int determine_stdout(mixed args)
 protected
 void bare_init()
 {
-   stdoutstr = 0;
+   stdoutstr = nil;
    buf = "";
-   next_cmd = 0;
+   next_cmd = nil;
    output_flags = 0;
+   next_implode_info = nil;
 }
 
 protected
@@ -106,10 +107,7 @@ mixed hello_stdio(mixed ininfo, mixed argstohold, mixed implode_info)
    string stdin;
    int i;
 
-   stdoutstr = 0;
-   buf = "";
-   next_cmd = 0;
-
+   bare_init();
    next_implode_info = implode_info;
    /* First, if there's ininfo, read our std input */
    if (ininfo)
@@ -137,7 +135,7 @@ mixed hello_stdio(mixed ininfo, mixed argstohold, mixed implode_info)
          i++;
       next_cmd = argstohold[i..];
       if (!sizeof(next_cmd))
-         next_cmd = 0;
+         next_cmd = nil;
       i = determine_stdout(argstohold[0..(i - 1)]);
       if (i != 1)
          return i;
@@ -155,7 +153,10 @@ mixed done_outputing()
    {
       if (buf == "" || !buf)
          return 0;
-      more(explode(buf, "\n"), 0, 0, output_flags);
+      string *lines = explode(buf, "\n");
+      if (buf[<1] == '\n')
+         lines = lines[0..<2];
+      more(lines, 0, nil, output_flags);
       return 0;
    }
    if (stdoutstr)
@@ -167,7 +168,7 @@ mixed done_outputing()
       return 0;
    }
    tmp = buf;
-   buf = 0;
+   buf = nil;
    return ({next_cmd, tmp, next_implode_info});
 }
 

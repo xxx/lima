@@ -7,8 +7,6 @@ inherit __DIR__ "cmd/stdio";
 // ### necessary?
 inherit M_ACCESS;
 
-varargs void main(mixed arg1, mixed arg2);
-
 protected
 void create()
 {
@@ -40,14 +38,14 @@ varargs nomask mixed call_main(mixed arg1, mixed arg2, mixed arg3, mixed arg4, m
          return 0;
       };
       if (stringp(hello_res))
-         main(arg1, arg2, hello_res, implode_info);
+         dispatch_main(arg1, arg2, hello_res, implode_info);
       else
-         main(arg1, arg2, 0, implode_info);
+         dispatch_main(arg1, arg2, nil, implode_info);
    }
    else
    {
       bare_init();
-      main(original_input, arg1, arg2, implode_info);
+      dispatch_main(original_input, arg1, arg2, implode_info);
    }
    return done_outputing();
 }
@@ -70,10 +68,10 @@ nomask void do_resend(mixed arg1, mixed arg2)
    if (prog != __FILE__ || fun != "resend")
       error(sprintf("Illegal resend() from %s::%s()\n", prog, fun));
    if (!restrict_redirection())
-      hello_stdio(0, 0, 0);
+      hello_stdio(nil, nil, nil);
    else
       bare_init();
-   main(arg1, arg2);
+   dispatch_main(arg1, arg2);
 }
 
 int clean_up(int instances)
