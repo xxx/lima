@@ -341,3 +341,17 @@ object master()
 {
    return find_object(MASTER_OB);
 }
+
+int clonep(mixed ob = previous_object())
+{
+   if (!objectp(ob))
+      return 0;
+   string name = file_name(ob);
+   int suffix = strindex(name, "#", -1);
+   if (suffix < 0 || suffix == sizeof(name) - 1)
+      return 0;
+   for (int i = suffix + 1; i < sizeof(name); i++)
+      if (name[i] < '0' || name[i] > '9')
+         return 0;
+   return 1;
+}

@@ -35,7 +35,13 @@ void main(mixed args)
 {
    mapping counts = ([]);
 
-   objects(( : $(counts)[base_name($1)]++ :));
+   foreach (object ob in objects())
+   {
+      string name = base_name(ob);
+      if (!intp(counts[name]))
+         counts[name] = 0;
+      counts[name]++;
+   }
 
    /* filter out those without the requested minimum number of instances.
       defaults to 2 or more (meaning cloned obs) */

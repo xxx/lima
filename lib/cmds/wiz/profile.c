@@ -74,7 +74,7 @@ void top_ten()
    mixed *tmp;
    int i, j;
 
-   tmp = map(objects(( : !clonep($1) :)), ( : ({$1, total(function_profile($1))}) :));
+   tmp = map(filter(objects(), ( : !clonep($1) :)), ( : ({$1, total(function_profile($1))}) :));
    // We could use sort_array() here, but that's an inefficient way
    // to get the top 10 when there are lots of objects.
 

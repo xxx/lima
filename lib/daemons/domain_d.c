@@ -77,8 +77,7 @@ string mob_name(string basename)
 
 int spawn_allowed(string basename)
 {
-   // The class is instance #1, the following are alive objects.
-   int instances = 1;
+   int instances;
    int spawn;
    // We are not under supervision, spawn away!
    if (!mappingp(spawn_control[basename]))
@@ -88,8 +87,7 @@ int spawn_allowed(string basename)
       return 1;
 
    // Expensive call, so doing this as late as possible.
-   instances = sizeof(filter(objects(), ( : base_name($1) == $(basename) :))) - 1;
-   instances = instances < 0 ? 0 : instances;
+   instances = sizeof(filter(objects(), ( : clonep($1) && base_name($1) == $(basename) :)));
 
    spawn = (instances >= spawn_control[basename]["max"] ? 0 : 1);
    if (spawn)

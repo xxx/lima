@@ -31,7 +31,7 @@ void main(string arg)
 {
    object *obs;
 
-   obs = objects(( : base_name($1) == $(arg) :));
+   obs = filter(objects(), ( : base_name($1) == $(arg) :));
 
    envs = ([]);
    map(obs, ( : envs[$1] = environment($1) :));

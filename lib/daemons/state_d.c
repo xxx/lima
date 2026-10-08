@@ -9,11 +9,15 @@
 // This daemon periodically calls objects on the MUD to allow them to change state. This can
 // be used to grow crops, make food rot, make critically wounded things die.
 //
-// This daemon runs on a heartbeat, so is as granular as the heartbeat settings.
+// This daemon checks due work every STATE_POLL_SECONDS using a repeating call_out.
 // See M_STATEFUL, M_DECAY, LIGHT_OBJECT and ^std/consumable/hamburger.c for some examples of usage.
 
 #define MAX_PROCESSED 10
 #define INITIAL_SPREAD 5
+#define STATE_POLL_SECONDS 2
+
+private nosave int heartbeat_id;
+private nosave int processing;
 
 int last_time;
 
@@ -23,11 +27,15 @@ mapping queue = ([]);
 // Checks if ob is in the queue (anywhere in queue).
 int in_queue(object ob)
 {
-   return member_array(ob, flatten_array(values(queue))) != -1;
+   foreach (mixed *targets in values(queue))
+      foreach (mixed *target in targets)
+         if (target[0] == ob)
+            return 1;
+   return 0;
 }
 
 //: FUNCTION add_to_queue
-// Adds ob to queue, to be scheduled at NOW + add_to_time in minutes.
+// Schedules ob after its interval in minutes, plus add_to_time in seconds.
 // If force=1, the object is added even if already in queue.
 varargs void add_to_queue(object ob, int add_to_time, int force, mixed extra)
 {
@@ -78,7 +86,7 @@ varargs void add_to_queue_at_time(mixed ob, int update_time, mixed extra)
 
    foreach (mixed *ar in queue[update_time])
    {
-      if (base_name(ar[0]) == base_name(ob) && ar[1] == extra)
+      if (ar[0] == ob && ar[1] == extra)
          return;
    }
 
@@ -89,7 +97,7 @@ varargs void add_to_queue_at_time(mixed ob, int update_time, mixed extra)
 // Removes ob from the queue nomatter when scheduled.
 varargs void remove_from_queue(object ob, mixed extra)
 {
-   foreach (int update_time, object * targets in queue)
+   foreach (int update_time, mixed * targets in queue)
    {
       foreach (mixed *target in targets)
       {
@@ -100,6 +108,8 @@ varargs void remove_from_queue(object ob, mixed extra)
             queue[update_time] -= ({target});
          }
       }
+      if (!sizeof(queue[update_time]))
+         m_delete(queue, update_time);
    }
 }
 
@@ -114,52 +124,48 @@ object *find_targets(string t)
 }
 
 private
+void update_target(object ob, mixed extra)
+{
+   if (ob && ob->is_stateful(extra) && ob->state_update(extra) && ob)
+      add_to_queue(ob, 0, 1, extra);
+}
+
+private
 void process_queue()
 {
    int processed;
-   int t = time();
-   foreach (int update_time, object * targets in queue)
+   int now = time();
+   foreach (int update_time in sort_array(keys(queue), 1))
    {
-      // If targets array is empty, just delete the entire entry - and on we go.
-      if (!sizeof(targets))
+      if (update_time > now)
+         break;
+      while (sizeof(queue[update_time]) && processed < MAX_PROCESSED)
       {
-         m_delete(queue, update_time);
-         continue;
-      }
-      // Walk through each target in targets and check if they are still stateful and return true on state_update().
-      foreach (mixed *target in targets)
-      {
+         mixed *target = queue[update_time][0];
+         mixed *remaining = queue[update_time][1..];
          if (stringp(target[0]))
          {
-            object *t_ar = find_targets(target[0]);
-            if (sizeof(t_ar) > 1)
-            {
-               foreach (object o in t_ar)
-                  queue[update_time] += ({({o, target[1]})});
-               continue;
-            }
-            // If we only have one, handle it now.
-            target[0] = t_ar[0];
+            object *matches = find_targets(target[0]);
+            mixed *expanded = ({});
+            foreach (object ob in matches)
+               expanded += ({({ob, target[1]})});
+            queue[update_time] = expanded + remaining;
+            if (!sizeof(matches))
+               processed++;
+            continue;
          }
 
-         // Strip away any objects from the queue that are now 0 (destroyed/removed).
-         if (!target[0])
-         {
-            queue[update_time] -= ({target});
-            continue;
-         }
-         if (target[0] && !target[0]->is_stateful(target[1]))
-            continue;
-         if (target[0] && update_time < time() && target[0]->state_update(target[1]))
-            add_to_queue(target[0], 0, 1, target[1]);
+         queue[update_time] = remaining;
+         if (!sizeof(remaining))
+            m_delete(queue, update_time);
+         processed++;
+         mixed failure = catch(update_target(target[0], target[1]));
+         if (failure)
+            debug_message(sprintf("STATE_D update failed: %O\n", failure));
       }
-
-      // Remove old timestamps from the queue
-      if (update_time < time())
+      if (!sizeof(queue[update_time]))
          m_delete(queue, update_time);
-
-      // We'll be back later for more processing.
-      if (processed == MAX_PROCESSED)
+      if (processed >= MAX_PROCESSED)
          return;
    }
 }
@@ -175,7 +181,13 @@ void capture_all_statefuls()
 
 void heart_beat()
 {
-   process_queue();
+   if (processing)
+      return;
+   processing = 1;
+   mixed failure = catch(process_queue());
+   processing = 0;
+   if (failure)
+      throw(failure);
 }
 
 void create()
@@ -187,7 +199,8 @@ void create()
    }
    capture_all_statefuls();
    EVENT_D->run_scheduler();
-   set_heart_beat(1);
+   if (!query_call_out(heartbeat_id))
+      heartbeat_id = call_out(heart_beat, STATE_POLL_SECONDS, STATE_POLL_SECONDS);
 }
 
 mapping queue()
@@ -199,7 +212,15 @@ object *owned(object body)
 {
    if (!body)
       body = this_body();
-   return filter(flatten_array(values(queue)), ( : objectp($1) && clonep($1) && $1->query_owner() == $(body) :));
+   object *result = ({});
+   foreach (mixed *targets in values(queue))
+      foreach (mixed *target in targets)
+      {
+         mixed ob = target[0];
+         if (objectp(ob) && clonep(ob) && ob->query_owner() == body && member_array(ob, result) < 0)
+            result += ({ob});
+      }
+   return result;
 }
 
 int unique(string bname, object body)
@@ -216,7 +237,7 @@ string stat_me()
    // Fairly simple transformations thanksfully.
    foreach (int update_time in sort_array(keys(queue), 1))
    {
-      object *targets = queue[update_time];
+      mixed *targets = queue[update_time];
       foreach (mixed *t in targets)
       {
          if (!arrayp(q_out[t[0]]))
@@ -229,7 +250,7 @@ string stat_me()
    }
 
    // Now we're ready to iterate over objects instead of timestamps.
-   foreach (object ob, int *times in q_out)
+   foreach (mixed ob, int *times in q_out)
    {
       if (sizeof(times) == 1)
          squeue +=

@@ -34,7 +34,7 @@ void main(string arg)
    }
 
    argo = arg;
-   obs = objects(( : $1->id(argo) :));
+   obs = filter(objects(), ( : $1->id(argo) :));
 
    envs = ([]);
    map(obs, ( : envs[$1] = environment($1) :));
