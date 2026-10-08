@@ -21,7 +21,7 @@ inherit M_FRAME;
 
 nomask private void main()
 {
-   string domain = explode(base_name(environment(this_body())), "/")[1];
+   string domain = explode(base_name(environment(this_body())), "/")[2];
    string footer;
    mapping quests = ([]);
    mapping quest_src = QUEST_D->query_domain_quests(domain);
@@ -80,4 +80,9 @@ nomask private void main()
    }
    set_frame_content(c);
    outf(frame_render());
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main();
 }
