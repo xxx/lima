@@ -21,6 +21,7 @@ nosave private int native_closing;
 nosave private int suppress_close;
 nosave private int close_notified;
 nosave private int input_eof;
+nosave private bytes text_pending = to_bytes(({}));
 nosave private int output_active;
 nosave private int input_timer;
 nosave private int output_timer;
@@ -35,6 +36,16 @@ nosave private mixed *local_endpoint;
 nosave private bytes *write_queue = ({});
 nosave private int queued_bytes;
 nosave private int write_offset;
+
+private int is_listener()
+{
+   return style == SKT_STYLE_LISTEN || style == SKT_STYLE_LISTEN_B || style == SKT_STYLE_LISTEN_M;
+}
+
+private int is_mud()
+{
+   return style == SKT_STYLE_CONNECT_M || style == SKT_STYLE_LISTEN_M;
+}
 
 private void require_client()
 {
@@ -68,6 +79,7 @@ private void finish_connection()
    write_queue = ({});
    queued_bytes = write_offset = 0;
    i3_reset_input();
+   text_pending = to_bytes(({}));
    notify_close();
    if (this_object()) destruct();
 }
@@ -127,8 +139,9 @@ private void begin_close()
    if (input_timer) remove_call_out(input_timer);
    input_timer = 0;
    i3_reset_input();
+   text_pending = to_bytes(({}));
    close_timer = call_out(close_expired, CLOSE_WAIT);
-   if (!ready || style == SKT_STYLE_LISTEN_M)
+   if (!ready || is_listener())
    {
       write_queue = ({});
       queued_bytes = write_offset = 0;
@@ -158,6 +171,45 @@ private void pump_input()
       if (!this_object()) return;
    }
    if (!closing && !input_timer) input_timer = call_out(continue_input, 0);
+}
+
+private void read_text(bytes data)
+{
+   // Keep each conversion below the native concatenation limit.
+   for (int start = 0; start < sizeof(data) && !closing; start += 4096)
+   {
+      int last = start + 4095;
+      if (last >= sizeof(data)) last = sizeof(data) - 1;
+      bytes part = data[start..last];
+      if (sizeof(text_pending)) part = text_pending + part;
+      int end = sizeof(part);
+      int lead = end - 1;
+      while (lead >= 0 && part[lead] >= 0x80 && part[lead] <= 0xbf) lead--;
+      if (lead >= 0)
+      {
+         int byte = part[lead];
+         int width = byte >= 0xc2 && byte <= 0xdf ? 2 :
+                     byte >= 0xe0 && byte <= 0xef ? 3 :
+                     byte >= 0xf0 && byte <= 0xf4 ? 4 : 1;
+         if (end - lead < width) end = lead;
+      }
+      text_pending = part[end..];
+      if (end)
+      {
+         string text = to_text(part[0..end - 1], "UTF-8");
+         catch(evaluate(read_func, this_object(), text));
+         if (!this_object()) return;
+      }
+   }
+}
+
+private void write_more()
+{
+   output_active = 0;
+   if (!write_func) return;
+   mixed next;
+   if (catch(next = evaluate(write_func, this_object()))) return;
+   if (this_object() && !closing && next != nil && sizeof(next)) send(next);
 }
 
 private void continue_input()
@@ -192,7 +244,7 @@ private void accept_connection(int fd)
    object peer;
    int acquired;
    mixed failure = catch {
-      peer = clone_object(SOCKET, SKT_STYLE_INT_ACQUIRE, read_func, close_func, this_object(), client);
+      peer = clone_object(SOCKET, SKT_STYLE_INT_ACQUIRE, read_func, close_func, this_object(), client, style + 1);
       acquired = socket_release(fd, peer, peer->ownership_offer());
    };
    if (failure || !acquired)
@@ -217,18 +269,29 @@ private void dispatch_event(int fd, string name, mixed data)
       else accept_connection(data);
       break;
    case "read":
-      if (!closing) { i3_feed(data); pump_input(); }
+      if (!closing)
+      {
+         if (is_mud()) { i3_feed(data); pump_input(); }
+         else if (style == SKT_STYLE_CONNECT_B) catch(evaluate(read_func, this_object(), data));
+         else read_text(data);
+      }
       break;
    case "eof":
-      if (!closing) { input_eof = 1; pump_input(); }
+      if (!closing)
+      {
+         if (is_mud()) { input_eof = 1; pump_input(); }
+         else
+         {
+            if (sizeof(text_pending)) throw("socket: incomplete UTF-8 at EOF");
+            begin_close();
+            notify_close();
+         }
+      }
       break;
    case "drained":
       flush_output();
       if (!closing && !sizeof(write_queue) && output_active)
-      {
-         output_active = 0;
-         if (write_func) catch(evaluate(write_func, this_object()));
-      }
+         write_more();
       break;
    case "closed":
       finish_connection();
@@ -252,10 +315,15 @@ nomask void set_write_callback(function f)
 varargs nomask void send(mixed message, string address)
 {
    require_client();
-   if (closing || fdOwned < 1 || style == SKT_STYLE_LISTEN_M)
+   if (closing || fdOwned < 1 || is_listener())
       throw("socket: connection is not writable");
-   if (address) throw("socket: MUD packets have no per-message address");
-   bytes frame = i3_encode(message);
+   if (address) throw("socket: TCP streams have no per-message address");
+   bytes frame;
+   if (is_mud()) frame = i3_encode(message);
+   else if (stringp(message)) frame = to_bytes(message, "UTF-8");
+   else if (style == SKT_STYLE_CONNECT_B && bytesp(message)) frame = message;
+   else throw("socket: expected text or binary stream data");
+   if (!sizeof(frame)) return;
    if (sizeof(write_queue) >= MAX_OUTPUT_FRAMES || sizeof(frame) > MAX_OUTPUT_BYTES - queued_bytes)
       throw("socket: output queue limit");
    write_queue += ({frame});
@@ -283,7 +351,7 @@ nomask mapping query_status()
    return (["handle":fdOwned, "ready":ready, "closing":closing,
             "queued_bytes":queued_bytes, "queued_frames":sizeof(write_queue),
             "native_output_pending":info ? info["output_pending"] : 0,
-            "pending_input":i3_pending_input(), "local":local_endpoint ? local_endpoint[0..] : nil,
+            "pending_input":is_mud() ? i3_pending_input() : sizeof(text_pending), "local":local_endpoint ? local_endpoint[0..] : nil,
             "remote":remote_endpoint ? remote_endpoint[0..] : nil]);
 }
 
@@ -293,7 +361,7 @@ string stat_me()
                   this_object(), style, local_endpoint, remote_endpoint, ready, closing, queued_bytes, sizeof(write_queue));
 }
 
-varargs void create(int skt_style, mixed p1, mixed p2, mixed p3, mixed p4)
+varargs void create(int skt_style, mixed p1, mixed p2, mixed p3, mixed p4, mixed p5)
 {
    if (!clonep()) return;
    if (configured) throw("socket: already configured");
@@ -306,6 +374,9 @@ varargs void create(int skt_style, mixed p1, mixed p2, mixed p3, mixed p4)
          throw("socket: only a listener can construct an accepted connection");
       offer_parent = client;
       client = p4;
+      if (p5 != SKT_STYLE_CONNECT && p5 != SKT_STYLE_CONNECT_B && p5 != SKT_STYLE_CONNECT_M)
+         throw("socket: invalid accepted stream style");
+      style = p5;
       read_func = p1;
       close_func = p2;
    }
@@ -316,8 +387,11 @@ varargs void create(int skt_style, mixed p1, mixed p2, mixed p3, mixed p4)
    }
    if (!functionp(read_func) || (close_func != nil && !functionp(close_func)))
       throw("socket: expected callbacks");
+   if (skt_style == SKT_STYLE_INT_ACQUIRE) return;
    switch (style)
    {
+   case SKT_STYLE_CONNECT:
+   case SKT_STYLE_CONNECT_B:
    case SKT_STYLE_CONNECT_M:
       if (!check_previous_privilege("Mudlib:socket"))
          throw("Insufficient privs to open an outgoing socket.");
@@ -329,13 +403,13 @@ varargs void create(int skt_style, mixed p1, mixed p2, mixed p3, mixed p4)
          if (ch < 48 || ch > 57) throw("socket: invalid port");
       fdOwned = socket_connect(parts[0], to_int(parts[1]), event_callback);
       break;
+   case SKT_STYLE_LISTEN:
+   case SKT_STYLE_LISTEN_B:
    case SKT_STYLE_LISTEN_M:
       if (!intp(p1) || (p4 != nil && !stringp(p4))) throw("socket: invalid listen address");
       fdOwned = socket_listen(p4 == nil ? "0.0.0.0" : p4, p1, event_callback);
       break;
-   case SKT_STYLE_INT_ACQUIRE:
-      break;
    default:
-      throw("socket: only MUD-mode TCP is supported by this adapter");
+      throw("socket: only TCP styles are supported by this adapter");
    }
 }
