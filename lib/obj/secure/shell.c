@@ -137,7 +137,11 @@ void shell_input(mixed input)
       input = expand_alias(input);
 
    if (input != "")
+   {
+      if (strlen(input) > 1 && input[0] == 'M' && owner->dispatch_mail_command(input[1..]))
+         return;
       execute_command(input);
+   }
 }
 
 private

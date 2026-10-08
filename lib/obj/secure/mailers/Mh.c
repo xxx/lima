@@ -127,14 +127,16 @@ void Mh_cmd_forward(mixed arg)
 nomask int parse_Mh_cmd(string input)
 {
    string arg;
+   object user = this_user();
 
-   ZBUG("FOO");
-   // ### we need to validate the caller!
+   if (!user || previous_object() != user || user->query_mailer() != this_object() ||
+       mailbox_ob->query_owner() != user->query_userid())
+      error("illegal Mh command caller\n");
 
-   if (strlen(input) > 2 && input[1] == ' ')
-      arg = input[2..];
-   else if (strlen(input) > 2)
+   if (!strlen(input) || (strlen(input) > 1 && input[1] != ' '))
       return 0;
+   if (strlen(input) > 2)
+      arg = input[2..];
 
    switch (input[0])
    {

@@ -37,6 +37,20 @@ nomask string query_default_mailer()
 {
    return default_mailer;
 }
+nomask int dispatch_mail_command(string input)
+{
+   if (this_user() != this_object() || previous_object() != this_object()->query_shell_ob())
+      error("illegal mail command caller\n");
+
+   if (!mailer && default_mailer != valid_mailers[1])
+      return 0;
+
+   object handler = query_mailer();
+   if (base_name(handler) != valid_mailers[1])
+      return 0;
+
+   return handler->parse_Mh_cmd(input);
+}
 nomask void set_default_mailer(string new_default_mailer)
 {
    default_mailer = new_default_mailer;
