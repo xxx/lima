@@ -47,3 +47,8 @@ void main(string arg)
 
    resend(CMD_OB_TELL, sprintf("%s %s", target, arg));
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}

@@ -125,7 +125,7 @@ void main(string arg)
 
             if (arg[0] == ';' || arg[0] == ':')
             {
-               string *soul_ret;
+               mixed *soul_ret;
                arg = arg[1..];
                soul_ret = SOUL_D->parse_imud_soul(arg);
 
@@ -174,7 +174,7 @@ void main(string arg)
 
    if (arg[0] == ':' || arg[0] == ';')
    {
-      string *soul_ret;
+      mixed *soul_ret;
       int tindex;
 
       arg = arg[1..];
@@ -191,7 +191,7 @@ void main(string arg)
       {
          mystring = sprintf("%%^TELL%%^(tell)%%^RESET%%^ %s", soul_ret[1][0]);
 
-         if ((tindex = member_array(who, soul_ret[0])) == -1)
+         if ((tindex = member_array(who->query_body(), soul_ret[0])) == -1)
          {
             deststring = sprintf("%%^TELL%%^(tell)%%^RESET%%^ %s", soul_ret[1][ < 1]);
          }
@@ -215,7 +215,7 @@ void main(string arg)
 
    out(mystring);
    this_user()->add_tell_history(mystring);
-   if (who != this_body())
+   if (who != this_user())
    {
       who->receive_private_msg(deststring, MSG_INDENT);
       who->add_tell_history(deststring);
@@ -226,4 +226,9 @@ void main(string arg)
 nomask int valid_resend(string ob)
 {
    return ob == "/cmds/player/reply";
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
