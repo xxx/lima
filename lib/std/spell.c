@@ -177,12 +177,12 @@ mixed valid_target(object target)
 
    // If living targets are valid, and the target is a living
    // we can cast the spell.
-   if (valid_targets & TARGET_LIVING && target->is_living() && target != this_body())
+   if (valid_targets & TARGET_LIVING && target && target->is_living() && target != this_body())
       return 1;
 
    // If item targets are valid, and the target is an item
    // we can cast the spell.
-   if (valid_targets & TARGET_ITEM && !target->is_living())
+   if (valid_targets & TARGET_ITEM && target && !target->is_living())
       return 1;
 
    // If self is a valid target, and the target is the caster
@@ -193,13 +193,13 @@ mixed valid_target(object target)
    return 0;
 }
 
-//: FUNCTION valid_spell_components
+//: FUNCTION valid_reagent
 // Checks if the spell components are valid.
 // Parameters:
-// - sc: The spell components mapping.
+// - sc: The reagent object.
 // Returns: 1 if the spell components are valid, 0 otherwise.
 protected
-mixed valid_spell_components(mapping sc)
+mixed valid_reagent(object sc)
 {
    /*DEFAULT: if there is a spell component, then it cant be used*/
    if (sc)
@@ -213,7 +213,7 @@ mixed valid_spell_components(mapping sc)
 // Checks if the circumstances are valid for casting the spell.
 // Parameters:
 // - target: The target object.
-// - sc: The spell components mapping.
+// - sc: The reagent object.
 // Returns: 1 if the circumstances are valid, 0 otherwise.
 protected
 mixed valid_circumstances(mixed target, mixed sc)
@@ -232,8 +232,8 @@ nomask mixed check_valid_spell(int has_target, int has_sc)
    // Did we define only specific valid targets?
    // Do we not have a target? Then we need to have TARGET_ROOM
    // defined as a valid target.
-   if (valid_targets && !has_target)
-      return valid_targets & TARGET_ROOM ? 1 : "The spell requires a target.";
+   if (valid_targets && !has_target && !(valid_targets & TARGET_ROOM))
+      return "The spell requires a target.";
 
    return valid_circumstances(has_target, has_sc);
 }
@@ -259,27 +259,27 @@ nomask mixed check_valid_target(object target, mixed has_sc)
    TBUG("check_valid_target");
 
    result = valid_circumstances(target, has_sc);
-   if (!result)
+   if (result != 1)
       return result;
 
    return valid_target(target);
 }
 
-//: FUNCTION check_valid_spell_components
+//: FUNCTION check_valid_reagent
 // Checks if the spell components are valid for the spell.
 // Parameters:
-// - sc: The spell components mapping.
+// - sc: The reagent object.
 // - has_target: 1 if the spell has a target, 0 otherwise.
 // Returns: 1 if the spell components are valid, an error message otherwise.
-nomask mixed check_valid_spell_components(mapping sc, mixed has_target)
+nomask mixed check_valid_reagent(object sc, mixed has_target)
 {
    mixed result;
 
    result = valid_circumstances(has_target, sc);
-   if (!result)
+   if (result != 1)
       return result;
 
-   return valid_spell_components(sc);
+   return valid_reagent(sc);
 }
 
 //: FUNCTION set_skill_used
@@ -425,23 +425,23 @@ int cast_action(mixed *args)
    sc = args[1];
    success = args[2];
 
-   if (!target && !valid_targets & TARGET_ROOM)
+   if (!target && valid_targets && !(valid_targets & TARGET_ROOM))
    {
       channel_failure("Your target has disappeared.");
-      return;
+      return 0;
    }
 
    // If we have a target, but it's not present in inventory or room, we can't cast the spell.
-   if (!valid_targets & TARGET_ROOM && !present(target, environment(this_body())) && !present(target, this_body()))
+   if (target && !(valid_targets & TARGET_ROOM) && !present(target, environment(this_body())) && !present(target, this_body()))
    {
       channel_failure("Your target seems to have disappeared.");
-      return;
+      return 0;
    }
 
-   if (valid_targets & TARGET_LIVING && target==this_body())
+   if (valid_targets & TARGET_LIVING && !(valid_targets & TARGET_SELF) && target==this_body())
    {
       channel_failure("You cannot cast the spell on yourself.");
-      return;
+      return 0;
    }
 
    this_object()->cast_spell(target, sc, success);
@@ -543,7 +543,7 @@ string target_to_str()
       targs += ({"Item"});
    if (valid_targets & TARGET_SELF)
       targs += ({"Self"});
-   return format_list(targs);
+   return format_list(targs, "and");
 }
 
 int query_channeling_interval()

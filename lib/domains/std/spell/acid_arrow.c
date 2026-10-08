@@ -28,9 +28,11 @@ varargs int calculate_damage(int success, object target)
 
 void ongoing_damage(object attacker, object target, string limb)
 {
-   int damage = calculate_damage(1) / 2;
-   if (!attacker)
+   int damage;
+
+   if (!attacker || !target)
       return;
+   damage = calculate_damage(1, attacker) / 2;
    target->targetted_action("$P1 acid arrow continues to burn $n on the $o.", attacker, limb);
    do_spell_damage(attacker, target, damage, limb, 1);
 }
@@ -49,12 +51,12 @@ void cast_spell(object ob, object reagent, int success)
 
       // On a hit, the target takes acid damage immediately and more acid damage on-going.
       // On success, either the head or torso is targeted.
-      do_spell_damage(this_body(), ob, ( : calculate_damage, success, ob:), limb);
+      do_spell_damage(this_body(), ob, &calculate_damage(success, ob), limb);
 
       // The acid arrow is a transient object that will handle the ongoing damage.
       // Move it to the target.
-      if (!ob->test_skill("combat/defense/dodge"), SKILL_D->pts_for_rank(query_level()))
-         transient("acid arrow", 1, 3, 0, limb)->move(ob);
+      if (!ob->test_skill("combat/defense/dodge", SKILL_D->pts_for_rank(query_level())))
+         transient("acid arrow", 1, 3, nil, limb)->move(ob);
       else
          ob->simple_action("$N $vdodge the acid arrow.");
    }

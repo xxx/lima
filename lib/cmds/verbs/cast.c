@@ -95,7 +95,7 @@ mixed direct_cast_str_at_obj_with_obj(string spell, object target, object reagen
 
 mixed indirect_cast_str_at_obj_with_obj(string spell, object target, object reagent)
 {
-   return SPELL_D->check_valid_reagent(spell, reagent, target);
+   return SPELL_D->check_valid_reagent(spell, reagent, HAS_TARGET);
 }
 
 mixed can_cast_str_on_obj_with_obj(string spell, object target, object reagent)
@@ -116,7 +116,7 @@ mixed direct_cast_str_on_obj_with_obj(string spell, object target, object reagen
 
 mixed indirect_cast_str_on_obj_with_obj(string spell, object target, object reagent)
 {
-   return SPELL_D->check_valid_reagent(spell, reagent, target);
+   return SPELL_D->check_valid_reagent(spell, reagent, HAS_TARGET);
 }
 
 mixed can_cast_str_with_obj_at_obj(string spell, object reagent, object target)
@@ -136,7 +136,7 @@ mixed direct_cast_str_with_obj_at_obj(string spell, object reagent, object targe
 
 mixed indirect_cast_str_with_obj_at_obj(string spell, object reagent, object target)
 {
-   return SPELL_D->check_valid_target(spell, target, reagent);
+   return SPELL_D->check_valid_target(spell, target, HAS_REAGENT);
 }
 
 mixed can_cast_str_with_obj_on_obj(string spell, object reagent, object target)
@@ -155,7 +155,7 @@ mixed direct_cast_str_with_obj_on_obj(string spell, object reagent, object targe
 
 mixed indirect_cast_str_with_obj_on_obj(string spell, object reagent, object target)
 {
-   return SPELL_D->check_valid_target(spell, target, reagent);
+   return SPELL_D->check_valid_target(spell, target, HAS_REAGENT);
 }
 
 void do_cast_str(string spell)
@@ -180,7 +180,12 @@ void do_cast_str_at_obj(string spell, object target)
 
 void do_cast_str_with_obj(string spell, object tool)
 {
-   SPELL_D->cast_spell(spell, 0, tool);
+   SPELL_D->cast_spell(spell, nil, tool);
+}
+
+void do_cast_str_at_obj_with_obj(string spell, object target, object tool)
+{
+   SPELL_D->cast_spell(spell, target, tool);
 }
 
 void do_cast_str_on_obj_with_obj(string spell, object target, object tool)

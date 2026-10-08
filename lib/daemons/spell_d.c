@@ -54,7 +54,7 @@ void remove_spell_dir(string dir)
 private
 int valid_spell_name(string spell_name)
 {
-   return stringp(spell_name) && regexp(spell_name, "^[a-zA-Z0-9 '-]+$");
+   return stringp(spell_name) && sizeof(regexp(({spell_name}), "^[a-zA-Z0-9 '-]+$")) != 0;
 }
 
 private
@@ -64,7 +64,7 @@ void build_spell_table()
 
    // Not necessary, and would be a bad thing if we didn't rebuild the spell
    // table each time.
-   spell_dirs -= ({0});
+   spell_dirs -= ({nil});
 
    foreach (string dir in spell_dirs)
    {
@@ -200,12 +200,12 @@ varargs void cast_spell(string spell, object target, object reagent)
    spell_obname = find_spell_obname(spell);
    ENSURE(spell_obname);
 
-   return spell_obname->internal_cast_spell(target, reagent);
+   spell_obname->internal_cast_spell(target, reagent);
 }
 
 void register_spell()
 {
-   string spell_name = previous_object()->qu_spell_name();
+   string spell_name = previous_object()->query_name();
    string spell_info = spell_table[spell_name];
 
    ENSURE(spell_name /* You didn't provide a spell name. */);

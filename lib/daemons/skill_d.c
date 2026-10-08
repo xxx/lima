@@ -66,7 +66,7 @@ string *register_skill(string skill)
       error("security: illegal attempt to add a skill\n");
 
    if (skills[skill])
-      return 0;
+      return nil;
 
    /* create the skill and all parent skills */
    parts = explode(skill, "/");
@@ -101,7 +101,7 @@ string *remove_skill(string skill)
       error("security: illegal attempt to remove a skill\n");
 
    if (!skills[skill])
-      return 0;
+      return nil;
 
    /* delete the skill */
    m_delete(skills, skill);
@@ -179,7 +179,7 @@ int rank_name_from_pts(int skill_pts)
 // skill.
 int skill_rank(object player, string skill_name)
 {
-   class skill skill;
+   mixed skill;
    int rank = 0;
 
    if (!player)
@@ -334,7 +334,7 @@ int percent_for_next_rank(object player, string skill_name)
    if (!skill)
       return 0;
 
-   return (skill->skill_points - (rank == 0 ? 0 : skill_ranks[rank - 1])) * 100 / next_rank;
+   return (skill.skill_points - (rank == 0 ? 0 : skill_ranks[rank - 1])) * 100 / next_rank;
 }
 
 //: FUNCTION monster_percent_for_next_rank

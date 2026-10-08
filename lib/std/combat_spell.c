@@ -29,11 +29,11 @@ varargs void do_spell_damage(object attacker, object target, mixed damage, strin
    {
       damage = evaluate(damage);
    }
-   if (!no_dodge && target->test_skill("combat/defense/dodge"), SKILL_D->pts_for_rank(query_level()))
+   if (!no_dodge && target->test_skill("combat/defense/dodge", opposing_dodge))
    {
       damage = damage / 2;
    }
-   attacker->add_event(target, this_object(), target->query_random_limb(), damage);
+   attacker->add_event(target, this_object(), limb ? limb : target->query_random_limb(), damage);
    if (attacker != target)
       attacker->start_fight(target);
 }

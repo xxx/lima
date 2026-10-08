@@ -27,5 +27,5 @@ void cast_spell(object target, object reagent, int success)
    else
       this_body()->targetted_action("$N $vchannel a wavering fire beam at $t1.", target);
 
-   do_spell_damage(this_body(), target, ( : calculate_damage:));
+   do_spell_damage(this_body(), target, &calculate_damage(success));
 }
