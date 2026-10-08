@@ -199,6 +199,6 @@ void load_config_from_file()
 void create()
 {
    ::create();
-   if (damage == ({}))
+   if (!sizeof(damage))
       load_config_from_file();
 }
