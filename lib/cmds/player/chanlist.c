@@ -36,7 +36,7 @@ nomask string fmt_imud_channel(string channel_name, mixed *channel_data)
       return "";
 
    if (!intp(channel_data[1]))
-      type = save_variable(channel_data[1]);
+      type = save_value(channel_data[1]);
    else
       type = valid_types[channel_data[1]];
    if (owner == "*")
@@ -88,10 +88,8 @@ void main(string arg)
          catch (chanlist = IMUD_D->query_chanlist());
          s += "\nOther subscribable intermud channels\n"
               "------------------------------------\n";
-         s += implode(({""}) + sort_array(keys(chanlist) - imud_chan, 1),
-                      (
-                          : $1 + fmt_imud_channel($2, $(chanlist)[$2])
-                          :));
+         foreach (string channel_name in sort_array(keys(chanlist) - imud_chan, 1))
+            s += fmt_imud_channel(channel_name, chanlist[channel_name]);
       }
       else
       {
@@ -99,4 +97,9 @@ void main(string arg)
       }
    }
    out(s);
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
