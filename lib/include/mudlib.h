@@ -85,6 +85,7 @@
 #define M_DRINK_SOURCE     _MODULES "m_drink_source"
 #define M_DRINKABLE        _MODULES "m_drinkable"
 #define M_DURABILITY       _MODULES "m_durability"
+#define M_ED               _MODULES "m_ed"
 #define M_EDIBLE           _MODULES "m_edible"
 #define M_FLUID_CONTAINER  _MODULES "m_fluid_container"
 #define M_FLUID_SOURCE     _MODULES "m_fluid_source"
