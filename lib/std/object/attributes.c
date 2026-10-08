@@ -23,7 +23,7 @@
 ** data.
 */
 private
-nosave mapping attribute_info = 0;
+nosave mapping attribute_info = nil;
 
 int test_flag(int);
 

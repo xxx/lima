@@ -98,7 +98,7 @@ string show_in_room()
    string str;
    int our_count;
    if (!is_visible())
-      return 0;
+      return nil;
    /* If an object is attached, it is considered part of its
     * parent and it's the parent's responsibility to print an
     * appropriate description.  For example, wielded weapons are
@@ -108,7 +108,7 @@ string show_in_room()
     *         passages out of the room.
     */
    if (is_attached())
-      return 0;
+      return nil;
    our_count = count();
    if (our_count > 4)
    {
@@ -117,7 +117,7 @@ string show_in_room()
 
       str = short();
       if (!str)
-         return 0;
+         return nil;
 
       return "There are many " + plural_short() + " here.\n";
    }
@@ -128,7 +128,7 @@ string show_in_room()
 
       str = short();
       if (!str)
-         return 0;
+         return nil;
 
       //	if( query_ob_flag( AUTO_IN_ROOM_DESC ) )
 
@@ -146,7 +146,7 @@ string show_in_room()
    str = a_short();
 
    if (!str)
-      return 0;
+      return nil;
 
    //    if( query_ob_flag( AUTO_IN_ROOM_DESC ) )
 

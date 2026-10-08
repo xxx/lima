@@ -54,7 +54,7 @@
 #include <stats.h>
 
 inherit "/std/adversary/stats/base";
-private
+protected
 inherit CLASS_STATMODS;
 inherit CLASS_WEAR_INFO;
 

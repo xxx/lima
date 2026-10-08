@@ -55,7 +55,7 @@ void remove_hook(string tag, function hook)
       hooks[tag] -= ({hook});
       if (sizeof(hooks[tag]) == h_size)
          TBUG("Warning: Failed to remove tag: " + tag + " hook: " + sprintf("%O", hook) +
-              "  Owner: " + function_owner(hook));
+              "  Owner: " + sprintf("%O", function_info(hook)["owner"]));
       hooks[tag] -= ({( : 0 :)});
    }
    if (!sizeof(hooks[tag]))
@@ -93,18 +93,18 @@ void hook_state(string tag, mixed hook, int state)
 varargs mixed call_hooks(string tag, mixed func, mixed start, mixed *args...)
 {
    mixed *hooks_to_call;
-   mixed tmp;
+   mixed tmp = 0;
    function hook;
 
    if (hooks_to_call = hooks[tag])
    {
-      hooks_to_call = filter(hooks_to_call, ( : !(functionp($1) & FP_OWNER_DESTED) :));
+      hooks_to_call = filter(hooks_to_call, (: objectp(function_info($1)["owner"]) :));
       hooks[tag] = hooks_to_call;
 
       hooks[tag] -= ({( : 0 :)});
 
       if (!intp(func))
-         return implode(map(hooks_to_call, ( : evaluate($1, $(args)...) :)), func, start);
+         return reduce(map(hooks_to_call, ( : evaluate($1, $(args)...) :)), func, start);
       switch (func)
       {
       case HOOK_IGNORE:

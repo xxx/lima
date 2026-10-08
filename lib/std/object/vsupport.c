@@ -7,8 +7,6 @@ inherit M_PARSING;
 
 int is_visible();
 string short();
-string is_relation_alias(string al);
-int valid_relation(string relation);
 
 varargs mixed call_hooks(string, int, mixed);
 
@@ -56,8 +54,8 @@ mixed direct_verb_rule(string verb, string rule, mixed args...)
       if (rule == "WRD OBJ")
       {
          args[0] = PREPOSITION_D->translate_preposition(args[0]);
-         aliased_to = is_relation_alias(args[0]);
-         if (!valid_relation(args[0]))
+         aliased_to = this_object()->is_relation_alias(args[0]);
+         if (member_array(args[0], this_object()->get_relations()) == -1)
          {
             if (!aliased_to)
                return 0;
@@ -88,8 +86,8 @@ int do_verb_rule(string verb, string rule, mixed args...)
       if (rule == "WRD OBJ")
       {
          args[0] = PREPOSITION_D->translate_preposition(args[0]);
-         aliased_to = is_relation_alias(args[0]);
-         if (!valid_relation(args[0]))
+         aliased_to = this_object()->is_relation_alias(args[0]);
+         if (member_array(args[0], this_object()->get_relations()) == -1)
          {
             args[0] = aliased_to;
          }

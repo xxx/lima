@@ -67,8 +67,8 @@ nomask int get_flags(int set_key)
       set_info = new (class flag_set_info);
 
    if (set_info.is_non_persistent)
-      return non_persist_flags[set_key];
-   return persist_flags[set_key];
+      return non_persist_flags[set_key] || 0;
+   return persist_flags[set_key] || 0;
 }
 
 //: FUNCTION set_flags

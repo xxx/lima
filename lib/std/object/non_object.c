@@ -19,7 +19,7 @@ int remove()
       environment()->release_object(this_object(), 1);
 
    // Abstract class fix
-   if (file_name() != __DIR__ "non_object")
+   if (file_name(this_object()) != __DIR__ "non_object")
    {
       //: HOOK remove
       // Called when an object is removed.  The return value is ignored

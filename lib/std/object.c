@@ -46,11 +46,11 @@ string stat_me()
    result += "Size: " + query_size() + " Light: " + query_light() + "\n";
 #else
 #ifdef USE_MASS
-   result += "Weight: " + query_mass() + "  Light: " + query_light() + "\n";
+   result += sprintf("Weight: %f  Light: %d\n", query_mass(), query_light());
 #else
    result += "Light: " + query_light() + "\n";
 #endif
-   result += "Value: " + query_value() + "\n";
+   result += sprintf("Value: %f\n", query_value());
 #endif
 
    return result;
@@ -112,7 +112,7 @@ int do_not_restore()
 void create(mixed *args...)
 {
    base_obj::create();
-   configure_set(STD_FLAGS, 0, ( : resync_visibility:));
+   configure_set(STD_FLAGS, 0, resync_visibility);
 #ifdef EVERYTHING_SAVES
    this_object()->add_save(({"adjs"}));
 #endif

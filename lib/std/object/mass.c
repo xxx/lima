@@ -63,5 +63,5 @@ float query_mass()
 // set_size(s) sets the size of an object to 's'
 void set_size(int s)
 {
-   TBUG("Deprecated: set_size() called in" + this_object());
+   TBUG("Deprecated: set_size() called in" + file_name(this_object()));
 }

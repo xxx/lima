@@ -25,7 +25,7 @@ varargs void receive_inside_msg(string msg, object *exclude, int message_type, m
 {
    object env;
 
-   receive(msg);
+   if (interactive(this_object())) write_socket(msg);
 
    if (environment_can_hear() && (env = environment()) && (!arrayp(exclude) || member_array(env, exclude) == -1))
    {
@@ -39,7 +39,7 @@ varargs void receive_inside_msg(string msg, object *exclude, int message_type, m
 // Outside messages propogate downward, so just receive
 varargs void receive_outside_msg(string msg, object *exclude, int message_type, mixed other)
 {
-   receive(msg);
+   if (interactive(this_object())) write_socket(msg);
 }
 
 // ### Where is this used?  Is it needed?  What is it's purpose?
@@ -53,5 +53,5 @@ varargs void receive_remote_msg(string msg, object *exclude, int message_type, m
 // Receive a message sent just to us.
 varargs void receive_private_msg(string msg, int message_type, mixed other)
 {
-   receive(msg);
+   if (interactive(this_object())) write_socket(msg);
 }

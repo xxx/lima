@@ -5,8 +5,8 @@
 ** is one integer and 3 functions. We will be okay.
 */
 
-nosave float object_value = 0;
-nosave float value_factor = 1;
+nosave float object_value = 0.0;
+nosave float value_factor = 1.0;
 
 //: FUNCTION set_value_factor
 // This factor is multiplied unto the value of the

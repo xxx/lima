@@ -278,7 +278,7 @@ void add_id(string *id...)
       ids = id;
    else
       ids += id;
-   plurals += map(id, ( : pluralize:));
+   plurals += map(id, pluralize);
    resync();
 }
 
@@ -287,8 +287,8 @@ void add_id(string *id...)
 void set_id(string *id...)
 {
    ids = id + ids; // Ensure proper order for resync of primary id
-   plurals += map(id, ( : pluralize:));
-   primary_id = 0;
+   plurals += map(id, pluralize);
+   primary_id = nil;
    resync();
 }
 
@@ -298,7 +298,7 @@ void set_adj(string *adj...)
       adjs = adj;
    else
       adjs = adj + adjs; // Ensure proper order for resync of primary adj
-   primary_adj = 0;
+   primary_adj = nil;
    resync();
 }
 
@@ -310,8 +310,8 @@ void remove_id(string *id...)
    if (!arrayp(ids))
       return;
    ids -= id;
-   plurals -= map(id, ( : pluralize:));
-   primary_id = 0;
+   plurals -= map(id, pluralize);
+   primary_id = nil;
    resync();
 }
 
@@ -320,7 +320,7 @@ void remove_adj(string *adj...)
    if (!arrayp(ids))
       return;
    adjs -= adj;
-   primary_adj = 0;
+   primary_adj = nil;
    resync();
 }
 
@@ -332,7 +332,7 @@ void clear_id()
 {
    ids = ({});
    plurals = ({});
-   primary_id = 0;
+   primary_id = nil;
    resync();
 }
 
@@ -341,7 +341,7 @@ void clear_id()
 void clear_adj()
 {
    adjs = ({});
-   primary_adj = 0;
+   primary_adj = nil;
    resync();
 }
 
