@@ -64,60 +64,36 @@ varargs int add_material(mixed m, int c)
 }
 
 //: FUNCTION has_material
-// int has_material(string m, int count)
-// Checks for count material from the pouch if available (return 1),
-// otherwise return 0. Material could also be in inventory, which is
-// also checked.
 int has_material(string m, int count)
 {
-   object ims;
-   if (materials[m] >= count)
-   {
+   if (count <= 0)
+      return count == 0;
+   if ((materials[m] || 0) >= count)
       return 1;
-   }
-
-   ims = filter(all_inventory(), ( : $1->id($(m)) && ($1->is_material() || $1->is_junk()) :));
-   if (sizeof(ims) >= count)
-      return 1;
-   return 0;
+   object *ims = filter(all_inventory(), (: $1->id($(m)) && ($1->is_material() || $1->is_junk()) :));
+   return sizeof(ims) >= count;
 }
 
 //: FUNCTION remove_material
-// int remove_material(string m, int count)
-// Removes count material from the pouch if available (return 1),
-// otherwise it does nothing (return 0).
+// Removes from the pouch first, or from inventory if it holds the whole count.
 int remove_material(string m, int count)
 {
-   object *ims;
-
-   ims = filter(all_inventory(), ( : $1->id($(m)) && ($1->is_material() || $1->is_junk()) :));
-
-   if (sizeof(ims) >= count)
-   {
-      count--;
-      ims = ims[0..count];
-      ims->remove();
-      return 1;
-   }
-   else if (sizeof(ims) < count && sizeof(ims))
-   {
-      return 0;
-   }
-
+   if (count <= 0)
+      return count == 0;
    if (!CRAFTING_D->valid_material(m))
-   {
-      m_delete(materials, m);
       return 0;
-   }
-
-   if (materials[m] >= count)
+   if ((materials[m] || 0) >= count)
    {
       materials[m] -= count;
       if (!materials[m])
          m_delete(materials, m);
       return 1;
    }
-   return 0;
+   object *ims = filter(all_inventory(), (: $1->id($(m)) && ($1->is_material() || $1->is_junk()) :));
+   if (sizeof(ims) < count)
+      return 0;
+   ims[0..count - 1]->remove();
+   return 1;
 }
 
 //: FUNCTION query_amt_money
@@ -125,63 +101,46 @@ int remove_material(string m, int count)
 // of currency you have.
 int query_amt_money(string type)
 {
-   string currency;
-   float factor;
-   type = MONEY_D->singular_name(type);
-   currency = MONEY_D->query_currency(type);
-   factor = MONEY_D->query_factor(type);
-   return round(money[currency] / factor);
+   return to_int(round(query_amt_currency(MONEY_D->query_currency(type)) / MONEY_D->query_factor(type)));
 }
 
 //: FUNCTION query_amt_currency
-// This is the functin to call to query the sum of the types of a
-// currency you have.
+// Balances are stored in base-currency units, including fractional units.
 float query_amt_currency(string currency)
 {
-   float amount = 0.0;
+   currency = MONEY_D->singular_name(currency);
    if (!valid_currency(currency))
       error("Unknown currency '" + currency + "'.");
-
-   currency = MONEY_D->singular_name(currency);
-   foreach (string type in MONEY_D->query_denominations(currency))
-   {
-      amount += to_float(money[type]) * MONEY_D->query_factor(type);
-   }
-   return amount;
+   return to_float(money[currency] || 0);
 }
 
 //: FUNCTION add_money
-// This is the function to call to add money to a person
+// Converts a denomination amount into the stored base-currency balance.
 void add_money(string type, float amount)
 {
-   string currency;
-   float factor;
-   type = MONEY_D->singular_name(type);
-   currency = MONEY_D->query_currency(type);
-   factor = MONEY_D->query_factor(type);
-   amount = amount * factor;
-
-   if (!valid_currency(currency))
-      error("Unknown currency '" + currency + "'.");
-
-   currency = MONEY_D->singular_name(currency);
-   money[currency] = money[currency] + amount;
-
-   if (money[currency] <= 0)
-      m_delete(money, currency);
+   string currency = MONEY_D->query_currency(type);
+   float value = amount * MONEY_D->query_factor(type);
+   if (amount < 0.0)
+      error("Cannot add a negative amount of money.");
+   if (value)
+      money[currency] = query_amt_currency(currency) + value;
 }
 
 //: FUNCTION subtract_money
-// This is the function to call to substract money from a person
-void subtract_money(string type, int amount)
+// Rejects overdrafts before changing the base-currency balance.
+void subtract_money(string type, float amount)
 {
-   string currency;
-   float factor;
-   type = MONEY_D->singular_name(type);
-   currency = MONEY_D->query_currency(type);
-   factor = MONEY_D->query_factor(type);
-   amount = amount * factor;
-   add_money(currency, -amount);
+   string currency = MONEY_D->query_currency(type);
+   float value = amount * MONEY_D->query_factor(type);
+   float balance = query_amt_currency(currency);
+   if (amount < 0.0)
+      error("Cannot subtract a negative amount of money.");
+   if (!MONEY_D->sufficient_money(balance, value))
+      error("Insufficient money.");
+   if (MONEY_D->sufficient_money(value, balance))
+      m_delete(money, currency);
+   else if (value)
+      money[currency] = balance - value;
 }
 
 //: FUNCTION query_money

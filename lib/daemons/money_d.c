@@ -7,10 +7,9 @@
 // The money system consists of currencies and denominations.
 // 
 // Different currencies can only be exchanged at a bank (for a fee) and
-// vendors only use one currency.  You can pay with any of the
-// denominations of the vendor's currency though and you get change if
-// needed.  If you want to drop or give money to somebody you can only
-// use the denominations which you really have though.
+// vendors only use one currency. Body wallets store base-currency balances;
+// denomination amounts are converted on deposit and withdrawal. Payment
+// receipts describe the debit in denominations and contain no change.
 // 
 // Each currency consists of its name, the plural name, a list of
 // denominations and an exchange rate.  By default a currency has a base
@@ -87,7 +86,7 @@ nosave mapping singulars = ([]);
 string singular_name(string name)
 {
    if (!name)
-      return;
+      return nil;
    name = lower_case(trim(name));
    if (singulars[name])
       name = singulars[name];
@@ -127,14 +126,14 @@ varargs nomask string *query_denominations(string type)
 // tests if name is a currency
 nomask int is_currency(string name)
 {
-   return denominations[singular_name(name)] != 0;
+   return !!denominations[singular_name(name)];
 }
 
 //: FUNCTION is_denomination
 // tests if name is a denomination
 nomask int is_denomination(string name)
 {
-   return denomination[singular_name(name)] != 0;
+   return !!denomination[singular_name(name)];
 }
 
 //: FUNCTION query_currency
@@ -264,7 +263,7 @@ void add_denomination(string type, string name, string plural, float factor)
       if (type == name)
          add_currency(type, plural, 1);
       else
-         add_currency(type, 0, 1);
+         add_currency(type, nil, 1);
       denominations[type] = ({name});
    }
    else
@@ -364,7 +363,7 @@ varargs nomask string currency_to_string(mixed money, string currency)
 
    foreach (name in types)
    {
-      if (amount = money[name])
+      if (amount = money[name] || 0)
       {
          if (str != "")
             str += ", ";
@@ -382,74 +381,29 @@ varargs nomask string currency_to_string(mixed money, string currency)
    return str;
 }
 
-//: FUNCTION handle_subtract_money
-// substracts an amount of currency from a player and adds change.
-// returns an array of two mappings: substract and change, which
-// consist of the denominations which were used.
-mapping *handle_subtract_money(object player, float f_amount, string type)
+//: FUNCTION sufficient_money
+// Allows accumulated binary floating-point roundoff at the payment boundary.
+nomask int sufficient_money(float balance, float amount)
 {
-   mapping substract = ([]), change;
-   int amount;
+   return amount >= 0.0 && (balance >= amount ||
+       amount - balance <= (abs(balance) + abs(amount)) * 0.000000000000001);
+}
 
+//: FUNCTION handle_subtract_money
+// Debits base-currency balances and returns paid denominations plus empty change.
+mapping *handle_subtract_money(object player, float amount, string type)
+{
    type = singular_name(type);
-   if (is_currency(type))
-   {
-
-      mapping money = player->query_money() || ([]);
-      string *types = denominations[type];
-      string currency = type;
-      for (int i = sizeof(types) - 1; i >= 0; i--)
-      {
-         type = types[i];
-         amount = to_int(f_amount / denomination[type].factor + 0.9999);
-         if (amount <= money[type])
-         {
-            substract[type] = amount;
-            f_amount -= to_float(amount) * denomination[type].factor;
-            break;
-         }
-      }
-      if (f_amount > 0)
-      {
-         foreach (type in types)
-         {
-            amount = to_int(f_amount / denomination[type].factor + 0.9999);
-            if (amount > money[type])
-            {
-               substract[type] = money[type];
-               f_amount -= to_float(money[type]) * denomination[type].factor;
-            }
-            else
-            {
-               substract[type] = amount;
-               f_amount -= to_float(amount) * denomination[type].factor;
-               break;
-            }
-         }
-      }
-      change = calculate_denominations(-f_amount, currency);
-   }
-   else
-   {
-      string currency = query_currency(type);
-      amount = to_int(f_amount + 0.9999);
-      substract[type] = amount;
-      f_amount = (to_float(amount) - f_amount) * denomination[type].factor;
-      change = calculate_denominations(f_amount, currency);
-   }
-   TBUG(amount + f_amount);
-   player->subtract_money(type, (amount + f_amount));
-   foreach (type, amount in substract)
-   {
-      // Because of the floats we sometimes get rounding errors,
-      // so let's clean up a little.
-      if (change[type])
-      {
-         change[type]--;
-         substract[type]--;
-      }
-   }
-   return ({substract, change});
+   string currency = is_currency(type) ? type : query_currency(type);
+   float value = is_currency(type) ? amount : amount * query_factor(type);
+   if (amount < 0.0)
+      error("Cannot subtract a negative amount of money.");
+   if (!sufficient_money(player->query_amt_currency(currency), value))
+      error("Insufficient money.");
+   mapping paid = calculate_denominations(value, currency);
+   if (value)
+      player->subtract_money(currency, value);
+   return ({paid, ([])});
 }
 
 string money_string(object body)
@@ -464,7 +418,7 @@ string money_string(object body)
    }
    else
    {
-      foreach (string key, int amount in curr)
+      foreach (string key, float amount in curr)
       {
          mapping money = MONEY_D->calculate_denominations(amount, key);
          string *denom_order = MONEY_D->query_denominations(key);
@@ -473,15 +427,15 @@ string money_string(object body)
          while (j < sizeof(denom_order))
          {
             string denom = denom_order[j];
-            int count = money[denom];
+            int count = money[denom] || 0;
             if (count)
                money_str += ({count + " " + denom + (count == 1 ? "" : "s")});
             j++;
          }
          if (sizeof(curr) > 1)
-            money_info += sprintf("%s: %s", capitalize(key), format_list(money_str) + "\n");
+            money_info += sprintf("%s: %s", capitalize(key), format_list(money_str, "and") + "\n");
          else
-            money_info += sprintf("%s", format_list(money_str) + "\n");
+            money_info += sprintf("%s", format_list(money_str, "and") + "\n");
       }
    }
    return money_info;

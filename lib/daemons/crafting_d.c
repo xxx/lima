@@ -440,205 +440,165 @@ string repair_cost_string(object ob)
    return MONEY_D->currency_to_string(money_to_repair(ob), currency_type);
 }
 
-mapping estimate_objects(object player, object *obs)
+private object *repair_objects(mixed obs)
 {
-   mapping pouch = deep_copy(player->query_materials());
-   mapping picked_mats = ([]);
-   int remainder = 0;
-   if (!arrayp(obs))
+   object *result = ({});
+   if (objectp(obs))
       obs = ({obs});
+   if (!arrayp(obs))
+      error("Expected an object or array of repair objects.");
+   foreach (mixed ob in obs)
+   {
+      if (!objectp(ob))
+         error("Invalid repair object.");
+      if (member_array(ob, result) == -1 && ob->missing_durability() > 0)
+         result += ({ob});
+   }
+   return result;
+}
 
-   TBUG(obs);
+private mapping repair_plan(object player, object *obs, int use_materials)
+{
+   mapping pouch = use_materials ? deep_copy(player->query_materials()) : ([]);
+   mapping picked = (["money":0.0]);
+   int cash_damage = 0;
    foreach (object ob in obs)
    {
-      mapping salvage = ob->query_salvageable();
-      int missing_dura = ob->missing_durability();
-      int rep_size = sizeof(repair_values) - 1;
-      if (!salvage)
-         continue;
-
-      foreach (string mat in keys(salvage))
+      int missing = ob->missing_durability();
+      int remainder = missing;
+      mapping salvage = use_materials ? ob->query_salvageable() : nil;
+      if (salvage && sizeof(salvage))
       {
-         int needed = salvage[mat] * missing_dura / 100;
-         TBUG("Salvage[" + mat + "] needed: " + needed);
-         if (!arrayp(picked_mats[mat]))
-            picked_mats[mat] = ({0, 0, 0, 0, 0});
-         for (int i = rep_size; i >= 0; i--)
+         int total = 0;
+         foreach (string category, mixed percent in salvage)
          {
-            if (repair_values[i] < needed)
-            {
-               int picked;
-               picked = clamp(needed / repair_values[i], 0, pouch[materials[mat][i]]);
-               picked_mats[mat][i] += picked;
-               needed -= picked * repair_values[i];
-               TBUG("Now picked " + picked + " of " + materials[mat][i] + ". Needed now: " + needed);
-               pouch[materials[mat][i]] -= picked;
-               if (i == 0 && needed != 0 && picked_mats[mat][i] < pouch[materials[mat][i]])
-               {
-                  TBUG("Added one extra " + materials[mat][i] + " to cover the remainder (" + needed + ").");
-                  picked_mats[mat][i]++;
-                  needed = 0;
-               }
-            }
+            if (!materials[category] || !intp(percent) || percent < 0 || percent > 100)
+               error("Invalid repair salvage category or percentage.");
+            total += percent;
          }
-         remainder += needed;
-         TBUG("Remainder: " + remainder);
+         if (total != 100)
+            error("Repair salvage percentages must total 100.");
+         foreach (string category, int percent in salvage)
+         {
+            int needed = percent * missing / 100;
+            remainder -= needed;
+            if (!picked[category])
+               picked[category] = ({0, 0, 0, 0, 0});
+            int tiers = min(sizeof(repair_values), sizeof(materials[category]));
+            for (int i = tiers - 1; i >= 0 && needed; i--)
+            {
+               string name = materials[category][i];
+               mixed available = pouch[name] || 0;
+               if (!intp(available) || available < 0)
+                  error("Invalid repair material count.");
+               int count = min(needed / repair_values[i], available);
+               if (i == 0 && needed % repair_values[i] && count < available)
+                  count++;
+               if (!count)
+                  continue;
+               pouch[name] = available - count;
+               picked[category][i] += count;
+               needed = max(0, needed - count * repair_values[i]);
+            }
+            remainder += needed;
+         }
       }
+      cash_damage += remainder;
    }
-   picked_mats["money"] = remainder / REPAIR_FACTOR;
-   return picked_mats;
+   picked["money"] = cash_damage / REPAIR_FACTOR;
+   return picked;
+}
+
+mapping estimate_objects(object player, mixed obs)
+{
+   return repair_plan(player, repair_objects(obs), 1);
+}
+
+private int can_pay_repair(object player, mapping plan)
+{
+   if (plan["money"] && !MONEY_D->sufficient_money(player->query_amt_currency(currency_type), plan["money"]))
+      return 0;
+   foreach (string category, mixed counts in plan)
+   {
+      if (category == "money")
+         continue;
+      for (int i = 0; i < sizeof(counts); i++)
+         if (counts[i] && !player->has_material(materials[category][i], counts[i]))
+            return 0;
+   }
+   return 1;
+}
+
+private int execute_repair(object player, object *obs, mapping plan)
+{
+   if (!can_pay_repair(player, plan))
+      return 0;
+   foreach (string category, mixed counts in plan)
+   {
+      if (category == "money")
+         continue;
+      for (int i = 0; i < sizeof(counts); i++)
+         if (counts[i] && !player->remove_material(materials[category][i], counts[i]))
+            error("Repair material removal failed after preflight.");
+   }
+   if (plan["money"])
+      MONEY_D->handle_subtract_money(player, plan["money"], currency_type);
+   // A caller that catches a failing item hook retains earlier mutations.
+   obs->durability_after_repair();
+   obs->remove_adj(DAMAGED_EQ_NAME);
+   if (sizeof(obs))
+      player->my_action("$N $vrepair for " + MONEY_D->currency_to_string(plan["money"], currency_type) + ".\n");
+   return 1;
 }
 
 int pay_for_repair_with_money(object player, mixed obs)
 {
-   float total_cost = 0.0;
-   int all_good = 1;
-   mapping money;
-
-   if (objectp(obs))
-      obs = ({obs});
-
-   foreach (object ob in obs)
-   {
-      total_cost += ob->missing_durability() / REPAIR_FACTOR;
-   }
-
-   if (total_cost && player->query_amt_currency(currency_type) > total_cost)
-   {
-
-      money = MONEY_D->handle_subtract_money(player, total_cost, currency_type);
-      player->my_action(
-          "$N $vrepair for " + MONEY_D->currency_to_string(total_cost, currency_type) + ". $N $vgive " +
-          MONEY_D->currency_to_string(money[0], currency_type) +
-          (sizeof(money[1]) ? " and get " + MONEY_D->currency_to_string(money[1], currency_type) + " as change" : "") +
-          ".\n");
-      all_good = 1;
-   }
-
-   if (all_good)
-   {
-      obs->durability_after_repair();
-      obs->remove_adj(DAMAGED_EQ_NAME);
-   }
-   return all_good;
+   object *items = repair_objects(obs);
+   return execute_repair(player, items, repair_plan(player, items, 0));
 }
 
 int pay_for_repair(object player, mixed obs)
 {
-   mapping estimate = estimate_objects(player, obs);
-   mapping pouch = player->query_materials();
-   int all_good = 1;
-   mapping money;
-   int rep_size = sizeof(repair_values) - 1;
-
-   foreach (string mat in keys(estimate))
-   {
-      if (mat == "money" || !all_good)
-         continue;
-      for (int i = rep_size; i >= 0; i--)
-      {
-         string material;
-         if (i + 1 > sizeof(materials[mat]))
-            continue;
-         TBUG("mat: " + mat + " i: " + i);
-         material = materials[mat][i];
-         if (!player->remove_material(material, estimate[mat][i]))
-         {
-            TBUG("Could not find " + material + " / " + estimate[mat][i]);
-            all_good = 0;
-         }
-      }
-   }
-   if (estimate["money"] && player->query_amt_currency(currency_type) > (estimate["money"] / REPAIR_FACTOR))
-   {
-      money = MONEY_D->handle_subtract_money(player, estimate["money"], currency_type);
-      player->my_action(
-          "$N $vrepair for " + MONEY_D->currency_to_string(estimate["money"], currency_type) + ". You hand over " +
-          MONEY_D->currency_to_string(money[0], currency_type) + "" +
-          (sizeof(money[1]) ? " and get " + MONEY_D->currency_to_string(money[1], currency_type) + " as change" : "") +
-          ".\n");
-      all_good = 1;
-   }
-
-   if (all_good)
-   {
-      obs->durability_after_repair();
-      obs->remove_adj(DAMAGED_EQ_NAME);
-   }
-   return all_good;
-}
-
-varargs string *buy_durability(mixed m, int rest)
-{
-   if (intp(m) || floatp(m))
-      return MONEY_D->money_to_array((m - rest) / REPAIR_FACTOR);
-   if (objectp(m))
-      return MONEY_D->money_to_array((m->missing_durability() - rest) / REPAIR_FACTOR);
-   if (arrayp(m))
-   {
-      float total_dura = 0.0;
-      foreach (object ob in m)
-         total_dura += ob->missing_durability();
-      total_dura -= (rest * REPAIR_FACTOR);
-      return ({MONEY_D->currency_to_string(total_dura / REPAIR_FACTOR, currency_type)});
-   }
+   object *items = repair_objects(obs);
+   return execute_repair(player, items, repair_plan(player, items, 1));
 }
 
 mixed estimate_with_mats(object player, mixed obs)
 {
-   string returnStr = "";
-   int possible = 1;
-   int mats_used = 0;
-   mapping picked_mats = estimate_objects(player, obs);
+   object *items = repair_objects(obs);
+   mapping plan = repair_plan(player, items, 1);
    mapping pouch = player->query_materials();
-   int rep_size = sizeof(repair_values) - 1;
-   if (objectp(obs))
-      obs = ({obs});
-
-   returnStr += "Repair estimate for: ";
-   foreach (object ob in obs)
+   string *names = ({});
+   float full_cost = 0.0;
+   int possible = can_pay_repair(player, plan);
+   foreach (object ob in items)
    {
-      returnStr += capitalize(ob->short()) + ", ";
+      names += ({capitalize(ob->short())});
+      full_cost += money_to_repair(ob);
    }
-   returnStr = returnStr[0.. < 3] + "\n\n";
-
-   foreach (string mat in keys(picked_mats))
+   string result = "Repair estimate for: " + implode(names, ", ") + "\n\n";
+   foreach (string category, mixed counts in plan)
    {
-      string mat_str = "";
-      if (mat == "money")
+      if (category == "money")
          continue;
-      for (int i = rep_size; i >= 0; i--)
+      string *parts = ({});
+      for (int i = 0; i < sizeof(counts); i++)
       {
-         if (picked_mats[mat][i])
-         {
-            mat_str += "[" + picked_mats[mat][i] + "/" + pouch[materials[mat][i]] + "] " + materials[mat][i] +
-                       (picked_mats[mat][i] != 1 ? "s" : "") + ", ";
-            mats_used = 1;
-         }
+         if (!counts[i])
+            continue;
+         string name = materials[category][i];
+         parts += ({sprintf("[%d/%d] %s", counts[i], pouch[name], name)});
       }
-
-      if (strlen(mat_str))
-      {
-         returnStr += sprintf("%-5s: ", capitalize(mat)) + mat_str;
-         returnStr = returnStr[0.. < 3] + "\n";
-      }
+      if (sizeof(parts))
+         result += capitalize(category) + ": " + implode(parts, ", ") + "\n";
    }
-
-   if (picked_mats["money"] && player->query_amt_currency(currency_type) > (picked_mats["money"] / REPAIR_FACTOR))
-      returnStr += "Money: " + MONEY_D->currency_to_string(picked_mats["money"], currency_type) + ".\n";
-   if (picked_mats["money"] && player->query_amt_currency(currency_type) < (picked_mats["money"] / REPAIR_FACTOR))
-   {
-      returnStr +=
-          "Money: " + format_list(buy_durability(picked_mats["money"]), "and") + " %%^RED%%^(You lack money!)%%^RESET%%^\n";
-      possible = 0;
-   }
-
-   returnStr +=
-       (mats_used ? "(You save " + format_list(buy_durability(obs, picked_mats["money"]), "and") + " by using materials)"
-                  : "(Salvage weapons and armours to get materials for cheaper repairs)") +
-       "\n\n";
-
-   return ({possible, returnStr});
+   result += "Money: " + MONEY_D->currency_to_string(plan["money"], currency_type) + ".";
+   if (!possible)
+      result += " %%^RED%%^(You lack repair resources!)%%^RESET%%^";
+   result += "\n";
+   if (full_cost > plan["money"])
+      result += "(You save " + MONEY_D->currency_to_string(full_cost - plan["money"], currency_type) + " by using materials)\n";
+   return ({possible, result});
 }
 
 private int valid_upgrade(string category, string material, string *names,
