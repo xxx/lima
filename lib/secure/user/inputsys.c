@@ -35,28 +35,7 @@ class input_info
 private nosave class input_info *modal_stack = ({});
 private nosave int dispatching_to;
 private nomask void dispatch_modal_input(string str);
-private nosave string *suboptions = ({});
-private nosave int utf8 = 0;
-private nosave string terminal_type;
 private nosave mapping environ = ([]);
-
-private nosave int width, height;
-
-void terminal_type(string term)
-{
-   // Don't allow direct calls of this function from other places.
-   // The apply will not have a previous_object().
-   if (previous_object())
-      return;
-
-   if (!term || term == "")
-   {
-      terminal_type = "unknown";
-      return;
-   }
-
-   terminal_type = explode(lower_case(term), " ")[0];
-}
 
 mixed environ(string var)
 {
@@ -71,38 +50,36 @@ void receive_environ(string var, string value)
    environ[var] = value;
 }
 
-void window_size(int w, int h)
-{
-   width = w;
-   height = h;
-}
-
 int *query_window_size()
 {
-   return ({width || DEFAULT_SCREEN_WIDTH, height || DEFAULT_SCREEN_HEIGHT});
+   mapping connection = query_connection(this_object());
+   int width = connection ? connection["cols"] : 0;
+   int height = connection ? connection["rows"] : 0;
+   return ({width ? width : DEFAULT_SCREEN_WIDTH,
+            height ? height : DEFAULT_SCREEN_HEIGHT});
 }
 
 string query_terminal_type()
 {
-   return terminal_type;
+   mapping connection = query_connection(this_object());
+   mixed term;
+   if (connection)
+   {
+      term = connection["client_name"];
+      if (!stringp(term) || term == "")
+         term = connection["terminal_type"];
+   }
+   if (!stringp(term) || trim(term) == "")
+      return "unknown";
+   return explode(lower_case(trim(term)), " ")[0];
 }
 
 int utf8()
 {
-   return utf8;
-}
-
-void telnet_suboption(string buff)
-{
-   buff = buff[1..];
-   suboptions += ({buff});
-
-   switch (buff)
-   {
-   case "UTF-8":
-      utf8 = 1;
-      break;
-   }
+   mapping connection = query_connection(this_object());
+   mixed charset = connection ? connection["charset"] : 0;
+   return stringp(charset) &&
+      (upper_case(charset) == "UTF-8" || upper_case(charset) == "UTF8");
 }
 
 private nomask int create_handler()
