@@ -50,6 +50,12 @@ int query_boost_strength()
    return strength;
 }
 
+// Cached casters cannot be rebound when inventory is reconstructed.
+int do_not_restore()
+{
+   return 1;
+}
+
 void mudlib_setup()
 {
    transient::mudlib_setup();

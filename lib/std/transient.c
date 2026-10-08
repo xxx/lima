@@ -108,7 +108,7 @@ void mudlib_setup()
 {
    m_stateful::mudlib_setup();
    set_attached(1);
-   add_save(({"effect_duration"}));
+   add_save(({"effect_duration", "effect_type", "effect_name", "can_extend"}));
 }
 
 void extend_effect(object t)

@@ -74,6 +74,7 @@ void remove()
 void mudlib_setup()
 {
    transient::mudlib_setup();
+   add_save(({"strength", "action"}));
 }
 
 void setup(int strength_par, int duration_par, string action_par)
