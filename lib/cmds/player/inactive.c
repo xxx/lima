@@ -44,7 +44,7 @@ nomask private void main(string arg)
    out("You place yourself in INACTIVE mode.  Press <ENTER> to return.\n");
    this_body()->other_action("$N $vgo into INACTIVE mode.");
    this_body()->set_flag(F_INACTIVE);
-   modal_simple(( : become_active, time() :));
+   modal_simple(&become_active(time()));
 }
 
 nomask int help()
@@ -55,4 +55,8 @@ nomask int help()
           "limit for idling.  In which case, you won't." +
           "\n");
    return 1;
+}
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
