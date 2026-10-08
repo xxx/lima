@@ -39,38 +39,38 @@ nomask string get_idle(object o)
 class finger get_finger_data(string userid)
 {
    class finger result;
+   string character = userid;
    object user;
    mixed *info;
    mixed last;
    object mbox;
 
 #ifdef USE_USER_MENU
-   userid = USER_D->find_real_user(userid);
+   userid = USER_D->find_real_user(character);
+   if (!userid) return nil;
 #endif
 
-   info = unguarded(1, (
-                           : call_other, USER_D, "query_variable", userid,
-                             ({
-                                 "real_name",
-                                 "email",
-                                 "nickname",
-                                 "url",
+   info = unguarded(1, &call_other(USER_D, "query_variable", character,
+      ({
+         "real_name",
+         "email",
+         "nickname",
+         "url",
 #ifdef USE_WIZ_POSITION
-                                 "wiz_position",
+         "wiz_position",
 #endif
 #ifdef USE_TITLES
-                                 "title",
+         "title",
 #endif
 #ifdef EVERYONE_HAS_A_PLAN
-                                 "plan",
+         "plan",
 #endif
 #ifdef USE_USER_MENU
-                                 "bodies",
+         "bodies",
 #endif
-                             })
-                           :));
+      })));
    if (!info)
-      return 0;
+      return nil;
 
    result = new (class finger,
                  // ### the visname should be queried from somewhere...
@@ -83,33 +83,33 @@ class finger get_finger_data(string userid)
                  : get_level(userid));
 
    if (result.real_name == "")
-      result.real_name = 0;
+      result.real_name = nil;
    if (result.email == "")
-      result.email = 0;
+      result.email = nil;
    if (result.nickname == "")
-      result.nickname = 0;
+      result.nickname = nil;
    if (result.home_page == "")
-      result.home_page = 0;
+      result.home_page = nil;
 
 #ifdef USE_WIZ_POSITION
    result.position = info[4];
    if (result.position == "")
-      result.position = 0;
+      result.position = nil;
 #endif
 
    if (!this_user() || (userid != this_user()->query_userid() && !check_privilege(1)))
    {
 #ifdef PLAYER_INFO_IS_PUBLIC
       if (result.email && result.email[0] == '#')
-         result.email = 0;
+         result.email = nil;
       if (result.real_name && result.real_name[0] == '#')
-         result.real_name = 0;
+         result.real_name = nil;
       if (result.home_page && result.home_page[0] == '#')
-         result.home_page = 0;
+         result.home_page = nil;
 #else
-      result.email = 0;
-      result.real_name = 0;
-      result.home_page = 0;
+      result.email = nil;
+      result.real_name = nil;
+      result.home_page = nil;
 #endif
    }
 
@@ -145,7 +145,7 @@ class finger get_finger_data(string userid)
 #else
    if (check_privilege(1))
 #endif
-      result.connect_from = last ? last[1] : 0;
+      result.connect_from = last ? last[1] : nil;
 
    result.last_login = last ? last[0] : 0;
 
@@ -170,7 +170,7 @@ string show_big_finger()
 {
    object *u = users();
 
-   return implode(u,
+   return reduce(u,
                   (
                       : $1 + sprintf("%-15s%-12s%-5s%s\n",
                                      find_body($2->query_userid()) ? capitalize($2->query_userid()) : "Login",

@@ -76,7 +76,7 @@ void main(string who)
          foreach (test in matches)
             if (lower_case(test) == mud)
             {
-               matches = 0;
+               matches = nil;
                break;
             }
          if (!matches)
@@ -172,7 +172,7 @@ void main(string who)
    {
       string *chars = map(keys(info.bodies), ( : capitalize($1) :));
       s += info.visname + " has the following characters: \n";
-      s += "  " + format_list(chars);
+      s += "  " + format_list(chars, nil);
    }
 #endif
 
@@ -182,4 +182,9 @@ void main(string who)
 nomask int valid_resend(string ob)
 {
    return ob == CMD_OB_FINGER;
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
