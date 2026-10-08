@@ -41,7 +41,7 @@ mapping short_names = DAMAGE_D->query_short_names();
 
 string short_damage_types(string *types)
 {
-   return format_list(map(types, ( : short_names[$1] :)));
+   return format_list(map(types, ( : short_names[$1] :)), nil);
 }
 
 string format_slots(object a, string *slots)
@@ -86,7 +86,7 @@ string format_slots(object a, string *slots)
    }
 
    slots = map(slots, ( : capitalize($1) :));
-   return format_list(slots);
+   return format_list(slots, nil);
 }
 
 private
@@ -124,8 +124,8 @@ void main(string arg)
    {
       if (body->find_wi(limb) && member_array(body->find_wi(limb), armours) == -1)
       {
-         armours += ({((class wear_info)body->find_wi(limb))->primary});
-         armours += ({((class wear_info)body->find_wi(limb))->secondary});
+         armours += ({((class wear_info)body->find_wi(limb)).primary});
+         armours += ({((class wear_info)body->find_wi(limb)).secondary});
       }
    }
 
@@ -144,7 +144,7 @@ void main(string arg)
                                                                                 ? $1->loaded_with()->query_damage_type()
                                                                                 : $1->query_damage_type())
                                                        :)));
-      frame_add_column("Properties", map(weapons, ( : format_list($1->query_properties()) :)));
+      frame_add_column("Properties", map(weapons, ( : format_list($1->query_properties(), nil) :)));
       nothing_wielded = 0;
       write(frame_render_columns());
    }
@@ -176,4 +176,9 @@ void main(string arg)
       printf("\n\n(You are wearing nothing)\n");
    else if (nothing_wielded)
       printf("\n\n(You are wielding nothing)\n");
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

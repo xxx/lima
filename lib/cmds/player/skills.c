@@ -68,7 +68,7 @@ void main(string arg)
       if (target)
       {
          out("Skills for " + target->short() + ":\n");
-         arg = 0;
+         arg = nil;
       }
    }
 
@@ -130,7 +130,7 @@ void main(string arg)
                                    " %3.3s [<040>%s<238>%s<res>]\n",
                                ((" " + (level == next_level ? contbend : bend)) * (level - 2)) + pretty_name,
 #ifdef SKILL_CONFIG_USES_TRAINING_PTS
-                               target->is_body() ? "" + (skill.training_points ? skill.training_points : "") : "",
+                               target->is_body() ? (skill.training_points ? "" + skill.training_points : "") : "",
 #else
                                "",
 #endif
@@ -186,4 +186,9 @@ void main(string arg)
             );
       }
    }
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
