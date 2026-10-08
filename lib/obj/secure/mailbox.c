@@ -189,6 +189,18 @@ nomask void nuke_mailbox()
    unguarded(1, (: rm(get_fname() + __SAVE_EXTENSION__) :));
 }
 
+nomask void recover_message(int message_key)
+{
+   if (previous_object() != find_object(MAIL_D))
+      error("security violation: illegal attempt to recover mail\n");
+
+   if (has_key(mailbox, message_key))
+      return;
+
+   mailbox[message_key] = F_UNREAD;
+   save_me();
+}
+
 // ### temp functions?  wait and see
 
 nomask void receive_new_message(int message_key)

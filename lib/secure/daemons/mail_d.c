@@ -324,7 +324,7 @@ nomask void process_message(string fname)
    foreach (string user in msg.dels_pending)
       if (!user_exists(user))
          error("mail: invalid pending-owner account: " + user + "\n");
-   map(msg.dels_pending, ( : MAILBOX_D->get_mailbox($1)->receive_new_message($(message_key)) :));
+   map(msg.dels_pending, ( : MAILBOX_D->get_mailbox($1)->recover_message($(message_key)) :));
 }
 
 nomask void rebuild_mailboxes()
