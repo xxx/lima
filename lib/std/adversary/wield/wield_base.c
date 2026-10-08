@@ -8,7 +8,7 @@ int do_wield(object);
 //  weapon object from within the setup() function of your monster.
 int set_wielding(string wep)
 {
-   object ob = clone_object (evaluate_path(wep, 0, 1));
+   object ob = clone_object (evaluate_path(wep, nil, 1));
 
    if (!ob)
       return 0;
