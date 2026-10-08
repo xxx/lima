@@ -537,7 +537,7 @@ private string create_left_header()
    if (title)
       header_width = colour_strlen(title) + (text_margin * 2);
 
-   max_header_width = max(map_array(headers, ( : colour_strlen($1) :)));
+   max_header_width = max(map(headers, ( : colour_strlen($1) :)));
    max_header_width = max_header_width + (2 * text_margin);
 
    // Line 1 - title only

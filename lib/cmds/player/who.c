@@ -45,21 +45,21 @@ string get_who_string(string arg)
       {
       case "-p":
       case "-z":
-         u = filter_array(bodies(), ( : !wizardp($1) :));
+         u = filter(bodies(), ( : !wizardp($1) :));
          extra = accent("(PLAYERS ONLY)");
          break;
       case "-w":
-         u = filter_array(bodies(), ( : wizardp:));
+         u = filter(bodies(), wizardp);
          extra = accent("(Wizards only)");
          break;
       case "-i":
-         u = filter_array(bodies(), ( : wizardp:));
+         u = filter(bodies(), wizardp);
          extra = accent("(Implementors only)");
          break;
       case "-m":
          if (wizardp(this_user()))
          {
-            u = filter_array(children(USER_OB), ( : !interactive($1) :))->query_body();
+            u = filter(children(USER_OB), ( : !interactive($1) :))->query_body();
             extra = accent("(Non-interactives)");
             break;
          }
@@ -71,10 +71,10 @@ string get_who_string(string arg)
          break;
       }
       if (!wizardp(this_user()))
-         u = filter_array(u, ( : $1->is_visible() :));
+         u = filter(u, ( : $1->is_visible() :));
    }
    else
-      u = filter_array(bodies(), ( : $1->is_visible() :));
+      u = filter(bodies(), ( : $1->is_visible() :));
 
    u -= ({0});
    i = sizeof(u);

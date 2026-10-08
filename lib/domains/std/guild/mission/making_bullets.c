@@ -64,8 +64,8 @@ void receive_item(object ob)
          query_mission_ctrl()->simple_action("$N $vtell $t, \"Sorry, but that item gave me nothing.\".", this_body());
          return;
       }
-      steel = filter_array(salvage, ( : $1->id("steel scrap") :));
-      lead = filter_array(salvage, ( : $1->id("lead scrap") :));
+      steel = filter(salvage, ( : $1->id("steel scrap") :));
+      lead = filter(salvage, ( : $1->id("lead scrap") :));
       salvage -= steel;
       salvage -= lead;
       steel_total += sizeof(steel);

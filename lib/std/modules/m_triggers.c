@@ -33,7 +33,7 @@ varargs void add_pattern(string pattern, mixed action, mixed left, mixed right, 
 
 void remove_pattern(string pattern)
 {
-   patterns[0] = filter_array(patterns[0], ( : ((class pattern)$1).pattern != $(pattern) :));
+   patterns[0] = filter(patterns[0], ( : ((class pattern)$1).pattern != $(pattern) :));
 }
 
 mapping query_patterns()

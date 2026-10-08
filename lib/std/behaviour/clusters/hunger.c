@@ -46,7 +46,7 @@ varargs int digest(int food)
 
 int eat_food()
 {
-   object *food = filter_array(all_inventory(environment()), ( : $1->query_num_eats() > 0 :));
+   object *food = filter(all_inventory(environment()), ( : $1->query_num_eats() > 0 :));
    object target;
    if (!sizeof(food))
       return EVAL_FAILURE;

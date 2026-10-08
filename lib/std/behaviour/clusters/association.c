@@ -304,7 +304,7 @@ int own_status()
 
 int study_beings()
 {
-   object *things = filter_array(all_inventory(environment()) - ({this_object()}),
+   object *things = filter(all_inventory(environment()) - ({this_object()}),
                                  ( : !$1->is_simple_ob() && $1->is_living() && $1->is_visible() :));
    object *beings, *new_people, *leavers;
 
@@ -317,7 +317,7 @@ int study_beings()
    if (!has_room_changed() && !this_object()->is_attacking())
       return EVAL_SUCCESS;
 
-   beings = filter_array(things, ( : $1->is_living() && environment($1) == environment() :));
+   beings = filter(things, ( : $1->is_living() && environment($1) == environment() :));
    new_people = living_arrived();
    leavers = left();
 
@@ -376,7 +376,7 @@ int cool_down()
 int look_around()
 {
    object *things =
-       filter_array(all_inventory(environment()) - ({this_object()}), ( : !$1->is_simple_ob() && $1->is_visible() :));
+       filter(all_inventory(environment()) - ({this_object()}), ( : !$1->is_simple_ob() && $1->is_visible() :));
    if (!environment())
       return EVAL_FAILURE;
    if (!has_room_changed())
@@ -384,12 +384,12 @@ int look_around()
    if (!blackboard("beings"))
       set_blackboard("beings", ({}));
 
-   set_blackboard("gettable", filter_array(things, ( : $1->is_gettable() :)));
-   set_blackboard("doors", filter_array(things, ( : $1->id("door") :)));
+   set_blackboard("gettable", filter(things, ( : $1->is_gettable() :)));
+   set_blackboard("doors", filter(things, ( : $1->id("door") :)));
    set_blackboard("exits", environment()->query_exit_directions(0));
    set_blackboard("hidden_exits", environment()->query_exit_directions(1) - blackboard("exits"));
    set_blackboard("beings",
-                  filter_array(things, ( : $1->is_living() && $1->is_visible() && environment($1) == environment() :)));
+                  filter(things, ( : $1->is_living() && $1->is_visible() && environment($1) == environment() :)));
    set_blackboard("environment", things - blackboard("doors") - blackboard("gettable") - blackboard("beings"));
    return EVAL_SUCCESS;
 }

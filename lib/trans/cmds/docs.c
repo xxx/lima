@@ -71,7 +71,7 @@ void main(mixed arg)
    if (arg == "playerdoc")
       return update_playerdoc();
 
-   foreach (string f in filter_array(help_pages, ( : $1[ < 4..] == ".rst" :)))
+   foreach (string f in filter(help_pages, ( : $1[ < 4..] == ".rst" :)))
    {
       string *parts = explode(f, "/");
       if (sizeof(parts) > 2 && parts[0] == "help" && member_array(parts[1], checked_dirs) != -1)
@@ -90,8 +90,8 @@ void main(mixed arg)
    next_files = sort_array(next_files, 1);
 
    // Print overall file counts
-   rst_files = sizeof(filter_array(help_pages, ( : $1[ < 4..] == ".rst" :)));
-   md_files = sizeof(filter_array(help_pages, ( : $1[ < 3..] == ".md" :)));
+   rst_files = sizeof(filter(help_pages, ( : $1[ < 4..] == ".rst" :)));
+   md_files = sizeof(filter(help_pages, ( : $1[ < 3..] == ".md" :)));
    other_files = sizeof(help_pages) - md_files - rst_files;
 
    if (mud_name() != "LIMA")

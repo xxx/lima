@@ -67,7 +67,7 @@ void main(string arg)
       return;
    }
 
-   ids = sort_array(filter_array(NEWS_D->get_messages(brd->query_group()), ( : filter_removed, brd:)), 1);
+   ids = sort_array(filter(NEWS_D->get_messages(brd->query_group()), &filter_removed(brd)), 1);
    if (id <= 0 || id > sizeof(ids))
    {
       write("No such note.\n");

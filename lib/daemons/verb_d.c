@@ -50,5 +50,5 @@ void create()
    string *files;
 
    files = get_dir(CMD_DIR_VERBS "/*.c");
-   map_array(files, ( : reload_verb:));
+   map(files, reload_verb);
 }

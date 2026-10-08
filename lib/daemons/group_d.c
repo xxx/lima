@@ -103,7 +103,7 @@ nomask mixed get_group(string group)
 
 nomask string *process_list(string *name_list)
 {
-   return decompose(map_array(name_list, ( : get_group:)));
+   return decompose(map(name_list, get_group));
 }
 
 nomask mixed get_group_data()

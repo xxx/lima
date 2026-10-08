@@ -143,7 +143,7 @@ void drop_corpse(object adversary)
       adversary->move(HEAVEN);
       corpse->override_room_desc(in_room_singular, in_room_plural);
 
-      filter_array(all_inventory(adversary), ( : $1->is_transient_effect() :))->remove();
+      filter(all_inventory(adversary), ( : $1->is_transient_effect() :))->remove();
 
       // Drop either, but not both.
       if (meaty && pelty)

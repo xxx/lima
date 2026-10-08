@@ -27,9 +27,9 @@ void main(string arg)
    arg = evaluate_path(arg);
 
    if (is_file(evaluate_path(arg) + ".c"))
-      mobs = filter_array(objects(), ( : !$1->is_body() && clonep($1) && base_name($1) == $(arg) :));
+      mobs = filter(objects(), ( : !$1->is_body() && clonep($1) && base_name($1) == $(arg) :));
    else
-      mobs = filter_array(objects(), ( : !$1->is_body() && clonep($1) && $1->query_name() == $(arg) :));
+      mobs = filter(objects(), ( : !$1->is_body() && clonep($1) && $1->query_name() == $(arg) :));
    mobs->remove();
    write("Killed " + sizeof(mobs) + " '" + arg + "'.\n");
 }

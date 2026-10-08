@@ -51,8 +51,8 @@ object *query_helpers()
          candidates += all_inventory(room);
    }
 
-   candidates = filter_array(candidates, ( : $1->id(helper) && $1 != this_object() && !$1->is_body() :));
-   candidates = filter_array(candidates, ( : check_wander($1) :));
+   candidates = filter(candidates, ( : $1->id(helper) && $1 != this_object() && !$1->is_body() :));
+   candidates = filter(candidates, ( : check_wander($1) :));
 
    return candidates;
 }

@@ -59,7 +59,7 @@ nomask void report_login_failures()
    if (!sizeof(failures))
       return;
 
-   count = sizeof(filter_array(failures, ( : $1[0] > $(notify_time) :)));
+   count = sizeof(filter(failures, ( : $1[0] > $(notify_time) :)));
    if (!count)
       return;
 

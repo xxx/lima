@@ -360,6 +360,6 @@ void create()
    if (MAX_SKILL_VALUE != 10000)
    {
       float factor = (MAX_SKILL_VALUE * 1.0) / 10000;
-      skill_ranks = map_array(skill_ranks, ( : to_int($1 * $(factor)) :));
+      skill_ranks = map(skill_ranks, ( : to_int($1 * $(factor)) :));
    }
 }

@@ -22,7 +22,7 @@ private
 nomask void repair_with_what(mixed what, string r)
 {
    string result;
-   object bench = filter_array(all_inventory(environment(this_body())), ( : $1->is_crafting_bench() :));
+   object bench = filter(all_inventory(environment(this_body())), ( : $1->is_crafting_bench() :));
 
    r = lower_case(r);
 
@@ -98,7 +98,7 @@ void do_repair_obj(object ob)
    }
 
    if (all_inventory(this_body()))
-      tools = filter_array(all_inventory(this_body()), ( : $1->is_tool() :));
+      tools = filter(all_inventory(this_body()), ( : $1->is_tool() :));
 
    if (sizeof(tools))
    {

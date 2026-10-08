@@ -181,7 +181,7 @@ string *glob(mixed pathname)
                dirname = dirname[0.. < 2];
          }
          sublist = glob1(dirname, basename);
-         sublist = map_array(sublist, ( : $(dirname) + "/" + $1:));
+         sublist = map(sublist, ( : $(dirname) + "/" + $1:));
 
          result += sublist;
       }

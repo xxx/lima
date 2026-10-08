@@ -53,7 +53,7 @@ nomask void rcv_mudlist(string orig_mud, string orig_user, string targ_user, mix
    }
 
    mud_names = ([]);
-   map_array(keys(mud_info), ( : $(mud_names)[evaluate(remap_name, $1)] = $1:));
+   map(keys(mud_info), ( : $(mud_names)[evaluate(remap_name, $1)] = $1:));
 }
 
 nomask mapping query_mudlist()

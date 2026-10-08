@@ -80,8 +80,8 @@ void main(string a)
       write(file_name1 + " and " + file_name2 + " are the same file.\n");
       return;
    }
-   ONEnotTWO = filter_array(lines1, "sort", this_object(), lines2);
-   TWOnotONE = filter_array(lines2, "sort", this_object(), lines1);
+   ONEnotTWO = filter(lines1, sort, lines2);
+   TWOnotONE = filter(lines2, sort, lines1);
    if (ONEnotTWO == TWOnotONE)
    {
       write(file_name1 + " and " + file_name2 + " have the same lines.\n");

@@ -19,5 +19,5 @@ void main(string arg)
    cmds = explode(arg, ";");
 
    if (sizeof(cmds))
-      map_array(cmds, ( : this_user()->force_me($1) :));
+      map(cmds, ( : this_user()->force_me($1) :));
 }

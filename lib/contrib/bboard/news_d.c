@@ -425,7 +425,7 @@ nomask int *get_messages(string group)
 
 nomask int *get_thread(string group, int thread)
 {
-   return filter_array(keys(data[group]),
+   return filter(keys(data[group]),
                        (
                            : $1 != "next_id" && ((class news_msg)data[$(group)][$1])->thread_id == $(thread)
                            :));

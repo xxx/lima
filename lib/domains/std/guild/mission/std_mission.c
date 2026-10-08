@@ -124,8 +124,8 @@ void channel_msg(string s)
 
 void notify_guild_members(string s)
 {
-   object *members = filter_array(bodies(), ( : member_array(guild, $1->guilds_belong()) != -1 :));
-   members = filter_array(members, (
+   object *members = filter(bodies(), ( : member_array(guild, $1->guilds_belong()) != -1 :));
+   members = filter(members, (
                                        : present("guild_artefact_ob", $1) &&
                                              member_array(guild, present("guild_artefact_ob", $1)->query_guilds()) != -1
                                        :));

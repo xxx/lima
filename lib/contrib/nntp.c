@@ -72,7 +72,7 @@ nomask void handle_response(int code, mixed response)
          evaluate(response_callback, "nntp error: unexpected reply: " + code);
          return;
       }
-      evaluate(response_callback, map_array(response[1..], ( : explode($1, " ") :)));
+      evaluate(response_callback, map(response[1..], ( : explode($1, " ") :)));
       return;
    case "GROUP":
       if (code != 211)

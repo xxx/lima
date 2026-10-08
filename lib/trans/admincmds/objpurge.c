@@ -29,7 +29,7 @@ inherit CMD;
 private
 object *get_obs(string arg)
 {
-   return filter_array(objects(), ( : base_name($1) == $(arg) :));
+   return filter(objects(), ( : base_name($1) == $(arg) :));
 }
 
 private
@@ -44,7 +44,7 @@ void main(string arg)
    outf("Removing %d objects of class %s\n", sizeof(obs), arg);
    obs->remove();
 
-   obs = filter_array(obs, ( : $1:)); /* remove zeros */
+   obs = filter(obs, ( : $1:)); /* remove zeros */
    outf("Destructing %d objects of class %s\n", sizeof(obs), arg);
-   map_array(obs, ( : destruct:));
+   map(obs, destruct);
 }

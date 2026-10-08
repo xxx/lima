@@ -59,7 +59,7 @@ void receive_item(object ob)
          query_mission_ctrl()->simple_action("$N $vtell $t, \"Sorry, but that item gave me nothing.\".", this_body());
          return;
       }
-      wood = filter_array(salvage, ( : $1->id("wood scrap") :));
+      wood = filter(salvage, ( : $1->id("wood scrap") :));
       salvage -= wood;
       wood_total += sizeof(wood);
       if (!wood_received[this_body()->query_name()])

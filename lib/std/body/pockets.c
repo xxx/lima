@@ -76,7 +76,7 @@ int has_material(string m, int count)
       return 1;
    }
 
-   ims = filter_array(all_inventory(), ( : $1->id($(m)) && ($1->is_material() || $1->is_junk()) :));
+   ims = filter(all_inventory(), ( : $1->id($(m)) && ($1->is_material() || $1->is_junk()) :));
    if (sizeof(ims) >= count)
       return 1;
    return 0;
@@ -90,7 +90,7 @@ int remove_material(string m, int count)
 {
    object *ims;
 
-   ims = filter_array(all_inventory(), ( : $1->id($(m)) && ($1->is_material() || $1->is_junk()) :));
+   ims = filter(all_inventory(), ( : $1->id($(m)) && ($1->is_material() || $1->is_junk()) :));
 
    if (sizeof(ims) >= count)
    {

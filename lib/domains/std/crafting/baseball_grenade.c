@@ -43,7 +43,7 @@ void has_been_thrown(object target)
    }
    else
    {
-      object targets = filter_array(all_inventory(environment()), ( : $1->attackable() && !$1->is_body() :));
+      object targets = filter(all_inventory(environment()), ( : $1->attackable() && !$1->is_body() :));
       foreach (object t in targets)
       {
          do_thrown_damage(t, ( : calc_damage, sizeof(targets) :));

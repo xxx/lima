@@ -32,7 +32,7 @@ void main(string arg)
       return;
    }
 
-   wizlist = filter_array(users(), ( : wizardp:));
+   wizlist = filter(users(), wizardp);
    if (!sizeof(wizlist))
    {
       out("You get the feeling no one hears you.\n");

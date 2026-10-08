@@ -20,7 +20,7 @@ void main(mixed *arg, mapping f)
    target = arg[0];
    if (f["i"])
       output = implode(({sprintf("Function list for %s", file_name(target))}) +
-                           sort_array(map_array(functions(target), (
+                           sort_array(map(functions(target), (
                                                                        : sprintf("%-34s: %-34s",
                                                                                  (function_exists($1, $(target))
                                                                                       ? function_exists($1, $(target))

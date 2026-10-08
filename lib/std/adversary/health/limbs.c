@@ -518,7 +518,7 @@ void kill_us()
    if (killer)
    {
       string team = PARTY_D->locate_user(killer->short());
-      object *viable = filter_array(all_inventory(environment(this_object())), ( : $1->is_body() :));
+      object *viable = filter(all_inventory(environment(this_object())), ( : $1->is_body() :));
       this_object()->slain_by(killer);
       if (team && sizeof(viable) > 1)
       {

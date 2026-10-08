@@ -163,7 +163,7 @@ nomask varargs string format_message_line(int id)
 private
 nomask string *query_message_lines()
 {
-   int *ids = sort_array(filter_array(NEWS_D->get_messages(linked_group), ( : filter_removed:)), 1);
+   int *ids = sort_array(filter(NEWS_D->get_messages(linked_group), filter_removed), 1);
    int i, k, j = sizeof(ids) - MAX_HEADERS;
    string *tmp;
 
@@ -172,7 +172,7 @@ nomask string *query_message_lines()
    // ### This can probably be removed, but will wait for now  --Vette--
    // ###    ids = ids[<MAX_HEADERS..];
    ids = ids[j..];
-   tmp = map_array(ids, ( : format_message_line($1) :));
+   tmp = map(ids, ( : format_message_line($1) :));
    if (sizeof(ids) == 0)
       return ({"The board is bereft of posts.  Feel free to change this!\n"});
    k = ids[ < 1] - this_body()->get_news_group_id(linked_group);
@@ -214,7 +214,7 @@ nomask mixed read_entry(string str)
    if (!check_group(linked_group))
       return "You do not have access.\n";
 
-   ids = sort_array(filter_array(NEWS_D->get_messages(linked_group), ( : filter_removed:)), 1);
+   ids = sort_array(filter(NEWS_D->get_messages(linked_group), filter_removed), 1);
 
    if (str == "next")
    {
@@ -265,7 +265,7 @@ nomask string do_desc()
    if (!NEWS_D->get_messages(linked_group))
       ids = ({});
    else
-      ids = sort_array(filter_array(NEWS_D->get_messages(linked_group), ( : filter_removed:)), 1);
+      ids = sort_array(filter(NEWS_D->get_messages(linked_group), filter_removed), 1);
 
    /* Slight fix here, lest see if this solves our problems. */
    if (curr_id < 0)
@@ -295,7 +295,7 @@ nomask int is_bulletin_board()
 // Check if id is in range, for board verbs can_* functions.
 nomask int valid_id(int id)
 {
-   int *ids = sort_array(filter_array(NEWS_D->get_messages(linked_group), ( : filter_removed:)), 1);
+   int *ids = sort_array(filter(NEWS_D->get_messages(linked_group), filter_removed), 1);
    if (id <= 0 || id > sizeof(ids))
       return 0;
 
@@ -316,7 +316,7 @@ nomask void do_remove(int id)
    int *ids;
    class news_msg msg;
 
-   ids = sort_array(filter_array(NEWS_D->get_messages(linked_group), ( : filter_removed:)), 1);
+   ids = sort_array(filter(NEWS_D->get_messages(linked_group), filter_removed), 1);
    msg = NEWS_D->get_message(linked_group, ids[id - 1]);
 
    if (msg.poster != this_body()->query_name() && !check_privilege(1))
@@ -422,7 +422,7 @@ nomask void do_followup(int id)
 {
    int *ids;
 
-   ids = sort_array(filter_array(NEWS_D->get_messages(linked_group), ( : filter_removed:)), 1);
+   ids = sort_array(filter(NEWS_D->get_messages(linked_group), filter_removed), 1);
 
    clone_object (EDIT_OB, EDIT_TEXT, 0, ( : receive_followup, ids[id - 1] :));
 }
@@ -433,7 +433,7 @@ nomask void do_followup_with_message(int id)
    class news_msg msg;
    string *lines;
 
-   ids = sort_array(filter_array(NEWS_D->get_messages(linked_group), ( : filter_removed:)), 1);
+   ids = sort_array(filter(NEWS_D->get_messages(linked_group), filter_removed), 1);
 
    msg = NEWS_D->get_message(linked_group, ids[id - 1]);
    if (!msg)
@@ -445,7 +445,7 @@ nomask void do_followup_with_message(int id)
    lines = ({sprintf("On %s %s wrote post #%d:", intp(msg.time) ? ctime(msg.time) : msg.time, msg.poster,
                      get_current_id())});
 
-   lines += map_array(explode(msg.body, "\n"), ( : "> " + $1:));
+   lines += map(explode(msg.body, "\n"), ( : "> " + $1:));
 
    clone_object (EDIT_OB, EDIT_TEXT, lines, ( : receive_followup, ids[id - 1] :));
 }
@@ -496,7 +496,7 @@ nomask void do_reply(int id)
 {
    int *ids;
 
-   ids = sort_array(filter_array(NEWS_D->get_messages(linked_group), ( : filter_removed:)), 1);
+   ids = sort_array(filter(NEWS_D->get_messages(linked_group), filter_removed), 1);
 
    clone_object (EDIT_OB, EDIT_TEXT, 0, ( : receive_reply, ids[id - 1] :));
 }
@@ -580,7 +580,7 @@ int count_unread_messages(string group, int all_messages)
 
    if (!all_messages)
    {
-      ids = filter_array(ids, ( : $1 > $(read_thru_id) :));
+      ids = filter(ids, ( : $1 > $(read_thru_id) :));
    }
    foreach (id in ids)
    {
@@ -620,7 +620,7 @@ nomask void display_groups_with_new()
 {
    string *groups;
 
-   groups = filter_array(this_body()->subscribed_groups(), ( : test_for_new:));
+   groups = filter(this_body()->subscribed_groups(), test_for_new);
 
    if (!sizeof(groups))
    {
@@ -629,7 +629,7 @@ nomask void display_groups_with_new()
    else
    {
       string *list;
-      list = ({"Groups with new messages:", ""}) + map_array(groups, ( : format_group_line:));
+      list = ({"Groups with new messages:", ""}) + map(groups, format_group_line);
       more(list);
    }
 }
@@ -639,7 +639,7 @@ nomask string switch_to_next_unread_group()
 {
    string *groups;
 
-   groups = filter_array(this_body()->subscribed_groups(), ( : test_for_new:));
+   groups = filter(this_body()->subscribed_groups(), test_for_new);
    if (!sizeof(groups))
    {
       return "";

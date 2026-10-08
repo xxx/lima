@@ -15,7 +15,7 @@ void main(string arg)
 {
    object *mobs;
    mapping counts = ([]);
-   mobs = filter_array(objects(), ( : !$1->is_body() && clonep($1) && $1->attackable() :));
+   mobs = filter(objects(), ( : !$1->is_body() && clonep($1) && $1->attackable() :));
    write("--------------\nLivings found\n--------------\n");
 
    foreach (object mob in mobs)

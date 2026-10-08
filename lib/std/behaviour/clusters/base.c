@@ -245,7 +245,7 @@ void behaviour_call()
 
 object *living_arrived()
 {
-   return filter_array(arrived, ( : $1 && $1->is_living() :));
+   return filter(arrived, ( : $1 && $1->is_living() :));
 }
 
 object *left()

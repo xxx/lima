@@ -58,6 +58,6 @@ nomask void run_login_script()
    login_file = wiz_dir(this_object()) + "/.login";
    if (file_size(login_file) > 0)
    {
-      map_array(explode(read_file(login_file), "\n"), ( : force_me:));
+      map(explode(read_file(login_file), "\n"), force_me);
    }
 }

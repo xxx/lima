@@ -52,7 +52,7 @@ void hook_func()
       else
          hints += ({punctuate(hint)});
    }
-   hints = filter_array(hints, ( : $1 && strlen($1) > 1 :));
+   hints = filter(hints, ( : $1 && strlen($1) > 1 :));
    if (sizeof(hints) && find_call_out("show_hints") == -1)
       call_out("show_hints", 0, hints);
 }

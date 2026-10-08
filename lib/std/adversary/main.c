@@ -38,7 +38,7 @@ int try_to_ready()
 {
    object weapon = query_weapon();
    object *ammo = all_inventory(this_object());
-   ammo = filter_array(ammo, ( : $1->is_ammo() && $1->query_ammo_type() == $2:), query_weapon()->query_ammo_type());
+   ammo = filter(ammo, ( : $1->is_ammo() && $1->query_ammo_type() == $2:), query_weapon()->query_ammo_type());
 
    if (sizeof(ammo))
    {

@@ -88,7 +88,7 @@ int spawn_allowed(string basename)
       return 1;
 
    // Expensive call, so doing this as late as possible.
-   instances = sizeof(filter_array(objects(), ( : base_name($1) == $(basename) :))) - 1;
+   instances = sizeof(filter(objects(), ( : base_name($1) == $(basename) :))) - 1;
    instances = instances < 0 ? 0 : instances;
 
    spawn = (instances >= spawn_control[basename]["max"] ? 0 : 1);

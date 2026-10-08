@@ -37,7 +37,7 @@ void main(string arg)
    obs = objects(( : $1->id(argo) :));
 
    envs = ([]);
-   map_array(obs, ( : envs[$1] = environment($1) :));
+   map(obs, ( : envs[$1] = environment($1) :));
 
    out(sprintf("%O\n", envs));
 }

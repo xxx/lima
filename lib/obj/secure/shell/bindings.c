@@ -71,7 +71,7 @@ nomask void handle_one_char(int c)
       matchstr = sprintf("%s%c", matchstr, c);
       break;
    }
-   binding_matches = filter_array(keys(bindings), ( : match_filter:));
+   binding_matches = filter(keys(bindings), match_filter);
    if (sizeof(binding_matches))
    {
       evaluate(bindings[matchstr], matchstr);
@@ -80,7 +80,7 @@ nomask void handle_one_char(int c)
    }
    // Now check for a partial match, in which case we hold off...
 
-   binding_matches = filter_array(keys(bindings), ( : partial_match_filter:));
+   binding_matches = filter(keys(bindings), partial_match_filter);
    if (sizeof(binding_matches))
       return;
 

@@ -121,7 +121,7 @@ class event_info effect_modify_event(class event_info evt)
    if (stringp(evt.data))
       return evt;
 
-   effects = filter_array(all_inventory(), ( : $1->is_transient_effect() :));
+   effects = filter(all_inventory(), ( : $1->is_transient_effect() :));
 
    if (sizeof(effects))
       foreach (object ef in effects)

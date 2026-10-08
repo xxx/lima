@@ -267,7 +267,7 @@ mixed expand_alias(string input)
    int numargs = sizeof(argv) - 1;
    int i, j;
 
-   xverb_matches = filter_array(xaliases, ( : strsrch($2, $1) == 0 :), argv[0]);
+   xverb_matches = filter(xaliases, ( : strsrch($2, $1) == 0 :), argv[0]);
    switch (sizeof(xverb_matches))
    {
    case 0:

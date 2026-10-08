@@ -198,7 +198,7 @@ void register_body(object body)
    if (!(names = body->query_channel_list()))
       return;
 
-   map_array(names, ( : register_one, 0, body:));
+   map(names, &register_one(0, body));
 }
 
 protected
@@ -266,7 +266,7 @@ varargs nomask void register_channels(string *names)
     * will be created.  If the channel's not created, we don't want it to be
     * done so automatically here. */
    //  names=names&keys(info);
-   map_array(names, ( : register_one, 0, previous_object() :));
+   map(names, &register_one(0, previous_object()));
 }
 
 /*
@@ -280,7 +280,7 @@ varargs nomask void unregister_channels(string *names)
    if (!names)
       names = keys(info);
 
-   map_array(names, ( : unregister_one:), previous_object());
+   map(names, unregister_one, previous_object());
 }
 
 /*
@@ -411,7 +411,7 @@ nomask void deliver_soul(string channel_name, mixed *soul)
 
    user_channel_name = user_channel_name(channel_name);
    soul = ({soul[0]}) +
-          ({map_array(soul[1], (
+          ({map(soul[1], (
                                    : sprintf(CHANNEL_FORMAT($(channel_name)), $(user_channel_name), $1[0.. < 2])
                                    :))});
 
@@ -434,7 +434,7 @@ void create()
    class listener_pair pair;
 
    info = ([]);
-   map_array(users(), ( : register_body:));
+   map(users(), register_body);
    ::create();
 
    if (!permanent_channels || !sizeof(keys(permanent_channels)))
@@ -587,7 +587,7 @@ nomask string make_name_list(mixed *list)
    ** Remove null objects, objects with no links (to interactive users),
    ** and link obs that are no longer interactive.
    */
-   list = filter_array(list, ( : $1 && interactive($1) :));
+   list = filter(list, ( : $1 && interactive($1) :));
    return implode(list->query_userid(), ", ");
 }
 

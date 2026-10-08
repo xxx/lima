@@ -79,7 +79,7 @@ int f_restrict(string s)
 private
 parse_rst(string path, string file)
 {
-   string *contents = filter_array(explode(read_file(path + file), "\n"),
+   string *contents = filter(explode(read_file(path + file), "\n"),
                                    (
                                        : strsrch($1, ".. c:function::") != -1 || strsrch($1, "TAGS: ") != -1
                                        :));
@@ -178,7 +178,7 @@ void process_file(string path, string file)
 nomask void process_dir(string path)
 {
    if (member_array(path, ignore) == -1)
-      map_array(get_dir(path + "*"), ( : process_file, path:));
+      map(get_dir(path + "*"), &process_file(path));
 
    if (!--pending_count)
    {
@@ -216,12 +216,12 @@ nomask void rebuild_data()
    fun_total = 0;
 
    lines = explode(read_file(DIR_HELP "/_restrict"), "\n");
-   map_array(lines, ( : f_restrict:));
+   map(lines, f_restrict);
 
    dirs = filter(get_dir(DIR_HELP "/*"), ( : $(restrict)[$1] != 99 :));
 
    pending_count = 0;
-   map_array(dirs, ( : process_file, DIR_HELP "/" :));
+   map(dirs, &process_file(DIR_HELP "/"));
 }
 
 nomask void create()
@@ -253,14 +253,14 @@ nomask string *find_topic(string name)
    // ### simulate the old levels
    lvl = adminp(this_user()) ? 5 : wizardp(this_user()) ? 1 : 0;
 
-   return filter_array(
+   return filter(
        result,
-       function(string file, int lvl) {
+       (: [string file, int lvl] {
           mixed *parts = explode(file, "/");
           if (sizeof(parts) < 3)
              return 1;
           return (lvl >= restrict[parts[1]] || lvl >= restrict[parts[1] + "/" + parts[2]]);
-       },
+       } :),
        lvl);
 }
 
@@ -274,7 +274,7 @@ nomask void conflict_report()
    mixed *values;
 
    values = values(topics);
-   values = filter_array(values, ( : sizeof($1) > 1 :));
+   values = filter(values, ( : sizeof($1) > 1 :));
    more(sprintf("%O", values));
 }
 

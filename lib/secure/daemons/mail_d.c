@@ -101,8 +101,8 @@ nomask string *process_mail_list(string *list)
       ensure lower-cased, ensure valid */
    list = GROUP_D->process_list(list);
    list = clean_array(list);
-   list = map_array(list, ( : lower_case:));
-   list = filter_array(list, ( : user_exists:));
+   list = map(list, lower_case);
+   list = filter(list, user_exists);
 
    return list;
 }
@@ -217,7 +217,7 @@ varargs nomask string *send_mail(string Sender, string Subject, mixed Body, stri
 
    msg.to_list = recip_list;
    // deliver the mail (the message keys) to all recipients
-   map_array(local_recip_list, ( : deliver_mail, message_key:));
+   map(local_recip_list, &deliver_mail(message_key));
 
    // we need to keep track of who needs to delete this message before
    // we erase this message to prevent people from making a call
@@ -294,5 +294,5 @@ nomask void rebuild_mailboxes()
 {
    string *messages = unguarded(1, ( : get_dir, MAIL_PATH "*.o" :));
 
-   map_array(messages, ( : process_message:));
+   map(messages, process_message);
 }

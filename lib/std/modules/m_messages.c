@@ -456,7 +456,7 @@ void inform(object *who, string *msgs, mixed others)
       tell(who[i], msgs[i], MSG_INDENT | 128);
    }
    if (arrayp(others))
-      map_array(others - who, ( : tell_from_outside($1, $(msgs[ < 1]), MSG_INDENT | EMOJI_MSG) :));
+      map(others - who, ( : tell_from_outside($1, $(msgs[ < 1]), MSG_INDENT | EMOJI_MSG) :));
    else if (others)
       tell_from_inside(others, msgs[sizeof(who)], MSG_INDENT | EMOJI_MSG, who);
 }
@@ -482,7 +482,7 @@ varargs void filtered_inform(object *who, string *msgs, mixed others, function f
          tell(who[i], msgs[i], MSG_INDENT);
    }
    if (arrayp(others))
-      map_array(others - who, ( : tell_from_outside($1, $(msgs[ < 1]), MSG_INDENT) :));
+      map(others - who, ( : tell_from_outside($1, $(msgs[ < 1]), MSG_INDENT) :));
    else if (others)
    {
       if (arrayp(others))

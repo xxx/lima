@@ -38,7 +38,7 @@ mixed map_func(mixed element)
 
 void do_follow()
 {
-   string *follows = map_array(this_body()->query_follow_search(), ( : map_func:));
+   string *follows = map(this_body()->query_follow_search(), map_func);
    follows -= ({""});
    if (!sizeof(follows))
    {

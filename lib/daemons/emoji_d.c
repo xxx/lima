@@ -173,7 +173,7 @@ nomask mixed get_emoji(string emoji)
 
 nomask string *process_list(string *name_list)
 {
-   return decompose(map_array(name_list, ( : get_emoji:)));
+   return decompose(map(name_list, get_emoji));
 }
 
 nomask mixed get_emoji_data()

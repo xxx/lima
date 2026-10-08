@@ -33,7 +33,7 @@ void main()
    int i;
    mapping calls = ([]);
 
-   call_out_stuff = filter_array(call_out_info(), ( : sizeof:));
+   call_out_stuff = filter(call_out_info(), sizeof);
 
    // We do not have any ANSI here, but also don't want emojis.
    set_output_flags(NO_ANSI);

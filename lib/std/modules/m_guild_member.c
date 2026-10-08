@@ -56,7 +56,7 @@ mapping query_guild_cmds()
 void do_special()
 {
    int reflex = this_object()->query_reflex();
-   int *keys = filter_array(keys(guild_cmds), ( : $1 <= $(reflex) :));
+   int *keys = filter(keys(guild_cmds), ( : $1 <= $(reflex) :));
    object target = this_object()->get_target();
    object spec;
    // TBUG("Target: " + target + " Reflex: " + reflex + " Keys: " + sizeof(keys));

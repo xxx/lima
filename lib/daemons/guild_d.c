@@ -189,7 +189,7 @@ string find_guild_dir(string g)
 
 object *belongs_to(string guild)
 {
-   return filter_array(bodies(), ( : member_array($(guild), $1->guilds_belong()) != -1 :));
+   return filter(bodies(), ( : member_array($(guild), $1->guilds_belong()) != -1 :));
 }
 
 int check_previous(string needed)

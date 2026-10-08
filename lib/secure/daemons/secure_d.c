@@ -833,7 +833,7 @@ nomask varargs int check_privilege(mixed prot, int ignore)
       next2 = (i < stacksize - 2 ? stack[i + 2] : 0);
       if (!ob)
       {
-         syslog("Secvio: object destructed in call stack\n" + implode(map_array(stack, (
+         syslog("Secvio: object destructed in call stack\n" + implode(map(stack, (
                                                                                            : $1 ? file_name($1) : "0"
                                                                                            :)),
                                                                       ", "));
@@ -850,7 +850,7 @@ nomask varargs int check_privilege(mixed prot, int ignore)
          }
          if (!next && prot)
          {
-            syslog("Secvio: ob destructed in call stack\n" + implode(map_array(stack, ( : file_name:)), ", "));
+            syslog("Secvio: ob destructed in call stack\n" + implode(map(stack, file_name), ", "));
             return 0; // This object has been destructed.
          }
          if (function_exists("query_unguarded_privilege", next) != M_ACCESS)

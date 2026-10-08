@@ -13,5 +13,5 @@ inherit CMD;
 private
 void main(mixed *arg)
 {
-   map_array(explode(read_file(arg[0]), "\n"), ( : this_user()->force_me($1) :));
+   map(explode(read_file(arg[0]), "\n"), ( : this_user()->force_me($1) :));
 }

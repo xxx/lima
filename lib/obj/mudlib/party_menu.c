@@ -205,7 +205,7 @@ void change_password()
 private
 void kill_menu_for(string s)
 {
-   object *menus = filter_array(objects(), (
+   object *menus = filter(objects(), (
                                                : base_name($1) == "/obj/mudlib/party_menu" &&
                                                      ($1->query_user() == $(s) || $1->query_user() == "none")
                                                :));
@@ -407,7 +407,7 @@ int is_party_menu()
 
 void simple_join(string party)
 {
-   object *party_invites = filter_array(objects(), ( : $1->is_party_menu() && $1->is_invited(this_body()) :));
+   object *party_invites = filter(objects(), ( : $1->is_party_menu() && $1->is_invited(this_body()) :));
    class party jparty = PARTY_D->query_party(party);
    string passwd = jparty.password;
    if (!PARTY_D->add_member(this_body()->query_name(), party, passwd))
@@ -433,7 +433,7 @@ void remove_invite(object body)
 
 void accept_invite(string party)
 {
-   object *party_invites = filter_array(objects(), ( : $1->is_party_menu() && $1->is_invited(this_body()) :));
+   object *party_invites = filter(objects(), ( : $1->is_party_menu() && $1->is_invited(this_body()) :));
    int count;
 
    if (stringp(party) && lower_case(party) == "q" || party == "")

@@ -67,7 +67,7 @@ void init_equipment_cluster()
 
 int use_heal()
 {
-   object *consumables = filter_array(all_inventory(this_object()), ( : $1->is_healing() :));
+   object *consumables = filter(all_inventory(this_object()), ( : $1->is_healing() :));
    object pick;
    string limb = very_wounded() || badly_wounded();
 
@@ -118,7 +118,7 @@ int take_from_room()
 
    if (!environment())
       return EVAL_FAILURE;
-   consumables = filter_array(all_inventory(environment()), ( : $1->is_healing() :));
+   consumables = filter(all_inventory(environment()), ( : $1->is_healing() :));
 
    if (sizeof(consumables))
       pick = choice(consumables);

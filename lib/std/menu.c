@@ -297,7 +297,7 @@ protected void new_parse_menu_input(string input)
          }
          return;
       }
-      matched_item = filter_array(current_menu.items,
+      matched_item = filter(current_menu.items,
                                   ( : intp(((class menu_item)$1)->choice_name)
                                         ? sprintf("%d", ((class menu_item)$1)->choice_name) == $2
                                         : ((class menu_item)$1)->choice_name == $2:),

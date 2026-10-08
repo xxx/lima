@@ -267,7 +267,7 @@ nomask void rcv_chan_user_reply(string orig_mud, string orig_user, string target
 protected
 nomask void chan_startup()
 {
-   CHANNEL_D->register_channels(map_array(listened_channels, ( : "imud_" + $1:)));
+   CHANNEL_D->register_channels(map(listened_channels, ( : "imud_" + $1:)));
 }
 
 protected

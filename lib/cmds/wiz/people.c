@@ -108,25 +108,25 @@ string get_who_string(string arg)
 
    if (member_array("W", args) != -1)
    {
-      b = filter_array(b, ( : wizardp($1) :));
+      b = filter(b, ( : wizardp($1) :));
       args -= ({"W"});
       DEBUG("Wizards only");
    }
    else if (member_array("A", args) != -1)
    {
-      b = filter_array(b, ( : adminp($1) :));
+      b = filter(b, ( : adminp($1) :));
       args -= ({"A"});
       DEBUG("Admins only");
    }
    else if (member_array("P", args) != -1)
    {
-      b = filter_array(b, ( : !wizardp($1) :));
+      b = filter(b, ( : !wizardp($1) :));
       args -= ({"P"});
       DEBUG("Players only");
    }
    if (!wizardp(this_user()))
    {
-      b = filter_array(b, ( : $1->query_body()->is_visible() :));
+      b = filter(b, ( : $1->query_body()->is_visible() :));
    }
 
    if (member_array("h", args) != -1)

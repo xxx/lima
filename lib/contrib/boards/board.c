@@ -97,11 +97,11 @@ nomask varargs string format_message_line(int id)
 private
 nomask string *query_message_lines()
 {
-   int *ids = sort_array(filter_array(NEWS_D->get_messages(linked_group), ( : filter_removed:)), 1);
+   int *ids = sort_array(filter(NEWS_D->get_messages(linked_group), filter_removed), 1);
    int i;
    string *tmp;
 
-   tmp = map_array(ids, ( : format_message_line($1) :));
+   tmp = map(ids, ( : format_message_line($1) :));
    for (i = 1; i < sizeof(tmp) + 1; i++)
       tmp[i - 1] = sprintf("%4d. ", i) + tmp[i - 1];
    return tmp;
@@ -126,7 +126,7 @@ nomask mixed read_entry(string str)
 {
    class news_msg msg;
    int id;
-   int *ids = sort_array(filter_array(NEWS_D->get_messages(linked_group), ( : filter_removed:)), 1);
+   int *ids = sort_array(filter(NEWS_D->get_messages(linked_group), filter_removed), 1);
 
    if (str == "next")
    {
@@ -157,7 +157,7 @@ nomask mixed direct_read_obj(object ob)
 private
 nomask string do_desc()
 {
-   int *ids = sort_array(filter_array(NEWS_D->get_messages(linked_group), ( : filter_removed:)), 1);
+   int *ids = sort_array(filter(NEWS_D->get_messages(linked_group), filter_removed), 1);
    int curr_id = this_body()->query_board_id(board_name);
 
    if (curr_id <= 0)

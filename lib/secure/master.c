@@ -609,7 +609,7 @@ nomask void preload(string file)
 
 string *epilog(int eflag)
 {
-   return filter_array(explode(read_file(PRELOAD_FILE), "\n") - ({""}), ( : $1[0] != '#' :));
+   return filter(explode(read_file(PRELOAD_FILE), "\n") - ({""}), ( : $1[0] != '#' :));
 }
 
 string object_name(object ob)

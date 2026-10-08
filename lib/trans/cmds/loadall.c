@@ -23,21 +23,21 @@ void main(mixed *args)
     ** Get all the files in the given directory.  If this command is in
     ** the directory, then remove it... we don't want to dest self.
     */
-   files = map_array(get_dir(args[0] + "/*.c"), ( : $(args[0]) + "/" + $1:));
+   files = map(get_dir(args[0] + "/*.c"), ( : $(args[0]) + "/" + $1:));
    files -= ({file_name(this_object()) + ".c"});
 
    /*
     ** Blow away the old objects
     */
-   obs = map_array(files, ( : find_object($1) :)) - ({0});
+   obs = map(files, ( : find_object($1) :)) - ({0});
    obs->remove();
    obs -= ({0});
-   map_array(obs, ( : destruct($1) :));
+   map(obs, ( : destruct($1) :));
 
    /*
     ** Load all the objects
     */
-   map_array(files, ( : load_object($1) :));
+   map(files, ( : load_object($1) :));
 
    out("Succeeded.\n");
 }

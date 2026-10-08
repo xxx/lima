@@ -89,8 +89,8 @@ varargs void walk_dir(string path, function func, mixed arg)
       res = names;
    if (path[ < 1] != '/')
       path += "/";
-   res = map_array(res, ( : $(path) + $1:));
-   res = filter_array(res, ( : file_size($1) == -2 :));
+   res = map(res, ( : $(path) + $1:));
+   res = filter(res, ( : file_size($1) == -2 :));
    i = sizeof(res);
    while (i--)
       walk_dir(res[i], func, arg);
@@ -204,7 +204,7 @@ mapping map_paths(mixed paths)
    int i;
 
    res = ([]);
-   paths = map_array(paths, ( : split_path:));
+   paths = map(paths, split_path);
    for (i = 0; i < sizeof(paths); i++)
    {
       if (!has_key(res, paths[i][0]))

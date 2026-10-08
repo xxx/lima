@@ -118,7 +118,7 @@ varargs mapping query_crafting_recipes(string station)
       return ([]);
 
    foreach (
-       string key in filter_array(keys(crafting_recipes), (
+       string key in filter(keys(crafting_recipes), (
                                                               : member_array($1, crafting_stations[$(station)]) != -1
                                                               :)))
    {

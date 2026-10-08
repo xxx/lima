@@ -37,7 +37,7 @@ mixed do_ask_liv_about_str(object liv, string item)
 
 mixed do_ask_about_str(string item)
 {
-   object *respondents = filter_array(all_inventory(environment(this_body())), ( : $1->direct_ask_liv_about_str() :));
+   object *respondents = filter(all_inventory(environment(this_body())), ( : $1->direct_ask_liv_about_str() :));
 
    switch (sizeof(respondents))
    {

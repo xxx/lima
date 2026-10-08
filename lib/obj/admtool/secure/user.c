@@ -42,7 +42,7 @@ nomask void nuke_user(string userid, int skip_save)
       // A bit ugly, but does the job. We'd rather store user info in user files than create a daemon to track all
       // these.
       bodies = restore_variable(
-          filter_array(explode(read_file(LINK_PATH(userid) + __SAVE_EXTENSION__), "\n"), (
+          filter(explode(read_file(LINK_PATH(userid) + __SAVE_EXTENSION__), "\n"), (
                                                                                              : $1[0..5] == "bodies"
                                                                                              :))[0][7..]);
    }

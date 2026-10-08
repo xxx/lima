@@ -80,9 +80,9 @@ void main(string arg)
       if (sizeof(arglist) < 3)
          out(SYNTAX);
 
-      arglist = filter_array(
+      arglist = filter(
           arglist[2..],
-          function(string x, string this_group, string * grp_members) {
+          (: [string x, string this_group, string * grp_members] {
              if (arrayp(grp_members) && member_array(grp_members, x) != -1)
              {
                 outf("%s is already in group %s.\n", x, this_group);
@@ -93,7 +93,7 @@ void main(string arg)
                 outf("%s added to group %s.\n", x, this_group);
                 return 1;
              }
-          },
+          } :),
           this_group);
 
       arglist = clean_array(arglist);
@@ -120,7 +120,7 @@ void main(string arg)
       outf("Group %s does not exist.\n", this_group);
       return;
    }
-   valid = filter_array(arglist, ( : member_array($1, $(groups[this_group])) != -1 :));
+   valid = filter(arglist, ( : member_array($1, $(groups[this_group])) != -1 :));
    not = clean_array(arglist - valid);
    valid = clean_array(valid);
 
@@ -147,7 +147,7 @@ nomask string *print_groups(mapping groups)
    foreach (string k, string * members in groups)
    {
       header += sprintf("%s\n", k);
-      content += sprintf("%s\n", implode(map_array(sort_array(members, 1), ( : capitalize:)), ", "));
+      content += sprintf("%s\n", implode(map(sort_array(members, 1), capitalize), ", "));
    }
 
    return ({header, content});

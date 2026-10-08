@@ -281,7 +281,7 @@ void new_parse_menu_input(string input)
          return;
       }
       matched_item =
-          filter_array(current_menu.items,
+          filter(current_menu.items,
                        (
                            : intp(((class menu_item)$1)->choice_name) ? sprintf("%d", ((class menu_item)$1)->choice_name) == $2
                                                                 : ((class menu_item)$1)->choice_name == $2:),
@@ -305,7 +305,7 @@ void new_parse_menu_input(string input)
       completion_menu = new_menu("Choose one by number:\n"
                                  "---------------------\n");
       set_menu_items(completion_menu,
-                     filter_array(current_menu.items,
+                     filter(current_menu.items,
                                   (
                                       : intp(((class menu_item)$1)->choice_name)
                                             ? member_array(sprintf("%d", ((class menu_item)$1)->choice_name), $2) != -1
@@ -472,14 +472,14 @@ void display_current_menu()
       current_menu.current_choices = current_menu.items;
       return;
    }
-   rightwidth = max(map(filter_array(current_menu.items, (
+   rightwidth = max(map(filter(current_menu.items, (
                                                              : !(((class menu_item)$1)->seperator)
                                                              :)),
                         (
                             : strlen(((class menu_item)$1)->description)
                             :)));
    // This stuff is getting as ugly as Amylaar closures =P
-   leftwidth = max(map(filter_array(current_menu.items, (
+   leftwidth = max(map(filter(current_menu.items, (
                                                             : stringp(((class menu_item)$1)->choice_name)
                                                             :)),
                        (

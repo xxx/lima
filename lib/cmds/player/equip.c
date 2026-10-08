@@ -129,8 +129,8 @@ void main(string arg)
       }
    }
 
-   weapons = filter_array(weapons, ( : $1:));
-   armours = filter_array(armours, ( : $1:));
+   weapons = filter(weapons, ( : $1:));
+   armours = filter(armours, ( : $1:));
    frame_init_user();
 
    if (sizeof(weapons))

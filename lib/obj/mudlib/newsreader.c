@@ -395,7 +395,7 @@ nomask void display_groups_with_new(string arg)
    **   -c   Check news. Display new news and then exit.
    */
    if (sizeof(groups))
-      groups = filter_array(SAVE_OB->subscribed_groups(), ( : test_for_new:));
+      groups = filter(SAVE_OB->subscribed_groups(), test_for_new);
    else
       groups = ({});
    if (!sizeof(groups))
@@ -412,7 +412,7 @@ nomask void display_groups_with_new(string arg)
    else
    {
       string *list;
-      list = ({"Groups with new messages:", ""}) + map_array(groups, ( : format_group_line:));
+      list = ({"Groups with new messages:", ""}) + map(groups, format_group_line);
 
       /* if -c was given, then quit after displaying the new stuff */
       if (arg == "-c")
@@ -430,7 +430,7 @@ nomask void next_group()
    int i;
    int next_group;
 
-   groups = filter_array(SAVE_OB->subscribed_groups(), ( : test_for_new:));
+   groups = filter(SAVE_OB->subscribed_groups(), test_for_new);
    max_group = sizeof(groups) - 1;
    if (max_group == -1)
    {
@@ -541,7 +541,7 @@ nomask void display_messages(int display_all)
       ids = all_messages;
       lines = ({sprintf("Messages on %s are:", current_group)});
    }
-   lines += map_array(ids, ( : format_message_line(0, $1, ($(display_all) ? 1 : 0)) :));
+   lines += map(ids, ( : format_message_line(0, $1, ($(display_all) ? 1 : 0)) :));
    more(lines);
 }
 
@@ -640,7 +640,7 @@ nomask void reply_with_message()
    }
    lines = ({sprintf("On %s %s wrote post %s in %s:", intp(msg.time) ? ctime(msg.time) : msg.time, msg.poster,
                      msg.subject, current_group)});
-   lines += map_array(explode(msg.body, "\n"), ( : "> " + $1:));
+   lines += map(explode(msg.body, "\n"), ( : "> " + $1:));
    clone_object (EDIT_OB, EDIT_TEXT, lines, ( : receive_reply_text:));
 }
 
@@ -696,7 +696,7 @@ nomask void followup_with_message()
    }
    lines = ({sprintf("On %s %s wrote post %s:", intp(msg.time) ? ctime(msg.time) : msg.time, msg.poster, msg.subject)});
 
-   lines += map_array(explode(msg.body, "\n"), ( : "> " + $1:));
+   lines += map(explode(msg.body, "\n"), ( : "> " + $1:));
 
    clone_object (EDIT_OB, EDIT_TEXT, lines, ( : receive_followup_text:));
 }
@@ -782,7 +782,7 @@ nomask void global_commands(string cmd)
    }
    else if (cmd == "")
    {
-      if (sizeof(filter_array(SAVE_OB->subscribed_groups(), ( : test_for_new:))))
+      if (sizeof(filter(SAVE_OB->subscribed_groups(), test_for_new)))
       {
          modal_pop();
          begin_reading();
@@ -1010,7 +1010,7 @@ nomask void receive_top_cmd(mixed cmd)
    {
       string *list;
 
-      list = map_array(NEWS_D->get_groups(), ( : format_group_line:));
+      list = map(NEWS_D->get_groups(), format_group_line);
       list = ({"", "Available groups are:"}) + list;
       more(list);
    }

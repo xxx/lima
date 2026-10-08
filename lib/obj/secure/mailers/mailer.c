@@ -93,7 +93,7 @@ protected nomask string *format_name_list(string prompt, string *names)
    if (!names || !sizeof(names))
       return ({});
 
-   return explode(prompt + implode(map_array(names, ( : capitalize:)), ", "), "\n");
+   return explode(prompt + implode(map(names, capitalize), ", "), "\n");
 }
 
 /*
@@ -150,7 +150,7 @@ protected nomask void write_dead_letter(string *buf)
 */
 protected nomask string *build_body_inclusion(string *body)
 {
-   return map_array(body, ( : "> " + $1:));
+   return map(body, ( : "> " + $1:));
 }
 
 /*

@@ -55,7 +55,7 @@ int someone_did(string str)
    did[curver()] += ({({time(), str})});
    save_me();
 
-   who = filter_array(users(), ( : wizardp($1) :)) - ({this_user()});
+   who = filter(users(), ( : wizardp($1) :)) - ({this_user()});
    who -= ({0});
    who->deliver_didlog_message(str);
 

@@ -700,7 +700,7 @@ nomask int *get_thread(string group, int thread)
 {
    if (is_read_restricted(group))
       return 0;
-   return filter_array(keys(data[group]),
+   return filter(keys(data[group]),
                        (
                            : $1 != "next_id" && ((class news_msg)data[$(group)][$1])->thread_id == $(thread)
                            :));
@@ -710,7 +710,7 @@ nomask int *get_thread_ids(string group)
 {
    if (is_read_restricted(group))
       return 0;
-   return filter_array(get_messages(group, 1), ( : $1 != get_thread_id($(group), $1) :));
+   return filter(get_messages(group, 1), ( : $1 != get_thread_id($(group), $1) :));
 }
 
 nomask string *get_groups()

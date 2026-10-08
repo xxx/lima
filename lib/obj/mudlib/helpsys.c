@@ -177,7 +177,7 @@ nomask void parse_file(string fname, string topic)
       write(sprintf("\n%s\n", "[" + fname + "]"));
 
    lines = explode(read_file(fname), "\n");
-   lines = filter_array(lines, ( : f_parse:));
+   lines = filter(lines, f_parse);
 
    if (directives["see"])
       // ### make this a bit more "in-your-face" ??
@@ -238,8 +238,7 @@ nomask void display_choice(string topic)
    i = 0;
 
    write("There are multiple help files for \"" + topic + "\"\n" + "Please choose one:\n\n" +
-         colour_table(map_array(files, (
-                                           : format_choice:)),
+         colour_table(map(files, format_choice),
                       this_user()->query_screen_width()) +
          "\n");
 
@@ -378,7 +377,7 @@ nomask void display_topic_columns(string *files, string header)
    int i;
    int n = sizeof(files);
 
-   files = map_array(files, ( : explode($1, "/")[ < 1] :));
+   files = map(files, ( : explode($1, "/")[ < 1] :));
    write(header + "\n\n");
    for (i = 0; i < (n / 2) + 1; i++)
    {
@@ -397,7 +396,7 @@ nomask void display_topics(string *arr)
 {
    string *new_stuff, *old_stuff;
 
-   old_stuff = filter_array(arr, ( : stat($1)[1] <= $(this_body())->query_help_topic($1) :));
+   old_stuff = filter(arr, ( : stat($1)[1] <= $(this_body())->query_help_topic($1) :));
 
    new_stuff = arr - old_stuff;
    if (sizeof(new_stuff))

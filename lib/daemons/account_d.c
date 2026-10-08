@@ -23,7 +23,7 @@ mapping transactions = ([]);
 private
 string abbreviate(string s)
 {
-   return filter_array(s, ( : member_array($1, "eyuioa") == -1 :))[0..2];
+   return implode(filter(explode(s, ""), (: member_array($1[0], "eyuioa") == -1 :)), "")[0..2];
 }
 
 private

@@ -168,7 +168,7 @@ mixed *internal_get_soul(string verb, string rule, mixed *args, int add_imud_msg
    }
    else
    {
-      soul = map_array(soul, ( : $1[ < 1] == '\n' ? $1 : $1 + "\n" :));
+      soul = map(soul, ( : $1[ < 1] == '\n' ? $1 : $1 + "\n" :));
    }
 
    who = ({this_body()});

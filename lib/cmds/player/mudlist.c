@@ -87,7 +87,7 @@ private void main(mixed *arg, mapping flags)
    }
    else
    {
-      matches = filter_array(matches, ( : $(mudlist)[$1][0] == -1 :));
+      matches = filter(matches, ( : $(mudlist)[$1][0] == -1 :));
       upcount = sizeof(matches);
    }
 

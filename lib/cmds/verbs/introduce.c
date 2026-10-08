@@ -47,7 +47,7 @@ void do_introduce_to_obj(object ob)
 
 void do_introduce_wrd(string word)
 {
-   object *players = filter_array(all_inventory(environment(this_body())), ( : $1->is_body() && $1 != this_body() :));
+   object *players = filter(all_inventory(environment(this_body())), ( : $1->is_body() && $1 != this_body() :));
 
    if (word != "yourself" && word != "myself")
    {

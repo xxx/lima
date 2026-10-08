@@ -21,9 +21,9 @@ nomask void rcv_who_req(string orig_mud, string orig_user, string targ_user, mix
 {
    mixed *who_data;
 
-   who_data = map_array(
+   who_data = map(
                   users(),
-                  function(object user) {
+                  (: [object user] {
                      object body = user->query_body();
                      string visname = user->query_userid();
                      string title = 0;
@@ -41,7 +41,7 @@ nomask void rcv_who_req(string orig_mud, string orig_user, string targ_user, mix
                         capitalize(visname);
 
                      return ({visname, query_idle(user), title});
-                  }) -
+                  } :)) -
               ({0});
 
    send_to_user("who-reply", orig_mud, orig_user, ({who_data}));
@@ -62,7 +62,7 @@ nomask void rcv_who_reply(string orig_mud, string orig_user, string targ_user, m
       string s;
 
       s = sprintf("[%s] %d users connected\n%s\n", orig_mud, sizeof(message[0]), repeat_string("-", 78));
-      s += implode(map_array(message[0], (
+      s += implode(map(message[0], (
                                              : sprintf("%-15s%-10s%s", $1[0], convert_time(to_int($1[1]), 3), $1[2])
                                              :)),
                    "\n");

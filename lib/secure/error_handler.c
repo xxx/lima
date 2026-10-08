@@ -139,7 +139,7 @@ void build_output_data()
 
    // Reduced the output width below. Object didn't give a lot, so removed.
    output_data.trace = sprintf("\n\n\n%sTrace:%s\n\n%s", HIW, NOR,
-                               implode(map_array(error_data.trace,
+                               implode(map(error_data.trace,
                                                  //(: sprintf("Line: %O File: %O Function: %O Object: %O Program: %O",
                                                  (
                                                      : sprintf("Line %-4.4O %O %s() Ob: %O", (int)$1["line"],

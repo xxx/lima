@@ -65,7 +65,7 @@ string main(string pattern)
       }
    }
 
-   matches = filter_array(matches, ( : $(mudlist)[$1][0] == -1 :));
+   matches = filter(matches, ( : $(mudlist)[$1][0] == -1 :));
    ret += sprintf("<TABLE BORDER=5><caption><h2>There are currently " + sizeof(matches) + " muds UP out of " +
                   sizeof(mudlist) + " muds on the I3:" + "</h2></caption>" +
                   "<TR><TH>Mud Name</TH><TH>Mudlib</TH><TH>Server</TH>" + "<TH>Type</TH>" +

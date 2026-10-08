@@ -56,7 +56,7 @@ void register_mission(string name, string giver, string controller, int rec_leve
 object *find_givers(string giver)
 {
    // Should be cloned, match base name, and have an environment.
-   return filter_array(objects(), ( : clonep($1) && base_name($1) == $(giver) && environment($1) :));
+   return filter(objects(), ( : clonep($1) && base_name($1) == $(giver) && environment($1) :));
 }
 
 //: FUNCTION live_missions

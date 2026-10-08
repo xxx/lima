@@ -175,7 +175,7 @@ void adversary_moved()
 
    my_env = environment();
    my_env->add_hook("object_arrived", adv_met_fn);
-   foreach (object liv in filter_array(all_inventory(my_env), ( : $1->is_living() && $1 != this_object() :)))
+   foreach (object liv in filter(all_inventory(my_env), ( : $1->is_living() && $1 != this_object() :)))
       adversary_met(liv);
 }
 
@@ -216,7 +216,7 @@ void surrender()
 // consumes food and alchohol from inventory to stay alive.
 void try_heal()
 {
-   object *consumables = filter_array(all_inventory(this_object()), ( : $1->is_healing() :));
+   object *consumables = filter(all_inventory(this_object()), ( : $1->is_healing() :));
    object pick;
    string limb = very_wounded() || badly_wounded();
 

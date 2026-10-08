@@ -64,7 +64,7 @@ void show_one_channel(string channel_name)
    if (flags & CHANNEL_PERMANENT)
       flagstr += " permanent";
 
-   out(channel_name + flagstr + "\n    " + implode(map_array(listeners, ( : fmt_listener:)), ", ") + "\n\n");
+   out(channel_name + flagstr + "\n    " + implode(map(listeners, fmt_listener), ", ") + "\n\n");
 }
 
 private

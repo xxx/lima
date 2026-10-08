@@ -148,7 +148,7 @@ nomask int cmd_moderation(string channel_name, string arg)
       {
          object *spkr;
 
-         spkr = filter_array(ci.requestors, ( : $(arg) == lower_case($1->query_name()) :));
+         spkr = filter(ci.requestors, ( : $(arg) == lower_case($1->query_name()) :));
          if (sizeof(spkr) == 0)
          {
             printf("'%s' was not found (or did not have their hand raised.\n", capitalize(arg));
