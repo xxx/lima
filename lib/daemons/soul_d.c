@@ -24,7 +24,7 @@ void create()
    mapping value;
    mixed ignore;
 
-   unguarded(1, ( : restore_object, SAVE_FILE, 1 :));
+   unguarded(1, (: restore_object(SAVE_FILE) :));
 
    parse_init();
 
@@ -73,7 +73,7 @@ int add_emote(string verb, mixed rule, string *parts)
    else
       emotes[verb][rule] = parts[0];
 
-   unguarded(1, ( : save_object, SAVE_FILE:));
+   unguarded(1, (: save_object(SAVE_FILE) :));
 
    return 1;
 }
@@ -98,7 +98,7 @@ int remove_emote(string verb, string rule)
    parse_remove(verb);
    parse_refresh();
 
-   unguarded(1, ( : save_object, SAVE_FILE:));
+   unguarded(1, (: save_object(SAVE_FILE) :));
    return 1;
 }
 
@@ -114,7 +114,7 @@ int move_emote(string verb, string dest)
       parse_add_rule(dest, rule);
    }
    m_delete(emotes, verb);
-   unguarded(1, ( : save_object, SAVE_FILE:));
+   unguarded(1, (: save_object(SAVE_FILE) :));
    return 1;
 }
 
@@ -139,10 +139,10 @@ mixed *internal_get_soul(string verb, string rule, mixed *args, int add_imud_msg
 
    rules = emotes[verb];
    if (!rules)
-      return 0;
+      return nil;
    soul = rules[rule];
    if (!soul)
-      return 0;
+      return nil;
 
    // minus the verb's real name; we don't want to process the real names
    // of any of the objects
@@ -154,7 +154,7 @@ mixed *internal_get_soul(string verb, string rule, mixed *args, int add_imud_msg
       {
          args[i] = get_completion(args[i][0.. < 2]);
          if (!args[i])
-            return 0;
+            return nil;
          break;
       }
    }
@@ -224,7 +224,7 @@ mixed *internal_get_soul(string verb, string rule, mixed *args, int add_imud_msg
          result[1 + j][i] = compose_message(w[i], tmp, w, args...);
       }
       // ### tmp fix
-      result[1 + j][ < 1] = compose_message(0, stringp(soul) ? soul : soul[1], w, args...);
+      result[1 + j][ < 1] = compose_message(nil, stringp(soul) ? soul : soul[1], w, args...);
    }
 
    return result;
@@ -291,12 +291,12 @@ string get_completion(string s)
    {
    case 0:
       write("Can't find a match for '" + s + "*'.\n");
-      return 0;
+      return nil;
    case 1:
       return completions[0];
    default:
       write("Can't find a unique match.\nFound: " + implode(completions, ", ") + "\n");
-      return 0;
+      return nil;
    }
 }
 
@@ -360,12 +360,12 @@ mixed *parse_soul(string str)
 
    result = efun::parse_my_rules(this_body(), str, 0, this_user());
    if (!result)
-      return 0;
+      return nil;
    if (intp(result) || stringp(result))
-      return 0;
+      return nil;
    soul = get_soul(result[0], result[1], result[2..]);
    if (!soul)
-      return 0;
+      return nil;
    return soul;
 }
 
@@ -424,7 +424,7 @@ mixed *parse_imud_soul(string str)
          if (!sizeof(matches))
          {
             write("Vague mud name.  could be: " + implode(previous_matches, ", ") + "\n");
-            return;
+            return nil;
          }
 
          /* We have narrowed things down to one successful match.  Nothing more
@@ -447,13 +447,13 @@ mixed *parse_imud_soul(string str)
    {
       if (temp)
          temp->remove();
-      return 0;
+      return nil;
    }
 
    soul = get_imud_soul(result...);
 
    if (!soul)
-      return 0;
+      return nil;
    return soul;
 }
 
@@ -462,7 +462,7 @@ void set_adverbs(string *mods)
    if (!arrayp(mods))
       error("bad arg type");
    adverbs = mods;
-   unguarded(1, ( : save_object, SAVE_FILE:));
+   unguarded(1, (: save_object(SAVE_FILE) :));
 }
 
 string *get_adverbs()
@@ -475,11 +475,11 @@ void add_adverb(string adverb)
    if (!stringp(adverb))
       error("bad arg type");
    adverbs += ({adverb});
-   unguarded(1, ( : save_object, SAVE_FILE:));
+   unguarded(1, (: save_object(SAVE_FILE) :));
 }
 
 void remove_adverb(string adverb)
 {
    adverbs -= ({adverb});
-   unguarded(1, ( : save_object, SAVE_FILE:));
+   unguarded(1, (: save_object(SAVE_FILE) :));
 }
