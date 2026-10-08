@@ -46,7 +46,7 @@ mixed do_wave_it(object ob, object with)
 
 void do_wave_obj(object ob)
 {
-   do_wave_it(ob, 0);
+   do_wave_it(ob, nil);
 }
 
 void do_wave_obj_at_obj(object ob1, object ob2)

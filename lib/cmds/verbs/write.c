@@ -12,7 +12,7 @@ inherit VERB_OB;
 //
 // .. TAGS: RST
 
-mixed can_verb_rule()
+mixed can_verb_rule(string verb, string rule)
 {
    return check_vision();
 }

@@ -19,7 +19,7 @@ mixed can_drop_obj()
 {
    // give a better message for this case, since all the errors generated
    // will be nonsense.
-   if (!first_inventory(this_body()))
+   if (!sizeof(all_inventory(this_body())))
       return "You don't have anything.\n";
    return default_checks();
 }
@@ -38,7 +38,7 @@ nomask void drop_one(object ob)
    if (stringp(tmp))
    {
       write(tmp);
-      return tmp;
+      return;
    }
 
    tmp = ob->move(environment(this_body()), environment(this_body())->query_relation(this_body()));

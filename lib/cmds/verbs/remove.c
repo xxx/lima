@@ -20,12 +20,12 @@ inherit VERB_OB;
 
 mixed can_remove_wrd(string wrd)
 {
-   object brd = 0;
+   object brd = nil;
    mixed res;
 
    foreach (object ob in deep_inventory(environment(this_body())))
    {
-      if ((int)ob->is_bulletin_board())
+      if (ob->is_bulletin_board())
       {
          if (!brd)
             brd = ob;
@@ -75,12 +75,12 @@ void do_remove_obs(object *obs)
 
 void do_remove_wrd(string wrd)
 {
-   object brd = 0;
+   object brd = nil;
    int id;
 
    foreach (object ob in deep_inventory(environment(this_body())))
    {
-      if ((int)ob->is_bulletin_board())
+      if (ob->is_bulletin_board())
          brd = ob;
    }
 

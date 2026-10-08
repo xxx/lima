@@ -49,7 +49,7 @@ void do_put_obj_wrd_obj(object ob1, string p, object ob2)
 
 void do_put_obs_wrd_obj(object *info, string p, object ob2)
 {
-   handle_obs(info, ( : do_put_obj_wrd_obj:), p, ob2);
+   handle_obs(info, do_put_obj_wrd_obj, p, ob2);
 }
 
 void do_put_wrd_str_in_obj(string amount, string str, object ob)
@@ -137,7 +137,7 @@ void do_put_wrd_str_in_obj(string amount, string str, object ob)
 
 void do_put_wrd_str_into_obj(string amount, string str, object ob)
 {
-   return do_put_wrd_str_in_obj(amount, str, ob);
+   do_put_wrd_str_in_obj(amount, str, ob);
 }
 
 void create()

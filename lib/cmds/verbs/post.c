@@ -21,12 +21,12 @@ inherit VERB_OB;
 
 mixed can_post_about_str(string str)
 {
-   object brd = 0;
+   object brd = nil;
    mixed res;
 
    foreach (object ob in deep_inventory(environment(this_body())))
    {
-      if ((int)ob->is_bulletin_board())
+      if (ob->is_bulletin_board())
       {
          if (!brd)
             brd = ob;
@@ -48,11 +48,11 @@ mixed can_post_on_obj_about_str(object ob, string str)
 
 void do_post_about_str(string str)
 {
-   object brd = 0;
+   object brd = nil;
 
    foreach (object ob in deep_inventory(environment(this_body())))
    {
-      if ((int)ob->is_bulletin_board())
+      if (ob->is_bulletin_board())
          brd = ob;
    }
    brd->do_post(str);
@@ -67,7 +67,7 @@ void do_post_on_obj_about_str(object ob, string str)
 /* Followups are posted using 'post followup to <id>' */
 mixed can_post_wrd_to_wrd(string wrd1, string wrd2)
 {
-   object brd = 0;
+   object brd = nil;
    mixed res;
 
    if (wrd1 != "followup")
@@ -75,7 +75,7 @@ mixed can_post_wrd_to_wrd(string wrd1, string wrd2)
 
    foreach (object ob in deep_inventory(environment(this_body())))
    {
-      if ((int)ob->is_bulletin_board())
+      if (ob->is_bulletin_board())
          if (!brd)
             brd = ob;
          else
@@ -100,12 +100,12 @@ mixed can_post_wrd_to_wrd_on_obj(string wrd1, string wrd2, object ob)
 
 void do_post_wrd_to_wrd(string wrd1, string wrd2)
 {
-   object brd = 0;
+   object brd = nil;
    int id;
 
    foreach (object ob in deep_inventory(environment(this_body())))
    {
-      if ((int)ob->is_bulletin_board())
+      if (ob->is_bulletin_board())
          brd = ob;
    }
    sscanf(wrd2, "%d", id);
@@ -125,7 +125,7 @@ void do_post_wrd_to_wrd_on_obj(string wrd1, string wrd2, object ob)
 
 mixed can_post_wrd_with_wrd(string wrd1, string wrd2)
 {
-   object brd = 0;
+   object brd = nil;
    mixed res;
 
    if (wrd1 != "followup")
@@ -133,7 +133,7 @@ mixed can_post_wrd_with_wrd(string wrd1, string wrd2)
 
    foreach (object ob in deep_inventory(environment(this_body())))
    {
-      if ((int)ob->is_bulletin_board())
+      if (ob->is_bulletin_board())
          if (!brd)
             brd = ob;
          else
@@ -158,12 +158,12 @@ mixed can_post_wrd_with_wrd_on_obj(string wrd1, string wrd2, object ob)
 
 void do_post_wrd_with_wrd(string wrd1, string wrd2)
 {
-   object brd = 0;
+   object brd = nil;
    int id;
 
    foreach (object ob in deep_inventory(environment(this_body())))
    {
-      if ((int)ob->is_bulletin_board())
+      if (ob->is_bulletin_board())
          brd = ob;
    }
    sscanf(wrd2, "%d", id);

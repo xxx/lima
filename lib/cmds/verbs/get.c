@@ -83,47 +83,47 @@ nomask void get_one(object ob, object with_ob, string rel)
 
 void do_get_obj(object ob)
 {
-   get_one(ob, 0, 0);
+   get_one(ob, nil, nil);
 }
 
 void do_get_obs(object *info)
 {
-   handle_obs(info, ( : get_one:));
+   handle_obs(info, get_one);
 }
 
 void do_get_obj_from_obj(object ob1, object ob2)
 {
-   get_one(ob1, 0, 0);
+   get_one(ob1, nil, nil);
 }
 
 void do_get_obs_from_obj(object *info, object ob2)
 {
-   handle_obs(info, ( : get_one:));
+   handle_obs(info, get_one);
 }
 
 void do_get_obj_from_wrd_obj(object ob1, string rel, object ob2)
 {
-   get_one(ob1, 0, rel);
+   get_one(ob1, nil, rel);
 }
 
 void do_get_obs_from_wrd_obj(string *info, string rel, object ob2)
 {
-   handle_obs(info, ( : get_one:), rel);
+   handle_obs(info, get_one, nil, rel);
 }
 
 void do_get_obj_out_of_obj(object ob1, object ob2)
 {
-   get_one(ob1, 0, 0);
+   get_one(ob1, nil, nil);
 }
 
 void do_get_obs_out_of_obj(string *info, object ob2)
 {
-   handle_obs(info, ( : get_one:));
+   handle_obs(info, get_one);
 }
 
 void do_get_obj_with_obj(object ob1, object ob2)
 {
-   get_one(ob1, ob2, 0);
+   get_one(ob1, ob2, nil);
 }
 
 void do_get_wrd_obj(string prep, object ob)

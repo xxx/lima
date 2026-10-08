@@ -45,7 +45,7 @@ object find_vendor()
       }
    }
    // can't happen, because test_vendor() was called already
-   return 0;
+   return nil;
 }
 
 mixed can_buy_str()

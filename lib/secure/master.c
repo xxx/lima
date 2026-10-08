@@ -437,11 +437,8 @@ string parser_gen_pos(object ob, int num, int indirect)
 
 string parser_error_message(int kind, object ob, mixed arg, int flag)
 {
-   string ret;
-   if (ob)
-      ret = ob->short() + ": ";
-   else
-      ret = "";
+   mixed description = ob ? ob->short() : nil;
+   string ret = stringp(description) ? description + ": " : "";
 
    switch (kind)
    {

@@ -27,7 +27,7 @@ object *get_all_readable_entry_items()
    {
       res += filter(search, ( : $1->has_entries() :));
       search = filter(search, ( : $1->inventory_accessable() && !$1->is_living() :));
-      search = decompose(map(search, ( : all_inventory:)));
+      search = decompose(map(search, all_inventory));
    }
    return res;
 }
@@ -85,12 +85,12 @@ void read_it(object ob, string str)
 
 void do_read_obj(object ob)
 {
-   read_it(ob, 0);
+   read_it(ob, nil);
 }
 
 void do_read_word_obj(string prep, object ob)
 {
-   read_it(ob, 0);
+   read_it(ob, nil);
 }
 
 void do_read_str_word_obj(string str, string p, object ob)

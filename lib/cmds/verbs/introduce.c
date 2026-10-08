@@ -42,7 +42,7 @@ void do_introduce_wrd_to_obj(string word, object ob)
 
 void do_introduce_to_obj(object ob)
 {
-   return do_introduce_wrd_to_obj("yourself", ob);
+   do_introduce_wrd_to_obj("yourself", ob);
 }
 
 void do_introduce_wrd(string word)
@@ -68,7 +68,10 @@ void do_introduce_wrd(string word)
 void do_introduce_obj(object ob)
 {
    if (ob == this_body())
-      return do_introduce_wrd("yourself");
+   {
+      do_introduce_wrd("yourself");
+      return;
+   }
    if (ob->is_body())
       this_body()->simple_action("$N $vare happy to introduce: $O!", ob->query_name());
    else
