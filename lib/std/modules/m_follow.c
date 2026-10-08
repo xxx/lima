@@ -29,9 +29,9 @@ void respond(string str);
 void add_hook(string tag, function hook);
 
 private
-nosave function f_follow = ( : follow_hook:);
+nosave function f_follow = follow_hook;
 private
-nosave function arrive = ( : arrive_hook:);
+nosave function arrive = arrive_hook;
 private
 mixed *follow_search = ({});
 private
@@ -86,12 +86,12 @@ varargs private mixed *expand_follows()
       else if (stringp(elem) || objectp(elem))
          potentials += ({elem});
    }
-   return clean_array(potentials);
+   return clean_array(flatten_array(potentials) - ({nil, 0}));
 }
 
 //: FUNCTION query_follow_search
 // Returns a list of the follow strings that the object will follow
-string *query_follow_search()
+mixed *query_follow_search()
 {
    return expand_follows();
 }
@@ -108,7 +108,7 @@ void set_follow(object what)
 // Clear the follow that's the object will follow
 void clear_follow()
 {
-   follow = 0;
+   follow = nil;
 }
 
 //: FUNCTION query_follow
@@ -151,7 +151,7 @@ private
 int follow_match(mixed check, object ob)
 {
    if (functionp(check))
-      return member_array(ob, eval(check, ob)) > -1;
+      return member_array(ob, evaluate(check, ob)) > -1;
    if (objectp(check))
       return ob == check;
    if (stringp(check))
@@ -162,7 +162,7 @@ int follow_match(mixed check, object ob)
 // Return 1 if the object is a potential follow to follow
 int is_potential_follow(object ob)
 {
-   return sizeof(filter(expand_follows(), ( : follow_match:), ob));
+   return sizeof(filter(expand_follows(), follow_match, ob));
 }
 
 void follow_hook(string whichway)
@@ -217,7 +217,7 @@ void did_move()
 
 void mudlib_setup()
 {
-   add_hook("move", ( : did_move:));
+   add_hook("move", did_move);
 }
 
 void do_follow_obj(object ob)
