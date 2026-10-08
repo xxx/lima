@@ -37,3 +37,9 @@ void main(string s)
    tell(users() - ({this_user()}), this_body()->query_name() + " shouts: " + punctuate(s) + "\n", MSG_INDENT);
    out("You shout: " + punctuate(s) + "\n");
 }
+
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}

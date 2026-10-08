@@ -43,3 +43,9 @@ void main(string message, mapping flags, string stdin, mixed impl)
    out("You emote: " + message);
    tell_environment(this_body(), message, MSG_INDENT, ({this_body()}));
 }
+
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg, flags, input, implode_info);
+}
