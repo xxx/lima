@@ -97,6 +97,9 @@ protected mixed prepare_pipeline(mixed *words, string *spacing, function lookup)
       stage = (["command":info, "spacing":arg_spacing,
                 "raw":pipeline_raw_suffix(words, spacing, start),
                 "input":nil, "output":nil, "remaining_spacing":nil]);
+      if (info[0]->query_no_pipeline() &&
+          (sizeof(stages) || (end < length && member_array("|", words[end..]) != -1)))
+         return "command " + words[start] + " does not support pipelines";
       if (info[0]->query_no_redirection())
          return stages + ({stage});
 

@@ -7,6 +7,11 @@ inherit __DIR__ "cmd/stdio";
 // ### necessary?
 inherit M_ACCESS;
 
+private nosave int standalone_command = 0;
+
+protected void no_pipeline() { standalone_command = 1; }
+nomask int query_no_pipeline() { return standalone_command; }
+
 protected
 void create()
 {

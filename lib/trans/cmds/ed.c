@@ -89,4 +89,5 @@ protected void create()
 {
    ::create();
    no_redirection();
+   no_pipeline();
 }
