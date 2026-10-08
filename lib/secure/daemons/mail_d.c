@@ -100,8 +100,8 @@ nomask string *process_mail_list(string *list)
    /* convert groups to real names, then clean the lists: remove dups,
       ensure lower-cased, ensure valid */
    list = GROUP_D->process_list(list);
-   list = clean_array(list);
    list = map(list, lower_case);
+   list = clean_array(list);
    list = filter(list, user_exists);
 
    return list;

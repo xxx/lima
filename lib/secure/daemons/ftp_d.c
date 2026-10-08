@@ -129,7 +129,7 @@ varargs private string find_flags(string incoming)
    parts = filter(parts, ( : $1[0] == '-' :));
    foreach (string part in parts)
       flags += explode(part, "");
-   clean_array(flags);
+   flags = clean_array(flags);
    return implode(flags -= ({"-"}), "");
 }
 

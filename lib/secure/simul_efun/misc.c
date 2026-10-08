@@ -54,34 +54,17 @@ string call_trace()
    return res;
 }
 
-// There should be an | operator for this.
-
 //: FUNCTION clean_array
-// returns a version of the passed array with duplicate
-// entries removed.  Eg, clean_array(({1,2,2}))  => ({1,2})
+// Remove duplicate values in first-occurrence order, leaving the input unchanged.
 mixed *clean_array(mixed *r)
 {
-   int i, n;
-
-   r = r & r; // sort.  sort_array() can't hack it.  And no, &= doesn't work.
-
-   n = sizeof(r) - 1;
-   while (i < n)
-   {
-      if (r[i] == r[i + 1])
-      {
-         int j = i + 1;
-
-         while (j < n && r[i] == r[j + 1])
-            j++;
-
-         r[i..j - 1] = ({});
-         n -= j - i;
-      }
-      i++;
-   }
-
-   return r;
+   mixed *result = ({});
+   if (!arrayp(r))
+      error("Bad argument 1 to clean_array");
+   foreach (mixed value in r)
+      if (member_array(value, result) == -1)
+         result += ({value});
+   return result;
 }
 
 //: FUNCTION rev_explode
