@@ -28,8 +28,12 @@ object query_link()
    return link;
 }
 
-void mudlib_setup(string name, string long, object l)
+void mudlib_setup(mixed args...)
 {
+   string name = sizeof(args) > 0 ? args[0] : nil;
+   string long = sizeof(args) > 1 ? args[1] : nil;
+   object l = sizeof(args) > 2 ? args[2] : nil;
+
    ::mudlib_setup();
    m_decay::mudlib_setup();
 
@@ -60,7 +64,7 @@ void mudlib_setup(string name, string long, object l)
    set_size(VERY_LARGE);
 #endif
 #ifdef USE_MASS
-   set_mass(VERY_LARGE);
+   set_mass(to_float(VERY_LARGE));
 #endif
    set_num_decays(3);
    set_decay_action("Insects gnaw at the withering corpse.\n");
@@ -74,7 +78,7 @@ string introduce_contents()
    return "On " + the_short() + " you see:\n";
 }
 
-mixed indirect_get_obj_from_obj(object ob1, object ob2)
+mixed indirect_get_obj_from_obj(object ob1, string wrd, object ob2)
 {
    return 1;
 }

@@ -49,7 +49,7 @@ mixed extinguish()
    return ::extinguish();
 }
 
-mixed light()
+varargs mixed light(object with)
 {
    mixed tmp = check_fuel();
    if (tmp != 1)
@@ -86,5 +86,5 @@ void mudlib_setup()
    set_decay_time(FUEL_DELAY);
    set_decay_action("$P $o flickers a little.");
    set_decay_auto_remove(1);
-   set_last_decay_action(( : burn_out:));
+   set_last_decay_action(burn_out);
 }

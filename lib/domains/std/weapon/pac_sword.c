@@ -4,10 +4,10 @@
 
 inherit WEAPON;
 
-#if BLOWS_STYLE == BLOWS_TYPES
+#if BLOW_STYLE == BLOW_TYPES
 #define evt_data(evt) evt.data[0]
-#define decrement_damage(evt) evt->data[sizeof(evt.data) - 1]--
-#else /* BLOWS_STYLE == BLOWS_SIMPLE */
+#define decrement_damage(evt) evt.data[sizeof(evt.data) - 1]--
+#else /* BLOW_STYLE == BLOW_SIMPLE */
 #define evt_data(evt) evt.data
 #define decrement_damage(evt) evt.data--
 #endif
@@ -23,11 +23,11 @@ class event_info source_modify_event(class event_info evt)
       return evt;
 
 #ifdef HEALTH_USES_LIMBS
-   opp_health = evt->target->query_health(evt.target_extra);
+   opp_health = evt.target->query_health(evt.target_extra);
 #else
-   opp_health = evt->target->query_health();
+   opp_health = evt.target->query_health();
 #endif
-   damage = evt->data[sizeof(evt.data) - 1];
+   damage = evt.data[sizeof(evt.data) - 1];
 
    if (opp_health <= damage)
    {
@@ -36,15 +36,15 @@ class event_info source_modify_event(class event_info evt)
       for (int i = 0; i <= excess; i++)
          decrement_damage(evt);
 #else  /* HEALTH_STYLE == HEALTH_LIMBS || HEALTH_STYLE == HEALTH_WOUNDS */
-      if (evt->target->is_vital_limb(evt.target_extra))
+      if (evt.target->is_vital_limb(evt.target_extra))
          for (int i = 0; i < excess; i++)
             decrement_damage(evt);
-      if (evt->target->is_system_limb(evt.target_extra))
+      if (evt.target->is_system_limb(evt.target_extra))
       {
-         system_limbs = evt->target->query_system_limbs() - ({evt.target_extra});
+         system_limbs = evt.target->query_system_limbs() - ({evt.target_extra});
          foreach (string s in system_limbs)
          {
-            if (evt->target->query_health(s) != -1)
+            if (evt.target->query_health(s) != -1)
                return evt;
          }
 

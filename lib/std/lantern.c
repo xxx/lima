@@ -1,6 +1,6 @@
 /* Do not remove the headers from this file! see /USAGE for more info. */
 
-inherit OBJ;
+inherit OBJ base_object;
 inherit M_GETTABLE;
 inherit LIGHT_OBJECT;
 inherit M_SWITCHABLE;
@@ -29,7 +29,7 @@ mixed direct_flip_obj_off(object ob)
 
 void mudlib_setup()
 {
-   object::mudlib_setup();
+   base_object::mudlib_setup();
    light_object::mudlib_setup();
    add_save(({"num_decays"}));
    set_id("lantern");
@@ -37,7 +37,7 @@ void mudlib_setup()
    set_size(MEDIUM);
 #endif
 #ifdef USE_MASS
-   set_mass(MEDIUM);
+   set_mass(to_float(MEDIUM));
 #endif
    set_long("It's an unremarkable lantern.");
    set_fuel(3600);

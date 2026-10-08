@@ -12,8 +12,8 @@ private
 void we_moved();
 
 string *current_blocks = ({});
-function hook = ( : handle_blocks:);
-function move_hook = ( : we_moved:);
+function hook = handle_blocks;
+function move_hook = we_moved;
 object env;
 mixed block_action;
 
@@ -90,6 +90,7 @@ void set_block_action(mixed ba)
 
 varargs void targetted_action();
 
+private
 mixed handle_blocks(string dir)
 {
    // sanity check

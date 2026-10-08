@@ -111,12 +111,12 @@ void remove_experience(int x)
    if (level != old_level)
    {
       tell(this_object(), "\n>>>>> %^B_RED%^LEVEL LOST!%^RESET%^ You're now just level " + level + "! <<<<<\n");
-      do_game_command("pout");
+      this_object()->do_game_command("pout");
    }
 #endif
 
    if (this_object()->query_link())
-      save_me();
+      this_object()->save_me();
 }
 
 void add_experience(int x)
@@ -132,12 +132,12 @@ void add_experience(int x)
    if (level != old_level)
    {
       tell(this_object(), "\n>>>>> %^B_GREEN%^LEVEL UP!%^RESET%^ You're now level " + level + "! <<<<<\n");
-      do_game_command("flex");
+      this_object()->do_game_command("flex");
    }
 #endif
 
    if (this_object()->query_link())
-      save_me();
+      this_object()->save_me();
 }
 
 int skill_xp_plus()

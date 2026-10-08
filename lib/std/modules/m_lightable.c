@@ -25,7 +25,7 @@ string light_with_msg = "$N $vlight a $o with a $o1.";
 private
 string extinguish_msg = "$N $vextinguish a $o.";
 private
-nosave function light_hook = ( : lighting_extra_short:);
+nosave function light_hook = (: this_object()->lighting_extra_short() :);
 private
 mixed source_filter;
 
@@ -102,7 +102,7 @@ varargs void do_light(object with)
       this_body()->simple_action(light_msg, this_object());
 }
 
-mixed direct_light_obj()
+mixed direct_light_obj(object ob)
 {
    if (is_lit())
       return "It is already lit.\n";
@@ -111,7 +111,7 @@ mixed direct_light_obj()
    return 1;
 }
 
-mixed direct_extinguish_obj()
+mixed direct_extinguish_obj(object ob)
 {
    if (!is_lit())
       return "It isn't lit.\n";

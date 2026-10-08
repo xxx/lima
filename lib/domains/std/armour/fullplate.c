@@ -13,5 +13,5 @@ void setup()
    set_resistances((["slashing":10, "bludgeon":10]));
    set_salvageable((["metal":100]));
    set_also_covers("left arm", "right arm", "left leg", "right leg");
-   set_mass(25);
+   set_mass(25.0);
 }

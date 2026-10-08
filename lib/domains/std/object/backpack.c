@@ -13,13 +13,13 @@ void setup()
    set_default_relation("in");
    set_objects(([]));
    set_max_capacity(3 * MEDIUM);
-   set_weight(2);
+   set_weight(2.0);
    set_slot("back");
 }
 
 mixed ob_state()
 {
-   return (string)container::ob_state() + (string)m_wearable::ob_state();
+   return to_string(container::ob_state()) + to_string(m_wearable::ob_state());
 }
 
 void remove()

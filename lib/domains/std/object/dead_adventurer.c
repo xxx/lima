@@ -5,7 +5,7 @@ inherit CORPSE;
 void setup()
 {
    ::mudlib_setup("adventurer"); // Sets the ID in the corpse.
-   set_proper_name(0);
+   set_proper_name(nil);
    set_adj("adventurer's", "brave");
    set_objects(
        (["/domains/std/weapon/pac_sword":1,
