@@ -9,6 +9,25 @@ object get_target();
 
 nosave int attacking = 0;
 
+#define COMBAT_PULSE_SECONDS 2
+
+private nosave int combat_timer;
+
+private void set_combat_pulse(int enabled)
+{
+   if (enabled)
+   {
+      if (!query_call_out(combat_timer))
+         combat_timer = call_out(heart_beat, COMBAT_PULSE_SECONDS, COMBAT_PULSE_SECONDS);
+   }
+   else
+   {
+      remove_call_out(combat_timer);
+      combat_timer = 0;
+   }
+}
+
+
 void set_attack_speed(int x)
 {
 }
@@ -22,7 +41,7 @@ void do_something()
 {
    if (!attacking)
    {
-      set_heart_beat(0);
+      set_combat_pulse(0);
       return;
    }
 
@@ -31,7 +50,11 @@ void do_something()
 
 void heart_beat()
 {
-   do_something();
+   object previous = set_this_player(this_object());
+   mixed failure = catch(do_something());
+   set_this_player(previous);
+   if (failure)
+      throw(failure);
 }
 
 /* Call this function to make us start a fight with "who".  It's
@@ -45,7 +68,7 @@ varargs void attacked_by(object who, int take_a_swing)
    if (!attacking)
    {
       attacking = 1;
-      set_heart_beat(1);
+      set_combat_pulse(1);
       if (take_a_swing)
          do_something();
    }
@@ -62,6 +85,7 @@ string continue_fight()
 void stop_attacking()
 {
    attacking = 0;
+   set_combat_pulse(0);
 }
 
 int is_attacking()

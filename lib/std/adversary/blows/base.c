@@ -13,7 +13,7 @@ nosave string *vulnerabilities = ({});
 varargs int hurt_us(int, string);
 varargs void attacked_by(object, int);
 string query_random_limb();
-void handle_message(string, object, object, string);
+void handle_message(mixed, object, object, string, int);
 string damage_message(int);
 void add_experience(int);
 object *query_targets();
@@ -78,7 +78,7 @@ class event_info modify_resistances(class event_info evt)
    {
       if (member_array(r, evt.data[0]) != -1)
       {
-         evt->data[sizeof(evt.data) - 1] = evt->data[sizeof(evt.data) - 1] / 2;
+         evt.data[sizeof(evt.data) - 1] = evt.data[sizeof(evt.data) - 1] / 2;
          return evt;
       }
    }
@@ -92,7 +92,7 @@ class event_info modify_vulnerabilities(class event_info evt)
       if (member_array(v, evt.data[0]) != -1)
       {
          //      TBUG(this_object() + " vulnerable to " + v + ".");
-         evt->data[sizeof(evt.data) - 1] = evt->data[sizeof(evt.data) - 1] * 2;
+         evt.data[sizeof(evt.data) - 1] = evt.data[sizeof(evt.data) - 1] * 2;
          return evt;
       }
    }
@@ -110,7 +110,8 @@ class event_info modify_our_event(class event_info evt)
    {
       object t = evt.target;
       evt = t->modify_resistances(evt);
-      evt = t->modify_vulnerabilities(evt);
+      if (evt)
+         evt = t->modify_vulnerabilities(evt);
    }
    return evt;
 }
@@ -126,7 +127,11 @@ class event_info effect_modify_event(class event_info evt)
    if (sizeof(effects))
       foreach (object ef in effects)
          if (ef)
+         {
             evt = ef->effect_modify_event(evt);
+            if (!evt)
+               return nil;
+         }
 
    return evt;
 }
@@ -154,7 +159,11 @@ class event_info armours_modify_event(class event_info evt)
    if (armours)
       foreach (object ob in armours)
          if (ob)
+         {
             evt = ob->sink_modify_event(evt);
+            if (!evt)
+               return nil;
+         }
    return evt;
 }
 
@@ -163,7 +172,11 @@ class event_info armours_modify_event(class event_info evt)
 class event_info modify_event(class event_info evt)
 {
    evt = effect_modify_event(evt);
+   if (!evt)
+      return nil;
    evt = health_modify_event(evt);
+   if (!evt)
+      return nil;
    evt = armours_modify_event(evt);
 
    return evt;
@@ -195,24 +208,24 @@ void handle_result(class event_info evt)
 
    // Debug combat events
    // TBUG(event_to_str(evt));
-   if (evt.target && evt->target->query_ghost())
+   if (evt.target && evt.target->query_ghost())
       return;
 
    if (stringp(evt.data))
    {
-      handle_message("!" + evt.data, evt.target, evt.weapon, evt.target_extra);
+      handle_message("!" + evt.data, evt.target, evt.weapon, evt.target_extra, 0);
 
       switch (evt.data)
       {
       case "fatal":
-         evt->target->kill_us();
+         evt.target->kill_us();
          break;
       case "disarm":
-         w = evt->target->query_weapon();
+         w = evt.target->query_weapon();
          disarm_weapon(w, evt.target);
          break;
       case "miss":
-         evt->target->do_damage_event(evt);
+         evt.target->do_damage_event(evt);
          break;
       }
    }
@@ -221,11 +234,11 @@ void handle_result(class event_info evt)
       int percent = event_damage(evt);
 
       // Do not message without a target or if the target is a ghost.
-      if (evt.target && !evt->target->query_ghost())
+      if (evt.target && !evt.target->query_ghost())
       {
          int do_stun = 0, stun_chance;
          // TBUG(event_to_str(evt));
-         percent = to_int(percent / (1.0 * evt->target->query_max_health(evt.target_extra)) * 100);
+         percent = to_int(percent / (1.0 * evt.target->query_max_health(evt.target_extra)) * 100);
          // TBUG("handle_message %" + percent + " Msg: " + damage_message(percent) + " Target: " + evt.target +
          //      " Weapon: " + evt.weapon + " Extra: " + evt.target_extra);
 
@@ -244,8 +257,8 @@ void handle_result(class event_info evt)
 
          handle_message(damage_message(percent), evt.target, evt.weapon, evt.target_extra, percent);
          if (do_stun)
-            evt->target->stun(evt.target_extra, stun_chance);
-         percent = evt->target->do_damage_event(evt);
+            evt.target->stun(evt.target_extra, stun_chance);
+         percent = evt.target->do_damage_event(evt);
       }
    }
 }
@@ -266,7 +279,7 @@ void handle_events()
       }
       if (queue[i].weapon)
       {
-         queue[i] = queue[i]->weapon->source_modify_event(queue[i]);
+         queue[i] = queue[i].weapon->source_modify_event(queue[i]);
          if (!queue[i])
          {
             i++;
@@ -274,7 +287,7 @@ void handle_events()
          }
       }
       if (queue[i].target)
-         queue[i] = queue[i]->target->modify_event(queue[i]);
+         queue[i] = queue[i].target->modify_event(queue[i]);
       if (!queue[i])
       {
          i++;
