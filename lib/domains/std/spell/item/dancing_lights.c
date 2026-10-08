@@ -5,17 +5,29 @@
  * around for a period of time.
  */
 
-inherit OBJ;         // This object exists and can move in the world.
+inherit OBJ base_object;         // This object exists and can move in the world.
 inherit M_COMPANION; // We need the dancing lights to be a companion and follow.
 inherit M_MESSAGES;  // We need this for targetted_action() messages.
 inherit M_STATEFUL;  // We need this for the state.
 
 int duration;
 
+void mudlib_setup()
+{
+   base_object::mudlib_setup();
+   m_companion::mudlib_setup();
+   m_stateful::mudlib_setup();
+}
+
+int query_level()
+{
+   return 0;
+}
+
 int state_update()
 {
    duration--;
-   if (!duration)
+   if (duration <= 0)
    {
       tell_from_inside(this_object(), "The lights flicker and fade away.");
       remove();

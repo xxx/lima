@@ -1,6 +1,7 @@
 /* Do not remove the headers from this file! see /USAGE for more info. */
 
 #include <spells.h>
+#include <move.h>
 
 #define DANCING_LIGHTS_OBJ "/domains/std/spell/item/dancing_lights"
 
@@ -22,12 +23,12 @@ void setup()
 
 void cast_spell(object ob, object reagent, int success)
 {
-   int duration = (spell_skill_rank(this_body(), "magic/evocation/dancing lights") + 2) * (1 + success);
+   object caster = this_body();
+   int duration = (spell_skill_rank(caster) + 2) * (1 + success);
    object dl;
 
-   // Only one dancing lights at a time.
-   // Call unique() to check if the object is unique to the caster.
-   if (!STATE_D->unique(DANCING_LIGHTS_OBJ, this_body()))
+   // Check live clones before delayed state registration.
+   if (sizeof(filter(children(DANCING_LIGHTS_OBJ), (: clonep($1) && $1->query_owner() == $(caster) :))))
    {
       // Should be safe to use write() as it goes to this_body().
       write("You fail to cast a second dancing lights at a time.");
@@ -36,10 +37,15 @@ void cast_spell(object ob, object reagent, int success)
 
    // Create the dancing lights object, it's unique to the caster.
    dl = clone_object (DANCING_LIGHTS_OBJ, duration);
-   this_body()->simple_action("$N $vsummon a swarm " + (success ? "of bright " : "") + "of dancing lights.");
-   dl->move(environment(this_body()));
-   dl->set_tamed_by(this_body());
-   dl->setup_follow(this_body());
-   dl->set_owner(this_body());
+   dl->set_tamed_by(caster);
+   dl->set_owner(caster);
    dl->no_chip();
+   if (dl->move(environment(caster)) != MOVE_OK)
+   {
+      dl->remove();
+      write("The dancing lights cannot appear here.\n");
+      return;
+   }
+   dl->setup_follow(caster);
+   caster->simple_action("$N $vsummon a swarm " + (success ? "of bright " : "") + "of dancing lights.");
 }

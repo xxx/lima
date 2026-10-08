@@ -18,6 +18,9 @@ string the_short();
 object master;
 string master_name;
 object chip;
+private nosave int follow_id;
+private nosave object follow_body;
+private nosave function move_hook;
 void start_fight(object);
 void failed_tame(object);
 mixed direct_tame_liv(object ob)
@@ -70,19 +73,23 @@ int skill_check(object body)
 
 void follow(object body)
 {
-   if (find_call_out("follow") == -1 && environment(this_object()) != environment(master->query_body()))
+   follow_id = 0;
+   if (!body || body != master || !chip)
+      return;
+   object destination = environment(body);
+   if (destination && environment(this_object()) != destination)
    {
-      this_object()->simple_action("$N $vleave following $o.", master->query_name());
-      this_object()->move(environment(master->query_body()));
-      this_object()->targetted_action("$N $vfollow $t.", master);
+      this_object()->simple_action("$N $vleave following $o.", body->query_name());
+      if (this_object()->move(destination) == MOVE_OK)
+         this_object()->targetted_action("$N $vfollow $t.", body);
    }
 }
 
 void call_out_follow(object body)
 {
    // The higher level, the slower.
-   if (find_call_out("follow") == -1 && chip)
-      call_out("follow", 1 + random(this_object()->query_level()), master);
+   if (body && body == master && chip && !query_call_out(follow_id))
+      follow_id = call_out(&follow(body), 1 + random(this_object()->query_level()));
 }
 
 void person_attacked_person(object attacker, object target)
@@ -90,16 +97,30 @@ void person_attacked_person(object attacker, object target)
    if (chip && chip->chip_type() == "combat")
    {
       if (master && attacker == master)
-         start_fight(target);
+         this_object()->start_fight(target);
       if (master && target == master)
-         start_fight(attacker);
+         this_object()->start_fight(attacker);
    }
+}
+
+void stop_follow()
+{
+   remove_call_out(follow_id);
+   follow_id = 0;
+   if (follow_body && move_hook)
+      follow_body->remove_hook("move", move_hook);
+   follow_body = nil;
+   move_hook = nil;
 }
 
 void setup_follow(object body)
 {
-   body->add_hook("move", ( : call_out_follow(master) :));
-   body->add_hook("move", ( : call_out_follow(master) :));
+   stop_follow();
+   if (!body)
+      return;
+   follow_body = body;
+   move_hook = &call_out_follow(body);
+   body->add_hook("move", move_hook);
 }
 
 int modify_name_by_chip()
@@ -346,10 +367,11 @@ void something_appeared(object ob)
    if (taming_resistance == -1)
       taming_resistance = this_object()->query_level() * RESISTANCE_PER_LEVEL;
    if (ob->is_pet_treat())
-      call_out("eat_snacks", random(2) + 1, ob);
+      call_out(&eat_snacks(ob), random(2) + 1);
 }
 
 void mudlib_setup()
 {
-   add_hook("object_arrived", ( : something_appeared:));
+   add_hook("object_arrived", something_appeared);
+   add_hook("remove", stop_follow);
 }
