@@ -44,7 +44,7 @@ string colour_truncate(string str, int len)
 // out of the width (typically screen width).
 string use_colour(string *cols, int position, int width)
 {
-   int col_index = floor(sizeof(cols) * ((0.0 + position) / (width || 1)));
+   int col_index = to_int(floor(sizeof(cols) * ((0.0 + position) / (width || 1))));
 
    col_index = clamp(col_index, 0, sizeof(cols) - 1);
    return "<" + cols[col_index] + ">";
@@ -114,7 +114,7 @@ varargs string colour_table(string *items, int width, int num_horiz)
    if (n < num_horiz)
       num_horiz = n;
 
-   lists = map(allocate(num_vert), ( : allocate($(num_horiz)) :));
+   lists = map(allocate(num_vert), ( : allocate($(num_horiz), "") :));
 
    for (i = 0; i < sizeof(items); i++)
    {

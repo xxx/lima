@@ -61,9 +61,9 @@ varargs void load_messages(string type, int batch)
    if (combat)
    {
       if (sizeof(mandatory_cmbt_msgs - keys(m)) != 0)
-         error("Missing combat message types in " + type + ": " + format_list(mandatory_cmbt_msgs - keys(m)));
+         error("Missing combat message types in " + type + ": " + format_list(mandatory_cmbt_msgs - keys(m), "and"));
       if (sizeof(keys(m) - mandatory_cmbt_msgs) != 0)
-         error("Unknown message types in " + type + ": " + format_list(keys(m) - mandatory_cmbt_msgs));
+         error("Unknown message types in " + type + ": " + format_list(keys(m) - mandatory_cmbt_msgs, "and"));
       messages[type] = m;
    }
    // Defeault messages for living
