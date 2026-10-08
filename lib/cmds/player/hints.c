@@ -54,7 +54,7 @@ void main(string arg)
    else if (arg && present(arg, this_body()))
    {
       object tmp = present("hint_token", this_body());
-      if (get_user_variable("hints") == 0)
+      if (!get_user_variable("hints"))
          main("on");
       if (!tmp->query_hint())
       {
@@ -77,4 +77,9 @@ void player_menu_entry(string str)
    bare_init();
    main(str);
    done_outputing();
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

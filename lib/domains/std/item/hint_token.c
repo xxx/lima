@@ -4,6 +4,8 @@ inherit OBJ;
 inherit M_GETTABLE;
 inherit M_GRAMMAR;
 
+private nosave int hint_timer;
+
 void show_hints(mixed hints)
 {
    int w = this_user()->query_screen_width() - 5;
@@ -46,15 +48,15 @@ void hook_func()
       mixed hint = item->query_hint(environment()->query_level());
       if (arrayp(hint))
       {
-         map(hint, ( : punctuate:));
+         map(hint, punctuate);
          hints += hint;
       }
       else
          hints += ({punctuate(hint)});
    }
    hints = filter(hints, ( : $1 && strlen($1) > 1 :));
-   if (sizeof(hints) && find_call_out("show_hints") == -1)
-      call_out("show_hints", 0, hints);
+   if (sizeof(hints) && !query_call_out(hint_timer))
+      hint_timer = call_out(&show_hints(hints), 0);
 }
 
 mixed drop()
@@ -82,7 +84,7 @@ void mudlib_setup()
             "item you "
             "carry for hints.\n\n"
             "You can use 'hints on' to get a new one should you lose this one.");
-   this_body()->add_hook("move", ( : hook_func:));
+   this_body()->add_hook("move", hook_func);
 }
 
 string query_hint()
