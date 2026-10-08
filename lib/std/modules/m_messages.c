@@ -169,7 +169,7 @@ mixed *handle_obs(mixed *obs, string res, mapping has)
             else
                ret += ({SHORT(ob)});
          }
-      has[obs]++;
+      has[obs] = (has[obs] || 0) + 1;
    }
    return ({res, ret});
 }
@@ -204,8 +204,8 @@ mixed *handle_obs(mixed *obs, string res, mapping has)
       }
       else
          bit = SHORT(ob);
-      has[ob]++;
-      has[bit]++;
+      has[ob] = (has[ob] || 0) + 1;
+      has[bit] = (has[bit] || 0) + 1;
    }
    return ({res, bit});
 }
@@ -275,7 +275,7 @@ varargs string compose_message(object forwhom, string msg, object *who, mixed *o
                tmp = handle_obs(ob, res, has);
                res = tmp[0];
                ob = tmp[1];
-               bit = format_list(ob);
+               bit = format_list(ob, nil);
             }
             else
             {
@@ -286,7 +286,7 @@ varargs string compose_message(object forwhom, string msg, object *who, mixed *o
                   ob[z] = tmp[1];
                }
                res = tmp[0];
-               bit = format_list(ob);
+               bit = format_list(ob, nil);
             }
          }
          else
@@ -336,7 +336,7 @@ varargs string compose_message(object forwhom, string msg, object *who, mixed *o
                if (who[num] == forwhom)
                {
                   bit = "you";
-                  has[who[num]]++;
+                  has[who[num]] = (has[who[num]] || 0) + 1;
                   break;
                }
                if (has[who[num]])
@@ -347,12 +347,12 @@ varargs string compose_message(object forwhom, string msg, object *who, mixed *o
                      bit = who[num]->query_subjective();
                   break;
                }
-               has[who[num]]++;
+               has[who[num]] = (has[who[num]] || 0) + 1;
                bit = objectp(who[num]) ? who[num]->a_short() : "someone";
                break;
             }
          }
-         has[who[num]]++;
+         has[who[num]] = (has[who[num]] || 0) + 1;
          bit = who[num]->short();
          break;
       case 'R':
@@ -395,7 +395,7 @@ varargs string compose_message(object forwhom, string msg, object *who, mixed *o
             break;
          }
          bit = who[num]->query_named_possessive();
-         has[who[num]]++;
+         has[who[num]] = (has[who[num]] || 0) + 1;
          break;
       }
       // hack to prevent errors.
@@ -431,7 +431,7 @@ varargs string *action(object *who, mixed msg, mixed *obs...)
    res = allocate(sizeof(who) + 1);
    for (i = 0; i < sizeof(who); i++)
       res[i] = compose_message(who[i], msg, who, obs...);
-   res[sizeof(who)] = compose_message(0, msg, who, obs...);
+   res[sizeof(who)] = compose_message(nil, msg, who, obs...);
    return res;
 }
 
@@ -452,7 +452,7 @@ void inform(object *who, string *msgs, mixed others)
    {
       if (done[who[i]])
          continue;
-      done[who[i]]++;
+      done[who[i]] = (done[who[i]] || 0) + 1;
       tell(who[i], msgs[i], MSG_INDENT | 128);
    }
    if (arrayp(others))
@@ -477,7 +477,7 @@ varargs void filtered_inform(object *who, string *msgs, mixed others, function f
    {
       if (done[who[i]])
          continue;
-      done[who[i]]++;
+      done[who[i]] = (done[who[i]] || 0) + 1;
       if (evaluate(filter, who[i], extra))
          tell(who[i], msgs[i], MSG_INDENT);
    }
@@ -514,7 +514,7 @@ varargs void filtered_simple_action(mixed msg, function filter, mixed extra, mix
       msg = msg[random(sizeof(msg))];
 
    us = compose_message(this_object(), msg, who, obs...);
-   others = compose_message(0, msg, who, obs...);
+   others = compose_message(nil, msg, who, obs...);
 
    if (evaluate(filter, this_object(), extra))
    {
@@ -556,7 +556,7 @@ varargs void simple_action(mixed msg, mixed *obs...)
       msg = msg[random(sizeof(msg))];
 
    us = compose_message(this_object(), msg, who, obs...);
-   others = compose_message(0, msg, who, obs...);
+   others = compose_message(nil, msg, who, obs...);
 
    tell(this_object(), us, MSG_INDENT);
    tell_from_outside(all_inventory(this_object()), others, MSG_INDENT);
@@ -591,7 +591,7 @@ varargs void other_action(mixed msg, mixed *obs...)
    who = ({this_object()});
    if (arrayp(msg))
       msg = msg[random(sizeof(msg))];
-   others = compose_message(0, msg, who, obs...);
+   others = compose_message(nil, msg, who, obs...);
    tell_from_outside(all_inventory(this_object()), others, MSG_INDENT);
    tell_environment(this_object(), others, MSG_INDENT, who);
 }
@@ -611,7 +611,7 @@ varargs void targetted_action(mixed msg, object target, mixed *obs...)
       msg = msg[random(sizeof(msg))];
    us = compose_message(this_object(), msg, who, obs...);
    them = compose_message(target, msg, who, obs...);
-   others = compose_message(0, msg, who, obs...);
+   others = compose_message(nil, msg, who, obs...);
    tell(this_object(), us, MSG_INDENT);
    tell(target, them, MSG_INDENT);
    tell_from_outside(all_inventory(this_object()), others, MSG_INDENT);
@@ -634,7 +634,7 @@ varargs void targetted_other_action(mixed msg, object target, mixed *obs...)
    if (arrayp(msg))
       msg = msg[random(sizeof(msg))];
    them = compose_message(target, msg, who, obs...);
-   others = compose_message(0, msg, who, obs...);
+   others = compose_message(nil, msg, who, obs...);
    tell(target, them, MSG_INDENT);
    tell_from_outside(all_inventory(this_object()), others, MSG_INDENT);
    tell_from_outside(all_inventory(target), others, MSG_INDENT);
