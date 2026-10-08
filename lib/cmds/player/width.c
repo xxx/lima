@@ -37,7 +37,7 @@ void main(mixed width)
       return;
    }
 
-   width = to_int(width);
+   width = to_int(width || 0);
    if (!intp(width))
    {
       out("Must set screen width to an integer or 'auto'.\n");
@@ -65,4 +65,8 @@ void player_menu_entry(string str)
    bare_init();
    main(str);
    done_outputing();
+}
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

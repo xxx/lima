@@ -53,6 +53,8 @@ void set_variable(string name, mixed value)
    case "hints":
    case "mode":
    case "emoji":
+   case "simplify":
+   case "metric":
    case "frames":
    case "frame_colour":
    case "status":
@@ -74,6 +76,8 @@ void unset_variable(string name, mixed value)
    case "hints":
    case "mode":
    case "emoji":
+   case "simplify":
+   case "metric":
    case "frames":
    case "frame_colour":
    case "status":

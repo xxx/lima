@@ -140,6 +140,8 @@ void remove_colour(string which)
 void do_receive(string msg, int msg_type)
 {
    string *lines = explode(msg, "\n");
+   if (query_screen_width() < 0)
+      msg_type |= NO_WRAP;
 
    // Force message type to be NO_WRAP and NO_ANSI if we simplify (use a screen reader).
    if (query_shell_ob() && query_shell_ob()->get_variable("simplify") == 1)
