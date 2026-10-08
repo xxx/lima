@@ -19,15 +19,19 @@ void gmcp_enable()
 int uses_gmcp()
 {
    TBUG("uses_gmcp?");
-   return has_gmcp();
+   mapping connection = query_connection(this_object());
+   return connection && connection["gmcp"];
 }
 
 void gmcp_message(string s)
 {
-   if (!s)
+   if (!s || s == "")
       return;
    if (uses_gmcp())
    {
-      send_gmcp(s);
+      int split = strindex(s, " ");
+      if (split == 0)
+         return;
+      send_gmcp(this_object(), split < 0 ? s : s[0..split-1], split < 0 ? "" : s[split+1..]);
    }
 }

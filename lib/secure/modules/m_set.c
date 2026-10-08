@@ -21,7 +21,7 @@ int valid_set(string set)
       return 1;
    foreach (string part in parts)
    {
-      if (sscanf("%d-%d%s", part1, part2, rest) != 2)
+      if (sscanf(part, "%d-%d%s", part1, part2, rest) != 2)
          return 0;
    }
    return 1;

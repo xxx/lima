@@ -118,7 +118,7 @@ nomask string *subscribed_groups()
 {
    string *groups;
    if (!sizeof(news_data))
-      return 0;
+      return nil;
    groups = sort_array(keys(news_data), 1);
    return filter(groups, ( : check_subscribed:));
 }
@@ -128,7 +128,7 @@ nomask string *subscribed_groups()
 nomask string *registered_groups()
 {
    if (!sizeof(news_data))
-      return 0;
+      return nil;
    return keys(news_data);
 }
 

@@ -93,7 +93,7 @@ void update_translations()
    translations = deep_copy(translations);
    foreach (string code, string value in colours)
    {
-      string *parts = map(explode(value, ","), ( : upper_case:));
+      string *parts = map(explode(value, ","), upper_case);
       string val = "";
 
       foreach (string item in parts)
@@ -112,7 +112,7 @@ void set_colour(string which, string what)
    save_me();
 }
 
-void query_colour(string which)
+mixed query_colour(string which)
 {
    return colours[which];
 }
@@ -156,7 +156,7 @@ void do_receive(string msg, int msg_type)
       }
       else
       {
-         lines = map(lines, ( : wrap:), query_screen_width());
+         lines = map(lines, wrap, query_screen_width());
       }
    }
    else
@@ -184,7 +184,7 @@ void do_receive(string msg, int msg_type)
 
    if (debug)
       msg = "[Debug: " + msg_type + "]\n" + msg;
-   receive(msg);
+   write_socket(msg);
 }
 
 //: FUNCTION receive_message
@@ -199,14 +199,14 @@ void receive_message(string type, string message)
 void do_receive(string msg, int msg_type) {
     if (msg_type & NO_ANSI) {
     if (msg_type & NO_WRAP)
-        receive(msg);
+        write_socket(msg);
     else
-        receive(wrap(msg, query_screen_width()));
+        write_socket(wrap(msg, query_screen_width()));
     } else {
     int indent = (msg_type & MSG_INDENT) ? 4 : 0;
     int wrap = (msg_type & NO_WRAP) ? 0 : query_screen_width();
 
-    receive(terminal_colour(msg + "%^RESET%^",
+    write_socket(terminal_colour(msg + "%^RESET%^",
         translations, wrap, indent));
     }
 }

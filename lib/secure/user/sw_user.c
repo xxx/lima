@@ -76,7 +76,7 @@ nomask int do_su(string old_userid, string new_userid, string new_body)
    if (body)
       body->add_id_no_plural(body->query_race());
 #endif
-   receive(sprintf("Done. You are now %s.\n", new_name));
+   write_socket(sprintf("Done. You are now %s.\n", new_name));
 
    /*
     * Run through the rest of the initialization routine for users
@@ -90,7 +90,7 @@ nomask void confirm_valid_su(string old_userid, string new_userid, string new_bo
    string pwd;
 
    /* new_userid should exist and therefore the return value should be ok */
-   pwd = unguarded(1, ( : call_other, USER_D, "query_variable", new_userid, ({"password"}) :))[0];
+   pwd = unguarded(1, &call_other(USER_D, "query_variable", new_userid, ({"password"})))[0];
 
    if (crypt(arg, pwd) != pwd)
    {
@@ -137,5 +137,5 @@ nomask void switch_user(string str, string new_body)
 
    printf("switching to: '%s'\n", new_userid);
 
-   modal_simple(( : confirm_valid_su, old_userid, new_userid, new_body:), "Password: ", 1);
+   modal_simple(&confirm_valid_su(old_userid, new_userid, new_body), "Password: ", 1);
 }

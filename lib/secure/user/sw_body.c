@@ -108,7 +108,7 @@ private
 nomask void incarnate(string name, int is_new, string new_fname)
 {
    string body_fname = query_fname(name);
-   if (strlen(new_fname))
+   if (new_fname && strlen(new_fname))
       body_fname = new_fname;
    body = clone_object (body_fname, name);
    master()->refresh_parse_info();
@@ -169,7 +169,7 @@ nomask void rcv_try_to_boot(object who, string answer)
    }
 
    write("please type 'y' or 'n'  >");
-   modal_simple(( : rcv_try_to_boot, who:), 0, 0, 1);
+   modal_simple(&rcv_try_to_boot(who), 0, 0, 1);
 }
 
 protected
@@ -180,10 +180,11 @@ nomask void sw_body_handle_existing_logon(string name, int enter_now)
    if (!sizeof(members))
    {
       TBUG("No admin found, emergency admin procedure fired.");
-      return sw_body_handle_new_logon();
+      sw_body_handle_new_logon(name, nil);
+      return;
    }
 
-   remove_call_out(); /* all call outs */
+   foreach (mixed *timer : query_call_outs()) remove_call_out(timer[4]); /* all call outs */
                       // TBUG("sw_body_handle_existing_logon("+identify(enter_now)+")");
 
    if (!enter_now)
@@ -225,7 +226,7 @@ nomask void sw_body_handle_existing_logon(string name, int enter_now)
          else
          {
             write("\nYou are already logged in!\nThrow yourself off?\n");
-            modal_simple(( : rcv_try_to_boot, the_user:), 0, 0, 1);
+            modal_simple(&rcv_try_to_boot(the_user), 0, 0, 1);
             return;
          }
       }
@@ -237,7 +238,7 @@ nomask void sw_body_handle_existing_logon(string name, int enter_now)
    report_login_failures();
    BIRTHDAY_D->report();
 
-   incarnate(name, 0, 0);
+   incarnate(name, 0, nil);
 }
 
 /* when a user reconnects, this is used to steal the body back */
@@ -247,7 +248,7 @@ nomask void steal_body()
    if (base_name(previous_object()) != USER_OB)
       error("illegal attempt to steal a body\n");
 
-   body = 0;
+   body = nil;
    remove();
 }
 
@@ -259,7 +260,7 @@ protected
 nomask void sw_body_handle_new_logon(string name, string fname)
 {
    // TBUG("sw_body_handle_new_logon() stack: "+get_stack());
-   remove_call_out(); /* all call outs */
+   foreach (mixed *timer : query_call_outs()) remove_call_out(timer[4]); /* all call outs */
    // TBUG("1");
 
 #ifdef AUTO_WIZ

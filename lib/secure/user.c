@@ -64,7 +64,7 @@ void remove()
    if (body)
       destruct(body);
 
-   remove_call_out();
+   foreach (mixed *timer : query_call_outs()) remove_call_out(timer[4]);
    stop_shell();
    destruct();
 }
@@ -83,13 +83,13 @@ nomask void save_me()
 {
    if (strlen(userid) > 5 && userid[0..4] == "guest")
       return;
-   unguarded(1, ( : save_object, LINK_PATH(userid) :));
+   unguarded(1, &save_object(LINK_PATH(userid)));
 }
 
 protected
 nomask void restore_me(string some_userid, int preserve_vars)
 {
-   unguarded(1, ( : restore_object, LINK_PATH(some_userid), preserve_vars:));
+   unguarded(1, &restore_object(LINK_PATH(some_userid), preserve_vars));
 }
 
 private
@@ -105,7 +105,7 @@ nomask void net_dead()
    if (body)
    {
       body->net_dead();
-      call_out(( : remove:), 300);
+      call_out(remove, 300);
    }
    else
    {
@@ -113,7 +113,3 @@ nomask void net_dead()
    }
 }
 
-void send_telnet_nop()
-{
-   telnet_nop();
-}

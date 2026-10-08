@@ -26,6 +26,7 @@ mixed unguarded(mixed priv, function fp);
 void initialize_channels();
 void display_didlog();
 void start_shell(int init_only);
+void stop_shell();
 
 /* Login states */
 #define TIMEOUT -1
@@ -36,7 +37,6 @@ void start_shell(int init_only);
 #define CONFIRM_PASSWORD 4
 #define GET_PASSWORD 10
 
-#define OLD_PASSWD_COMPAT
 
 private
 string password;
@@ -44,8 +44,7 @@ string password;
 private
 nomask void get_lost()
 {
-   remove_call_out();
-   modal_func(( : 1 :), ""); /* ignore all input */
+   foreach (mixed *timer : query_call_outs()) remove_call_out(timer[4]);
    destruct();
 }
 
@@ -53,24 +52,19 @@ nomask void get_lost()
 ** Name and password processing
 */
 
+private
+nomask int password_supported()
+{
+   return stringp(password) && sizeof(regexp(({password}),
+      "^\\$6\\$(rounds=[1-9][0-9]*\\$)?[^$]{1,16}\\$[./0-9A-Za-z]{86}$"));
+}
+
 nomask int matches_password(string str)
 {
-#ifdef OLD_PASSWD_COMPAT
-   if (password[0..2] == "$6$") // 36 == $
-#endif
-      return crypt(str, password) == password;
-#ifdef OLD_PASSWD_COMPAT
-   else
-   {
-      if (oldcrypt(str, password) == password)
-      {
-         write("(Upgrading your password hash to SHA)\n");
-         password = crypt(str, 0);
-         return 1;
-      }
-   }
-   return 0;
-#endif
+   string encoded;
+   if (!password_supported() || catch(encoded = crypt(str, password)))
+      return 0;
+   return encoded == password;
 }
 
 nomask void set_password(string str)
@@ -132,7 +126,7 @@ nomask int valid_name(string str)
    ** Note that this regex matches the restriction imposed by the
    ** SECURE_D.  Also note the name is in lower case right now.
    */
-   if (!regexp(str, "^[a-z]+$"))
+   if (!sizeof(regexp(({str}), "^[a-z]+$")))
    {
       write("Sorry, that name is forbidden by the implementors.  Please\n"
             "choose a name containing only letters.\n");
@@ -142,7 +136,7 @@ nomask int valid_name(string str)
    return 1;
 }
 
-private
+protected
 nomask void initialize_user()
 {
    initialize_channels();
@@ -154,7 +148,7 @@ void enter_game(string name, string fname)
    USER_D->register_body(name, name);
    if (!arrayp(LAST_LOGIN_D->query_last(name)))
    {
-      sw_body_handle_new_logon(name);
+      sw_body_handle_new_logon(name, fname);
       return;
    }
 
@@ -222,6 +216,36 @@ nomask void modify_guest_userid()
    }
 }
 
+private
+nomask void start_authenticated_session()
+{
+   string failure;
+#ifdef USE_USER_MENU
+   object menu;
+   failure = catch {
+      menu = clone_object(USER_MENU);
+      start_shell(1);
+      modal_pop();
+      menu->start_menu();
+   };
+   if (failure && menu)
+      catch(unguarded(1, &destruct(menu)));
+#else
+   failure = catch {
+      modal_pop();
+      initialize_user();
+      sw_body_handle_existing_logon(query_userid(), 0);
+   };
+#endif
+   if (failure)
+   {
+      debug_message("Login handoff failed: " + failure);
+      write_socket("Login is temporarily unavailable. Please try again later.\n");
+      catch(stop_shell());
+      get_lost();
+   }
+}
+
 /*
  * Handles most of Phase 0 of the login process.  At this point, we have
  * neither a shell nor a body.
@@ -254,7 +278,7 @@ nomask varargs void login_handle_logon(int state, mixed extra, string arg)
 
    case INITIAL_PROMPT:
       /* setup timeout */
-      call_out(( : login_handle_logon, TIMEOUT:), LOGIN_NAME_WAIT);
+      call_out(&login_handle_logon(TIMEOUT), LOGIN_NAME_WAIT);
 
       write("");
 #ifdef WELCOME_DIR
@@ -282,7 +306,7 @@ nomask varargs void login_handle_logon(int state, mixed extra, string arg)
 #else
       write("Hello, Player!\n");
 #endif
-      modal_push(( : login_handle_logon, NAME_PROMPT, 0 :), LOGIN_PROMPT);
+      modal_push(&login_handle_logon(NAME_PROMPT, 0), LOGIN_PROMPT);
 
       /* do this to kick off the modal system and print a prompt */
       modal_recapture();
@@ -301,9 +325,9 @@ nomask varargs void login_handle_logon(int state, mixed extra, string arg)
          return;
       if (!valid_name(arg))
          return;
-      if (arg != "guest" && unguarded(1, ( : file_size, LINK_PATH(arg) + __SAVE_EXTENSION__:)) <= 0)
+      if (arg != "guest" && unguarded(1, &file_size(LINK_PATH(arg) + __SAVE_EXTENSION__)) <= 0)
       {
-         modal_func(( : login_handle_logon, CONFIRM_NEW_NAME, arg:), "Is '" + capitalize(arg) + "' correct? ");
+         modal_func(&login_handle_logon(CONFIRM_NEW_NAME, arg), "Is '" + capitalize(arg) + "' correct? ");
          return;
       }
 
@@ -327,13 +351,20 @@ nomask varargs void login_handle_logon(int state, mixed extra, string arg)
          // No guests from this point on
          restore_me(arg, 0);
 
-      modal_func(( : login_handle_logon, GET_PASSWORD, 0 :), "Password: ", 1);
+      if (!password_supported())
+      {
+         write_socket("This account needs a password reset. Please contact an administrator.\n");
+         get_lost();
+         return;
+      }
+
+      modal_func(&login_handle_logon(GET_PASSWORD, 0), "Password: ", 1);
 
       /*
       ** Adjust the time we'll wait for the user
       */
-      remove_call_out(); /* all call outs */
-      call_out(( : login_handle_logon, -1 :), LOGIN_PASSWORD_WAIT);
+      foreach (mixed *timer : query_call_outs()) remove_call_out(timer[4]); /* all call outs */
+      call_out(&login_handle_logon(-1), LOGIN_PASSWORD_WAIT);
       break;
 
       /************ IS 'NAME' CORRECT? ************/
@@ -344,9 +375,7 @@ nomask varargs void login_handle_logon(int state, mixed extra, string arg)
       case "n":
       case "no":
       case "nay":
-         modal_func((
-                        : login_handle_logon, NAME_PROMPT, 0
-                        :),
+         modal_func(&login_handle_logon(NAME_PROMPT, 0),
                     "Please enter your name (preferably correctly this time): ");
          break;
 
@@ -379,7 +408,7 @@ nomask varargs void login_handle_logon(int state, mixed extra, string arg)
 
          write("\nA new player in our midst!\n");
 
-         modal_func(( : login_handle_logon, NEW_PASSWORD, 0 :), "Please enter your password: ", 1);
+         modal_func(&login_handle_logon(NEW_PASSWORD, 0), "Please enter your password: ", 1);
          break;
 
       case "maybe":
@@ -405,7 +434,7 @@ nomask varargs void login_handle_logon(int state, mixed extra, string arg)
 
       write("\n"); /* needed after a no-echo input */
 
-      modal_func(( : login_handle_logon, CONFIRM_PASSWORD, crypt(arg, 0) :), "Again to confirm: ", 1);
+      modal_func(&login_handle_logon(CONFIRM_PASSWORD, crypt(arg, 0)), "Again to confirm: ", 1);
       break;
 
       /************ CONFIRM PASSWORD *************/
@@ -414,7 +443,7 @@ nomask varargs void login_handle_logon(int state, mixed extra, string arg)
       {
          write("\nSocks don't need to, but passwords have to match.\n");
 
-         modal_func(( : login_handle_logon, NEW_PASSWORD, 0 :), "Password: ", 1);
+         modal_func(&login_handle_logon(NEW_PASSWORD, 0), "Password: ", 1);
          return;
       }
 
@@ -436,19 +465,8 @@ nomask varargs void login_handle_logon(int state, mixed extra, string arg)
    case GET_PASSWORD:
       if (matches_password(arg))
       {
-         /*
-         ** Done with the login sequence.  Pop our input handler now.
-         */
-         modal_pop();
-#ifdef USE_USER_MENU
-         start_shell(1);
-         clone_object (USER_MENU)->start_menu();
+         start_authenticated_session();
          return;
-#else
-         initialize_user();
-         sw_body_handle_existing_logon(query_userid(), 0);
-         return;
-#endif
       }
 
       register_failure(query_ip_name(this_object()));
@@ -461,11 +479,11 @@ nomask varargs void login_handle_logon(int state, mixed extra, string arg)
       }
 
       write("\nHmmm.....\nI'll give you another chance.\n");
-      modal_func(( : login_handle_logon, GET_PASSWORD, extra + 1 :), "Password: ", 1);
+      modal_func(&login_handle_logon(GET_PASSWORD, extra + 1), "Password: ", 1);
       break;
 
    case TIMEOUT: /* The timer has expired */
-      write("\nSorry, you've taken too long.\n");
+      write_socket("\nSorry, you've taken too long.\n");
       get_lost();
       break;
    }
@@ -477,7 +495,8 @@ nomask varargs void login_handle_logon(int state, mixed extra, string arg)
 ** Invoked by the driver to set up the object for logging in
 */
 private
-nomask void logon()
+nomask int logon(string remote_ip, int remote_port)
 {
    login_handle_logon(INITIAL_PROMPT, 0);
+   return 1;
 }

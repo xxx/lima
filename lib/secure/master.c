@@ -81,7 +81,7 @@ void debug_connections(object ob)
 }
 #endif
 
-object connect(int port)
+object connect(string remote_ip, int remote_port)
 {
    object ob;
    string ret;

@@ -64,7 +64,7 @@ void unbanish_name(string name)
    if (!check_privilege("Mudlib:daemons"))
       return;
 
-   bad_names = filter(bad_names, ( : ((class banish_data)$1)->item != $(name) :));
+   bad_names = filter(bad_names, ( : ((class banish_data)$1).item != $(name) :));
    save_me();
 }
 
@@ -90,14 +90,14 @@ void unbanish_site(string site)
 {
    if (!check_privilege("Mudlib:daemons"))
       return;
-   bad_sites = filter(bad_sites, ( : ((class banish_data)$1)->item != $(site) :));
+   bad_sites = filter(bad_sites, ( : ((class banish_data)$1).item != $(site) :));
    save_me();
 }
 
 int check_name(string name)
 {
    // return non-zero if banished
-   return sizeof(filter(bad_names, ( : regexp($(name), ((class banish_data)$1)->item) :)));
+   return sizeof(filter(bad_names, ( : sizeof(regexp(({ $(name) }), ((class banish_data)$1).item)) :)));
 }
 
 varargs int check_site(string *check)
@@ -107,7 +107,7 @@ varargs int check_site(string *check)
       check = ({query_ip_number(previous_object()), lower_case(query_ip_name(previous_object()))});
 
    // return non-zero if banished
-   return sizeof(filter(bad_sites, ( : sizeof(regexp($(check), translate(((class banish_data)$1)->item))) :)));
+   return sizeof(filter(bad_sites, ( : sizeof(regexp($(check), translate(((class banish_data)$1).item))) :)));
 }
 
 void add_registered(string who)
