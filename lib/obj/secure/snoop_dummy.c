@@ -22,7 +22,7 @@ object *get_snoopers()
 {
    if (previous_object() != find_object(SNOOP_D))
    {
-      return;
+      return nil;
    }
    return snoopers;
 }
@@ -49,7 +49,7 @@ void remove_snooper(object snooper)
    }
 }
 
-void receive_snoop(string s)
+void receive_snoop(string s, object target, string direction)
 {
    if (!strlen(s))
       return;

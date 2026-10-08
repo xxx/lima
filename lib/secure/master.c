@@ -722,3 +722,9 @@ string author_file(string file)
    else
       return "mudlib";
 }
+int valid_snoop(object caller, object observer, object target, string operation, string program)
+{
+   return operation == "start"
+      && caller == find_object("/secure/simul_efun")
+      && program == "/secure/simul_efun/overrides.c";
+}
