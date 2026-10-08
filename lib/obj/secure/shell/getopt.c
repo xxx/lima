@@ -73,147 +73,62 @@ mixed getopt(mixed args, string options)
    return ({res, args});
 }
 
-// Got the idea for this one from python,
-// but unlike getopt, didn't pirate the implimentation =)
-//
+private string argument_span(string text, int start, int end)
+{
+   return start < end ? text[start..end - 1] : "";
+}
 
 //: FUNCTION argument_explode
-// assumes the arg passed is the argument to some unix-like
-// command where ares are space seperated unless enclosed in non-escaped
-// quotes.
-// Returns an array of the arguments. and an *of implode info
-
-mixed *argument_explode(string s)
+// Returns tokens and the exact spacing before, between and after them.
+mixed *argument_explode(string text)
 {
-   string *result = ({});
-   string *implode_info = ({});
-   int i, l;
-   int waiting_for;
-   int end_of_last_word = -1;
-   int beginning_of_word = 0;
+   string *tokens = ({});
+   string *spacing = ({});
+   int i = 0, end = 0, length = strlen(text);
 
-   l = strlen(s);
-   for (i = 0; i < l; i++)
+   while (i < length)
    {
-      switch (s[i])
-      {
-      case '\\':
-         // This is because all \\'s aren't converted to \ here.
-         if (i + 1 != l && s[i + 1] == '\\')
-            break;
+      int start, quote;
+      while (i < length && text[i] == ' ')
          i++;
+      if (i == length)
          break;
-      case '`':
-      case '"':
-         if (!waiting_for)
-         {
-            waiting_for = s[i];
-            if (beginning_of_word != i)
-            {
-               implode_info += ({s[end_of_last_word + 1..beginning_of_word - 1]});
-               end_of_last_word = i - 1;
-               result += ({s[beginning_of_word..end_of_last_word]});
-            }
-            beginning_of_word = i;
-            break;
-         }
-         if (waiting_for != s[i])
-            continue;
-         result += ({s[beginning_of_word..i]});
-         implode_info += ({s[(end_of_last_word + 1)..(beginning_of_word - 1)]});
-         end_of_last_word = i;
-         beginning_of_word = i + 1;
-         waiting_for = 0;
-         break;
-      case '|':
-         if (waiting_for)
-            break;
-         if (beginning_of_word != i)
-         {
-            result += ({s[beginning_of_word..i - 1], "|"});
-            implode_info += ({s[end_of_last_word + 1..beginning_of_word - 1], ""});
-            end_of_last_word = i;
-            beginning_of_word = i + 1;
-            break;
-         }
-         implode_info += ({s[end_of_last_word + 1..beginning_of_word - 1]});
-         result += ({"|"});
-         beginning_of_word = i + 1;
-         end_of_last_word = i;
-         break;
-      case '<':
-         if (waiting_for)
-            break;
-         if (beginning_of_word != i)
-         {
-            result += ({s[beginning_of_word..i - 1], "<"});
-            implode_info += ({s[end_of_last_word + 1..beginning_of_word - 1], ""});
-            end_of_last_word = i;
-            beginning_of_word = i + 1;
-            break;
-         }
-         result += ({"<"});
-         implode_info += ({s[end_of_last_word + 1..beginning_of_word - 1]});
-         end_of_last_word = i;
-         beginning_of_word = i + 1;
-         break;
-      case '>':
-         if (waiting_for)
-            break;
-         if (beginning_of_word != i)
-         {
-            implode_info += ({s[end_of_last_word + 1..beginning_of_word - 1]});
-            result += ({s[beginning_of_word..i - 1]});
-            beginning_of_word = i + 1;
-            end_of_last_word = i;
-         }
-         if (s[i + 1] == '>')
-         {
-            // Skip the next >
+      start = i;
+      if (text[i] == '|' || text[i] == '<' || text[i] == '>')
+      {
+         if (text[i] == '>' && i + 1 < length && text[i + 1] == '>')
             i++;
-            implode_info += ({s[end_of_last_word + 1..beginning_of_word - 1]});
-            end_of_last_word = i;
-            beginning_of_word = i + 1;
-            result += ({">>"});
-            break;
-         }
-         else
-         {
-            implode_info += ({s[end_of_last_word + 1..beginning_of_word - 1]});
-            end_of_last_word = i;
-            beginning_of_word = i + 1;
-            result += ({">"});
-            break;
-         }
-      case ' ':
-         if (waiting_for)
-            break;
-         if (beginning_of_word == i)
-         {
-            beginning_of_word = i + 1;
-            break;
-         }
-         implode_info += ({s[end_of_last_word + 1..beginning_of_word - 1]});
-         result += ({s[beginning_of_word..i - 1]});
-         end_of_last_word = i - 1;
-         beginning_of_word = i + 1;
-         break;
-      default:
-         break;
+         i++;
       }
+      else if (text[i] == '"' || text[i] == '`')
+      {
+         quote = text[i++];
+         while (i < length)
+         {
+            if (text[i] == '\\' && i + 1 < length)
+               i += 2;
+            else if (text[i++] == quote)
+               break;
+         }
+      }
+      else
+      {
+         while (i < length)
+         {
+            if (text[i] == '\\' && i + 1 < length)
+               i += 2;
+            else if (text[i] == ' ' || text[i] == '|' || text[i] == '<' || text[i] == '>' ||
+                     text[i] == '"' || text[i] == '`')
+               break;
+            else
+               i++;
+         }
+      }
+      spacing += ({argument_span(text, end, start)});
+      tokens += ({argument_span(text, start, i)});
+      end = i;
    }
-   if (beginning_of_word < l)
-   {
-      implode_info += ({s[end_of_last_word + 1..beginning_of_word - 1]});
-      result += ({s[beginning_of_word..]});
-      implode_info += ({""});
-   }
-   else
-   {
-      implode_info += ({s[end_of_last_word + 1..beginning_of_word - 1]});
-   }
-
-   return ({result, implode_info});
+   return ({tokens, spacing + ({argument_span(text, end, length)})});
 }
 
 //: FUNCTION parse_argument

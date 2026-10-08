@@ -65,7 +65,7 @@ int determine_stdout(mixed args)
    case ">":
       clobber = 1;
    case ">>":
-      stdoutfile = evaluate_path(implode(args[1..], " "));
+      stdoutfile = evaluate_path(args[1]);
       if (!is_directory(base_path(stdoutfile)))
       {
          printf("%s is not a valid directory.\n", base_path(stdoutfile));
@@ -105,10 +105,23 @@ mixed hello_stdio(mixed ininfo, mixed argstohold, mixed implode_info)
 {
    string stdinfile;
    string stdin;
-   int i;
-
    bare_init();
    next_implode_info = implode_info;
+   if (argstohold)
+   {
+      if (!arrayp(argstohold) || sizeof(argstohold) < 2 ||
+          (argstohold[0] != "|" && argstohold[0] != ">" && argstohold[0] != ">>") ||
+          (argstohold[0] != "|" && (sizeof(argstohold) != 2 || !stringp(argstohold[1]) || !strlen(argstohold[1]))))
+      {
+         write("syntax error: invalid output route.\n");
+         return 0;
+      }
+   }
+   if (arrayp(ininfo) && (sizeof(ininfo) != 1 || !stringp(ininfo[0]) || !strlen(ininfo[0])))
+   {
+      write("syntax error: invalid input route.\n");
+      return 0;
+   }
    /* First, if there's ininfo, read our std input */
    if (ininfo)
    {
@@ -119,7 +132,7 @@ mixed hello_stdio(mixed ininfo, mixed argstohold, mixed implode_info)
       }
       else
       {
-         stdinfile = evaluate_path(implode(ininfo, " "));
+         stdinfile = evaluate_path(ininfo[0]);
          if (!is_file(stdinfile))
          {
             printf("%s is not a file.\n", stdinfile);
@@ -130,15 +143,8 @@ mixed hello_stdio(mixed ininfo, mixed argstohold, mixed implode_info)
    }
    if (argstohold)
    {
-      i = 1;
-      while ((i < sizeof(argstohold)) && (argstohold != "|"))
-         i++;
-      next_cmd = argstohold[i..];
-      if (!sizeof(next_cmd))
-         next_cmd = nil;
-      i = determine_stdout(argstohold[0..(i - 1)]);
-      if (i != 1)
-         return i;
+      if (!determine_stdout(argstohold))
+         return 0;
    }
    return stdin || 1;
 }

@@ -23,6 +23,11 @@ int width()
    return this_user()->query_screen_width();
 }
 
+nomask int query_no_redirection()
+{
+   return restrict_redirection();
+}
+
 varargs nomask mixed call_main(mixed arg1, mixed arg2, mixed arg3, mixed arg4, mixed implode_info,
                                mixed remaining_implode_info, string original_input)
 {

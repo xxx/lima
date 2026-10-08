@@ -8,6 +8,7 @@ inherit M_SHELLVARS;
 inherit M_PROMPT;
 inherit M_COMPLETE;
 inherit M_GETOPT;
+inherit "/obj/secure/shell/pipeline";
 inherit M_REGEX;
 
 #define WIZ_CMD_DIRS ({CMD_DIR_NO_RESTRICT "/", CMD_DIR_RESTRICT "/", CMD_DIR_CREATE "/", CMD_DIR_PLAYER "/"})
@@ -25,8 +26,6 @@ void set_expand_vars(int i)
 }
 
 int is_variable(string name);
-private
-mixed check_for_nuggets(string *args);
 
 private
 void cmd_rehash()
@@ -158,23 +157,24 @@ string query_shellname()
    return "wish (Lima wizard shell) v. 0.9";
 }
 
+private mixed lookup_pipeline_command(mixed *args, string *spacing)
+{
+   return CMD_D->smart_arg_parsing(args, query_path(), spacing);
+}
+
 varargs protected void execute_command(string original_input)
 {
-   string *argv = explode(original_input, " ");
+   string *argv;
    mixed tmp;
-   string path = query_path();
    mixed cmd_info;
    string channel_name;
    mixed orig_argv;
-   mixed stdin_info;
-   mixed extra_args;
-   mixed nugget_info;
-   mixed remaining_implode_info;
+   mixed pipeline;
    string virgin_input;
    string *implode_info;
 
    /* BEGINNING OF EXPANSION */
-   tmp = evaluate(arg_to_words_func, implode(argv, " "));
+   tmp = evaluate(arg_to_words_func, original_input);
    argv = tmp[0];
    implode_info = tmp[1];
 
@@ -189,7 +189,7 @@ varargs protected void execute_command(string original_input)
    // In some shells, this is the hook for doing username completion,
    // globbing, flag pre-parsing, etc...  In others, it's used to execute
    // code encased in ` `'s.
-   argv = expand_arguments(argv - ({""}) - ({}));
+   argv = expand_arguments(argv);
 
    if (!argv)
       return;
@@ -227,64 +227,19 @@ varargs protected void execute_command(string original_input)
    /* END OF EXPANSION */
 
    orig_argv = argv;
-   virgin_input = implode_by_arr(map(orig_argv[1..], (
-                                                         : stringp($1) ? $1 : sprintf("%O", $1)
-                                                         :)),
-                                 implode_info[1..])[1..];
-
-   nugget_info = check_for_nuggets(argv);
-   argv = nugget_info[0];
-   stdin_info = nugget_info[1];
-   extra_args = nugget_info[2];
-   remaining_implode_info = implode_info[sizeof(argv)..];
-   implode_info = implode_info[1..(sizeof(argv) - 1)] + ({""});
-   if (sizeof(implode_info) && (implode_info[0][0..0] == " "))
-      implode_info[0] = implode_info[0][1..];
-
-   /* find and execute the given command */
-   cmd_info = CMD_D->smart_arg_parsing(argv, path, implode_info);
-   if (!intp(cmd_info))
+   virgin_input = pipeline_raw_suffix(argv, implode_info, 0);
+   pipeline = prepare_pipeline(argv, implode_info, lookup_pipeline_command);
+   if (stringp(pipeline))
    {
-      if (strlen(virgin_input) == strlen(original_input))
-         virgin_input = "";
-      while (1)
-      {
-         mixed tmp2;
-         cmd_info = cmd_info[0]->call_main(cmd_info[2], cmd_info[1], stdin_info, extra_args, implode_info,
-                                           remaining_implode_info, virgin_input);
-         if (!cmd_info)
-            return;
-         stdin_info = cmd_info[1];
-         implode_info = cmd_info[2];
-         nugget_info = check_for_nuggets(cmd_info[0]);
-         argv = nugget_info[0];
-         extra_args = nugget_info[2];
-         tmp2 = argv;
-         if (arrayp(extra_args))
-            tmp2 += extra_args;
-         if (!sizeof(tmp2))
-         {
-            write("error: pipe to nothing.\n");
-            return;
-         }
-         virgin_input = implode_by_arr(tmp2[1..], implode_info[(sizeof(implode_info) - sizeof(tmp2))..]);
-         if (virgin_input[0] == ' ')
-            virgin_input = virgin_input[1..];
-         remaining_implode_info = implode_info[sizeof(argv)..];
-         implode_info = implode_info[1..(sizeof(argv) - 1)] + ({""});
-         if (sizeof(implode_info) && (implode_info[0][0..0] == " "))
-            implode_info[0] = implode_info[0][1..];
-         cmd_info = CMD_D->smart_arg_parsing(argv, path, implode_info);
-         if (intp(cmd_info))
-         {
-            if (sizeof(argv))
-               printf("error: pipe to %s failed.\n", argv[0]);
-            else
-               write("error: pipe to nothing.\n");
-            return;
-         }
-      }
+      printf("syntax error: %s.\n", pipeline);
+      return;
    }
+   if (arrayp(pipeline))
+   {
+      execute_pipeline(pipeline);
+      return;
+   }
+   cmd_info = pipeline;
    if (cmd_info > 0)
    {
       if (cmd_info != 1)
@@ -367,35 +322,3 @@ nomask string query_save_path(string userid)
    return WSHELL_PATH(userid);
 }
 
-// Support for IO redirection
-private
-mixed check_for_nuggets(string *args)
-{
-   int i, j;
-   string *stdinstuff = 0;
-
-   i = member_array("<", args);
-   if (i != -1)
-   {
-      j = i + 1;
-      while ((j < sizeof(args)) && (args[j] != ">") && (args[j] != ">>") && (args[j] != "|") && (args[j] != "<"))
-         j++;
-      stdinstuff = args[i + 1..(j - 1)];
-      args = args[0..(i - 1)] + args[j..];
-   }
-
-   for (i = 0; i < sizeof(args); i++)
-   {
-      if (stringp(args[i]))
-         switch (args[i])
-         {
-         case "|":
-         case ">":
-         case ">>":
-            return ({args[0..(i - 1)], stdinstuff, args[i..]});
-         default:
-            break;
-         }
-   }
-   return ({args, stdinstuff, 0});
-}
