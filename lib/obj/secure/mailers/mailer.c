@@ -285,8 +285,12 @@ protected nomask void cmd_read(int user_num, string outputfile, int supress_head
       return;
    }
 
-   mailbox_ob->set_message_index(user_num - 1);
-   mailbox_ob->set_message_read(timestamp);
+   int current_index = member_array(timestamp, mailbox_ob->query_message_keys());
+   if (current_index != -1)
+   {
+      mailbox_ob->set_message_index(current_index);
+      mailbox_ob->set_message_read(timestamp);
+   }
 
    more(output);
 }
@@ -294,6 +298,7 @@ protected nomask void cmd_read(int user_num, string outputfile, int supress_head
 protected nomask void cmd_headers(string rangestr)
 {
    int i;
+   int removed;
    string *output;
    int *mail_keys;
    mapping nums;
@@ -331,11 +336,15 @@ protected nomask void cmd_headers(string rangestr)
    {
       class mail_msg msg;
       mixed problem = catch(msg = mailbox_ob->get_one_message(key));
+      nums[key] -= removed;
 
       if (problem)
          output += ({sprintf("%c %-3d *** ERROR READING MESSAGE: %s", mailbox_ob->query_message_read(key) ? 'N' : ' ', nums[key], trim(problem))});
       else if (!msg)
-         output += ({sprintf("  %-3d %-15s  %10s  %s", nums[key], "", "", "*** LOST MESSAGE ***")});
+      {
+         output += ({"      *** LOST MESSAGE ***"});
+         removed++;
+      }
       else if (!valid_message_metadata(msg))
          output += ({sprintf("%c %-3d *** INVALID MESSAGE METADATA ***", mailbox_ob->query_message_read(key) ? 'N' : ' ', nums[key])});
       else

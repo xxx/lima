@@ -74,6 +74,20 @@ nomask string query_owner()
    return owner;
 }
 
+private nomask void remove_mail_receipt(int message_key)
+{
+   int deleted_index = member_array(message_key, query_message_keys());
+   m_delete(mailbox, message_key);
+   if (deleted_index < message_index)
+      message_index--;
+   if (message_index >= sizeof(mailbox))
+      message_index = sizeof(mailbox) - 1;
+   if (message_index < 0)
+      message_index = 0;
+
+   save_me();
+}
+
 nomask class mail_msg get_one_message(int message_key)
 {
    class mail_msg msg;
@@ -88,11 +102,7 @@ nomask class mail_msg get_one_message(int message_key)
 
    msg = MAIL_D->get_one_message(message_key);
    if (!msg)
-   {
-      /* damn. bad message. remove it from the mailbox. */
-      m_delete(mailbox, message_key);
-      save_me();
-   }
+      remove_mail_receipt(message_key);
 
    return msg;
 }
@@ -151,16 +161,7 @@ nomask int first_unread_message()
 private nomask void delete_mail_entry(int message_key)
 {
    MAIL_D->delete_mail(message_key, owner);
-   int deleted_index = member_array(message_key, query_message_keys());
-   m_delete(mailbox, message_key);
-   if (deleted_index < message_index)
-      message_index--;
-   if (message_index >= sizeof(mailbox))
-      message_index = sizeof(mailbox) - 1;
-   if (message_index < 0)
-      message_index = 0;
-
-   save_me();
+   remove_mail_receipt(message_key);
 }
 
 nomask void delete_message(int message_key)
