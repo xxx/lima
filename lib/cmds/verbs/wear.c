@@ -30,7 +30,7 @@ void do_wear_obs(object *obs)
    foreach (object ob in obs)
    {
       // TBUG("Wear: "+ob);
-      if (typeof(ob) == T_STRING)
+      if (stringp(ob))
          continue;
 
       // Do not try to wear living things or things not in inventory.

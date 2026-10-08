@@ -98,7 +98,7 @@ varargs mixed call_hooks(string tag, mixed func, mixed start, mixed *args...)
 
    if (hooks_to_call = hooks[tag])
    {
-      hooks_to_call = filter(hooks_to_call, (: objectp(function_info($1)["owner"]) :));
+      hooks_to_call = filter(hooks_to_call, (: !functionp($1) || objectp(function_info($1)["owner"]) :));
       hooks[tag] = hooks_to_call;
 
       hooks[tag] -= ({( : 0 :)});

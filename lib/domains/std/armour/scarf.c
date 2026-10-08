@@ -7,6 +7,6 @@ void setup()
    set_adj("red");
    set_id("scarf");
    set_slot("head");
-   set_value(1);
+   set_value(1.0);
    set_weight(0.1);
 }
