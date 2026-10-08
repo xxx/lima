@@ -31,7 +31,7 @@ void main(string arg)
    if (!arg)
    {
       name = this_user()->query_selected_body();
-      race = 0;
+      race = nil;
    }
    else if (sscanf(arg, "(%s)%s", race, name) == 2)
    {
@@ -42,7 +42,7 @@ void main(string arg)
    else
    {
       name = arg;
-      race = 0;
+      race = nil;
    }
    if (race)
    {
@@ -72,4 +72,9 @@ void main(string arg)
       this_body()->save_autoload();
    }
    this_user()->switch_user(name, race);
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

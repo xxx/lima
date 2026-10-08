@@ -13,10 +13,12 @@ With the lpc-rs checkout beside this one and its CLI built, check a command with
 ../lpc-rs/target/debug/lpc-rs-lpcc -c lpc-rs.env --check lib/cmds/player/mudlist.c
 ```
 
-The current focused checks compile 64 of 67 player commands and all 12 supporting
-targets. Mudlist passes 13 runtime cases using both actual shells. `su` is next;
-experimental `random2` remains deferred and `suicide` is disabled upstream.
-Full-inventory and startup results are recorded separately in the port notes.
+The current focused checks compile 65 of 67 player commands and all 12 supporting
+targets. Mudlist passes 13 runtime cases using both actual shells. `su` passes
+refresh, race-change and password-modal checks; its existing account/character
+lookup limitation is recorded in the port notes. Experimental `random2` remains
+deferred and `suicide` is disabled upstream. Full-inventory and startup results
+are recorded separately in the port notes.
 
 Current compatibility and handoff notes are in the neighboring lpc-rs checkout:
 `doc/driver-comparison.md` and `local/lima/compatibility.md`. Temporary test
