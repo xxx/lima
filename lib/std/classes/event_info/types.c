@@ -13,7 +13,7 @@ class event_info
 int
 event_damage(class event_info evt)
 {
-   return evt->data[sizeof(evt.data) - 1];
+   return evt.data[sizeof(evt.data) - 1];
 }
 
 //: FUNCTION event_to_str
@@ -22,36 +22,20 @@ event_damage(class event_info evt)
 // Only used for debug purposes, but oh so very useful.
 string event_to_str(class event_info evt)
 {
-   string data = "";
-   string out = "Event:\n"
-                " target=" +
-                evt.target +
-                "\n"
-                " target_extra=" +
-                evt.target_extra +
-                "\n"
-                " weapon=" +
-                evt.weapon + "\n";
+   string out = sprintf("Event:\n target=%O\n target_extra=%O\n weapon=%O\n",
+                        evt.target, evt.target_extra, evt.weapon);
 
    if (arrayp(evt.data))
    {
       int count = 0;
       foreach (mixed ele in evt.data)
       {
-         if (arrayp(ele))
-         {
-            string ar = "[";
-            foreach (mixed e in ele)
-               ar += e + ", ";
-            data += " evt.data[" + count + "]=" + ar + "]\n";
-         }
-         else
-            data += " evt.data[" + count + "]=" + ele + "\n";
+         out += sprintf(" evt.data[%d]=%O\n", count, ele);
          count++;
       }
    }
-   else if (stringp(evt.data))
-      data += " " + evt.data;
+   else
+      out += sprintf(" evt.data=%O\n", evt.data);
 
-   return out + data;
+   return out;
 }
