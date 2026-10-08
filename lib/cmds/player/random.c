@@ -39,14 +39,17 @@ void main(string str)
       rule = extra = "";
    }
 
-   while (1)
+   emotes = filter(emotes, (: SOUL_D->query_emote($1)[$(rule)] :));
+   if (!sizeof(emotes))
    {
-      string emote = choice(emotes);
-
-      if (SOUL_D->query_emote(emote)[rule])
-      {
-         this_body()->do_game_command(emote + extra);
-         return;
-      }
+      out("No suitable emotes.\n");
+      return;
    }
+
+   this_body()->do_game_command(choice(emotes) + extra);
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
