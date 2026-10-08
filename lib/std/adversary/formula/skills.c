@@ -131,7 +131,7 @@ int defend_chance(object weapon, object target)
    }
 
    res = to_int(((0.0 + defend_value) / attack_value) * MAX_SKILL_VALUE);
-   res = (res * 50 / (MAX_SKILL_VALUE)) + (((target->query_dex() * skill_impact) / DEFEND_STAT_IMPACT));
+   res = (res * 50 / (MAX_SKILL_VALUE)) + ((((target->query_dex() || 0) * skill_impact) / DEFEND_STAT_IMPACT));
    if (combat_debug)
       TBUG("defend," + defend_skill + "," + defend_value + ",attack," + attack_skill + "," + attack_value +
            " skill impact: " + skill_impact + " res: " + res + "\n");
