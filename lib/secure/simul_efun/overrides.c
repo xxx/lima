@@ -3,6 +3,8 @@
 #include <commands.h>
 #include <playerflags.h>
 
+void debug_message(string message) { efun::tell_object(nil, message + "\n"); }
+
 nomask object this_user() { return efun::this_player(); }
 
 object this_body();
@@ -98,20 +100,19 @@ nomask object this_player(string str)
 // destruct() can also be passed an optional second arg, which is passed
 // to the remove() routine.  The update command passes 1 as the second
 // argument to indicate that a new copy will be reloaded immediately.
-nomask varargs void destruct(object ob, mixed arg)
-{
-   if (!nullp(ob))
-   { // were we called with an arg ?
-      if (ob)
-         catch (ob->remove(arg));
-   }
-   else
-   {
-      // self destruct; presumably from non_object or some similar base
-      ob = previous_object();
-   }
-   if (ob)
-      efun::destruct(ob);
+nomask void destruct(mixed *args...) {
+    object ob;
+    if (sizeof(args) > 2) throw("destruct: too many arguments");
+    if (!sizeof(args)) {
+        ob = previous_object();
+    } else {
+        mixed value = args[0];
+        if (value == nil || (intp(value) && value == 0)) return;
+        if (!objectp(value)) throw("destruct: expected an object");
+        ob = value;
+        catch(ob->remove(sizeof(args) > 1 ? args[1] : nil));
+    }
+    if (ob) efun::destruct(ob);
 }
 
 //: FUNCTION shutdown
