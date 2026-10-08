@@ -96,6 +96,22 @@ protected nomask string *format_name_list(string prompt, string *names)
    return explode(prompt + implode(map(names, capitalize), ", "), "\n");
 }
 
+private nomask int valid_message_body(string *body)
+{
+   int valid = arrayp(body);
+   if (valid)
+      foreach (mixed line in body)
+         if (!stringp(line))
+         {
+            valid = 0;
+            break;
+         }
+
+   if (!valid)
+      write("*** ERROR: message body is missing or invalid!\n");
+   return valid;
+}
+
 /*
 ** build_message()
 **
@@ -109,6 +125,9 @@ protected nomask string *build_message(int mail_key, int supress_header)
    msg = mailbox_ob->get_one_message(mail_key);
    if (!msg)
       return ({"*** LOST THE MESSAGE! ***"});
+
+   if (!valid_message_body(msg.body))
+      return nil;
 
    output = ({});
    if (!supress_header)
@@ -210,6 +229,8 @@ protected nomask void cmd_read(int user_num, string outputfile, int supress_head
       return;
 
    output = build_message(timestamp, supress_header);
+   if (!output)
+      return;
 
    if (outputfile)
    {
@@ -345,6 +366,9 @@ protected nomask void cmd_reply(int user_num, int reply_all)
       return;
    }
 
+   if (!valid_message_body(msg.body))
+      return;
+
    body = build_body_inclusion(msg.body);
    body = implode(body, "\n");
    body = sprintf("On %s %s wrote:\n%s\n", ctime(msg.date), capitalize(msg.sender), body);
@@ -426,6 +450,9 @@ protected nomask void cmd_forward(int user_num, string newto)
       write("*** ERROR: the message was lost!\n");
       return;
    }
+
+   if (!valid_message_body(msg.body))
+      return;
 
    body = build_body_inclusion(msg.body);
    body = ({"Begin forwarded message:", sprintf("On %s %s wrote:", ctime(msg.date), capitalize(msg.sender))}) + body;
