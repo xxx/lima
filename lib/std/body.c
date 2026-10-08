@@ -151,6 +151,19 @@ nomask void init_stuff()
    reinstate_effects();
 }
 
+private
+nomask void rebuild_inventory_light()
+{
+   int visible = inventory_visible();
+   int own_light = query_light() - (visible ? contained_light : 0);
+
+   contained_light = 0;
+   foreach (object ob in all_inventory())
+      contained_light += ob->query_light();
+   contained_light_added = visible;
+   set_light(own_light + (visible ? contained_light : 0));
+}
+
 /* initialize various internal things */
 // ### needs a new name
 private
@@ -166,6 +179,8 @@ nomask void init_cmd_hook()
    set_size(VERY_LARGE);
 #endif
    set_max_capacity(VERY_LARGE);
+
+   rebuild_inventory_light();
 
    if (saved_items)
    {
@@ -187,6 +202,7 @@ nomask void init_cmd_hook()
       saved_items = 0;
    }
    init_stuff();
+   rebuild_inventory_light();
 }
 
 nomask void su_enter_game(object where)
