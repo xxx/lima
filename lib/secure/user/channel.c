@@ -82,13 +82,12 @@ void channel_rcv_string(string channel_name, string msg)
 void channel_rcv_soul(string channel_name, mixed *data)
 {
    string msg;
+   int recipient = member_array(query_body(), data[0]);
 
-   if (data[0][0] == this_object())
-      msg = data[1][0];
-   else if (sizeof(data[0]) == 2 && data[0][1] != this_object())
-      msg = data[1][2];
+   if (recipient == -1)
+      msg = data[1][ < 1];
    else
-      msg = data[1][1];
+      msg = data[1][recipient];
 
    receive_private_msg(msg);
 }
