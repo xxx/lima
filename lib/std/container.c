@@ -157,7 +157,7 @@ string is_relation_alias(string test)
       if (member_array(test, aliases) > -1)
          return relation;
    }
-   return 0;
+   return nil;
 }
 
 //: FUNCTION set_relation_alias
@@ -258,7 +258,7 @@ varargs float query_capacity(string relation)
    if (!valid_relation(relation))
    {
       if (!aliased_to)
-         return 0;
+         return 0.0;
       relation = aliased_to;
    }
    foreach (object ob in relations[relation].contents)
@@ -322,7 +322,7 @@ int query_total_capacity()
 }
 #ifdef USE_MASS
 //: FUNCTION query_mass
-int query_mass()
+float query_mass()
 {
    return query_total_capacity() + ::query_mass();
 }
@@ -340,7 +340,7 @@ int query_aggregate_size()
 // returns a value from <move.h> if there is an error
 varargs mixed receive_object(object target, string relation)
 {
-   int x, m;
+   float x, m;
    string aliased_to;
    if (!relation || relation == "" || relation == "#CLONE#")
       relation = query_default_relation();
@@ -530,7 +530,7 @@ string simple_long()
 mixed ob_state()
 {
    /* if we have an inventory, and it can be seen, we should be unique */
-   if (first_inventory(this_object()) && inventory_visible())
+   if (sizeof(all_inventory(this_object())) && inventory_visible())
       return -1;
    // ### hack
    if (this_object()->query_closed())
@@ -865,7 +865,7 @@ int environment_can_hear()
 // We use this so that bodies can overload this
 void do_receive(string msg, int msg_type)
 {
-   receive(msg);
+   if (interactive(this_object())) write_socket(msg);
 }
 
 // Inside messages propogate upward and downward...
@@ -961,7 +961,7 @@ int destruct_if_useless()
    {
       object link = ob->query_link();
 
-      if (link && userp(link))
+      if (link && link->is_user())
          return ASK_AGAIN;
    }
    return ::destruct_if_useless();
