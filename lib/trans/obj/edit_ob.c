@@ -11,11 +11,9 @@
 **     new(EDIT_OB, EDIT_FILE, fname, func)
 ** or  new(EDIT_OB, EDIT_TEXT, text, func)
 **
-** "func" will be evaluated when the editing is complete.  One
-** parameter will be passed, which will be zero if the editing
-** was aborted for some reason.  Otherwise, it will be a single
-** string specifying the file name, or an array of strings
-** holding the lines of text.
+** "func" is called on completion or explicit abort, with one argument.
+** Explicit abort passes nil; completion passes the file name or text lines.
+** Input-stack teardown discards the edit without calling the continuation.
 */
 
 #include <edit.h>
@@ -66,7 +64,11 @@ string *read_strings(string fname, int messages)
    if (size <= 0)
       return ({});
 
-   return explode(read_file(fname), "\n");
+   string contents = read_file(fname);
+   string *text = explode(contents, "\n");
+   if (contents[<1] == '\n')
+      text = text[0..<2];
+   return text;
 }
 
 varargs private string build_string(int flag)
@@ -90,30 +92,28 @@ void end_edit(int aborted)
 {
    mixed arg;
 
-   if (client_fname)
+   if (!aborted)
    {
-      rm(client_fname);
-
-      if (!aborted)
+      if (client_fname)
       {
-         write_file(client_fname, build_string(1));
+         rm(client_fname);
+         write_file(client_fname, build_string());
          arg = client_fname;
       }
+      else
+         arg = buf;
    }
-   else if (!aborted)
-      arg = buf;
 
-   /*
-   ** Clear up this information before dispatching the callback.  The
-   ** callback may want to push new modal handlers or something.
-   */
+   // The continuation may start another editor.
    if (!already_editing && this_body())
       this_body()->clear_flag(F_IN_EDIT);
-   modal_pop();
-
-   evaluate(client_func, arg);
-
+   mixed problem = catch {
+      modal_pop();
+      evaluate(client_func, arg);
+   };
    destruct();
+   if (problem)
+      throw(problem);
 }
 
 private
@@ -172,7 +172,7 @@ void handle_escape(string str)
    case 'e':
       tmp_file = tmp_fname();
       write_file(tmp_file, build_string());
-      clone_object (ED_SESSION)->begin_editing(tmp_file, !this_user()->query_privilege(), ( : end_ed:));
+      clone_object (ED_SESSION)->begin_editing(tmp_file, !this_user()->query_privilege(), end_ed);
       return;
    }
 }
@@ -181,7 +181,13 @@ private
 nomask void parse_edit(mixed str)
 {
    if (str == -1)
+   {
+      // The input stack has already removed this handler.
+      if (!already_editing && this_body())
+         this_body()->clear_flag(F_IN_EDIT);
       destruct(this_object());
+      return;
+   }
    if (str[0] == '~')
    {
       handle_escape(str);
@@ -214,7 +220,7 @@ void begin_edit(string *text, function continuation)
    client_func = continuation;
 
    write(HEADER + build_string(2));
-   modal_push(( : parse_edit:), ""); /* empty prompt */
+   modal_push(parse_edit, ""); /* empty prompt */
 }
 
 void create(int kind, mixed text, function continuation)

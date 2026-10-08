@@ -77,7 +77,7 @@ int next_file()
       printf("more: going back to file \"%s\"\n", file_list[file_index]);
    else
       printf("more: going on to file \"%s\"\n", file_list[file_index]);
-   lines = 0;
+   lines = nil;
    return 0;
 }
 
@@ -102,12 +102,14 @@ void print_help()
 private
 void finish()
 {
-   modal_pop();
-
-   if (continue_func)
-      evaluate(continue_func);
-
+   mixed problem = catch {
+      modal_pop();
+      if (continue_func)
+         evaluate(continue_func);
+   };
    destruct(this_object());
+   if (problem)
+      throw(problem);
 }
 
 private
@@ -165,7 +167,7 @@ nomask void do_more(mixed arg)
          }
          else
          {
-            current_search = 0;
+            current_search = nil;
             write("more: search off\n");
          }
          return;
@@ -214,7 +216,7 @@ nomask void do_more(mixed arg)
             return;
          }
          else
-            lines = 0;
+            lines = nil;
          break;
       case 'q':
          finish();
@@ -229,7 +231,7 @@ nomask void do_more(mixed arg)
          break;
       default: // Next chunk
          if (last_search)
-            current_search = 0;
+            current_search = nil;
          line_index += chunk_size * direction;
          if (line_index < 0 || line_index >= sizeof(lines))
          {
@@ -259,13 +261,16 @@ nomask void do_more(mixed arg)
             continue;
          }
          contents = read_file(file_list[file_index], 0, NUM_LINES);
-         if (!contents || !sizeof(lines = explode(contents, "\n")))
+         if (contents == "")
          {
             write("more: file \"" + file_list[file_index] + "\" contains nothing\n");
             if (next_file())
                break;
             continue;
          }
+         lines = explode(contents, "\n");
+         if (contents[<1] == '\n')
+            lines = lines[0..<2];
          if (direction == -1)
             line_index = (sizeof(lines) - chunk_size >= 0 ? sizeof(lines) - chunk_size : 0);
          else
@@ -274,7 +279,7 @@ nomask void do_more(mixed arg)
       if (current_search)
       {
          for (; line_index < sizeof(lines) && line_index >= 0; line_index += direction)
-            if (regexp(lines[line_index], current_search))
+            if (regmatch(lines[line_index], current_search) != nil)
                break;
          if (line_index < 0 || line_index >= sizeof(lines))
          {
@@ -329,7 +334,12 @@ void create(int kind, mixed arg, int c, function continuation, int of)
    chunk_size = c;
    continue_func = continuation;
    output_flags = of;
-   modal_push(( : do_more:), ( : query_prompt:));
-   if (catch (do_more(0)))
+   modal_push(do_more, query_prompt);
+   mixed problem = catch(do_more(0));
+   if (problem)
+   {
       modal_pop();
+      destruct(this_object());
+      throw(problem);
+   }
 }
