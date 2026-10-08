@@ -14,6 +14,8 @@ private nosave int ed_number;
 private nosave int ed_scroll = 20;
 private nosave mapping ed_marks = ([]);
 private nosave string ed_pattern = "";
+private nosave int ed_global;
+private nosave int *ed_selected = ({});
 private nosave string ed_scan = "";
 private nosave int ed_scan_pos;
 
@@ -95,6 +97,16 @@ private void ed_replace(int first, int last, string *replacement)
          m_delete(ed_marks, mark);
    }
    ed_lines = next;
+   if (ed_global)
+   {
+      int *pending = ({});
+      foreach (int line in ed_selected)
+         if (line < first)
+            pending += ({ line });
+         else if (line > last)
+            pending += ({ line + delta });
+      ed_selected = pending;
+   }
    ed_cursor = first + sizeof(replacement) - 1;
    ed_dirty = 1;
 }
@@ -132,9 +144,8 @@ private string ed_search_pattern(int delimiter)
          closed = 1;
          break;
       }
-      if (ch == '\\' && ed_scan_pos < sizeof(ed_scan) &&
-          ed_scan[ed_scan_pos] == delimiter)
-         pattern += sprintf("%c", ed_scan[ed_scan_pos++]);
+      if (ch == '\\' && ed_scan_pos < sizeof(ed_scan))
+         pattern += "\\" + sprintf("%c", ed_scan[ed_scan_pos++]);
       else
          pattern += sprintf("%c", ch);
    }
@@ -262,26 +273,278 @@ private void ed_range(int first, int last)
       ed_fail("invalid line range");
 }
 
+private int ed_delimiter()
+{
+   int delimiter;
+   ed_skip_space();
+   if (ed_scan_pos == sizeof(ed_scan))
+      ed_fail("missing pattern delimiter");
+   delimiter = ed_scan[ed_scan_pos];
+   if (delimiter < 33 || delimiter > 126 || delimiter == '\\' ||
+       (delimiter >= '0' && delimiter <= '9') ||
+       (delimiter >= 'a' && delimiter <= 'z') ||
+       (delimiter >= 'A' && delimiter <= 'Z'))
+      ed_fail("delimiter must be printable punctuation other than backslash");
+   return delimiter;
+}
+
+private string ed_replacement(int delimiter)
+{
+   string replacement = "";
+   while (ed_scan_pos < sizeof(ed_scan))
+   {
+      int ch = ed_scan[ed_scan_pos++];
+      if (ch == delimiter)
+         return replacement;
+      if (ch == '\\')
+      {
+         if (ed_scan_pos == sizeof(ed_scan)) ed_fail("unterminated replacement");
+         replacement += "\\";
+         ch = ed_scan[ed_scan_pos++];
+         if (ch != delimiter && strindex("\\&123456789nrtb", sprintf("%c", ch)) < 0)
+            ed_fail("unsupported replacement escape");
+      }
+      replacement += sprintf("%c", ch);
+   }
+   ed_fail("unterminated replacement");
+   return "";
+}
+
+private string ed_output(string output, string addition)
+{
+   if (ed_bytes(output) + ed_bytes(addition) > ED_MAX_BYTES)
+      ed_fail("output exceeds 8192 UTF-8 bytes; use a smaller range");
+   return output + addition;
+}
+
+private string ed_expand(string replacement, mixed *captures, int delimiter)
+{
+   string output = "";
+   for (int index = 0; index < sizeof(replacement); index++)
+   {
+      int ch = replacement[index];
+      string addition;
+      if (ch == '&')
+         addition = captures[0];
+      else if (ch == '\\')
+      {
+         ch = replacement[++index];
+         if (ch == delimiter)
+            addition = sprintf("%c", ch);
+         else if (ch >= '1' && ch <= '9')
+         {
+            int group = ch - '0';
+            if (group >= sizeof(captures) - 1) ed_fail("replacement capture does not exist");
+            addition = stringp(captures[group]) ? captures[group] : "";
+         }
+         else if (ch == 'n') addition = "\n";
+         else if (ch == 'r') addition = "\r";
+         else if (ch == 't') addition = "\t";
+         else if (ch == 'b') addition = sprintf("%c", 8);
+         else addition = sprintf("%c", ch);
+      }
+      else
+         addition = sprintf("%c", ch);
+      output = ed_output(output, addition);
+   }
+   return output;
+}
+
+private string ed_render(string text, int line, int list)
+{
+   if (list)
+   {
+      text = replace_string(text, "\\", "\\\\");
+      text = replace_string(text, "\t", "\\t");
+      text = replace_string(text, "\r", "\\r");
+      text = replace_string(text, sprintf("%c", 0), "\\000");
+      text += "$";
+   }
+   if (ed_number) text = sprintf("%d\t%s", line, text);
+   return text + "\n";
+}
+
+private string ed_substitute(int first, int last, int selected_only = 0)
+{
+   int delimiter = ed_delimiter();
+   string pattern = ed_search_pattern(delimiter);
+   string replacement = ed_replacement(delimiter);
+   int all;
+   int print;
+   int changed;
+   int total_bytes;
+   int total_lines = first - 1 + sizeof(ed_lines) - last;
+   int selected_index;
+   int cursor = ed_cursor;
+   string *next = first > 1 ? ed_lines[0..first-2] : ({});
+   mapping positions = ([]);
+   mapping pending_positions = ([]);
+   string output = "";
+   ed_skip_space();
+   while (ed_scan_pos < sizeof(ed_scan))
+   {
+      int flag = ed_scan[ed_scan_pos++];
+      if (flag == 'g' && !all) all = 1;
+      else if (flag == 'p' && !print) print = 1;
+      else ed_fail("unsupported or repeated substitution flag");
+   }
+   ed_range(first, last);
+   efun::regmatch("", pattern, 0x1000);
+   for (int line = 1; line <= sizeof(ed_lines); line++)
+      if (line < first || line > last) total_bytes += ed_bytes(ed_lines[line-1]) + 1;
+   for (int original = first; original <= last; original++)
+   {
+      int line = sizeof(next) + 1;
+      int selected = !selected_only ||
+                     (selected_index < sizeof(ed_selected) && ed_selected[selected_index] == original);
+      string text = ed_lines[original-1];
+      string result = "";
+      int position;
+      int start;
+      int matches;
+      int previous_nonempty;
+      positions[original] = line;
+      if (selected_only && selected)
+      {
+         selected_index++;
+         cursor = line;
+      }
+      while (selected && start <= sizeof(text))
+      {
+         mixed found = efun::regmatch(text, pattern, 0x1000, start);
+         mixed *captures;
+         int end;
+         int begin;
+         if (!arrayp(found)) break;
+         captures = found;
+         end = captures[<1] - (sizeof(captures[0]) == 0 ? 1 : 0);
+         begin = end - sizeof(captures[0]);
+         start = captures[<1];
+         // An empty match at the end of a nonempty match must not replace it twice.
+         if (!sizeof(captures[0]) && matches && previous_nonempty && end == position)
+            continue;
+         if (begin > position)
+            result = ed_output(result, text[position..begin-1]);
+         result = ed_output(result, ed_expand(replacement, captures, delimiter));
+         position = end;
+         previous_nonempty = sizeof(captures[0]) != 0;
+         matches++;
+         if (!all) break;
+      }
+      if (!matches)
+      {
+         result = text;
+         pending_positions[original] = line;
+      }
+      else if (position < sizeof(text)) result = ed_output(result, text[position..]);
+      {
+         string *lines = sizeof(result) ? explode(result, "\n") : ({ "" });
+         ed_check_lines(lines);
+         total_bytes += ed_bytes(result) + 1;
+         total_lines += sizeof(lines);
+         if (total_bytes > ED_MAX_BYTES) ed_fail("buffer exceeds 8192 UTF-8 bytes");
+         if (total_lines > ED_MAX_LINES) ed_fail("buffer exceeds 1000 lines");
+         next += lines;
+         if (matches)
+         {
+            cursor = sizeof(next);
+            if (print)
+               foreach (string item in lines) output = ed_output(output, ed_render(item, line++, 0));
+         }
+      }
+      if (matches) changed++;
+   }
+   if (!changed && !ed_global) ed_fail("pattern not found");
+   if (last < sizeof(ed_lines)) next += ed_lines[last..];
+   {
+      int delta = sizeof(next) - sizeof(ed_lines);
+      foreach (string mark in keys(ed_marks))
+      {
+         int line = ed_marks[mark];
+         if (line >= first && line <= last) ed_marks[mark] = positions[line];
+         else if (line > last) ed_marks[mark] = line + delta;
+      }
+      if (ed_global)
+      {
+         int *pending = ({});
+         if (!selected_only)
+            foreach (int line in ed_selected)
+               if (line < first) pending += ({ line });
+               else if (line > last) pending += ({ line + delta });
+               else if (has_key(pending_positions, line)) pending += ({ pending_positions[line] });
+         ed_selected = pending;
+      }
+   }
+   ed_lines = next;
+   ed_cursor = cursor;
+   if (changed) ed_dirty = 1;
+   return output;
+}
+
+private void ed_delete_selected()
+{
+   string *next = allocate(sizeof(ed_lines));
+   mapping positions = ([]);
+   int index;
+   int kept;
+   int cursor = ed_selected[<1] - sizeof(ed_selected) + 1;
+   for (int line = 1; line <= sizeof(ed_lines); line++)
+      if (index < sizeof(ed_selected) && ed_selected[index] == line)
+         index++;
+      else
+      {
+         next[kept++] = ed_lines[line-1];
+         positions[line] = kept;
+      }
+   foreach (string mark in keys(ed_marks))
+      if (has_key(positions, ed_marks[mark])) ed_marks[mark] = positions[ed_marks[mark]];
+      else m_delete(ed_marks, mark);
+   ed_lines = kept ? next[0..kept-1] : ({});
+   ed_cursor = cursor < kept ? cursor : kept;
+   ed_dirty = 1;
+   ed_selected = ({});
+}
+
+private string ed_select(int first, int last, int inverse)
+{
+   int delimiter = ed_delimiter();
+   string pattern = ed_search_pattern(delimiter);
+   string command = efun::trim(ed_scan_pos < sizeof(ed_scan) ? ed_scan[ed_scan_pos..] : "");
+   string output = "";
+   ed_range(first, last);
+   efun::regmatch("", pattern);
+   ed_selected = ({});
+   for (int line = first; line <= last; line++)
+      if (stringp(efun::regmatch(ed_lines[line-1], pattern)) != inverse)
+         ed_selected += ({ line });
+   if (!sizeof(command)) command = "p";
+   ed_global = 1;
+   if (sizeof(ed_selected) && command == "d")
+      ed_delete_selected();
+   else if (sizeof(ed_selected) && command[0] == 's')
+   {
+      ed_scan = command;
+      ed_scan_pos = 1;
+      output = ed_substitute(first, last, 1);
+   }
+   // Pending line numbers follow edits; inserted lines never join the original selection.
+   while (sizeof(ed_selected))
+   {
+      ed_cursor = ed_selected[0];
+      ed_selected = ed_selected[1..];
+      output = ed_output(output, ed_execute(command));
+   }
+   ed_global = 0;
+   return output;
+}
+
 private string ed_print(int first, int last, int list)
 {
    string output = "";
    ed_range(first, last);
    for (int line = first; line <= last; line++)
    {
-      string text = ed_lines[line-1];
-      if (list)
-      {
-         text = replace_string(text, "\\", "\\\\");
-         text = replace_string(text, "\t", "\\t");
-         text = replace_string(text, "\r", "\\r");
-         text = replace_string(text, sprintf("%c", 0), "\\000");
-         text += "$";
-      }
-      if (ed_number)
-         text = sprintf("%d\t%s", line, text);
-      if (ed_bytes(output) + ed_bytes(text) + 1 > ED_MAX_BYTES)
-         ed_fail("output exceeds 8192 UTF-8 bytes; use a smaller range");
-      output += text + "\n";
+      output = ed_output(output, ed_render(ed_lines[line-1], line, list));
    }
    ed_cursor = last;
    return output;
@@ -306,6 +569,8 @@ private void ed_quit()
    ed_marks = ([]);
    ed_cursor = ed_dirty = ed_number = ed_restricted = 0;
    ed_filename = ed_pattern = "";
+   ed_global = 0;
+   ed_selected = ({});
    ed_mode = -1;
 }
 
@@ -320,6 +585,9 @@ private string ed_execute(string command)
    ed_skip_space();
    operation = ed_scan_pos < sizeof(command) ? command[ed_scan_pos++] : 0;
    argument = ed_scan_pos < sizeof(command) ? efun::trim(command[ed_scan_pos..]) : "";
+   if (ed_global && operation != 0 && operation != 'p' && operation != 'l' &&
+       operation != '=' && operation != 'd' && operation != 's')
+      ed_fail("command is not supported inside global selection");
    if (!operation)
    {
       if (!addressed)
@@ -328,6 +596,12 @@ private string ed_execute(string command)
    }
    switch (operation)
    {
+   case 'g':
+   case 'v':
+      if (!addressed) { first = 1; last = sizeof(ed_lines); }
+      return ed_select(first, last, operation == 'v');
+   case 's':
+      return ed_substitute(first, last);
    case 'p':
    case 'l':
       if (sizeof(argument)) ed_fail("unexpected command argument");
@@ -492,6 +766,8 @@ protected string ed_start(string path = "", int restricted = 0, int scroll = 20)
    ed_filename = path;
    ed_marks = ([]);
    ed_pattern = "";
+   ed_global = 0;
+   ed_selected = ({});
    ed_cursor = sizeof(loaded) ? 1 : 0;
    ed_mode = ed_dirty = ed_number = 0;
    ed_restricted = restricted;
@@ -518,6 +794,8 @@ protected string ed_cmd(string command)
    int saved_number = ed_number;
    string saved_filename = ed_filename;
    string saved_pattern = ed_pattern;
+   int saved_global = ed_global;
+   int *saved_selected = ed_selected;
    mixed failure;
    string output = "";
    if (ed_mode == -1) ed_fail("editor is inactive");
@@ -550,6 +828,8 @@ protected string ed_cmd(string command)
       ed_number = saved_number;
       ed_filename = saved_filename;
       ed_pattern = saved_pattern;
+      ed_global = saved_global;
+      ed_selected = saved_selected;
       return "? " + failure + "\n";
    }
    return output;
