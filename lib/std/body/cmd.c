@@ -61,7 +61,7 @@ varargs nomask int do_game_command(string str, int debug)
    /*
    ** Parse the player's input
    */
-   result = parse_sentence(str, debug, objs);
+   result = efun::parse_sentence(str, debug, objs, nil, this_object(), this_user());
 
    /*
    ** If a string was returned, then the parser figured something out.
@@ -117,7 +117,7 @@ varargs nomask int do_game_command(string str, int debug)
    /*
    ** Check if they typed an exit
    */
-   go_result = parse_sentence("go " + str);
+   go_result = efun::parse_sentence("go " + str, 0, nil, nil, this_object(), this_user());
    if (go_result == 1)
       return 1;
    if (!result)
@@ -144,9 +144,12 @@ nomask void force_game_command(string str)
    object save_this_user = this_user();
 
    set_this_player(query_link());
-   if (!do_game_command(str))
-      write(nonsense());
+   mixed problem = catch {
+      if (!do_game_command(str))
+         write(nonsense());
+   };
    set_this_player(save_this_user);
+   if (problem) throw(problem);
 }
 
 //: FUNCTION read_help_topic

@@ -22,6 +22,7 @@ string name;
 void mudlib_setup()
 {
    ::mudlib_setup();
+   enable_commands();
    /* We always should have an 'in' relation in living objects. */
    /* This takes care of capacity too */
    add_relation("on", 100);

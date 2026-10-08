@@ -58,7 +58,8 @@ void main(mixed *arg)
    }
    save_tp = this_user();
    set_this_player(target->query_link() || target);
-   target->force_look();
+   mixed problem = catch(target->force_look());
    set_this_player(save_tp);
+   if (problem) throw(problem);
    return;
 }

@@ -203,21 +203,24 @@ void do_game_command(string str)
    save_tu = this_user();
    set_this_user(this_object());
 
-   verb = str;
-   sscanf(verb, "%s %s", verb, argument);
+   mixed problem = catch {
+      verb = str;
+      sscanf(verb, "%s %s", verb, argument);
 
-   winner = CMD_D->find_cmd_in_path(verb, ({CMD_DIR_PLAYER "/"}));
-   if (arrayp(winner))
-      winner[0]->call_main("", "", "", "", "", "", argument);
-   else if (environment())
-   {
-      mixed result = parse_sentence(str);
+      winner = CMD_D->find_cmd_in_path(verb, ({CMD_DIR_PLAYER "/"}));
+      if (arrayp(winner))
+         winner[0]->call_main("", "", "", "", "", "", argument);
+      else if (environment())
+      {
+         mixed result = efun::parse_sentence(str, 0, nil, nil, this_object(), this_user());
 
-      if (stringp(result))
-         write(result);
-   }
+         if (stringp(result))
+            write(result);
+      }
+   };
 
    set_this_user(save_tu);
+   if (problem) throw(problem);
 }
 
 // Return the number of listeners (player in room)

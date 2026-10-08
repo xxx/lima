@@ -559,15 +559,25 @@ int valid_override(string file, string efun_name, string main_file)
    case "pluralize":
       // M_GRAMMAR overrides this
       return 1;
+   case "parse_sentence":
+      if (file == "/std/body/cmd.c" ||
+          file == "/std/modules/m_actions.c" ||
+          file == "/std/behaviour/clusters/base.c")
+         return 1;
+      break;
+   case "parse_my_rules":
+      if (file == "/daemons/soul_d.c")
+         return 1;
+      break;
    case "input_to":
    case "get_char":
-      return file == "/secure/user/inputsys";
+      return file == "/secure/user/inputsys.c";
    }
    /*
     ** The simul efun ob can use efun:: all it wants.  Other objects are
     ** completely restricted.
     */
-   return file == "/secure/simul_efun/overrides";
+   return file == "/secure/simul_efun/overrides.c";
 }
 
 int valid_socket(object ob, string what, mixed *info)

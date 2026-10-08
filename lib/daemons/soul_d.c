@@ -358,7 +358,7 @@ mixed *parse_soul(string str)
    mixed result;
    mixed soul;
 
-   result = parse_my_rules(this_body(), str, 0);
+   result = efun::parse_my_rules(this_body(), str, 0, this_user());
    if (!result)
       return 0;
    if (intp(result) || stringp(result))
@@ -441,7 +441,7 @@ mixed *parse_imud_soul(string str)
       }
    }
 
-   result = parse_my_rules(this_body(), str, 0);
+   result = efun::parse_my_rules(this_body(), str, 0, this_user());
 
    if (!result || intp(result) || stringp(result))
    {

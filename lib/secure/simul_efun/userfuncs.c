@@ -15,7 +15,7 @@ nomask object this_body()
 {
    object u = this_user();
 
-   return u ? u->query_body() : 0;
+   return u ? u->query_body() : nil;
 }
 
 varargs nomask object find_user(string str, int even_linkdead)

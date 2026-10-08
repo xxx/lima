@@ -169,9 +169,11 @@ void follow_hook(string whichway)
 {
    if (follow == this_body())
    {
+      object saved_user = this_user();
       set_this_user(this_object());
-      respond("go " + whichway);
-      set_this_user(follow->query_link());
+      mixed problem = catch(respond("go " + whichway));
+      set_this_user(saved_user);
+      if (problem) throw(problem);
    }
 }
 

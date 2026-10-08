@@ -424,8 +424,9 @@ nomask void force_me(string str)
    //         error("illegal force attempt.\n");
 
    set_this_player(this_object());
-   dispatch_to_bottom(str);
+   mixed problem = catch(dispatch_to_bottom(str));
    set_this_player(save_this_user);
+   if (problem) throw(problem);
 }
 
 string stat_me()
