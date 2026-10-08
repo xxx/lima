@@ -26,7 +26,12 @@ nomask private void main(string str)
       write("stupidemote verb\n");
       return;
    }
-   SOUL_D->add_emote(str, "", "$N $v" + str + ".", 0);
-   SOUL_D->add_emote(str, "STR", "$N $v" + str + " $o.", 0);
+   SOUL_D->add_emote(str, "", ({"$N $v" + str + "."}));
+   SOUL_D->add_emote(str, "STR", ({"$N $v" + str + " $o."}));
    out("Added.\n");
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

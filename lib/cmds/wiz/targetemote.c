@@ -30,9 +30,14 @@ nomask private void main(string str)
       out("targetemote verb\n");
       return;
    }
-   SOUL_D->add_emote(str, "", "$N $v" + str + ".", 0);
-   SOUL_D->add_emote(str, "STR", "$N $v" + str + " $o.", 0);
-   SOUL_D->add_emote(str, "OBJ", "$N $v" + str + " at $o.", 0);
-   SOUL_D->add_emote(str, "LIV", "$N $v" + str + " at $t.", 0);
+   SOUL_D->add_emote(str, "", ({"$N $v" + str + "."}));
+   SOUL_D->add_emote(str, "STR", ({"$N $v" + str + " $o."}));
+   SOUL_D->add_emote(str, "OBJ", ({"$N $v" + str + " at $o."}));
+   SOUL_D->add_emote(str, "LIV", ({"$N $v" + str + " at $t."}));
    out("Added.\n");
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
