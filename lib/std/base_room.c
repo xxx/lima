@@ -41,6 +41,10 @@ nosave int chat_percentage_chance = 20;
 private
 nosave int tag;
 private
+nosave int check_tag;
+private
+nosave function arrival_hook, departure_hook;
+private
 nosave int no_combat;
 
 //: FUNCTION stat_me
@@ -149,11 +153,11 @@ string get_brief()
 
 void possible_light_change(int old_light, int new_light)
 {
-   if (old_light && !new_light)
+   if (old_light >= 1 && new_light < 1)
    {
       tell_from_inside(this_object(), "The room goes dark.\n");
    }
-   else if (!old_light && new_light)
+   else if (old_light < 1 && new_light >= 1)
    {
       tell_from_inside(this_object(), "You can see again.\n");
    }
@@ -193,7 +197,7 @@ string get_base_long()
 
    fmt = reg_assoc(base, ({"\\$[A-Za-z_]*"}), ({1}))[0];
 
-   for (i = 1; i < sizeof(fmt); i++)
+   for (i = 1; i < sizeof(fmt); i += 2)
    {
       string tmp;
 
@@ -291,9 +295,10 @@ void do_listen()
       write("You hear nothing unusual.\n");
 }
 
-void do_look_at_str()
+int do_look_at_str(string str)
 {
    write("You do not see that here.\n");
+   return 1;
 }
 
 void do_pray()
@@ -301,12 +306,13 @@ void do_pray()
    write("Nothing special happens.\n");
 }
 
-void do_smell()
+int do_smell()
 {
    if (smell)
       write(smell + "\n");
    else
       write("You smell nothing unusual.\n");
+   return 1;
 }
 
 int listeners()
@@ -317,10 +323,12 @@ int listeners()
 
 void check_anybody_here()
 {
-   if (listeners())
+   remove_call_out(check_tag);
+   check_tag = 0;
+   if (chat_msg != nil && listeners())
    {
-      if (find_call_out("room_chat") == -1)
-         tag = call_out("room_chat", chat_period, chat_msg);
+      if (!query_call_out(tag))
+         tag = call_out(room_chat, chat_period);
    }
    else
    {
@@ -331,6 +339,11 @@ void check_anybody_here()
 
 void room_chat()
 {
+   remove_call_out(tag);
+   tag = 0;
+   if (chat_msg == nil || !listeners())
+      return;
+
    if (random(100) <= chat_percentage_chance)
    {
       if (stringp(chat_msg))
@@ -340,18 +353,21 @@ void room_chat()
       else if (functionp(chat_msg))
          tell_from_outside(this_object(), punctuate(trim(evaluate(chat_msg))) + "\n");
    }
-   check_anybody_here();
+   // A deferred check gives callback reconfiguration or departure precedence.
+   if (!check_tag)
+      check_anybody_here();
 }
 
 void departure(object who)
 {
-   call_out("check_anybody_here", 0);
+   if (!check_tag)
+      check_tag = call_out(check_anybody_here, 0);
 }
 
 void arrival(object who)
 {
-   if (listeners() && find_call_out("room_chat") == -1)
-      tag = call_out("room_chat", chat_period, chat_msg);
+   if (!check_tag)
+      check_anybody_here();
 }
 
 //: FUNCTION set_room_chat
@@ -361,15 +377,32 @@ void arrival(object who)
 // that will be evaluated to create a string.
 // The call_out() in the room is only called if players are in the room,
 // so using this will be okay even for many rooms.
-varargs void set_room_chat(mixed chat, int interval, int chance)
+varargs void set_room_chat(mixed chat, int interval = 15, int chance)
 {
+   if (interval <= 0)
+      error("Room chat interval must be positive.\n");
+   if (arrayp(chat))
+   {
+      if (!sizeof(chat))
+         error("Room chat messages must not be empty.\n");
+      foreach (mixed message in chat)
+         if (!stringp(message))
+            error("Room chat messages must be strings.\n");
+   }
+   else if (!stringp(chat) && !functionp(chat))
+      error("Room chat requires a string, string array or function.\n");
+
    chat_msg = chat;
    chat_period = interval;
    if (chance > 0)
       chat_percentage_chance = chance;
 
-   add_hook("object_arrived", ( : arrival:));
-   add_hook("object_left", ( : departure:));
+   if (!arrival_hook)
+      arrival_hook = arrival;
+   if (!departure_hook)
+      departure_hook = departure;
+   add_hook("object_arrived", arrival_hook);
+   add_hook("object_left", departure_hook);
 
    if (tag)
    {
@@ -377,5 +410,6 @@ varargs void set_room_chat(mixed chat, int interval, int chance)
       tag = 0;
    }
 
-   call_out("check_anybody_here", 0);
+   remove_call_out(check_tag);
+   check_tag = call_out(check_anybody_here, 0);
 }

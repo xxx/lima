@@ -28,7 +28,7 @@ string query_state_desc(string state)
    else if (member_array(state + "_off", room_state) != -1)
       return evaluate(room_state_extra_longs[state + "_off"]) || "";
    else
-      return 0; /* not a valid state */
+      return nil; /* not a valid state */
 }
 
 void set_room_state(string state)

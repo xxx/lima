@@ -35,7 +35,7 @@ varargs string show_objects(object except)
       if (obs[n]->is_living())
       {
          str = obs[n]->in_room_desc();
-         if ((link = obs[n]->query_link()) && userp(link))
+         if ((link = obs[n]->query_link()) && link->is_user())
          {
             if (except)
                str += sprintf(" (outside %s)", except->the_short());
@@ -123,12 +123,16 @@ varargs void do_looking(int force_long_desc, object who)
       if (wizardp(who) && who->query_link()->query_shell_ob()->get_variable("show_loc"))
       {
          tell(who, sprintf("File: %s %s\n", file_name(this_object()),
-                           sizeof(query_area()) ? " Areas: " + format_list(query_area()) : ""));
+                           sizeof(query_area()) ? " Areas: " + format_list(query_area(), nil) : ""));
       }
 
-      // ### for now, hack a global
+      int previous_force = this_look_is_forced;
+      mixed err;
+
       this_look_is_forced = force_long_desc;
-      tell(who, long());
-      this_look_is_forced = 0;
+      err = catch(tell(who, long()));
+      this_look_is_forced = previous_force;
+      if (err)
+         error(err);
    }
 }
