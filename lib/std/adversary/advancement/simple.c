@@ -266,10 +266,10 @@ void set_karma(int k)
 // Returns the new karma. Karma is between -1000 and 1000.
 int modify_karma(int modifier)
 {
-   float karma_mod = 0;
+   float karma_mod = 0.0;
    modifier = clamp(modifier, -5, 5);
    karma_mod = modifier * ((1100 / (200.0 + abs(karma))));
-   karma = karma + karma_mod;
+   karma = to_int(karma + karma_mod);
 
    karma = clamp(karma, -1000, 1000);
    return karma;
