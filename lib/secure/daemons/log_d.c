@@ -48,5 +48,5 @@ void log(string which, string what)
    if (member_array(which, timestamps) != -1)
       what = ctime(time()) + ": " + what;
 
-   unguarded(1, ( : write_file, legal_logs[which], what:));
+   unguarded(1, (: write_file(legal_logs[$(which)], $(what)) :));
 }
