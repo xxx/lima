@@ -108,7 +108,7 @@ void set_drink_source(string source)
 
 int calculate_num_drinks()
 {
-   num_drinks = to_int((query_mass() < 1 ? 1 : query_mass()) * drinks_per_unit + drinks_current_unit);
+   num_drinks = to_int((query_mass() < 1.0 ? 1.0 : query_mass()) * to_float(drinks_per_unit) + to_float(drinks_current_unit));
    return num_drinks;
 }
 
@@ -120,7 +120,7 @@ void reduce_drink_number()
    {
       drinks_current_unit = drinks_per_unit;
       set_weight(query_mass());
-      set_quantity(query_mass());
+      set_quantity(to_int(query_mass()));
    };
    calculate_num_drinks();
    if (!num_drinks)

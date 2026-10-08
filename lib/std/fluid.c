@@ -5,7 +5,8 @@
 // be handled at all except using a container.
 // Coded by Uae of Zork.  9/20/97
 
-inherit OBJ;
+inherit OBJ base_object;
+#include <move.h>
 inherit M_GETTABLE;
 inherit M_MESSAGES;
 
@@ -22,7 +23,25 @@ mixed pour_action = "$N $vpour $o $o1 $o2.";
 mixed taste_action = "It tastes rather bland.";
 
 mixed evaporate_action = 0;
-function evaporate_puddle = ( : evaporate_puddle_func:);
+function evaporate_puddle = evaporate_puddle_func;
+private nosave int evaporation_id;
+
+void stop_evaporation()
+{
+   remove_call_out(evaporation_id);
+   evaporation_id = 0;
+}
+
+void start_evaporation()
+{
+   stop_evaporation();
+   if (!evaporate_action || !environment())
+      return;
+   if (functionp(evaporate_action))
+      evaluate(evaporate_action);
+   else
+      evaporation_id = call_out(evaporate_puddle, evap_amount);
+}
 
 private
 string default_container;
@@ -105,15 +124,17 @@ void set_pour_action(mixed x)
 
 void create()
 {
-   ::create();
+   base_object::create();
+   add_hook("move", stop_evaporation);
+   add_hook("remove", stop_evaporation);
    add_id("fluid", "liquid", "watery"); // watery can be used to exclude fluids that are not viscous.
    set_quantity(1);
 }
 
-varargs void set_fluid_level(int x, int y)
+varargs void set_fluid_level(float x, int y)
 {
 #ifdef USE_SIZE
-   set_size(x);
+   set_size(to_int(x));
 #endif
 #ifdef USE_MASS
    set_mass(x);
@@ -121,12 +142,12 @@ varargs void set_fluid_level(int x, int y)
    if (y)
       set_quantity(y);
    else
-      set_quantity(x);
+      set_quantity(to_int(x));
 }
 
 varargs int add_fluid(object fluid)
 {
-   if (!fluid)
+   if (!fluid || fluid == this_object())
       return 0;
 #ifdef USE_SIZE
    set_fluid_level(query_size() + (fluid->query_size()));
@@ -146,76 +167,66 @@ int do_mix(object fluid)
 
 varargs object fluid_already(string x, object env)
 {
-
-   object ob;
-
-   if (!env)
+   if (!env && this_body())
       env = environment(this_body());
-
+   if (!env)
+      return nil;
    if (!x)
       x = query_primary_id();
-   ob = present(x, env);
-
-   if (!ob)
-      return 0;
-
-   if (!ob->id("fluid"))
-      return 0;
-
-   return ob;
+   foreach (object ob in all_inventory(env))
+      if (ob != this_object() && ob->id(x) && ob->id("fluid"))
+         return ob;
+   return nil;
 }
 
 varargs void pour(string how, mixed ob2, mixed from)
 {
-
+   object caster = this_body();
+   object resident;
    string where;
 
+   if (!caster)
+      return;
    if (how == "from" || how == "out")
-      ob2 = environment(this_body());
+      ob2 = environment(caster);
+   if (!objectp(ob2))
+      return;
 
-   if (ob2 == environment(this_body()))
+   if (ob2 == environment(caster))
    {
       how = "onto";
       where = "the ground";
-   }
-   else
-      where = ob2->the_short();
-
-   if (ob2 == environment(this_body()))
-   {
+      if (environment() != ob2 && move(ob2) != MOVE_OK)
+         return;
       if (functionp(pour_action))
          evaluate(pour_action, how, ob2);
-      else
-         this_body()->simple_action(pour_action, this_object(), how, where);
-      if (add_fluid(fluid_already()))
-         return;
-      if (evaporate_action)
+      else if (pour_action)
+         caster->simple_action(pour_action, this_object(), how, where);
+      resident = fluid_already(nil, ob2);
+      if (resident)
       {
-         remove_call_out(0);
-         if (functionp(evaporate_action))
-            evaluate(evaporate_action);
-         else
-            call_out(evaporate_puddle, evap_amount);
-      };
-      move(ob2);
-      remove_adj(query_primary_adj()); // This avoids strange bugs.
+         resident->add_fluid(this_object());
+         resident->start_evaporation();
+         return;
+      }
+      remove_adj(query_primary_adj());
       set_proper_name(query_puddle_name());
       add_id(puddle_id);
+      start_evaporation();
    }
-
    else if (ob2->part_fill_with(this_object()))
    {
       if (functionp(pour_action))
          evaluate(pour_action);
-      else
-         this_body()->simple_action(pour_action, this_object(), how, where);
-   };
+      else if (pour_action)
+         caster->simple_action(pour_action, this_object(), how, ob2->the_short());
+   }
 }
 
 int will_fit(object bottle)
 {
-   int fluid_size;
-   int room_left;
+   float fluid_size;
+   float room_left;
 #ifdef USE_SIZE
    fluid_size = query_size();
 #endif
@@ -233,19 +244,21 @@ mixed move_fluid(object bottle)
    if (!will_fit(bottle))
       return 0;
 
-   move(bottle);
-   return 1;
+   return move(bottle) == MOVE_OK;
 }
 
 void remove_puddle()
 {
-   remove_call_out(0);
+   stop_evaporation();
    simple_action("The $o dwindles to nothing.", this_object());
    remove();
 }
 
 void evaporate_puddle_func()
 {
+   evaporation_id = 0;
+   if (!environment())
+      return;
 
 #ifdef USE_SIZE
    set_size(query_size() - 1);
@@ -256,7 +269,7 @@ void evaporate_puddle_func()
    };
 #endif
 #ifdef USE_MASS
-   set_mass(query_mass() - 1);
+   set_mass(query_mass() - 1.0);
    if (query_mass() <= 0)
    {
       remove_puddle();
@@ -265,7 +278,7 @@ void evaporate_puddle_func()
 #endif
    this_object()->simple_action(evaporate_action, this_object());
 
-   call_out(evaporate_puddle, evap_time);
+   evaporation_id = call_out(evaporate_puddle, evap_time);
 }
 
 mixed drop()
@@ -274,7 +287,7 @@ mixed drop()
 
    msg = ::drop();
 
-   if (msg)
+   if (msg == MOVE_OK)
    {
       add_id(puddle_id);
       add_fluid(fluid_already());
@@ -289,10 +302,10 @@ mixed get()
 
    msg = ::get();
 
-   if (msg)
+   if (msg == MOVE_OK)
    {
       remove_id(puddle_id);
-      add_fluid(fluid_already(0, this_body()));
+      add_fluid(fluid_already(nil, this_body()));
    };
 
    return msg;

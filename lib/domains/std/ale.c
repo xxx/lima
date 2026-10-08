@@ -11,7 +11,7 @@ void setup()
    set_size(1);
 #endif
 #ifdef USE_MASS
-   set_mass(1);
+   set_mass(1.0);
 #endif
    set_long("The ale is amber and clear, with a slight head of foam on it. ");
    set_in_room_desc("There is a puddle of spilled ale on the ground here.");
