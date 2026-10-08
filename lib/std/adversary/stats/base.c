@@ -18,14 +18,20 @@ mapping query_stats()
    return deep_copy(stats);
 }
 
+private int stat_value(string key)
+{
+   mixed value = stats[key];
+   return value == nil ? 0 : value;
+}
+
 int query_stat_pure(string stat)
 {
-   return stats["stat_" + stat];
+   return stat_value("stat_" + stat);
 }
 
 int query_stat(string stat)
 {
-   return stats["cur_" + stat];
+   return stat_value("cur_" + stat);
 }
 
 void set_mod_stat(string stat, int s)
@@ -35,17 +41,20 @@ void set_mod_stat(string stat, int s)
 
 int query_mod_stat(string stat)
 {
-   return stats["mod_" + stat];
+   return stat_value("mod_" + stat);
 }
 
 void inc_mod_stat(string stat)
 {
-   stats["mod_" + stat]++;
+   string key = "mod_" + stat;
+   if (stats[key] == nil)
+      stats[key] = 0;
+   stats[key]++;
 }
 
 mapping stat_type(string type)
 {
-   return filter_mapping(stats, ( : strsrch($1, $(type)) == 0 :));
+   return filter(stats, ( : strsrch($1, $(type)) == 0 :));
 }
 
 /*
@@ -167,7 +176,7 @@ void refresh_stats()
    string *names = stat_names();
 
    foreach (string s in names)
-      stats["cur_" + s] = stats["stat_" + s] + stats["mod_" + s] + call_hooks(s + "_bonus", HOOK_SUM);
+      stats["cur_" + s] = stat_value("stat_" + s) + stat_value("mod_" + s) + call_hooks(s + "_bonus", HOOK_SUM);
 }
 
 void reset_stat_increases()
@@ -176,6 +185,8 @@ void reset_stat_increases()
 
    foreach (string s, int value in mods)
       stats[s] = 0;
+   foreach (string s in stat_names())
+      stats["mod_" + s] = 0;
    refresh_stats();
 }
 
@@ -188,11 +199,11 @@ int max_stat()
 
 void clear_description()
 {
-   cached_description = 0;
+   cached_description = nil;
 }
 
 void init_stats()
 {
    stats = ([]);
-   cached_description = 0;
+   cached_description = nil;
 }
