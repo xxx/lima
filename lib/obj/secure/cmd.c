@@ -64,8 +64,8 @@ nomask varargs void resend(string ob, mixed arg1, mixed arg2)
 
 nomask void do_resend(mixed arg1, mixed arg2)
 {
-   string prog = call_stack(0)[1];
-   string fun = call_stack(2)[1];
+   string prog = calling_program();
+   string fun = calling_function();
 
    if (prog != __FILE__ || fun != "resend")
       error(sprintf("Illegal resend() from %s::%s()\n", prog, fun));

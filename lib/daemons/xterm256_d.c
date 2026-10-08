@@ -195,7 +195,7 @@ varargs string substitute_ansi(string text = "", string mode)
 
          // If the previous object was a user, we will pick the custom colour
          // mapping from the previous object.
-         if (previous_object()->is_user())
+         if (previous_object() && previous_object()->is_user())
             user = previous_object()->query_colour_mapping();
          // Otherwise, we'll go for this_user().
          //  This should allow each user to receive their own colours, and not the
@@ -203,10 +203,10 @@ varargs string substitute_ansi(string text = "", string mode)
          else if (this_user())
             user = this_user()->query_colour_mapping();
          // If we don't even have this user, lastly
-         //  use the call_stack() to find the user.
+         //  inspect the callers to find the user.
          else
          {
-            object *u = filter(call_stack(1), ( : $1->is_user() :));
+            object *u = filter(({ this_object() }) + calling_object(-1), (: objectp($1) && $1->is_user() :));
             if (sizeof(u))
                user = u[0]->query_colour_mapping();
          }

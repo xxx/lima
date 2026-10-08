@@ -18,6 +18,18 @@ int is_normal_direction(string dir)
    return 0;
 }
 
+private mixed *diagnostic_stack(int kind)
+{
+   switch (kind)
+   {
+   case 0: return calling_program(-1);
+   case 1: return calling_object(-1);
+   case 2: return calling_function(-1);
+   }
+   error("Invalid diagnostic stack selector.\n");
+   return ({});
+}
+
 //: FUNCTION call_trace
 // returns the stack of objects and functions
 
@@ -30,9 +42,9 @@ string call_trace()
    string *functions;
 
    res = "";
-   programs = call_stack(0);
-   objects = call_stack(1);
-   functions = call_stack(2);
+   programs = diagnostic_stack(0);
+   objects = diagnostic_stack(1);
+   functions = diagnostic_stack(2);
 
    n = sizeof(programs);
    for (i = 0; i < n; i++)
@@ -832,12 +844,12 @@ varargs string get_stack(int x)
 {
    int i, s;
    string list = "";
-   string *stack0 = call_stack(0);
-   string *stack1 = call_stack(1);
-   string *stack2 = call_stack(2);
+   string *stack0 = diagnostic_stack(0);
+   object *stack1 = diagnostic_stack(1);
+   string *stack2 = diagnostic_stack(2);
    for (i = 0, s = sizeof(stack1); i < s; i++)
    {
-      list += "\n" + i + ":" + identify(stack2[i]) + "." + identify(stack1[i]) + "." + identify(stack2[i]);
+      list += "\n" + i + ":" + identify(stack0[i]) + "." + identify(stack1[i]) + "." + identify(stack2[i]);
    }
 
    if (x)

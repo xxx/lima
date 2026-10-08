@@ -825,12 +825,12 @@ nomask varargs int check_privilege(mixed prot, int ignore)
 
    if (!prot)
       return 1;
-   stacksize = (sizeof(stack = all_previous_objects()));
+   stacksize = (sizeof(stack = previous_object(-1)));
    for (i = ignore; i < stacksize; i++)
    {
       ob = stack[i];
-      next = (i < stacksize - 1 ? stack[i + 1] : 0);
-      next2 = (i < stacksize - 2 ? stack[i + 2] : 0);
+      next = (i < stacksize - 1 ? stack[i + 1] : nil);
+      next2 = (i < stacksize - 2 ? stack[i + 2] : nil);
       if (!ob)
       {
          syslog("Secvio: object destructed in call stack\n" + implode(map(stack, (

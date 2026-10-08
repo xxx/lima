@@ -46,7 +46,16 @@ nomask varargs protected mixed unguarded(mixed priv, function code)
    if (origin() != ORIGIN_LOCAL)
       return 0;
    unguarded_privilege = priv;
-   return SECURE_D->call_unguarded(code, security_handle = allocate(1));
+   function callback = code;
+   if (functionp(code))
+   {
+      mapping info = function_info(code);
+      if (info["owner"] == this_object() &&
+          (info["kind"] == "dynamic" || info["kind"] == "simul_efun" ||
+           (info["kind"] == "efun" && info["name"] == "call_other")))
+         callback = (: $(code)() :);
+   }
+   return SECURE_D->call_unguarded(callback, security_handle = allocate(1));
 }
 
 /* Do not remove the headers from this file! see /USAGE for more info. */
