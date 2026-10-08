@@ -83,7 +83,7 @@ private void main(mixed *arg, mapping flags)
 
    if (flags["a"])
    {
-      upcount = implode(matches, ( : $1 + ($(mudlist)[$2][0] == -1) :), 0);
+      upcount = reduce(matches, ( : $1 + ($(mudlist)[$2][0] == -1) :), 0);
    }
    else
    {
@@ -96,7 +96,7 @@ private void main(mixed *arg, mapping flags)
       mudinfo = mudlist[match];
       if (search_str)
       {
-         if (!regexp(lower_case(mudinfo[1]), search_str))
+         if (!sizeof(regexp(({lower_case(mudinfo[1])}), search_str)))
          {
             --matched;
             if (mudinfo[0] == -1)
@@ -119,15 +119,15 @@ private void main(mixed *arg, mapping flags)
    frame_add_column("Up",
                     map(sorted_list, ( : $1[0] == -1 ? (uses_unicode() ? "↑" : "U") : (uses_unicode() ? "↓" : "D") :)),
                     ( : colour_up_down($1) :));
-   frame_add_column("Name", map(sorted_list, ( : $1[13] :)), 0, 20);
+   frame_add_column("Name", map(sorted_list, ( : $1[13] :)), nil, 20);
    frame_add_column("Address", map(sorted_list, ( : $1[1] :)));
    frame_add_column("Port", map(sorted_list, ( : $1[2] :)));
-   frame_add_column("Open Status", map(sorted_list, ( : $1[9] :)), 0, 18);
+   frame_add_column("Open Status", map(sorted_list, ( : $1[9] :)), nil, 18);
    if (wizardp(this_user()))
       {
-         frame_add_column("Library", map(sorted_list, ( : $1[5] :)), 0, 18);
-         frame_add_column("Driver", map(sorted_list, ( : $1[7] :)), 0, 18);
-         frame_add_column("Administrator", map(sorted_list, ( : $1[10] :)), 0, 18);
+         frame_add_column("Library", map(sorted_list, ( : $1[5] :)), nil, 18);
+         frame_add_column("Driver", map(sorted_list, ( : $1[7] :)), nil, 18);
+         frame_add_column("Administrator", map(sorted_list, ( : $1[10] :)), nil, 18);
       }
 
    set_frame_title(sprintf("Mudlist - %d matches", matched));
@@ -137,6 +137,11 @@ private void main(mixed *arg, mapping flags)
 void player_menu_entry()
 {
    bare_init();
-   main(0, 0);
+   main(nil, nil);
    done_outputing();
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg, flags);
 }
