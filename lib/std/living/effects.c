@@ -22,12 +22,10 @@ nosave private int tag; // Tag for call_out
 // Returns time remaining in call_out to the next effect
 int time_to_next_effect()
 {
-   mixed *callouts = call_out_info();
-   foreach (mixed callout in callouts)
+   foreach (mixed *callout in query_call_outs())
    {
-      if (callout[0] == this_object())
-         if (callout[1] == "next_effect")
-            return callout[2];
+      if (function_name(callout[1]) == "next_effect")
+         return callout[2] < 0 ? 0 : callout[2] / 1000;
    }
    return -1;
 }
@@ -270,7 +268,7 @@ void next_effect()
    if (sizeof(effects))
    {
       this_effect = effects[0];
-      tag = call_out("next_effect", this_effect.delay);
+      tag = call_out(next_effect, this_effect.delay);
    }
    else
       tag = 0;
@@ -327,7 +325,7 @@ void add_effect(string ob, mixed args = nil, mixed *options...)
       this_effect.args = obj->start_effect(this_object(), args, repeats, interval);
    insert_effect(this_effect);
    if (!tag)
-      tag = call_out("next_effect", this_effect.delay);
+      tag = call_out(next_effect, this_effect.delay);
 }
 
 //: FUNCTION reinstate_effects

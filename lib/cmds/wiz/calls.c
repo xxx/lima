@@ -33,7 +33,8 @@ void main()
    int i;
    mapping calls = ([]);
 
-   call_out_stuff = filter(call_out_info(), sizeof);
+   call_out_stuff = map(query_call_outs(-1),
+                        (: ({ $1[0], function_name($1[1]), $1[2] < 0 ? 0 : $1[2] / 1000 }) :));
 
    // We do not have any ANSI here, but also don't want emojis.
    set_output_flags(NO_ANSI);

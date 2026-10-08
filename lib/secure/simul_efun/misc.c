@@ -526,8 +526,11 @@ void call_out_chain(mixed *funcs, int delay, mixed *args...)
 
 mixed *my_call_outs()
 {
-   object p = previous_object();
-   return filter(call_out_info(), ( : $1[0] == $(p) :));
+   object owner = previous_object();
+   if (!owner)
+      return ({});
+   return map(query_call_outs(owner),
+              (: ({ $1[0], function_name($1[1]), $1[2] < 0 ? 0 : $1[2] / 1000 }) :));
 }
 
 // Beek fixed not to loop forever if exp < 0, etc
