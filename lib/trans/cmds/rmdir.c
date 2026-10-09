@@ -23,9 +23,15 @@ void main(mixed *arg)
    string dir;
    foreach (dir in arg[0])
    {
-      if (rmdir(dir))
+      int removed;
+      if (!catch(removed = rmdir(dir)) && removed)
          outf("Removed directory: %s.\n", dir);
       else
          outf("Failed to remove directory: %s.\n", dir);
    }
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

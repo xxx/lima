@@ -21,7 +21,7 @@ deferred and `suicide` is disabled upstream.
 
 Wizard directory navigation passes seven cases covering 28 inputs, including
 saved directory history and current-file restoration after shell recreation.
-Focused checks compile 15 of 81 wizard commands, 11 of 49 transitional commands
+Focused checks compile 15 of 81 wizard commands, 14 of 49 transitional commands
 and all 9 navigation support targets. The existing root-origin `cd -` edge is
 recorded separately in the port notes.
 
@@ -66,6 +66,15 @@ overwrite/force, directory/glob selection, refusals and status output routes.
 All 12 supporting targets compile; fresh transitional checks add only `cp` and
 `mv`, with no regressions. Their existing text-based I/O, unused `-r` option and
 same-file behavior are recorded in the port notes.
+
+`mkdir`, `rmdir` and `rm` pass twelve scenarios across 42 registered inputs.
+They use native command dispatch and preserve existing status messages and
+argument rules. `mkdir` receives the grouped path array with an explicit
+`mixed *` argument type; mkdir/rmdir refusals are caught per path so later paths
+still run. Native `rmdir` accounts for earlier pending child removals and refuses
+duplicate removal. Fresh transitional checks add only these three commands,
+with no regressions; all 12 supporting targets compile. The existing parent/
+child argument-expansion behavior is recorded in the port notes.
 
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.

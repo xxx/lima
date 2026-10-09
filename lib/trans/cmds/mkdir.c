@@ -18,13 +18,19 @@
 inherit CMD;
 
 private
-void main(string *arg)
+void main(mixed *arg)
 {
    foreach (string d in arg[0])
    {
-      if (mkdir(d))
+      int made;
+      if (!catch(made = mkdir(d)) && made)
          outf("Ok.\n");
       else
          outf("Failed to make directory: %s\n", d);
    }
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

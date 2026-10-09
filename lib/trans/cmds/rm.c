@@ -28,3 +28,8 @@ void main(mixed argv)
 {
    map(argv[0], ( : rm($1) ? outf("%s: removed.\n", $1) : outf("failed to remove: %s\n", $1) :));
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}
