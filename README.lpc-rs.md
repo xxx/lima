@@ -192,6 +192,17 @@ the existing early cleanup and caught errors; the same-second timestamp edge
 remains documented.
 Fresh transitional checks add only `update`, with no regressions.
 
+`renew` passes 23 scenarios across 54 registered inputs, including baseline
+and minimal-port controls. It uses native command dispatch and a bare void return.
+The destruction simul handles contents after cleanup: children try to move to the
+parent environment, and those remaining are retired recursively. Inventory
+snapshots are processed in batches. Saved types, replacement identity/state,
+nested contents, movement outcomes, errors, output routes and shell context pass.
+Existing duplication, reconstructed relation bookkeeping and buffered helper
+output remain recorded in the port notes. Fresh transitional checks add only
+`renew`, with no regressions; native destruction and permission applies are
+unchanged.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

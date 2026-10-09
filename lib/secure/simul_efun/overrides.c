@@ -82,6 +82,28 @@ nomask object this_player(string str)
    error("this_player() is obsolete.  Use this_body() or this_user() instead.\n");
 }
 
+// Native destruction leaves contents in the dying object unless the mudlib handles them.
+private void destruct_with_contents(object ob)
+{
+   object destination = environment(ob);
+   object *contents;
+   while (ob && sizeof(contents = all_inventory(ob)))
+   {
+      foreach (object child in contents)
+      {
+         if (!child || environment(child) != ob)
+            continue;
+         child->move(destination);
+         if (!ob)
+            return;
+         if (child && environment(child) == ob)
+            destruct_with_contents(child);
+      }
+   }
+   if (ob)
+      efun::destruct(ob);
+}
+
 //: FUNCTION destruct
 // Authorized explicit targets receive remove() before native destruction.
 // Omitted targets remove the requester without calling remove() recursively.
@@ -112,7 +134,7 @@ nomask void destruct(mixed *args...)
    else if (sizeof(args))
       ob->remove();
    if (ob)
-      efun::destruct(ob);
+      destruct_with_contents(ob);
 }
 
 //: FUNCTION shutdown

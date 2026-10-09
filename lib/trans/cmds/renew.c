@@ -26,7 +26,7 @@ void main(mixed *arg)
    if (file_size(file + ".c") < 0)
    {
       outf("renew: file '" + file + "' does not exist (or is a directory).\n");
-      return 0;
+      return;
    }
    env = environment(ob);
    data = ob->save_to_string(1);
@@ -37,4 +37,9 @@ void main(mixed *arg)
    ob = clone_object (file);
    ob->load_from_string(data, 1);
    ob->move(env);
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
