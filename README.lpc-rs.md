@@ -21,7 +21,7 @@ deferred and `suicide` is disabled upstream.
 
 Wizard directory navigation passes seven cases covering 28 inputs, including
 saved directory history and current-file restoration after shell recreation.
-Focused checks compile 15 of 81 wizard commands, 8 of 49 transitional commands
+Focused checks compile 15 of 81 wizard commands, 9 of 49 transitional commands
 and all 9 navigation support targets. The existing root-origin `cd -` edge is
 recorded separately in the port notes.
 
@@ -52,6 +52,13 @@ the existing editor module and reports its 8,192 UTF-8 byte, 1,000-line and
 fix preserves escaped pattern pairs. Inverse directory searches and existing
 glob-pattern semantics remain recorded source limitations. Fresh transitional
 checks add only `grep`, with no regressions; all 16 supporting targets compile.
+
+`more` passes nine scenarios across 56 inputs through the registered user/pager
+callbacks. File and stdin display, navigation, searches, help, shell escapes,
+multiple files, completion and error cleanup pass; all 12 supporting targets
+compile. Fresh transitional checks add only `more`, with no regressions. Its
+existing direct-output routing, 999-line file cap, display spacing and unsupported
+`-c` option are recorded in the port notes.
 
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.

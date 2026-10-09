@@ -29,12 +29,12 @@ void main(mixed *arg, mapping flags, string stdin)
          out("Usage: more file(s)\n");
       }
       else
-         more(stdin, 0, 0, NO_ANSI);
+         more(stdin, 0, nil, NO_ANSI);
       return;
    }
 
    files = filter(
-       files, function(string file) {
+       files, (: [string file] {
           if (!stringp(file))
              return 0;
           if (is_directory(file))
@@ -43,8 +43,8 @@ void main(mixed *arg, mapping flags, string stdin)
              return 0;
           }
           return 1;
-       });
-   more_file(files, 0, 0, NO_ANSI);
+       } :));
+   more_file(files, 0, nil, NO_ANSI);
 }
 
 void help()
@@ -53,4 +53,9 @@ void help()
          "The more command prints a file on the screen in managable chunks. "
          "Type '?' while within more for detailed information.\n");
    return;
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg, flags, input);
 }
