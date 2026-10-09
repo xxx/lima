@@ -34,3 +34,8 @@ void main(mixed *arg)
    if (start)
       this_body()->move(start);
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}

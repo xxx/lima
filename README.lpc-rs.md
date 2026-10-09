@@ -154,6 +154,14 @@ context, exception recovery and repeated modal entry/exit pass. Fresh
 transitional checks add only `times`, with no regressions. Existing numeric
 prefixes, word joining and ignored outer routes/stdin remain in the port notes.
 
+`at` retains all fourteen audited scenarios across 39 registered inputs.
+Its dispatcher forwards parsed arguments to the existing handler. Temporary
+movement and normal return, target diagnostics, player/directory context,
+move refusals, child errors, output routes and modal input/location/cleanup
+pass. Fresh transitional checks add only `at`, with no regressions. Existing
+ignored move results, skipped return after a child exception, target lookup,
+separate child stdout and ignored stdin remain recorded in the port notes.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
