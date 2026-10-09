@@ -136,7 +136,7 @@ void prompt_user(string *asContents, string sPath, string sOrigFile, string sSel
       }
 
       out(sMenu);
-      modal_push(( : prompt_user, asContents, sPath, sOrigFile:), "\nWhich would you like to restore (#?q)? ");
+      modal_push(&prompt_user(asContents, sPath, sOrigFile), "\nWhich would you like to restore (#?q)? ");
    }
    else
    {
@@ -156,7 +156,7 @@ void prompt_user(string *asContents, string sPath, string sOrigFile, string sSel
          }
 
          write("\n" + sMenu);
-         modal_simple(( : prompt_user, asContents, sPath, sOrigFile:), "\nWhich would you like to restore (#?q)? ");
+         modal_simple(&prompt_user(asContents, sPath, sOrigFile), "\nWhich would you like to restore (#?q)? ");
 
          return;
       }
@@ -164,21 +164,21 @@ void prompt_user(string *asContents, string sPath, string sOrigFile, string sSel
       if (!to_int(sSelection) || (to_int(sSelection) > sizeof(asContents) || to_int(sSelection) < 0))
       {
          write("Invalid selection.\n");
-         modal_simple(( : prompt_user, asContents, sPath, sOrigFile:), "\nWhich would you like to restore (#?q)? ");
+         modal_simple(&prompt_user(asContents, sPath, sOrigFile), "\nWhich would you like to restore (#?q)? ");
 
          return;
       }
 
       write("Restoring \"" + asContents[to_int(sSelection) - 1] + "\" to \"" + sPath + "/" + sOrigFile + "\"...\n");
 
-      if (!sFileContents = read_file(evaluate_path(sPath + "/bak/" + asContents[to_int(sSelection) - 1])))
+      if (catch(sFileContents = read_file(evaluate_path(sPath + "/bak/" + asContents[to_int(sSelection) - 1]))) || !sFileContents)
       {
          write("Error: Reading backup file. Exiting...\n");
          modal_pop();
          return;
       }
 
-      if (!write_file(evaluate_path(sPath + "/" + sOrigFile), sFileContents, 1))
+      if (catch(write_file(evaluate_path(sPath + "/" + sOrigFile), sFileContents, 1)))
       {
          write("Error: Restoring file. Exiting...\n");
          modal_pop();
@@ -191,4 +191,9 @@ void prompt_user(string *asContents, string sPath, string sOrigFile, string sSel
 
       return;
    }
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

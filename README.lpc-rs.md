@@ -176,6 +176,13 @@ editors, repeated binding and stack teardown pass with cleanup intact. Fresh
 transitional checks add only `to`, with no regressions. Existing parent stdin
 and delayed child output routes remain recorded in the port notes.
 
+`bk` and `rst` retain all eighteen audited scenarios across 64 registered
+inputs. Dispatchers make both commands available; bound restore callbacks
+handle selection, retries and cancellation. File errors use the existing
+diagnostics and cleanup. Backup bytes, empty files, current-file state and
+output routes pass. Existing absolute-current-file paths, missing backup
+subdirectories and final collision overwrite remain recorded in the port notes.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

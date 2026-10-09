@@ -62,7 +62,7 @@ void main(string sFile)
    }
 
    // Read in file and error if problems.
-   if (!(sFileContents = read_file(sPwd + "/" + sFile)))
+   if (catch(sFileContents = read_file(sPwd + "/" + sFile)) || !sFileContents)
    {
       outf("Could not read %s.  Backup failed.\n", sFile);
    }
@@ -137,7 +137,7 @@ void main(string sFile)
          sFullTime = sHour + sMins + sSecs;
 
          sSecDest += "-" + sFullTime;
-         if (!write_file(sSecDest, sFileContents, 1))
+         if (catch(write_file(sSecDest, sFileContents, 1)))
          {
             out("Error: Writing backup file. Exiting...\n");
             return;
@@ -151,7 +151,7 @@ void main(string sFile)
       }
       else
       {
-         if (!write_file(sDest, sFileContents, 1))
+         if (catch(write_file(sDest, sFileContents, 1)))
          {
             out("Error: Writing backup file. Exiting...\n");
             return;
@@ -167,7 +167,7 @@ void main(string sFile)
    else
    {
       // Throw an error message if problems.
-      if (!write_file(sDest, sFileContents, 1))
+      if (catch(write_file(sDest, sFileContents, 1)))
       {
          out("Error: Writing backup file. Exiting...\n");
          return;
@@ -179,4 +179,9 @@ void main(string sFile)
          return;
       }
    }
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
