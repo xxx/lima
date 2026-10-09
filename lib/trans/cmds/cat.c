@@ -32,7 +32,7 @@ void main(mixed *arg, mapping flags, string stdin)
          else
          {
             int place = 0;
-            while ((chunk = read_file(file, place, 100)) != 0 && chunk != "")
+            while ((chunk = read_file(file, place, 100)) && chunk != "")
             {
                place += 101;
                out(chunk);
@@ -42,4 +42,9 @@ void main(mixed *arg, mapping flags, string stdin)
    }
    else
       out(stdin);
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg, flags, input || "");
 }

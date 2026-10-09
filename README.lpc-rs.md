@@ -13,7 +13,7 @@ With the lpc-rs checkout beside this one and its CLI built, check a command with
 ../lpc-rs/target/debug/lpc-rs-lpcc -c lpc-rs.env --check lib/cmds/player/mudlist.c
 ```
 
-The current focused checks compile 65 of 67 player commands and all 12 supporting
+The retained player checks compile 65 of 67 player commands and all 12 supporting
 targets. Mudlist passes 13 runtime cases using both actual shells. `su` passes
 refresh, race-change and password-modal checks; its existing account/character
 lookup limitation is recorded in the port notes. Experimental `random2` remains
@@ -21,15 +21,22 @@ deferred and `suicide` is disabled upstream.
 
 Wizard directory navigation passes seven cases covering 28 inputs, including
 saved directory history and current-file restoration after shell recreation.
-Focused checks compile 15 of 81 wizard commands, 4 of 49 transitional commands
+Focused checks compile 15 of 81 wizard commands, 5 of 49 transitional commands
 and all 9 navigation support targets. The existing root-origin `cd -` edge is
 recorded separately in the port notes.
 
 `ls` passes eight cases covering 29 shell inputs and two external calls. Checks
 cover flags, metadata and loaded markers, globbing, plain/ANSI output, pipelines
 and redirection; all 9 listing support targets compile. Its existing KB arithmetic
-and stored plain-mode behavior are recorded in the port notes. Full-inventory
-and startup results retain their preceding scope.
+and stored plain-mode behavior are recorded in the port notes.
+
+`cat` passes nine cases covering 34 shell inputs, including controls for nil EOF
+and absent stdin. File contents, read boundaries, incoming pipelines, stdin
+precedence and output redirection pass; all 10 file-output support targets compile.
+Fresh transitional checks add only `cat`, with no regressions. Its existing
+chunk-cursor omissions and missing current-file fallback are recorded separately.
+Full-inventory, wizard/player-command and startup results retain their preceding
+scope.
 
 Current compatibility and handoff notes are in the neighboring lpc-rs checkout:
 `doc/driver-comparison.md` and `local/lima/compatibility.md`. Temporary test
