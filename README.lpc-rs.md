@@ -183,6 +183,15 @@ diagnostics and cleanup. Backup bytes, empty files, current-file state and
 output routes pass. Existing absolute-current-file paths, missing backup
 subdirectories and final collision overwrite remain recorded in the port notes.
 
+`update` passes 34 scenarios across 68 registered inputs, including retained
+controls and clock/error fixtures. Reloads replace prototype identity and state
+while old clones keep their compiled program. Flags reload loaded parent
+prototypes; timestamps include unloaded inherited sources without instantiating
+fragments. Successful room reloads and skips return players. Failures retain
+the existing early cleanup and caught errors; the same-second timestamp edge
+remains documented.
+Fresh transitional checks add only `update`, with no regressions.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
