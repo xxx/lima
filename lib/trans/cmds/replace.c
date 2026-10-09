@@ -9,6 +9,7 @@
 
 inherit M_GLOB;
 inherit CMD;
+inherit M_ED;
 
 private
 void main(mixed *argv, mapping flags)
@@ -20,22 +21,34 @@ void main(mixed *argv, mapping flags)
 
    foreach (file in argv[2])
    {
-      ed_start(file);
-      if (flags["n"])
-         ed_cmd("set number");
-      output = ed_cmd("1,$g/" + argv[0] + "/p");
-      if (output && strlen(output))
-      {
-         output += sprintf("[Changing in %s]:\n%s\n\n", file, output);
+      mixed failure = catch {
+         ed_start(file);
+         if (flags["n"])
+            ed_cmd("set number");
+         output = ed_cmd("1,$g/" + argv[0] + "/p");
+         if (output && strlen(output))
+         {
+            output += sprintf("[Changing in %s]:\n%s\n\n", file, output);
 
-         ed_cmd(sprintf("1,$s/%s/%s/g", argv[0], argv[1]));
-         ed_cmd("w");
+            ed_cmd(sprintf("1,$s/%s/%s/g", argv[0], argv[1]));
+            ed_cmd("w");
+         }
+         ed_cmd("q");
+      };
+      if (query_ed_mode() != -1)
+         ed_cmd("Q");
+      if (failure)
+      {
+         output = "";
+         outf("Cannot replace %s: %s\n", file, failure);
       }
-      ed_cmd("q");
    }
 
    if (!strlen(output))
-      out("No matches found.\n");
+   {
+      if (!strlen(get_output()))
+         out("No matches found.\n");
+   }
    else
    {
       if (flags["q"])
@@ -43,4 +56,9 @@ void main(mixed *argv, mapping flags)
       else
          out(output);
    }
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg, flags);
 }

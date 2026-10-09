@@ -21,7 +21,7 @@ deferred and `suicide` is disabled upstream.
 
 Wizard directory navigation passes seven cases covering 28 inputs, including
 saved directory history and current-file restoration after shell recreation.
-Focused checks compile 15 of 81 wizard commands, 16 of 49 transitional commands
+Focused checks compile 15 of 81 wizard commands, 17 of 49 transitional commands
 and all 9 navigation support targets. The existing root-origin `cd -` edge is
 recorded separately in the port notes.
 
@@ -93,6 +93,14 @@ First-batch and empty-tree publication, repeated rebuilds and file-error recover
 pass. Results retain the driver's 8,192-byte string-concatenation limit; oversized
 output reports a diagnostic without partial results. Fresh transitional checks
 add only `locate`, with no regressions; all 16 supporting targets compile.
+
+`replace` passes twelve scenarios across 52 registered inputs. It uses native
+command dispatch and the existing editor module, reports thrown per-file
+refusals and closes retained editor sessions before continuing. Exact file
+contents, patterns/captures, flags, pipes, redirection and pager return pass.
+Fresh transitional checks add only `replace`, with no regressions; all 17
+supporting targets compile. Existing last-file/duplicated reports and ignored
+substitution diagnostics are retained and recorded separately in the port notes.
 
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
