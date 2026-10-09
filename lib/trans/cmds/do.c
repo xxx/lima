@@ -14,10 +14,18 @@ void main(string arg)
    string *cmds;
 
    if (!arg)
-      return write("Syntax : do <cmd_1>;...;<cmd_n>\n");
+   {
+      write("Syntax : do <cmd_1>;...;<cmd_n>\n");
+      return;
+   }
 
    cmds = explode(arg, ";");
 
    if (sizeof(cmds))
       map(cmds, ( : this_user()->force_me($1) :));
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

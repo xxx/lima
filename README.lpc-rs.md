@@ -140,6 +140,13 @@ only `xargs`, with no regressions. Its existing option-spacing mismatch,
 dropped lock argument and separate child-output routing remain recorded in
 the port notes.
 
+`do` retains all thirteen audited scenarios across 31 registered inputs.
+It uses native command dispatch and a bare return after its syntax report.
+Ordered and nested commands, player/directory context, failure recovery and
+modal interaction pass. Fresh transitional checks add only `do`, with no
+regressions. Literal semicolon splitting, separate child stdout and ignored
+stdin remain recorded in the port notes.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
