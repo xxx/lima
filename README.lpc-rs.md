@@ -117,6 +117,13 @@ transitional checks add only `diff`, with no regressions. Its existing line
 membership algorithm, raw filename parsing and direct pager output remain
 recorded in the port notes.
 
+`du` passes nine scenarios across 32 registered inputs and four direct helper
+calls. It uses native command dispatch with the existing directory rule.
+Directory totals and order, paths, output routes and pager return pass; all
+25 supporting targets compile. Fresh transitional checks add only `du`, with
+no regressions. Its existing KB arithmetic, recursion cutoff and blank root
+display label remain recorded in the port notes.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

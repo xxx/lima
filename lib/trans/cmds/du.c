@@ -72,3 +72,8 @@ void main(mixed *arg)
 
    disk_usage(arg[0], 0);
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}
