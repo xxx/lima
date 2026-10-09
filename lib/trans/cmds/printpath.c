@@ -18,5 +18,10 @@ void main()
 {
    string *paths = this_user()->query_shell_ob()->query_path();
 
-   out("Your current path is: " + implode(paths, ( : $1 + ", " + $2:)) + "\n");
+   out("Your current path is: " + (sizeof(paths) ? reduce(paths, ( : $1 + ", " + $2:)) : 0) + "\n");
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main();
 }

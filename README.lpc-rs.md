@@ -124,6 +124,14 @@ Directory totals and order, paths, output routes and pager return pass; all
 no regressions. Its existing KB arithmetic, recursion cutoff and blank root
 display label remain recorded in the port notes.
 
+`addpath`, `rmpath` and `printpath` retain all ten audited scenarios across
+55 registered shell inputs. They use native command dispatch and `reduce`
+for callback formatting, with explicit integer zero for empty `printpath`.
+Cached and saved paths, ordinary lookup order, real shell reload, pipes and
+redirection pass. Fresh transitional checks add only these three commands,
+with no regressions. Existing directory rules, empty-rmpath formatting and
+ignored arguments/stdin remain recorded in the port notes.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

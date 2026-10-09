@@ -51,5 +51,10 @@ void main(string *arg)
    paths += ({arg[0] + "/"});
    shell_ob->set_variable("path", paths);
 
-   out(implode(paths, ( : $1 + ($2[ < 1] == '/' ? $2[0.. < 2] : $2) + ", " :), "Your path is now: ")[0.. < 3] + "\n");
+   out(reduce(paths, ( : $1 + ($2[ < 1] == '/' ? $2[0.. < 2] : $2) + ", " :), "Your path is now: ")[0.. < 3] + "\n");
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
