@@ -21,7 +21,7 @@ deferred and `suicide` is disabled upstream.
 
 Wizard directory navigation passes seven cases covering 28 inputs, including
 saved directory history and current-file restoration after shell recreation.
-Focused checks compile 15 of 81 wizard commands, 5 of 49 transitional commands
+Focused checks compile 15 of 81 wizard commands, 7 of 49 transitional commands
 and all 9 navigation support targets. The existing root-origin `cd -` edge is
 recorded separately in the port notes.
 
@@ -35,7 +35,15 @@ and absent stdin. File contents, read boundaries, incoming pipelines, stdin
 precedence and output redirection pass; all 10 file-output support targets compile.
 Fresh transitional checks add only `cat`, with no regressions. Its existing
 chunk-cursor omissions and missing current-file fallback are recorded separately.
-Full-inventory, wizard/player-command and startup results retain their preceding
+
+`head` and `tail` pass eight cases covering 57 shell inputs. Checks cover file
+selection, counts and flags, text edges, stdin precedence and head's outgoing
+pipelines and redirection; all 12 supporting targets compile. Fresh transitional
+checks add only `head` and `tail`, with no regressions. Tail's existing direct
+pager output bypasses the outgoing pipe/redirection buffer; head's snippet
+concatenation and count behavior are also preserved and recorded in the notes.
+
+Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
 Current compatibility and handoff notes are in the neighboring lpc-rs checkout:

@@ -35,3 +35,8 @@ void main(mixed *arg, mapping flags, string stdin)
    for (i = 0; i < sizeof(arg[0]); i++)
       tail(arg[0][i], n);
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg, flags, input);
+}
