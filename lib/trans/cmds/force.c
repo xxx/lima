@@ -65,3 +65,8 @@ void main(string orig_input)
 
    targ_user->force_me(what);
 }
+
+protected varargs void dispatch_main(mixed original_input, mixed parsed_args, mixed flags, mixed implode_info)
+{
+   main(original_input);
+}

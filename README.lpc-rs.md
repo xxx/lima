@@ -162,6 +162,13 @@ pass. Fresh transitional checks add only `at`, with no regressions. Existing
 ignored move results, skipped return after a child exception, target lookup,
 separate child stdout and ignored stdin remain recorded in the port notes.
 
+`force` retains all fourteen audited scenarios across 50 registered inputs.
+Its dispatcher forwards raw input to the existing handler. Both actual shells,
+target context, notices and logging, nested commands, caller error recovery,
+target modal interaction and child output routes pass. Fresh transitional
+checks add only `force`, with no regressions. Existing literal account-name
+lookup and ignored parent stdin remain recorded in the port notes.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
