@@ -21,7 +21,7 @@ deferred and `suicide` is disabled upstream.
 
 Wizard directory navigation passes seven cases covering 28 inputs, including
 saved directory history and current-file restoration after shell recreation.
-Focused checks compile 15 of 81 wizard commands, 14 of 49 transitional commands
+Focused checks compile 15 of 81 wizard commands, 15 of 49 transitional commands
 and all 9 navigation support targets. The existing root-origin `cd -` edge is
 recorded separately in the port notes.
 
@@ -75,6 +75,14 @@ still run. Native `rmdir` accounts for earlier pending child removals and refuse
 duplicate removal. Fresh transitional checks add only these three commands,
 with no regressions; all 12 supporting targets compile. The existing parent/
 child argument-expansion behavior is recorded in the port notes.
+
+`find` passes nine scenarios across 47 registered shell inputs. It uses native
+command dispatch and the existing editor module, reporting editor startup
+refusals per file before continuing. The editor's 8,192 UTF-8 byte, 1,000-line
+and 2,048-byte line limits remain. Fresh transitional checks add only `find`,
+with no regressions; all 15 supporting targets compile. Its existing raw/case
+pattern differences, file-only rule, ignored stdin and slash/empty-file
+diagnostics are recorded in the port notes.
 
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.

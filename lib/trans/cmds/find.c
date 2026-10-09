@@ -14,6 +14,7 @@
 inherit CMD;
 inherit M_REGEX;
 inherit M_GLOB;
+inherit M_ED;
 
 private
 void main(mixed argv, mapping flags)
@@ -26,7 +27,12 @@ void main(mixed argv, mapping flags)
       argv[0] = insensitive_pattern(translate(argv[0], 1));
    foreach (file in argv[1])
    {
-      ed_start(file);
+      mixed start_error = catch(ed_start(file));
+      if (start_error)
+      {
+         outf("Cannot search %s: %s\n", file, start_error);
+         continue;
+      }
       if (flags["n"])
          ed_cmd("n");
       this_output = ed_cmd("1,$g/" + argv[0] + "/p");
@@ -36,4 +42,9 @@ void main(mixed argv, mapping flags)
    }
    if (!strlen(get_output()))
       out("No matches found.\n");
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg, flags);
 }
