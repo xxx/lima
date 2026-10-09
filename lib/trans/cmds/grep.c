@@ -19,11 +19,13 @@
 inherit CMD;
 inherit M_REGEX;
 inherit M_GLOB;
+inherit M_ED;
 
 private
 void stdin_grep(string pattern, mapping flags, string stdin)
 {
-   string *lines;
+   string *input_lines;
+   mixed *lines;
    int bits = 0;
    int i;
 
@@ -41,7 +43,10 @@ void stdin_grep(string pattern, mapping flags, string stdin)
       bits |= 2;
 
    pattern = translate(pattern);
-   lines = regexp(explode(stdin, "\n"), pattern, bits);
+   input_lines = strlen(stdin) ? explode(stdin, "\n") : ({});
+   if (strlen(stdin) && stdin[<1] == '\n')
+      input_lines = input_lines[0..<2];
+   lines = regexp(input_lines, pattern, bits);
    if (!sizeof(lines))
    {
       out("No matches.\n");
@@ -50,12 +55,12 @@ void stdin_grep(string pattern, mapping flags, string stdin)
    {
       if (flags["n"])
       {
-         for (i = 0; i < sizeof(lines); i++)
-            outf(" %d  %s\n", lines[i + 1], lines[i++]);
+         for (i = 0; i < sizeof(lines); i += 2)
+            outf(" %d  %s\n", lines[i], lines[i + 1]);
       }
       else
       {
-         map(map(lines, ( : $1 + "\n" :)), ( : out:));
+         map(map(lines, ( : $1 + "\n" :)), out);
       }
    }
 }
@@ -93,7 +98,12 @@ void main(mixed argv, mapping flags, string stdin)
          outf("Ignoring file %s - too large!\n", file);
          continue;
       }
-      ed_start(file);
+      mixed start_error = catch(ed_start(file));
+      if (start_error)
+      {
+         outf("Cannot grep %s: %s\n", file, start_error);
+         continue;
+      }
       if (flags["n"])
          ed_cmd("n");
       if (catch (this_output = ed_cmd("1,$g/" + pattern + "/p")))
@@ -107,4 +117,9 @@ void main(mixed argv, mapping flags, string stdin)
    }
    if (!strlen(get_output()))
       out("No matches found.\n");
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg, flags, input);
 }

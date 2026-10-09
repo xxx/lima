@@ -21,7 +21,7 @@ deferred and `suicide` is disabled upstream.
 
 Wizard directory navigation passes seven cases covering 28 inputs, including
 saved directory history and current-file restoration after shell recreation.
-Focused checks compile 15 of 81 wizard commands, 7 of 49 transitional commands
+Focused checks compile 15 of 81 wizard commands, 8 of 49 transitional commands
 and all 9 navigation support targets. The existing root-origin `cd -` edge is
 recorded separately in the port notes.
 
@@ -42,6 +42,16 @@ pipelines and redirection; all 12 supporting targets compile. Fresh transitional
 checks add only `head` and `tail`, with no regressions. Tail's existing direct
 pager output bypasses the outgoing pipe/redirection buffer; head's snippet
 concatenation and count behavior are also preserved and recorded in the notes.
+
+`grep` passes eight shell scenarios across 57 inputs. A separate range/glob
+check confirms escaped pairs remain intact. File selection, flags, numbered and
+inverse matches, stdin precedence,
+Unicode and blank lines, slash patterns, pipelines and redirection pass. It uses
+the existing editor module and reports its 8,192 UTF-8 byte, 1,000-line and
+2,048-byte line startup limits per file, then continues. The driver's slice-read
+fix preserves escaped pattern pairs. Inverse directory searches and existing
+glob-pattern semantics remain recorded source limitations. Fresh transitional
+checks add only `grep`, with no regressions; all 16 supporting targets compile.
 
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
