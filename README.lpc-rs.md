@@ -147,6 +147,13 @@ modal interaction pass. Fresh transitional checks add only `do`, with no
 regressions. Literal semicolon splitting, separate child stdout and ignored
 stdin remain recorded in the port notes.
 
+`times` retains all fifteen audited scenarios across 46 registered inputs.
+Its dispatcher forwards original input and parsed arguments to the existing
+handler. Counts and administrator login, nested commands, player/directory
+context, exception recovery and repeated modal entry/exit pass. Fresh
+transitional checks add only `times`, with no regressions. Existing numeric
+prefixes, word joining and ignored outer routes/stdin remain in the port notes.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
