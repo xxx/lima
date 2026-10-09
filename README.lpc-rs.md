@@ -21,10 +21,15 @@ deferred and `suicide` is disabled upstream.
 
 Wizard directory navigation passes seven cases covering 28 inputs, including
 saved directory history and current-file restoration after shell recreation.
-Focused checks compile 15 of 81 wizard commands, 3 of 49 transitional commands
+Focused checks compile 15 of 81 wizard commands, 4 of 49 transitional commands
 and all 9 navigation support targets. The existing root-origin `cd -` edge is
-recorded separately in the port notes. Full-inventory and startup results retain
-their preceding scope.
+recorded separately in the port notes.
+
+`ls` passes eight cases covering 29 shell inputs and two external calls. Checks
+cover flags, metadata and loaded markers, globbing, plain/ANSI output, pipelines
+and redirection; all 9 listing support targets compile. Its existing KB arithmetic
+and stored plain-mode behavior are recorded in the port notes. Full-inventory
+and startup results retain their preceding scope.
 
 Current compatibility and handoff notes are in the neighboring lpc-rs checkout:
 `doc/driver-comparison.md` and `local/lima/compatibility.md`. Temporary test

@@ -109,7 +109,7 @@ int do_ls(mixed argv, mapping flags)
    // Changed because this is non-intuitive compared to the rest of the
    // uses of colour -- Tigran.
    // uses_ansi = get_user_variable("colour-ls");
-   uses_ansi = terminal_mode() != 0;
+   uses_ansi = !!terminal_mode();
 
    if (uses_ansi || flags["l"] || flags["s"] || !flags["p"])
    {
@@ -180,6 +180,11 @@ string external_ls(string *files, mapping flags)
    hello_stdio(0, 0, 0);
    info = map(files, ( : M_GLOB->glob($1) :));
    if (!do_ls(({files}), flags))
-      return 0;
+      return nil;
    return get_output();
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg, flags);
 }
