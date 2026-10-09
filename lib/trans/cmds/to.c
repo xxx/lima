@@ -34,5 +34,10 @@ nomask void main(string arg)
    }
 
    printf("** Enter args to \"%s\". **\n", arg);
-   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : done_editing, arg:));
+   clone_object (EDIT_OB, EDIT_TEXT, 0, &done_editing(arg));
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

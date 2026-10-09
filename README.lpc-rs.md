@@ -169,6 +169,13 @@ target modal interaction and child output routes pass. Fresh transitional
 checks add only `force`, with no regressions. Existing literal account-name
 lookup and ignored parent stdin remain recorded in the port notes.
 
+`to` retains all fourteen audited scenarios across 53 registered inputs.
+Its dispatcher and bound callback execute the chosen command after text-editor
+completion. Abort, empty completion, arguments/context, child errors, chained
+editors, repeated binding and stack teardown pass with cleanup intact. Fresh
+transitional checks add only `to`, with no regressions. Existing parent stdin
+and delayed child output routes remain recorded in the port notes.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
