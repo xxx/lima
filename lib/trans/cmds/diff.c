@@ -43,7 +43,7 @@ mixed get_lines(string file_name)
       return 0;
    }
    }
-   if (!master()->valid_read(file_name, previous_object(), "diff"))
+   if (!master()->valid_read(file_name, "diff", this_object(), __FILE__))
    {
       write(file_name + " : Permission denied.\n");
       return 0;
@@ -82,7 +82,7 @@ void main(string a)
    }
    ONEnotTWO = filter(lines1, sort, lines2);
    TWOnotONE = filter(lines2, sort, lines1);
-   if (ONEnotTWO == TWOnotONE)
+   if (!sizeof(ONEnotTWO) && !sizeof(TWOnotONE))
    {
       write(file_name1 + " and " + file_name2 + " have the same lines.\n");
       return;
@@ -93,4 +93,9 @@ void main(string a)
    more(explode(output, "\n"));
 
    return;
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

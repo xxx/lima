@@ -109,6 +109,14 @@ Fresh transitional checks add only `cut`, with no regressions; all 19 supporting
 targets compile. Its existing final-field omission, extra newlines/separators
 and direct diagnostics remain recorded in the port notes.
 
+`diff` passes eleven scenarios across 40 registered inputs. It uses native
+command dispatch and the read-policy signature, and checks empty difference
+arrays explicitly. Line comparison, paths, text edges, diagnostics, output
+routes and pager return pass; all 22 supporting targets compile. Fresh
+transitional checks add only `diff`, with no regressions. Its existing line
+membership algorithm, raw filename parsing and direct pager output remain
+recorded in the port notes.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
