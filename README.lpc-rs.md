@@ -132,6 +132,14 @@ redirection pass. Fresh transitional checks add only these three commands,
 with no regressions. Existing directory rules, empty-rmpath formatting and
 ignored arguments/stdin remain recorded in the port notes.
 
+`xargs` retains all twelve audited scenarios across 40 registered inputs.
+It uses native command dispatch, bound callbacks and explicit object/callback
+arguments. Per-line piping, both placeholders, empty stdin, modal clone reuse,
+exits, shell escape and context/recovery pass. Fresh transitional checks add
+only `xargs`, with no regressions. Its existing option-spacing mismatch,
+dropped lock argument and separate child-output routing remain recorded in
+the port notes.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
