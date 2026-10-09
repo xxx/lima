@@ -21,7 +21,7 @@ deferred and `suicide` is disabled upstream.
 
 Wizard directory navigation passes seven cases covering 28 inputs, including
 saved directory history and current-file restoration after shell recreation.
-Focused checks compile 15 of 81 wizard commands, 17 of 49 transitional commands
+Focused checks compile 15 of 81 wizard commands, 18 of 49 transitional commands
 and all 9 navigation support targets. The existing root-origin `cd -` edge is
 recorded separately in the port notes.
 
@@ -101,6 +101,13 @@ contents, patterns/captures, flags, pipes, redirection and pager return pass.
 Fresh transitional checks add only `replace`, with no regressions; all 17
 supporting targets compile. Existing last-file/duplicated reports and ignored
 substitution diagnostics are retained and recorded separately in the port notes.
+
+`cut` passes ten scenarios across 54 registered inputs. It uses native command
+dispatch and the existing regex association simul. Field selection, delimiters,
+Unicode, file expansion, stdin, pipelines, redirection and pager return pass.
+Fresh transitional checks add only `cut`, with no regressions; all 19 supporting
+targets compile. Its existing final-field omission, extra newlines/separators
+and direct diagnostics remain recorded in the port notes.
 
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.

@@ -98,3 +98,8 @@ void main(mixed *argv, mapping flags, string stdin)
    }
    return;
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg, flags, input);
+}
