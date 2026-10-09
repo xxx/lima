@@ -32,89 +32,75 @@ int started_at;
 private
 void end_building()
 {
-   cp(TMP_DATA_FILE, DATA_FILE);
-   rm(TMP_DATA_FILE);
-   printf("Locate DB build done in " + time_to_string(time() - started_at) + ".\n");
+   mixed failure = catch(rename(TMP_DATA_FILE, DATA_FILE));
    building_database = 0;
+   if (failure)
+      printf("Locate DB build failed: %s\n", failure);
+   else
+      printf("Locate DB build done in %s.\n", time_to_string(time() - started_at, 0));
 }
 
 private
 void rebuild_locate_db()
 {
-   int i = ITERS_PER_CALL;
-   string *this_dir;
-
-   while (i--)
-   {
-      string new_path;
-
-      if (!sizeof(stack))
+   mixed failure = catch {
+      int i = ITERS_PER_CALL;
+      while (i-- && sizeof(stack))
       {
-         end_building();
-         return;
-      }
-
-      if (intp(stack[0]))
-      {
-         /* hit the sentinel. pop up one directory level */
+         string new_path;
+         string *this_dir;
+         if (intp(stack[0]))
+         {
+            stack = stack[1..];
+            path = split_path(path)[0];
+            i++;
+            continue;
+         }
+         new_path = path + stack[0] + "/";
          stack = stack[1..];
-         path = split_path(path)[0];
-         i++;
-         continue;
+         this_dir = get_dir(new_path + "*");
+         foreach (string name in this_dir)
+            write_file(TMP_DATA_FILE, join_path(new_path, name) + "\n");
+         this_dir = filter(this_dir, (: is_directory(join_path($(new_path), $1)) :));
+         if (sizeof(this_dir))
+         {
+            stack = this_dir + ({0}) + stack;
+            path = new_path;
+         }
       }
-
-      new_path = path + stack[0] + "/";
-      stack = stack[1..];
-      this_dir = get_dir(new_path + "*", -1);
-
-      if (arrayp(this_dir))
-      {
-         int w;
-
-         if ((w = member_array(".", get_dir(new_path + "*"))) != -1)
-            this_dir = this_dir[0..(w - 1)] + this_dir[(w + 2)..];
-      }
-      else
-         continue;
-
-      /* prepend the dir and write into the file */
-      map(this_dir, ( : write_file(TMP_DATA_FILE, join_path($(new_path), $1[0]) + "\n") :));
-
-      /* filter out just the dirs and extract the names */
-      this_dir = map(filter(this_dir, ( : $1[1] == -2 :)), ( : $1[0] :));
-
-      /* push onto stack w/ a sentinel to go up the dir tree */
-      if (sizeof(this_dir))
-      {
-         stack = this_dir + ({0}) + stack;
-         path = new_path;
-      }
+   };
+   if (failure)
+   {
+      stack = ({});
+      building_database = 0;
+      printf("Locate DB build failed: %s\n", failure);
+      return;
    }
-
-   // If your players complain when you run the 'locate -u' command, increase this value to 2 or even 3.
-   call_out(( : rebuild_locate_db:), 1);
+   if (sizeof(stack))
+      call_out(rebuild_locate_db, 1);
+   else
+      // Rename requires the temporary file to exist on disk before publication.
+      call_out(end_building, 0);
 }
 
 private
 void begin_database_build()
 {
-   stack = ({""});
-   path = "";
-   if (is_file(TMP_DATA_FILE) && !rm(TMP_DATA_FILE))
+   mixed failure = catch(write_file(TMP_DATA_FILE, "", 1));
+   if (failure)
    {
-      out("You don't have permission to do that.\n");
+      outf("Locate DB build failed: %s\n", failure);
       return;
    }
-   rebuild_locate_db();
+   stack = ({""});
+   path = "";
    building_database = 1;
+   rebuild_locate_db();
 }
 
 private
 void main(mixed *arg, mapping flags)
 {
-   string find;
-   string outstr;
-
    if (!arg[0] && !flags["u"])
    {
       out("Syntax: locate <string>\n" + "        locate -u (to update the database)");
@@ -130,19 +116,27 @@ void main(mixed *arg, mapping flags)
       out("Building database... This can take a while for large MUDs.\n");
       started_at = time();
       begin_database_build();
-      return;
    }
    else
    {
-      /* arg[0] is an array of strings. use just the first */
-      find = arg[0];
-      ed_start(DATA_FILE);
-      outstr = ed_cmd(sprintf("1,$g#%s#p", find));
-      if (!sizeof(outstr))
-         out("No matching files found.\n");
-      else
-         out(outstr);
-      ed_cmd("q");
-      return;
+      string *matches;
+      mixed failure = catch {
+         string text = read_file(DATA_FILE);
+         string *names = sizeof(text) ? explode(text, "\n") : ({});
+         if (sizeof(text) && text[<1] == '\n')
+            names = names[0..<2];
+         matches = regexp(names, arg[0]);
+         if (!sizeof(matches))
+            out("No matching files found.\n");
+         else
+            out(implode(matches, "\n") + "\n");
+      };
+      if (failure)
+         outf("Cannot search locate database: %s\n", failure);
    }
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg, flags);
 }
