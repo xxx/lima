@@ -58,3 +58,8 @@ nomask private void main(string *argv)
    ob->set_pwd(fname);
    outf("New cwd: %s\n", fname);
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}

@@ -17,8 +17,14 @@ The current focused checks compile 65 of 67 player commands and all 12 supportin
 targets. Mudlist passes 13 runtime cases using both actual shells. `su` passes
 refresh, race-change and password-modal checks; its existing account/character
 lookup limitation is recorded in the port notes. Experimental `random2` remains
-deferred and `suicide` is disabled upstream. Full-inventory and startup results
-are recorded separately in the port notes.
+deferred and `suicide` is disabled upstream.
+
+Wizard directory navigation passes seven cases covering 28 inputs, including
+saved directory history and current-file restoration after shell recreation.
+Focused checks compile 15 of 81 wizard commands, 3 of 49 transitional commands
+and all 9 navigation support targets. The existing root-origin `cd -` edge is
+recorded separately in the port notes. Full-inventory and startup results retain
+their preceding scope.
 
 Current compatibility and handoff notes are in the neighboring lpc-rs checkout:
 `doc/driver-comparison.md` and `local/lima/compatibility.md`. Temporary test
