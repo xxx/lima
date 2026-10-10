@@ -243,6 +243,15 @@ exception stops later lines while keeping completed effects. Fresh transitional
 checks add only `tsh`, with no regressions. Existing bottom-shell dispatch while
 a modal handler is open remains recorded in the port notes.
 
+`testargs` retains all ten audited scenarios across 43 registered inputs,
+including unavailable dispatch and the old-callback control. Its dispatcher,
+explicit file_name argument and bound callback support interactive input,
+both exits, clone reuse/cleanup, shell escapes, directory changes and recovery
+after child errors. Parent output routes remain empty while child output reaches
+the user. Existing prefix truncation, stdin argument-type errors and the
+missing-command unused clone remain recorded as Lima source problems. Fresh
+transitional checks add only `testargs`, with no regressions.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

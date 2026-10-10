@@ -42,7 +42,7 @@ nomask void start_cmd(mixed *arg)
       return;
    }
    write("Entering pipe mode. Type '**' to quit.\n");
-   modal_push(( : handle_piping, arg[0] :), "*\b");
+   modal_push(&handle_piping(arg[0]), "*\b");
 }
 
 private
@@ -65,6 +65,11 @@ nomask void main(mixed *arg, mapping flags, string stdin)
    }
    else
    {
-      clone_object (file_name())->start_cmd(arg[0]);
+      clone_object (file_name(this_object()))->start_cmd(arg[0]);
    }
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg, flags, input);
 }
