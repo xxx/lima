@@ -225,6 +225,14 @@ transitional checks add only `spew`, with no regressions. Existing partial
 numeric scans, whitespace-only parser diagnostics and empty outgoing output
 buffers remain recorded in the port notes.
 
+`whoguests` retains all seven audited scenarios across 18 registered inputs,
+including the unavailable-command control. Its dispatcher exposes the private
+handler; sorted reporting leaves guest order, membership and saved bytes intact.
+Empty lists, daemon add/remove/clear, saved-data reload, extra arguments, ordinary
+administrator checks and retry, output routes and shell/input context pass. Fresh
+transitional checks add only `whoguests`, with no regressions. Existing ignored
+command text and raw no-redirection suffixes remain recorded in the port notes.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
