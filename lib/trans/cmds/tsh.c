@@ -15,3 +15,8 @@ void main(mixed *arg)
 {
    map(explode(read_file(arg[0]), "\n"), ( : this_user()->force_me($1) :));
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}

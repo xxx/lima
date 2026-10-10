@@ -233,6 +233,16 @@ administrator checks and retry, output routes and shell/input context pass. Fres
 transitional checks add only `whoguests`, with no regressions. Existing ignored
 command text and raw no-redirection suffixes remain recorded in the port notes.
 
+`tsh` retains all eleven audited scenarios across 28 registered inputs,
+including the unavailable-command control. Its dispatcher exposes the private
+handler; batch lines use the actual wizard shell and current user/body context.
+Nested batches, paths, directory changes, blank lines, Unicode, CRLF, errors and
+retry, output routes and modal entry/exit pass. Child output keeps its own routes;
+the parent sends an empty output buffer and ignores incoming stdin. A child
+exception stops later lines while keeping completed effects. Fresh transitional
+checks add only `tsh`, with no regressions. Existing bottom-shell dispatch while
+a modal handler is open remains recorded in the port notes.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
