@@ -207,17 +207,10 @@ private void merge_file(string fname)
          if (typeof(data[key]) != typeof(value))
             write("Type mismatch in merging variable '" + key + "': " + typeof(data[key]) + " vs " + typeof(value) +
                   "\n");
-         switch (typeof(value))
-         {
-         case "mapping":
-         case "array":
+         if (mappingp(value) || arrayp(value))
             data[key] += value;
-            break;
-         default:
-            if (value == data[key])
-               continue;
+         else if (value != data[key])
             write("While merging variable '" + key + "': Cannot merge objects of type " + typeof(value) + "\n");
-         }
       }
    }
    update();

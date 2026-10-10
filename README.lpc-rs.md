@@ -261,9 +261,19 @@ bytes; save/reload preserves zero, nil, floats, text, containers and nominal cla
 records. Both quit paths remove the handler and retire the active clone. Empty
 and comment-only files, argument handling and relative quoted paths retain shell
 context. Existing reader errors leave unused clones but allow valid retry.
-Fresh transitional checks add only `dataedit`, with no regressions. Delete,
-rename, set, list, print, expression, merge and save-as interactions remain to be
-audited; the full editor is not yet validated.
+Fresh transitional checks add only `dataedit`, with no regressions.
+
+The editing-actions follow-up retains fourteen cases across 105 registered
+inputs, including one original-source merge control. Merge dispatch uses
+`mappingp` and `arrayp` because native `typeof()` returns integer tags; arrays
+and mappings now combine. Scalar diagnostics, false-value replacement and
+mismatch behavior remain. Delete, rename, set, print, listing and save-as retain
+values, prompt ownership and shell context, with native save/reload and
+checkpoint/discard checks. Existing empty-list failure, expression artifacts
+and generic feedback on errors, and save-as I/O failure remain recorded; valid
+retries keep the menu usable. Concurrent editors and commit-time delivery
+failures were not exercised. Fresh transitional and support compilation checks
+retain the preceding inventory without regressions.
 
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
