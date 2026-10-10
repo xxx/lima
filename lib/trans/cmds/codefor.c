@@ -8,9 +8,11 @@
 //$$ see: treefor
 // USAGE: ``codefor <lpc expression>``
 //
-// Displays a "disassembly" of the LPC expression.
+// Displays a disassembly of the LPC expression without invoking it.
 //
 // .. TAGS: RST
+
+#include <msgtypes.h>
 
 inherit CMD;
 
@@ -22,42 +24,37 @@ void create()
 
 #define SYNTAX "USAGE:  codefor <lpc expression>\n"
 
-// prototype
-string doith(string arg);
-
-private
-void main(string str)
+private void main(string str)
 {
-   string tmp_file;
-   string initial_write_to_file;
-   mixed ret;
-   object o;
+   object scratch;
+   mixed failure;
 
-   initial_write_to_file = "#include <mudlib.h> \n"
-                           "#include <daemons.h>\n"
-                           "#include <config.h>\n"
-                           "mixed eval_function(){\n";
-   tmp_file = wiz_dir(this_user()) + "/EVAL.c";
-   rm(tmp_file);
-   if (o = find_object(tmp_file))
-      destruct(o);
-   if (!write_file(tmp_file, initial_write_to_file))
+   if (!str || str == "")
    {
-      out("eval: Unable to write to " + tmp_file + ". \n"); // shouldn't happen.
-      return 0;
+      write(SYNTAX);
+      return;
    }
-   write_file(tmp_file, str + ";\n");
-   write_file(tmp_file, "}\n");
 
-   ret = load_object(tmp_file);
-   dump_prog(ret, 1, "/tmp/CODE_TMP_FILE");
-   ret = read_file("/tmp/CODE_TMP_FILE");
-   rm("/tmp/CODE_TMP_FILE");
-   rm(tmp_file);
+   failure = catch {
+      string source = "#include <mudlib.h>\n"
+                      "#include <daemons.h>\n"
+                      "#include <config.h>\n"
+                      "mixed eval_function(){\n" + str + ";\n}\n";
+      scratch = compile_string(wiz_dir(this_user()) + "/CODEFOR", source);
+      // Keep a full-size listing line separate from its newline.
+      foreach (string line in disassemble(scratch))
+      {
+         tell(this_user(), line, TREAT_AS_BLOB | MSG_PROMPT);
+         tell(this_user(), "\n", TREAT_AS_BLOB | MSG_PROMPT);
+      }
+   };
+   if (scratch)
+      destruct(scratch);
+   if (failure)
+      write("codefor: " + failure + "\n");
+}
 
-   ret = explode(ret, ";;;  *** Disassembly ***");
-   out(ret[1]);
-
-   destruct(find_object(tmp_file));
-   return;
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

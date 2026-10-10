@@ -286,6 +286,14 @@ saved data, scan failure with saved-byte preservation, and successful retry.
 The help daemon, write rules and native APIs remain unchanged. Full help-tree
 scanning and commit-time delivery failures retain their preceding scope.
 
+`codefor` compiles its expression in memory, obtains native instruction lines
+with `disassemble`, and prints them individually without the command output
+buffer or a pager. It does not invoke `eval_function` or write/remove EVAL.c or
+an assembly dump file. The temporary wizard-home CODEFOR object is destructed
+after output or a listing failure; an occupied name is reported and retained.
+Usage and compiler errors leave the shell ready for another command.
+Native `compile_string` authorization and initialization still apply.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
