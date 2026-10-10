@@ -217,6 +217,14 @@ description. Paths, clones, inventory IDs, inherited reports, absent information
 errors, output routes and caller/player context retain their audited behavior.
 Fresh transitional checks add only `stat`, with no regressions.
 
+`spew` passes all nine audited scenarios across 28 registered inputs, including
+retained controls. Its dispatcher exposes the private handler; selected lines
+use the existing say verb, recipient delivery and speech history. Paths, ranges,
+text, read errors and retry, output routes and shell/input context pass. Fresh
+transitional checks add only `spew`, with no regressions. Existing partial
+numeric scans, whitespace-only parser diagnostics and empty outgoing output
+buffers remain recorded in the port notes.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
