@@ -1,13 +1,13 @@
 /* Do not remove the headers from this file! see /USAGE for more info. */
 
-// specification is: snoop [user] [str*]
-// we will recieve: ({ user, ({ words }) })
+// specification is: unsnoop [user]
+// we receive: ({ user })
 
 //: COMMAND
 //$$ see: snoop, snoops
-// USAGE: ``unsnoop <user>``
+// USAGE: ``unsnoop [user]``
 //
-// Stops snooping the target.
+// Stops snooping the target, or everyone when no target is supplied.
 //
 // .. TAGS: RST
 
@@ -31,4 +31,9 @@ void main(mixed *arg)
       out(rc ? "Like you're snooping 'em, duh!\n" : "Okay.\n");
       return;
    }
+}
+
+protected varargs void dispatch_main(mixed first, mixed second, mixed third, mixed fourth)
+{
+   main(first);
 }

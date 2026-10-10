@@ -356,7 +356,11 @@ chains while rejecting self- and back-edge cycles. Each watched account has
 one native relay shared by its subscribers. The existing callback forwards
 buffered output and decoded input; subscribers can detach independently,
 and a stopped relationship can be started again.
-The `unsnoop` command still needs its dispatcher before it is available.
+`unsnoop <user>` removes one subscription; `unsnoop` removes all targets for
+the current body. Feedback shares command stdout for pipelines and redirection.
+Removing the last subscriber retires the relay. Reloading the snoop daemon
+cleans up its subscriptions and relays before loading the replacement, so
+subscriptions can be started again afterward.
 
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.

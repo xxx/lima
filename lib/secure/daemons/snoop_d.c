@@ -156,8 +156,11 @@ void remove()
 
    snoopers = keys(snoops) - ({nil});
    snoopers->receive_private_msg("Whoops! SNOOP_D is being dested!\n");
-   map(snoopers, ( : unsnoop_all:));
-   map(values(dummy_objects), ( : destruct:));
+   foreach (object snooper in snoopers)
+      unsnoop_all(snooper);
+   foreach (object dummy in values(dummy_objects))
+      if (dummy)
+         destruct(dummy);
 }
 
 void bye()
