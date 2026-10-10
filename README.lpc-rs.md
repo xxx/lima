@@ -318,9 +318,16 @@ diagnostic, with source excerpts and stack traces when available. Command stdout
 supports pipelines and redirection.
 Saved named records remain available without a live player body. Empty records
 and unknown players retain their existing messages. These records come from the
-master's uncaught-error handler; caught command failures currently do not create
-a new record. The report uses native diagnostic text, without the structured
-FluffOS frames required by `dbxframe`.
+master's uncaught-error handler and the user input layer's caught-message recorder.
+Caught command and modal failures update the current account and `last`, with
+wizard detail or the usual generic player bug notice. Input resumes even if the
+recorder fails. Internally handled errors and successful input preserve history.
+The recorder attempts to append messages to `/log/catch`.
+
+Caught runtime records retain only the message; propagated compilation errors
+retain their native source diagnostic. Uncaught records retain the native rendered
+stack when available. The report does not supply the structured frames and local
+variables required by `dbxframe`.
 
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.

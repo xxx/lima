@@ -156,6 +156,24 @@ void error_handler(mapping mp)
                  capitalize(userid), mp["error"], mp["location"])));
 }
 
+void record_input_error(string message)
+{
+   object user = this_interactive();
+   mapping record;
+   string userid = "(none)";
+   if (!user || previous_object() != user ||
+       calling_program() != "/secure/user/inputsys.c")
+      return;
+   record = (["error":message, "diagnostic":message, "caught":1]);
+   errors["last"] = record;
+   catch(userid = user->query_userid());
+   if (!stringp(userid) || userid == "")
+      userid = "(none)";
+   errors[userid] = record;
+   catch(write_file(LOG_FILE_CATCH, "---\n" + standard_trace(record)));
+   catch(tell(user, wizardp(user) ? message + "\n" : BUG_MSG));
+}
+
 mapping query_error(string name)
 {
    /* This MUST be secure */

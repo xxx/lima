@@ -354,12 +354,13 @@ private nomask void dispatch_to_bottom(mixed str)
 private nomask void dispatch_modal_input(string str)
 {
    class input_info info = get_top_handler(1, 1);
+   mixed problem;
    if (!info)
       return;
 
    if (strlen(str) && str[0] == '!' && !info.lock && info.input_type != INPUT_CHAR_MODE)
    {
-      catch(dispatch_to_bottom(str[1..]));
+      problem = catch(dispatch_to_bottom(str[1..]));
    }
    else
    {
@@ -367,8 +368,10 @@ private nomask void dispatch_modal_input(string str)
       dispatching_to = sizeof(modal_stack);
       if (info.input_type == INPUT_AUTO_POP)
          modal_pop();
-      catch(evaluate(info.input_func, str));
+      problem = catch(evaluate(info.input_func, str));
    }
+   if (stringp(problem))
+      catch(master()->record_input_error(problem));
    dispatching_to = 0;
 
    if (this_object())
