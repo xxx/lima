@@ -252,6 +252,19 @@ the user. Existing prefix truncation, stdin argument-type errors and the
 missing-command unused clone remain recorded as Lima source problems. Fresh
 transitional checks add only `testargs`, with no regressions.
 
+`dataedit` retains all eight audited entry scenarios across 25 registered inputs,
+including unavailable dispatch, the uncompiled editor and terminal-split-field
+controls. Command dispatch, declaration visibility, typed nil and assignment
+repairs, native value codec names, function callbacks and local split boundary
+normalization let native saved files open in the real menu. Discard preserves
+bytes; save/reload preserves zero, nil, floats, text, containers and nominal class
+records. Both quit paths remove the handler and retire the active clone. Empty
+and comment-only files, argument handling and relative quoted paths retain shell
+context. Existing reader errors leave unused clones but allow valid retry.
+Fresh transitional checks add only `dataedit`, with no regressions. Delete,
+rename, set, list, print, expression, merge and save-as interactions remain to be
+audited; the full editor is not yet validated.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

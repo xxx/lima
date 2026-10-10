@@ -7,55 +7,59 @@ inherit M_ACCESS;
 inherit M_COLOURS;
 
 /****** Begin private data and functions */
-private:
-class menu toplevel;
-class section main, other;
-class menu_item quit1, quit2, blank;
+private class menu toplevel;
+private class section main, other;
+private class menu_item quit1, quit2, blank;
 
-string fname;
-mapping data;
+private string fname;
+private mapping data;
 
-string menu_title()
+private string menu_title()
 {
    return "Save file editor: \"" + fname + "\"";
 }
 
-void update()
+private void update()
 {
    set_menu_title(toplevel, menu_title());
 }
 
-mapping load_data_file(string fn)
+private mapping load_data_file(string fn)
 {
    string text = read_file(fn);
    mapping result;
    string name, value;
 
    if (!text)
-      return 0;
+      return nil;
    result = ([]);
-   foreach (string line in explode(text, "\n"))
+   string *lines = explode(text, "\n");
+   if (lines[0] == "")
+      lines = lines[1..];
+   if (sizeof(lines) && lines[<1] == "")
+      lines = lines[0..<2];
+   foreach (string line in lines)
    {
       if (line[0] == '#')
          continue;
       if (sscanf(line, "%s %s", name, value) != 2)
          error("Syntax error in data file.\n");
-      result[name] = restore_variable(value);
+      result[name] = restore_value(value);
    }
    return result;
 }
 
-int save_data_file(string fname)
+private int save_data_file(string fname)
 {
    string result = "";
 
    foreach (string var, mixed value in data)
-      result += var + " " + save_variable(value) + "\n";
+      result += var + " " + save_value(value) + "\n";
 
    return write_file(fname, result, 1);
 }
 
-mixed expression(string str)
+private mixed expression(string str)
 {
    mixed *parts = reg_assoc(str, ({"\\$\\$", "\\$[a-zA-Z0-9_]+"}), ({1, 2}));
    string expr = "mixed expression(mapping internal_data) {\nreturn ";
@@ -90,7 +94,7 @@ mixed expression(string str)
    return value;
 }
 
-void print_variables()
+private void print_variables()
 {
    string *nicedata = sort_array(keys(data), 1);
    int w = this_user()->query_screen_width() - 20;
@@ -99,12 +103,12 @@ void print_variables()
    write("Variables:\n" + colour_table(nicedata, w, w / max_length));
 }
 
-void quit_and_discard()
+private void quit_and_discard()
 {
    quit_menu_application();
 }
 
-void quit_and_save()
+private void quit_and_save()
 {
    if (save_data_file(fname))
       quit_menu_application();
@@ -112,7 +116,7 @@ void quit_and_save()
       write("Failed.\n");
 }
 
-void remove_variable(string var)
+private void remove_variable(string var)
 {
    if (!has_key(data, var))
       write("No such variable.\n");
@@ -124,12 +128,12 @@ void remove_variable(string var)
    update();
 }
 
-void remove_var()
+private void remove_var()
 {
-   get_input_then_call(( : remove_variable:), "Variable: ");
+   get_input_then_call(remove_variable, "Variable: ");
 }
 
-void rename_variable(string oldv, string newv)
+private void rename_variable(string oldv, string newv)
 {
    if (has_key(data, newv))
       write("A variable by that name already exists.\n");
@@ -142,49 +146,49 @@ void rename_variable(string oldv, string newv)
    update();
 }
 
-void get_new_name(string old)
+private void get_new_name(string old)
 {
    if (!has_key(data, old))
       write("No such variable.\n");
    else
    {
-      get_input_then_call(( : rename_variable, old:), "New name: ");
+      get_input_then_call(&rename_variable(old), "New name: ");
    }
 }
 
-void rename_var()
+private void rename_var()
 {
-   get_input_then_call(( : get_new_name:), "Old name: ");
+   get_input_then_call(get_new_name, "Old name: ");
 }
 
-void set_variable(string vname, string valstr)
+private void set_variable(string vname, string valstr)
 {
    mixed value = expression(valstr);
    data[vname] = value;
    write("Done.\n");
 }
 
-void get_value(string vname)
+private void get_value(string vname)
 {
-   get_input_then_call(( : set_variable, vname:), "Value: ");
+   get_input_then_call(&set_variable(vname), "Value: ");
 }
 
-void set_var()
+private void set_var()
 {
-   get_input_then_call(( : get_value:), "Variable: ");
+   get_input_then_call(get_value, "Variable: ");
 }
 
-void print_variable(string expr)
+private void print_variable(string expr)
 {
    printf("Value is: %O\n", expression(expr));
 }
 
-void print()
+private void print()
 {
-   get_input_then_call(( : print_variable:), "Expression: ");
+   get_input_then_call(print_variable, "Expression: ");
 }
 
-void merge_file(string fname)
+private void merge_file(string fname)
 {
    mapping data2;
 
@@ -219,12 +223,12 @@ void merge_file(string fname)
    update();
 }
 
-void merge()
+private void merge()
 {
-   get_input_then_call(( : merge_file:), "File to merge with: ");
+   get_input_then_call(merge_file, "File to merge with: ");
 }
 
-void save_to_file(string file)
+private void save_to_file(string file)
 {
    if (save_data_file(file))
    {
@@ -235,16 +239,15 @@ void save_to_file(string file)
       write("Failed.\n");
 }
 
-void save_to()
+private void save_to()
 {
-   get_input_then_call(( : save_to_file:), "New filename: ");
+   get_input_then_call(save_to_file, "New filename: ");
 }
 
 /****** End of private functions */
-public:
 void start_menu(string file)
 {
-   if (!data = load_data_file(fname = file))
+   if (!(data = load_data_file(fname = file)))
    {
       write(file + ": No such file.\n");
       destruct(this_object());
@@ -259,17 +262,17 @@ void start_menu(string file)
    add_section_item(toplevel, other);
 
    //Main section
-   add_menu_item(main, new_menu_item("Delete Variable", ( : remove_var:), "d"));
-   add_menu_item(main, new_menu_item("Rename Variable", ( : rename_var:), "r"));
-   add_menu_item(main, new_menu_item("Set Variable", ( : set_var:), "="));
-   add_menu_item(main, new_menu_item("List all variables", ( : print_variables:), "l"));
-   add_menu_item(main, new_menu_item("Print Expression", ( : print:), "p"));
-   add_menu_item(main, new_menu_item("Merge Datafile", ( : merge:), "m"));
+   add_menu_item(main, new_menu_item("Delete Variable", remove_var, "d"));
+   add_menu_item(main, new_menu_item("Rename Variable", rename_var, "r"));
+   add_menu_item(main, new_menu_item("Set Variable", set_var, "="));
+   add_menu_item(main, new_menu_item("List all variables", print_variables, "l"));
+   add_menu_item(main, new_menu_item("Print Expression", print, "p"));
+   add_menu_item(main, new_menu_item("Merge Datafile", merge, "m"));
    
    //Other section
-   add_menu_item(other, new_menu_item("Save as ...", ( : save_to:), "s"));
-   add_menu_item(other, new_menu_item("Quit and Save", ( : quit_and_save:), "q"));
-   add_menu_item(other, new_menu_item("Quit w/o Saving", ( : quit_and_discard:), "Q"));
+   add_menu_item(other, new_menu_item("Save as ...", save_to, "s"));
+   add_menu_item(other, new_menu_item("Quit and Save", quit_and_save, "q"));
+   add_menu_item(other, new_menu_item("Quit w/o Saving", quit_and_discard, "Q"));
 
    set_menu_prompt(toplevel, "[dr=pmsqQ] ");
    init_menu_application(toplevel);
