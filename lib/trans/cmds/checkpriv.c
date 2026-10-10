@@ -23,13 +23,13 @@ inherit CMD;
 private
 void main(mixed arg)
 {
-   if (!arg)
+   arg = arg ? trim(arg) : "";
+   if (arg == "")
    {
       out("Usage: checkpriv <privilege>\n");
       return;
    }
 
-   arg = trim(arg);
    if (arg == "1")
       arg = 1;
    else if (arg == "0")
@@ -37,7 +37,7 @@ void main(mixed arg)
 
    if (!SECURE_D->valid_privilege(arg))
    {
-      printf("'%s' is not a valid privilege.\n", arg + "");
+      outf("'%s' is not a valid privilege.\n", arg + "");
       return;
    }
 
@@ -45,4 +45,9 @@ void main(mixed arg)
       outf("Verified.  You have privilege '%s'\n", arg + "");
    else
       outf("Sorry.  You do not have privilege '%s'\n", arg + "");
+}
+
+protected varargs void dispatch_main(mixed first, mixed second, mixed third, mixed fourth)
+{
+   main(first);
 }

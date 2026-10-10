@@ -339,6 +339,13 @@ recorded source file rather than its defining program. Large displayed reports
 are capped at 1,600 Unicode characters plus a truncation notice to fit command
 stdio's single-string buffer; this does not alter the saved snapshot.
 
+`checkpriv` reports whether the current command and user context has a privilege,
+using Lima's existing validation and privilege checks. Exact `0` and `1` inputs
+select integer privilege levels; registered names and suffixes remain strings.
+Blank input shows usage. Usage, verified/denied results and invalid-privilege
+feedback share command stdout for pipelines and redirection. Shell argument
+quotes remain literal.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
