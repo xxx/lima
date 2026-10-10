@@ -275,6 +275,17 @@ retries keep the menu usable. Concurrent editors and commit-time delivery
 failures were not exercised. Fresh transitional and support compilation checks
 retain the preceding inventory without regressions.
 
+`docs` uses the command dispatcher, explicit void returns, local path-split
+normalization and integer/array defaults for category counts and absent RST tags.
+Fourteen retained cases across 23 registered inputs check reports, deduplication,
+category counts, sorted ten-file topic lists, and actual ASCII/Unicode/simplified
+widgets. Administrator player-help generation uses real command/verb discovery,
+handles empty verbs and overwrites the page deterministically. Refresh runs the
+existing help daemon, including flat/nested completion, its busy guard, native
+saved data, scan failure with saved-byte preservation, and successful retry.
+The help daemon, write rules and native APIs remain unchanged. Full help-tree
+scanning and commit-time delivery failures retain their preceding scope.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

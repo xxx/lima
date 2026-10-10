@@ -63,22 +63,32 @@ void main(mixed arg)
    mapping rst_tag_cats = ([]);
    int width = this_user()->query_screen_width() - 30;
    string *rst_tags = HELP_D->query_tags()["RST"];
+   if (!arrayp(rst_tags))
+      rst_tags = ({});
 
    // Build help pages index of unique pages
    help_pages = clean_array(flatten_array(values(HELP_D->query_topics())));
    if (arg == "refresh")
-      return update_stats();
+   {
+      update_stats();
+      return;
+   }
    if (arg == "playerdoc")
-      return update_playerdoc();
+   {
+      update_playerdoc();
+      return;
+   }
 
    foreach (string f in filter(help_pages, ( : $1[ < 4..] == ".rst" :)))
    {
-      string *parts = explode(f, "/");
+      string *parts = explode(f, "/") - ({""});
       if (sizeof(parts) > 2 && parts[0] == "help" && member_array(parts[1], checked_dirs) != -1)
       {
          string category = parts[ < 2];
+         if (!intp(rst_categories[category]))
+            rst_categories[category] = 0;
          rst_categories[category]++;
-         if (!rst_tag_cats[category])
+         if (!intp(rst_tag_cats[category]))
             rst_tag_cats[category] = 0;
          if (member_array(f, rst_tags) != -1)
             rst_tag_cats[category]++;
@@ -120,4 +130,9 @@ void main(mixed arg)
    }
    write("\n\nOther options:\n\tdocs playerdoc - updates " + COMMANDS_HELP +
          "\n\tdocs refresh - forces HELP_D to update documents.\n\n");
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
