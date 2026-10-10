@@ -346,6 +346,18 @@ Blank input shows usage. Usage, verified/denied results and invalid-privilege
 feedback share command stdout for pipelines and redirection. Shell argument
 quotes remain literal.
 
+`snoop` keeps Lima's optional target and reason-word rule. Wizards require the
+target's `snoopable` flag; administrators retain their override. Successful
+subscriptions log account names and the reason, using `no reason given` when
+omitted. Feedback shares command stdout for pipelines.
+
+The daemon invokes its cycle-check callback directly, permitting ordinary
+chains while rejecting self- and back-edge cycles. Each watched account has
+one native relay shared by its subscribers. The existing callback forwards
+buffered output and decoded input; subscribers can detach independently,
+and a stopped relationship can be started again.
+The `unsnoop` command still needs its dispatcher before it is available.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

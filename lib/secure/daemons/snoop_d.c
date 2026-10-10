@@ -52,7 +52,7 @@ int detect_cycle_recursive(object snooper)
    snoopees = snoops[snooper];
    if (!snoopees)
       return 0;
-   cycles = filter(snoopees, ( : detect_cycle_recursive:));
+   cycles = filter(snoopees, detect_cycle_recursive);
    if (sizeof(cycles))
    {
       // clean up

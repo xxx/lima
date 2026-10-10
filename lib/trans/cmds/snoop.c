@@ -66,3 +66,8 @@ void main(mixed *arg)
       }
    }
 }
+
+protected varargs void dispatch_main(mixed first, mixed second, mixed third, mixed fourth)
+{
+   main(first);
+}
