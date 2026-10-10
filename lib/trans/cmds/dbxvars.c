@@ -4,65 +4,60 @@
 // USAGE:
 //     ``dbxvars <ob> <var>``
 //
-// Finds functions in an objects, e.g.:
+// Finds global variables in a loaded object by regular expression, e.g.:
 //
 //  |   ``dbxvars /std/body name``
 //  |   Matches:
-//  |   proper_name         : 0
-//  |   old_fnames          : ({ /* sizeof() == 2 */
-//  |   "/obj/shells/wish",
-//  |   "/obj/pshell"
-//  |   })
-//  |   name                : 0
 //  |   corpse_filename     : "/std/corpse"
-//  |   invis_name          : 0
-//  |   nickname            : 0
 //
 // .. TAGS: RST
 
 #include <mudlib.h>
 inherit CMD;
 
-private
-void main(string str)
+private void main(string str)
 {
-   string obname;
-   string var;
-   string *vars;
+   string obname, pattern;
    object ob;
-   function f;
-
-   if (!str || sscanf(str, "%s %s", obname, var) != 2)
+   if (!str || sscanf(str, "%s %s", obname, pattern) != 2)
    {
       out("dbxvars <ob> <var>\n");
       return;
    }
-
    obname = evaluate_path(obname);
-
    if (!(ob = find_object(obname)))
    {
       out("Can't find object " + obname + "\n");
       return;
    }
-
-   vars = regexp(variables(ob), var);
-
-   if (!sizeof(vars))
+   mapping *entries = variable_info(ob);
+   string *names = regexp(map(entries, (: $1["name"] :)), pattern);
+   if (!sizeof(names))
    {
       out("No matches\n");
       return;
    }
-
-   /*
-   ** NOTE: this may fail if the command user does not have enuf privs
-   */
-   f = bind(( : fetch_variable:), ob);
-
-   out("Matches:\n");
-   foreach (var in vars)
+   mapping counts = ([]);
+   foreach (string name in names)
    {
-      outf("%-20s: %O\n", var, evaluate(f, var));
+      if (counts[name])
+         counts[name]++;
+      else
+         counts[name] = 1;
    }
-   return;
+   out("Matches:\n");
+   foreach (mapping entry in entries)
+   {
+      string name = entry["name"];
+      if (!counts[name])
+         continue;
+      if (counts[name] > 1)
+         name += " (" + entry["program"] + ")";
+      outf("%-20s: %Q\n", name, entry["value"]);
+   }
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

@@ -715,6 +715,11 @@ int valid_bind(object binder, object old_owner, object new_owner)
    return check_privilege(get_protection(base_name(new_owner), "wf"));
 }
 
+int valid_variable_info(object caller, object target, string program)
+{
+   return check_privilege(get_protection(base_name(target), "wf"));
+}
+
 int valid_save_binary()
 {
    return 1;

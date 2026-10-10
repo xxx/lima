@@ -302,6 +302,16 @@ exclude variadic collectors. Usage, missing objects and no matches are reported
 through command stdout, along with headings and rows, so pipelines and output
 redirection receive the complete report. Regex errors leave input usable.
 
+`dbxvars` reports matching globals in loaded objects through native
+`variable_info`, including inherited, private and non-persistent declarations.
+The master preserves the original binding permission rule: inspection requires
+the target's write privilege through Lima's existing security daemon. This check
+runs before filtering, including when the pattern would match no variables.
+Each shadowed declaration reports its own value with the declaring source in
+its label. Strings and nested string values remain quoted. Headings, values and
+usage messages share command stdout for pipelines and redirection; missing
+objects, permission failures and regex errors leave shell input usable.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
