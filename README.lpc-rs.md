@@ -326,8 +326,18 @@ The recorder attempts to append messages to `/log/catch`.
 
 Caught runtime records retain only the message; propagated compilation errors
 retain their native source diagnostic. Uncaught records retain the native rendered
-stack when available. The report does not supply the structured frames and local
-variables required by `dbxframe`.
+stack when available. With native saved-frame support, `dbxframe` displays an
+uncaught record's named arguments and locals as rendered diagnostic text, with
+source excerpts, defining program and receiver names. Frame numbers index the
+retained root-to-leaf list from zero. Container values use summaries, and omission
+counts and truncation flags identify shortened snapshots. Current-account, named
+account and `last` lookups, pipelines and redirection are supported.
+
+Caught errors explicitly report that frame data is unavailable. Missing, empty or
+changed source files do not replace the saved error, and source excerpts use the
+recorded source file rather than its defining program. Large displayed reports
+are capped at 1,600 Unicode characters plus a truncation notice to fit command
+stdio's single-string buffer; this does not alter the saved snapshot.
 
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
