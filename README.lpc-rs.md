@@ -294,6 +294,14 @@ after output or a listing failure; an occupied name is reported and retained.
 Usage and compiler errors leave the shell ready for another command.
 Native `compile_string` authorization and initialization still apply.
 
+`dbxfuncs` inspects loaded objects using native `functions` and
+`function_signature`, preserving return types, fixed-parameter placeholders and
+defining programs. Results include inherited public functions and local
+overrides; foreign private/protected methods stay hidden. Signature counts
+exclude variadic collectors. Usage, missing objects and no matches are reported
+through command stdout, along with headings and rows, so pipelines and output
+redirection receive the complete report. Regex errors leave input usable.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

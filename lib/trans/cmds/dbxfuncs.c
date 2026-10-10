@@ -14,61 +14,49 @@
 //
 // .. TAGS: RST
 
-#include <driver/type.h>
 #include <mudlib.h>
 
 inherit CMD;
 
-private
-void main(string str)
+private void main(string str)
 {
-   string obname, func;
-   string *funcs;
-   mixed *result;
-   string where;
+   string obname, pattern;
    object ob;
-   string line;
 
-   if (!str || sscanf(str, "%s %s", obname, func) != 2)
+   if (!str || sscanf(str, "%s %s", obname, pattern) != 2)
    {
-      write("dbxfuncs <ob> <funcs>\n");
+      outf("dbxfuncs <ob> <funcs>\n");
       return;
    }
 
    obname = evaluate_path(obname);
-
    if (!(ob = find_object(obname)))
    {
-      write("Can't find object " + obname + "\n");
+      outf("Can't find object %s\n", obname);
       return;
    }
 
-   funcs = filter(
-       functions(ob, 1), function(mixed * result, string func) { return (sizeof(regexp(({result[0]}), func))); }, func);
-
-   if (!sizeof(funcs))
+   string *names = regexp(functions(ob), pattern);
+   if (!sizeof(names))
    {
-      write("No matches\n");
+      outf("No matches\n");
       return;
    }
 
-   write("Matches:\n");
-   foreach (result in funcs)
+   outf("Matches:\n");
+   foreach (string name in names)
    {
-      line = result[2] + " ";
-      line += (result[0] + "(");
-      while (result[1]--)
-      {
-         line += ("x");
-         if (result[1])
-            line += (", ");
-      }
-      line += (")");
-
-      if (where = function_exists(result[0], ob))
-         outf("%-30s(defined in %s)\n", line, where);
-      else
-         outf("%s\n", line);
+      mapping signature = function_signature(name, ob);
+      string line = signature["return_type"] + " " + name + "(";
+      line += implode(allocate(signature["num_args"], "x"), ", ") + ")";
+      string where = signature["program"];
+      if (where[<2..] == ".c")
+         where = where[..<3];
+      outf("%-30s(defined in %s)\n", line, where);
    }
-   return;
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
