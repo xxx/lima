@@ -312,6 +312,16 @@ its label. Strings and nested string values remain quoted. Headings, values and
 usage messages share command stdout for pipelines and redirection; missing
 objects, permission failures and regex errors leave shell input usable.
 
+`dbxwhere` displays saved native error diagnostics for the current account, a
+named account, or `last`. Reports include a timestamp and the stored native
+diagnostic, with source excerpts and stack traces when available. Command stdout
+supports pipelines and redirection.
+Saved named records remain available without a live player body. Empty records
+and unknown players retain their existing messages. These records come from the
+master's uncaught-error handler; caught command failures currently do not create
+a new record. The report uses native diagnostic text, without the structured
+FluffOS frames required by `dbxframe`.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

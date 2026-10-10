@@ -17,37 +17,42 @@ inherit CMD;
 private
 mapping get_the_error(string str)
 {
-   return unguarded(1, ( : call_other, master(), "query_error", str:));
+   return unguarded(1, (: master()->query_error($(str)) :));
 }
 
 private
 void main(string str)
 {
-   mapping error;
+   mapping record;
 
    // We do not have any ANSI here, but also don't want emojis.
    set_output_flags(NO_ANSI);
 
    if (!str || str == "")
    {
-      error = get_the_error(this_user()->query_userid());
+      record = get_the_error(this_user()->query_userid());
    }
    else
    {
-      error = get_the_error(str);
-      if (!error && !find_body(str) && str != "last")
+      record = get_the_error(str);
+      if (!record && !find_body(str) && str != "last")
       {
          out("No such player.\n");
          return;
       }
    }
-   if (!error)
+   if (!record)
    {
       out("No error.\n");
    }
    else
    {
-      outf("%s\n", master()->standard_trace(error, 1));
+      outf("%s\n", master()->standard_trace(record, 1));
    }
    return;
+}
+
+protected varargs void dispatch_main(mixed first, mixed second, mixed third, mixed fourth)
+{
+   main(first);
 }
