@@ -210,6 +210,13 @@ preflight runs before cleanup. Batch removal, old clones, original callbacks,
 self-exclusion, contents cleanup, errors and output/context behavior remain.
 Fresh transitional checks add only `loadall`, with no regressions.
 
+`stat` passes all thirteen audited scenarios across 27 registered inputs,
+including retained controls. Its dispatcher exposes the private handler; the
+body passes the bare `our_description` callback so `stat me` reports its real
+description. Paths, clones, inventory IDs, inherited reports, absent information,
+errors, output routes and caller/player context retain their audited behavior.
+Fresh transitional checks add only `stat`, with no regressions.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

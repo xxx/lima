@@ -426,7 +426,7 @@ void create(string userid)
    */
    configure_set(PLAYER_NP_FLAGS, 1);
 
-   set_long(( : our_description:));
+   set_long(our_description);
    set_name(userid);
 
    // TBUG("restore_object("+USER_PATH(userid)+",1);");
