@@ -203,6 +203,13 @@ output remain recorded in the port notes. Fresh transitional checks add only
 `renew`, with no regressions; native destruction and permission applies are
 unchanged.
 
+`loadall` passes all seventeen audited scenarios across 25 registered inputs,
+including retained controls. Its dispatcher exposes the private handler; explicit
+load checks stop later replacements after a failed load. A resident master/simul
+preflight runs before cleanup. Batch removal, old clones, original callbacks,
+self-exclusion, contents cleanup, errors and output/context behavior remain.
+Fresh transitional checks add only `loadall`, with no regressions.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

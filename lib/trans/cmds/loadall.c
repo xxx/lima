@@ -29,6 +29,13 @@ void main(mixed *args)
    /*
     ** Blow away the old objects
     */
+   foreach (string file in files)
+   {
+      object loaded = find_object(file);
+      if (loaded && (loaded == master() || loaded == find_object(SIMUL_OB)))
+         error("loadall: resident master/simul efuns require queued recompilation");
+   }
+
    obs = map(files, ( : find_object($1) :)) - ({0});
    obs->remove();
    obs -= ({0});
@@ -37,7 +44,14 @@ void main(mixed *args)
    /*
     ** Load all the objects
     */
-   map(files, ( : load_object($1) :));
+   foreach (string file in files)
+      if (!load_object(file))
+         error("loadall: failed to load '" + file + "'");
 
    out("Succeeded.\n");
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
