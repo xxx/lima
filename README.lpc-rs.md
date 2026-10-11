@@ -477,6 +477,13 @@ routing without a newline; incoming input is ignored. Existing command privilege
 can deny home output after action state changes. Ordinary player shells exclude
 the command.
 
+`lightme <number>` sets total body light, including visible carried light, and
+updates the room by the difference. Room visibility messages remain direct;
+status uses stdout, file or pipe routing with a newline. Moving a carried light
+out after resetting total light can leave the body with negative light, as in
+the existing setter. Numeric arguments retain integer-prefix parsing. Incoming
+input is ignored, and ordinary player shells exclude the command.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
