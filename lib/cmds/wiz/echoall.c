@@ -40,3 +40,8 @@ void main(string orig_input, mixed *arg)
    out("You echoall: " + msg + "\n");
    tell(users() - ({this_user()}), msg + "\n");
 }
+
+protected varargs void dispatch_main(mixed original_input, mixed parsed_args, mixed flags, mixed implode_info)
+{
+   main(original_input, parsed_args);
+}

@@ -31,3 +31,8 @@ void main(string orig_input, mixed arg, mapping flags)
    outf("You echo to %s: %s\n", arg[0]->query_name(), msg);
    tell(arg[0], msg + "\n");
 }
+
+protected varargs void dispatch_main(mixed original_input, mixed parsed_args, mixed flags, mixed implode_info)
+{
+   main(original_input, parsed_args, flags);
+}

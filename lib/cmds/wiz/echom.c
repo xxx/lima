@@ -51,3 +51,8 @@ void main(string args)
       this_body()->simple_action(args, who);
    }
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed stdin, mixed implode_info)
+{
+   main(arg);
+}

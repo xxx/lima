@@ -43,3 +43,8 @@ void main(string str)
    tell_environment(this_body(), str + "\n", 0, ({this_body()}));
    write("You echo: " + str + "\n");
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed stdin, mixed implode_info)
+{
+   main(arg);
+}

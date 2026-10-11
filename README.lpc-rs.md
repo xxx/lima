@@ -426,6 +426,21 @@ The client uses the port's UTF-8 text socket wrapper. Telnet option negotiation
 remains unfinished in the upstream client. Existing failed-open session records
 and the receive loop's access to closed slots remain separate source issues.
 
+`echo <text>` sends raw text to other bodies in the room and acknowledges the
+sender. With an outgoing pipe, it supplies the raw text to command stdout.
+`echoall <text>` sends normalized rule arguments to other attached users across
+rooms, including users without bodies. `echoto <player> <text>` selects a linked
+body and preserves raw message text, delivering only to that target.
+`echom [@target] <action>` uses Lima's message and grammar modules for actor,
+target and onlooker views, with body, carried-object and room-object lookup.
+
+`echoall` disables IO, but its parsed arguments omit operator suffixes; this
+retains the original shell's behavior. `echoto` keeps those suffixes as literal
+message text. Direct messages from `echo` and `echom` bypass stdout, so permitted
+file redirection creates an empty file. Existing `Mudlib:wizcmds` privilege can
+deny home-directory output after message delivery. Incoming pipeline text does
+not supply a message. Ordinary player shells exclude these wizard commands.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
