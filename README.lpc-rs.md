@@ -385,6 +385,15 @@ updates preserve object identity and compatible state without rerunning `create(
 failed compilation or initialization leaves the old master usable. Status messages
 support pipelines and redirection; incoming stdin does not supply a request ID.
 
+`objpurge <base-name>` requires an administrator and removes loaded instances
+of one exact extensionless filename, including its prototype and clones.
+The selector is raw text; relative paths, extensions and quoted names do not
+match. Objects receive `remove()` first; surviving objects receive it again
+through the destruct wrapper before destruction. Cleanup failures return to
+the shell with preceding hook writes retained. Counts support pipelines and
+redirection; incoming stdin does not supply the selector. Omitting the filename
+retains the command's caught formatting error.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

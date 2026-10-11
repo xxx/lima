@@ -48,3 +48,8 @@ void main(string arg)
    outf("Destructing %d objects of class %s\n", sizeof(obs), arg);
    map(obs, destruct);
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}
