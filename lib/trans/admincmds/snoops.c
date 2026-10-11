@@ -35,14 +35,9 @@ void main()
    }
    foreach (object snoop_ob in keys(raw_data))
    {
-      // Haha! Obfuscation rox!
-      // This code:
-      // 1) converts the object in the current key into a proper name
-      // 2) converts the people that guy is snooping into a _sorted_ comma
-      //    seperated string (removing dested people by subtracting ({0}) )
-      // 3) stuffs 1 mapped to 2 into a mapping (str_data).
+      // Ignore destroyed targets when formatting each subscriber's list.
       str_data[capitalize(snoop_ob->query_userid())] =
-          implode(sort_array(map(raw_data[snoop_ob] - ({0}), (
+          implode(sort_array(map(filter(raw_data[snoop_ob], objectp), (
                                                                  : capitalize($1->query_userid())
                                                                  :)),
                              0),
@@ -54,4 +49,9 @@ void main()
    {
       outf("%s: %s\n", snooper, str_data[snooper]);
    }
+}
+
+protected varargs void dispatch_main(mixed first, mixed second, mixed third, mixed fourth)
+{
+   main();
 }

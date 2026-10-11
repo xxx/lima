@@ -4,7 +4,7 @@
 #define SNOOP_DUMMY "/obj/secure/snoop_dummy"
 #define SNOOP_CMD "/trans/cmds/snoop"
 #define UNSNOOP_CMD "/trans/cmds/unsnoop"
-#define SNOOPS_CMD "/trans/cmds/snoops"
+#define SNOOPS_CMD "/trans/admincmds/snoops"
 mapping cycle_info;
 mapping snoops = ([]);
 mapping dummy_objects = ([]);

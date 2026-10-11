@@ -362,6 +362,10 @@ Removing the last subscriber retires the relay. Reloading the snoop daemon
 cleans up its subscriptions and relays before loading the replacement, so
 subscriptions can be started again afterward.
 
+The administrator command `snoops` lists subscribers and targets in name order,
+using command stdout for pipelines and redirection. Destroyed target references
+are omitted from the display.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
