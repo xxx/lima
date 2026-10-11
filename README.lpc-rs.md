@@ -372,6 +372,12 @@ Destroyed references and nil entries are omitted from the display while the
 stored channel membership remains unchanged. Output supports pipelines and
 redirection; the existing object-argument report remains unfinished.
 
+`addguest <name>` and `removeguest <name>` maintain the saved guest list used
+when `NO_NEW_PLAYERS` is enabled. They require an administrator and preserve
+case-sensitive names and feedback for duplicate additions or missing removals.
+Both commands keep direct user output and raw arguments: redirect and outgoing
+pipe suffixes form part of the name, and incoming pipeline text is ignored.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

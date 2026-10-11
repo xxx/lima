@@ -39,3 +39,8 @@ void main(string arg)
    GUEST_D->add_guest(arg);
    write("Guest " + arg + " added.\n");
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}
