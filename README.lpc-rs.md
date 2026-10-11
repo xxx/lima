@@ -378,6 +378,13 @@ case-sensitive names and feedback for duplicate additions or missing removals.
 Both commands keep direct user output and raw arguments: redirect and outgoing
 pipe suffixes form part of the name, and incoming pipeline text is ignored.
 
+`master` queues an in-place update of the resident master object; `master <id>`
+reports its queued, succeeded or failed status. Administrator privileges are
+required when requesting an update and when preparation starts. Successful
+updates preserve object identity and compatible state without rerunning `create()`;
+failed compilation or initialization leaves the old master usable. Status messages
+support pipelines and redirection; incoming stdin does not supply a request ID.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

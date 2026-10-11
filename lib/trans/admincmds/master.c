@@ -21,7 +21,7 @@ private
 void main(string arg)
 {
    int id;
-   mixed error;
+   mixed problem;
    mapping status;
 
    if (!this_user() || !check_privilege(1))
@@ -32,25 +32,25 @@ void main(string arg)
 
    if (!arg || arg == "")
    {
-      error = catch(id = request_object_recompile("master"));
-      if (error)
-         outf("Master update request failed: %s\n", error);
+      problem = catch(id = request_object_recompile("master"));
+      if (problem)
+         outf("Master update request failed: %s\n", problem);
       else
          outf("Master update %d queued. Use 'master %d' to check completion.\n", id, id);
       return;
    }
 
-   error = catch(id = to_int(arg));
-   if (error || id <= 0 || sprintf("%d", id) != arg)
+   problem = catch(id = to_int(arg));
+   if (problem || id <= 0 || sprintf("%d", id) != arg)
    {
       out("Usage: master [<request-id>]\n");
       return;
    }
 
-   error = catch(status = query_object_recompile(id));
-   if (error)
+   problem = catch(status = query_object_recompile(id));
+   if (problem)
    {
-      outf("Cannot inspect master update %d: %s\n", id, error);
+      outf("Cannot inspect master update %d: %s\n", id, problem);
       return;
    }
    if (!status || status["target"] != "master")
@@ -65,4 +65,9 @@ void main(string arg)
       outf("Master update %d failed: %s\n", id, status["error"]);
    else
       outf("Master update %d is %s.\n", id, status["state"]);
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
