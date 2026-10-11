@@ -441,6 +441,24 @@ file redirection creates an empty file. Existing `Mudlib:wizcmds` privilege can
 deny home-directory output after message delivery. Incoming pipeline text does
 not supply a message. Ordinary player shells exclude these wizard commands.
 
+`emotem [@target] <action>` prepends the actor's name through Lima's message
+syntax. It finds a body, carried object or room object as the target; an unknown
+or bodyless target falls back to a simple room action. Self-targeting retains
+the existing two direct sends. Its direct messages leave redirected stdout
+empty, and incoming pipeline text does not supply an action.
+
+`msg <type> <message>` adds a personal message variant using normalized rule
+arguments. `msg <type> clear` removes the personal override, exposing a stock
+default again when one exists; a custom type disappears. Its acknowledgement
+uses normal stdout, file and pipe routing.
+
+`review [-cd] [player]` displays every message variant, using your own view or
+another linked body's onlooker view. The inspected player receives no output.
+`-d` includes raw templates; `-c` is accepted but unused. The existing raw-template
+display removes the last character even without a newline; rendered actions keep
+their punctuation. Review uses normal stdout routing and ignores incoming pipe
+text. Ordinary player shells exclude these wizard commands.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
