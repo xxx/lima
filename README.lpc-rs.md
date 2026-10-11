@@ -408,6 +408,12 @@ The existing second-request path clears its cancellation handle while the
 countdown remains scheduled, so a later cancellation reports no shutdown in
 progress. This source issue remains separate from the command adaptation.
 
+`wall <message>` requires an administrator, appends the broadcast to `/log/walls`
+and delivers it to the sender and other connected users, including users without
+a live body. It retains Lima's punctuation rules and each recipient's wrapping.
+Empty input shows usage. Arguments stay raw: quotes and redirect or outgoing
+pipe suffixes remain message text, and incoming pipeline data is ignored.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
