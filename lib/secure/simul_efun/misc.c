@@ -258,7 +258,7 @@ varargs mixed exec_code(string arg, string dir, string includefile)
    string contents;
 
    if (tmp = find_object(file))
-      destruct(tmp);
+      this_object()->destruct(tmp);
 
    rm(file);
 
@@ -288,7 +288,8 @@ varargs mixed exec_code(string arg, string dir, string includefile)
    contents += sprintf("mixed exec_foo(){ %s", arg);
    contents += ";}\n";
    write_file(file, contents);
-   retval = file->exec_foo();
+   tmp = compile_string(file, contents);
+   retval = tmp->exec_foo();
    rm(file);
    return retval;
 }

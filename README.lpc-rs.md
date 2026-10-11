@@ -501,9 +501,8 @@ privilege can deny home output.
 
 Bare `print` without text or input still raises a type error. The shipped `@`
 alias wraps its entire remainder in a backtick expression; use `print` with an
-explicit backtick expression for redirected evaluation. First evaluation works,
-but repeated evaluation currently fails while removing the previous temporary
-object; the wizard shell catches this error and produces no output.
+explicit backtick expression for redirected evaluation. Repeated evaluations
+preserve player context and use your optional `eval.h` header.
 
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
