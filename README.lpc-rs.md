@@ -492,6 +492,19 @@ Action messages and lookup refusals remain direct, leaving redirected file/pipe
 output empty. Incoming input is ignored. Existing command privilege can deny
 home output after healing; ordinary player shells exclude the command.
 
+`print <text>` preserves raw spacing and quotes and appends a newline. Incoming
+file or pipe input takes precedence, even when empty, and passes through unchanged.
+`null [argument]` discards its optional argument and incoming input and emits
+nothing; it sends empty output to the next pipeline stage. Both use normal stdout,
+file and pipe routing. Ordinary player shells exclude them, and existing command
+privilege can deny home output.
+
+Bare `print` without text or input still raises a type error. The shipped `@`
+alias wraps its entire remainder in a backtick expression; use `print` with an
+explicit backtick expression for redirected evaluation. First evaluation works,
+but repeated evaluation currently fails while removing the previous temporary
+object; the wizard shell catches this error and produces no output.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
