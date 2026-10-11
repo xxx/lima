@@ -394,6 +394,20 @@ the shell with preceding hook writes retained. Counts support pipelines and
 redirection; incoming stdin does not supply the selector. Omitting the filename
 retains the command's caught formatting error.
 
+`shutdown <reason>` requests immediate shutdown; `shutdown -t<minutes> <reason>`
+starts a minute countdown and `shutdown -c <reason>` cancels it. Administrator
+privileges are required by the command and rechecked by the final timer action.
+The configured preserved call-out player supplies the initiating user context.
+Announcements go directly to connected users; startup feedback uses command
+stdout for pipelines and redirection. Incoming stdin does not supply the reason.
+The command logs the request and quits users before calling the privileged
+shutdown simul. The master accepts the native request only through that wrapper
+with its existing privilege check.
+
+The existing second-request path clears its cancellation handle while the
+countdown remains scheduled, so a later cancellation reports no shutdown in
+progress. This source issue remains separate from the command adaptation.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

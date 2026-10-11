@@ -814,6 +814,13 @@ int valid_destruct(object caller, object target, string program)
    return destruct_allowed(requester, target);
 }
 
+int valid_shutdown(object caller, string program)
+{
+   return caller == find_object(SIMUL_OB)
+      && program == "/secure/simul_efun/overrides.c"
+      && check_privilege(1);
+}
+
 int valid_snoop(object caller, object observer, object target, string operation, string program)
 {
    return operation == "start"

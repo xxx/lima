@@ -45,7 +45,7 @@ void do_shutdown(string s)
    foreach (object ob in users())
       catch (ob->quit());
 
-   unguarded(1, ( : shutdown:));
+   unguarded(1, (: shutdown() :));
 }
 
 private
@@ -60,7 +60,7 @@ void count_down(int num, string s)
 
    tell_all(THE_BIG_GUY " tells you: Shutdown in " + M_GRAMMAR->number_of(num, "minute") + ".\n");
    num--;
-   call_number = call_out(( : count_down, num, s:), 60);
+   call_number = call_out(&count_down(num, s), 60);
 }
 
 private
@@ -124,4 +124,9 @@ void automatic_shutdown(string reason)
    LOG_D->log(LOG_SHUTDOWN, "Shutdown started by " THE_BIG_GUY "[" + reason + "]\n");
 
    count_down(10, reason);
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg, flags);
 }
