@@ -459,6 +459,16 @@ display removes the last character even without a newline; rendered actions keep
 their punctuation. Review uses normal stdout routing and ignores incoming pipe
 text. Ordinary player shells exclude these wizard commands.
 
+`vis` makes your body visible and `invis` hides it. Both use your personal
+message template for a direct action to you and other bodies in the room,
+keeping your name in both transition messages. Repeated calls show only status.
+Arguments and incoming pipe or file input are ignored.
+
+Normal status supports stdout, file and pipe routing. When you are already
+visible, `vis` sends its status directly instead, leaving redirected output
+empty. Existing command privilege can deny home output after action messages
+and visibility changes. Ordinary player shells exclude these wizard commands.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

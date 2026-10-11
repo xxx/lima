@@ -34,3 +34,8 @@ void main()
    FINGER_D->update_me();
    return;
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed stdin, mixed implode_info)
+{
+   main();
+}
