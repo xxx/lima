@@ -414,6 +414,18 @@ a live body. It retains Lima's punctuation rules and each recipient's wrapping.
 Empty input shows usage. Arguments stay raw: quotes and redirect or outgoing
 pipe suffixes remain message text, and incoming pipeline data is ignored.
 
+`telnet` requires an administrator and opens a modal client. Normal input stays
+with the shell until `/tog` routes it to the active connection; `!` sends a line
+to the shell, and `/send` sends explicitly. `/open` accepts an address or a case-insensitive
+unique mud name, `/jobs` lists sessions, `/goto` selects one and `/close` closes
+it. Output from inactive sessions is buffered; `/hide` toggles display and
+`/exit` returns to the shell. The control prefix defaults to `/` and follows the
+user's `telnet_char` setting. Incoming pipeline text does not supply an address.
+
+The client uses the port's UTF-8 text socket wrapper. Telnet option negotiation
+remains unfinished in the upstream client. Existing failed-open session records
+and the receive loop's access to closed slots remain separate source issues.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

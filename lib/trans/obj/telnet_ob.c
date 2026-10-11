@@ -155,11 +155,9 @@ nomask void open_socket(class connection this_con)
 {
    string session = this_con.session_name;
 
-   this_con.socket = clone_object (OLD_SOCKET, SKT_STYLE_CONNECT, this_con.address,
-                          (
-                              : recv_input_from, session:),
-                          (
-                              : close_session, session:));
+   this_con.socket = clone_object (SOCKET, SKT_STYLE_CONNECT, this_con.address,
+                          &recv_input_from(session),
+                          &close_session(session));
 }
 
 private
@@ -224,7 +222,7 @@ nomask void handle_input(mixed input)
       class connection con;
 
       con = sessions[active_session];
-      con->socket->send(input + "\n");
+      con.socket->send(input + "\n");
       return;
    }
    else
@@ -237,7 +235,7 @@ void init_telnet()
       return;
    owner = this_body();
    control_char = get_user_variable("telnet_char") || "/";
-   modal_push(( : handle_input:), "# ");
+   modal_push(handle_input, "# ");
 }
 
 nomask void remove()
@@ -250,7 +248,7 @@ nomask void remove()
          continue;
       if (!con.socket)
          continue;
-      catch (con->socket->remove());
+      catch (con.socket->remove());
    }
    destruct();
 }
@@ -285,7 +283,7 @@ nomask void handle_command(string cmd)
          return;
       }
       con = sessions[active_session];
-      con->socket->send(arg + "\n");
+      con.socket->send(arg + "\n");
       return;
 
    case "open":
@@ -312,7 +310,7 @@ nomask void handle_command(string cmd)
       return;
 
    case "jobs":
-      if (!sizeof(filter(sessions, ( : typeof($1) == "class" :))))
+      if (!sizeof(filter(sessions, ( : classp($1) :))))
       {
          write("You currently have no sessions open.\n");
          return;
@@ -320,7 +318,7 @@ nomask void handle_command(string cmd)
       write("Active sessions:\n================\n");
       for (i = 0; i < sizeof(sessions); i++)
       {
-         if (typeof(sessions[i]) != T_CLASS)
+         if (!classp(sessions[i]))
             continue;
          printf("%i:  %s\n", i + 1, sessions[i].session_name);
       }
@@ -377,7 +375,7 @@ nomask void close_session(string ses, object sock)
          continue;
       if (sessions[i].session_name == ses)
       {
-         sessions[i] = 0;
+         sessions[i] = nil;
       }
       else if (new_session == -1 && sessions[i])
       {
@@ -385,7 +383,7 @@ nomask void close_session(string ses, object sock)
       }
    }
    active_session = new_session;
-   write(active_session);
+   write(sprintf("%d", active_session));
    write("     " + active_session_name + "\n");
    if (active_session == -1)
    {
@@ -396,7 +394,7 @@ nomask void close_session(string ses, object sock)
          actively_elsewhere = 0;
       }
       else
-         active_session_name = 0;
+         active_session_name = nil;
    }
    else
    {
