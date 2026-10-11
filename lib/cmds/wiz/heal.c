@@ -20,7 +20,7 @@ void main(string arg)
       this_body()->heal_all();
       return;
    }
-   if (!target = find_body(arg))
+   if (!(target = find_body(arg)))
    {
       write("You can't heal that.\n");
       return;
@@ -34,4 +34,9 @@ void main(string arg)
    target->heal_all();
    this_body()->targetted_action("$N $vraise $p arms and $vheal $t.", target);
    return;
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed stdin, mixed implode_info)
+{
+   main(arg);
 }

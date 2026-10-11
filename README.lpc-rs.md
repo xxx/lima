@@ -484,6 +484,14 @@ out after resetting total light can leave the body with negative light, as in
 the existing setter. Numeric arguments retain integer-prefix parsing. Incoming
 input is ignored, and ordinary player shells exclude the command.
 
+`heal [player]` heals yourself with no argument, `me`, `myself` or your own
+account. It resolves other connected bodies by account, lower-case display name
+or nickname, including remote bodies. With the selected limb health system, it
+restores damaged and disabled limbs, clears drunkenness and refills reflex points.
+Action messages and lookup refusals remain direct, leaving redirected file/pipe
+output empty. Incoming input is ignored. Existing command privilege can deny
+home output after healing; ordinary player shells exclude the command.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
