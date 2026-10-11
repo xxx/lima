@@ -53,7 +53,7 @@ void show_one_channel(string channel_name)
       out("No such channel: " + channel_name + "\n");
       return;
    }
-   listeners -= ({0});
+   listeners -= ({nil});
 
    flags = CHANNEL_D->query_flags(channel_name);
 
@@ -91,6 +91,11 @@ void main(mixed *argv)
    }
    else
    {
-      map(CHANNEL_D->query_channels(), ( : show_one_channel:));
+      map(CHANNEL_D->query_channels(), show_one_channel);
    }
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

@@ -366,6 +366,12 @@ The administrator command `snoops` lists subscribers and targets in name order,
 using command stdout for pipelines and redirection. Destroyed target references
 are omitted from the display.
 
+The administrator command `listeners` lists a named channel or all channels,
+including channel flags and linked, link-dead and non-body listener formatting.
+Destroyed references and nil entries are omitted from the display while the
+stored channel membership remains unchanged. Output supports pipelines and
+redirection; the existing object-argument report remains unfinished.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
