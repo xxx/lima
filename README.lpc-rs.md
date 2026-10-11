@@ -469,6 +469,14 @@ visible, `vis` sends its status directly instead, leaving redirected output
 empty. Existing command privilege can deny home output after action messages
 and visibility changes. Ordinary player shells exclude these wizard commands.
 
+`quiet <object>` stops periodic actions and clears the action list. Bodies cannot
+be quieted; objects without an action array are already quiet. Queued responses
+and existing movement/room hooks remain. A later move can schedule one idle
+callback that does nothing and stops. Status uses normal stdout, file and pipe
+routing without a newline; incoming input is ignored. Existing command privilege
+can deny home output after action state changes. Ordinary player shells exclude
+the command.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
