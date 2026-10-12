@@ -504,6 +504,14 @@ alias wraps its entire remainder in a backtick expression; use `print` with an
 explicit backtick expression for redirected evaluation. Repeated evaluations
 preserve player context and use your optional `eval.h` header.
 
+`eval(text[, header])` converts canonical numeric text and evaluates longer LPC
+expressions. Repeated calls preserve player context and support an optional
+include header.
+Evaluated strings, nil and other false results return the original text, as do
+caught expression errors; `eval("0")` returns integer zero. The generated source
+stays in `/tmp/eval.c` until the next call. The existing object-name shortcut
+returns text; use `find_object()` to look up an object.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

@@ -307,11 +307,12 @@ varargs mixed eval(string arg, string includefile)
 {
    mixed tmp;
    string file;
+   string contents;
 
    file = "/tmp/eval.c";
 
    if (tmp = find_object(file))
-      destruct(tmp);
+      this_object()->destruct(tmp);
    rm(file);
    if (!stringp(arg))
    {
@@ -328,7 +329,7 @@ varargs mixed eval(string arg, string includefile)
       if (tmp + "" == arg)
          return tmp;
    if (tmp = to_float(arg))
-      if (tmp + "" == arg)
+      if (to_string(tmp) == arg)
          return tmp;
 
    if (tmp = find_object(arg) && objectp(tmp))
@@ -337,8 +338,14 @@ varargs mixed eval(string arg, string includefile)
    if (strlen(arg) < 4)
       return arg;
 
-   write_file(file, sprintf("mixed foo(){ return %s; }\n", arg));
-   if (catch (tmp = file->foo()))
+   contents = sprintf("mixed foo(){ return %s; }\n", arg);
+   write_file(file, contents);
+   if (includefile)
+      contents = sprintf("#include \"%s\"\n", includefile) + contents;
+   if (catch {
+      tmp = compile_string(file, contents);
+      tmp = tmp->foo();
+   })
       return arg;
 
    if (tmp && !stringp(tmp))
