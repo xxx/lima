@@ -13,6 +13,20 @@
 inherit CMD;
 inherit M_REGEX;
 
+// Match the reviewed FluffOS defaults for newline split boundaries.
+private int count_lines(string text)
+{
+   string *lines;
+   if (trim(text, 0, "\n") == "")
+      return 0;
+   lines = explode(text, "\n");
+   if (lines[0] == "")
+      lines = lines[1..];
+   if (lines[<1] == "")
+      lines = lines[0..<2];
+   return sizeof(lines);
+}
+
 private
 string count(string s, int flags)
 {
@@ -21,9 +35,9 @@ string count(string s, int flags)
    case 1:
       return sprintf("%d\n", sizeof(split(s, "[ \n\t]+")));
    case 2:
-      return sprintf("%d\n", sizeof(explode(s, "\n")));
+      return sprintf("%d\n", count_lines(s));
    default:
-      return sprintf("%d words, %d lines\n", sizeof(split(s, "[ \n\t]+")), sizeof(explode(s, "\n")));
+      return sprintf("%d words, %d lines\n", sizeof(split(s, "[ \n\t]+")), count_lines(s));
    }
 }
 
@@ -59,4 +73,9 @@ void main(mixed *argv, mapping flags, string stdin)
       }
       map(argv[0], ( : out($1 + ":  " + count_file($1, $(f))) :));
    }
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg, flags, input);
 }

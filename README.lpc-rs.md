@@ -545,6 +545,16 @@ The table goes directly to your screen, including under file or pipe redirection
 overwrite produces an empty file, append preserves existing contents, and the
 next pipeline stage receives empty output. Arguments and incoming input are ignored.
 
+`wc [-lw] <files>` counts words and lines, with globs and quoted filenames
+supported. Supplied file or pipe input takes precedence over filenames, even
+when empty. Counts use normal stdout, file and pipe routing; usage messages stay
+on screen, so redirected usage produces empty output.
+
+Line counting drops one empty field at each newline boundary, retains interior
+empty fields, and returns zero for empty or newline-only text. Existing word
+counting splits on spaces, tabs and newlines and includes empty boundary gaps:
+an empty file reports one word, and a trailing newline adds an empty word gap.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
