@@ -517,6 +517,12 @@ path. It accepts a command name, preserves missing/noncommand diagnostics, and
 does not execute the command it finds. A matching noncommand file stops the
 search. Output supports stdout, file and pipe routing; incoming input is ignored.
 
+`calls` lists active timers grouped by owning object and callback name, followed
+by the state daemon's queue. Named callbacks with different bound arguments share
+a group. Delays use whole seconds; elapsed timers show a blank delay. The listing
+does not run callbacks. Output supports stdout, files and pipes; extra arguments
+and incoming input are ignored.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
