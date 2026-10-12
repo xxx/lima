@@ -20,3 +20,8 @@ void main()
 
    outf("new cwd: %s\n", ob->get_variable("pwd") || "NONE");
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main();
+}

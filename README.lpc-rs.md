@@ -630,6 +630,14 @@ are printed verbatim, including their own line endings. Extra arguments and
 incoming file or pipe text are ignored. Reports use command output buffers,
 supporting overwrite, append, pipes and paging.
 
+`uncd` swaps the current and previous working directories in the wizard shell,
+leaving the current working file and body unchanged. It takes no arguments and
+does not check whether the previous directory still exists. When no previous
+directory is recorded, it selects nil and reports NONE; a second call restores
+the former directory. Incoming file or pipe text is ignored. Output uses command
+buffers, supporting overwrite, append and pipes. Argument rejection and refusals
+opening this command's input or output occur before the swap.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
