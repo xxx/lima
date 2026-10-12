@@ -594,6 +594,17 @@ rooms that forbid combat are omitted. Arguments and incoming input are ignored.
 Reports go directly to the screen without paging. Under redirection, overwrite
 writes an empty file, append retains existing text, and pipes receive no report.
 
+`wheremobs` lists loaded clones matching a filename, excluding player bodies
+and prototypes and omitting matches without an environment. Relative paths and
+optional `.c` suffixes work. It includes ordinary clones and does not require
+attackability. Existing source files take precedence over ID matching.
+
+The original command resolves IDs as paths before matching names: at `/`, `rat`
+seeks `/rat`, so a mob named `rat` is missed. This Lima source limitation remains.
+Reports go directly to the screen without paging. Redirection overwrites with
+empty output, append preserves existing text, and pipes receive no report.
+Incoming file or pipe text is ignored.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
