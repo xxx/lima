@@ -37,3 +37,8 @@ void main(string *argv)
    outf("%s%s\n", result[1], argv[0]);
    return;
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed stdin, mixed implode_info)
+{
+   main(arg);
+}

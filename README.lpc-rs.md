@@ -512,6 +512,11 @@ caught expression errors; `eval("0")` returns integer zero. The generated source
 stays in `/tmp/eval.c` until the next call. The existing object-name shortcut
 returns text; use `find_object()` to look up an object.
 
+`which <command>` prints the first matching command in your shell's search
+path. It accepts a command name, preserves missing/noncommand diagnostics, and
+does not execute the command it finds. A matching noncommand file stops the
+search. Output supports stdout, file and pipe routing; incoming input is ignored.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
