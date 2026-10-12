@@ -399,11 +399,6 @@ string xterm256_wrap(string str, int wrap_at, int indent_at)
    if (!wrap_at)
       wrap_at = DEFAULT_SCREEN_WIDTH;
 
-   // this routine strips out the first space, put it back into the
-   // array if the original string had a leading space
-   if (str[0..0] == " ")
-      parts = ({"", parts...});
-
    parts = map(
        parts,
        (: [string part, mapping running, int max, int indent] {

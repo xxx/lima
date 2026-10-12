@@ -646,6 +646,12 @@ are visited in reverse native order; no upstream ordering guarantee is implied.
 Output uses command buffers, supporting files, pipes and paging. Incoming file
 or pipe text is ignored. Argument and stdio refusals preserve shell/body state.
 
+Terminal wrapping preserves leading indentation when text fits the configured
+width. Recognized colour markers do not count toward word widths. Right trimming,
+word-boundary wrapping and continuation indentation retain the existing policy.
+No-wrap, prompt, blob and simplified output keep their existing handling;
+redirected command output retains its exact bytes.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
