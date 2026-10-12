@@ -535,6 +535,16 @@ can exceed 100%. Zero uptime or unavailable CPU counters produces `CPU usage:
 unavailable.`. Output supports stdout, files and pipes; arguments and incoming
 input are ignored.
 
+`status` displays raw integer process resource counters. User and system CPU
+times are milliseconds, maximum resident set size is peak KiB, and integral-memory
+fields use OS accounting units. Existing labels remain, with capitalized field
+names for unlabelled counters. Unavailable resource data prints only the header
+and delimiters.
+
+The table goes directly to your screen, including under file or pipe redirection:
+overwrite produces an empty file, append preserves existing contents, and the
+next pipeline stage receives empty output. Arguments and incoming input are ignored.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
