@@ -36,3 +36,9 @@ void main()
    env = environment(this_body());
    outf("%s: [%s]\n", env->short(), file_name(env));
 }
+
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main();
+}

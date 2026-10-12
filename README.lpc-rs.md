@@ -616,6 +616,12 @@ without entering the ported registry's canonical-name API. Reports use command
 output buffers, supporting overwrite, append, pipes and normal paging. Incoming
 file or pipe text is ignored.
 
+`here` reports the current body's room short description and filename, including
+a clone suffix when the room is cloned. Shell working-directory changes do not
+change the room being reported. Extra arguments and incoming file or pipe text
+are ignored. Reports use command output buffers, supporting overwrite, append,
+pipes and normal paging for multiline room descriptions.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
