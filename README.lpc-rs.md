@@ -638,6 +638,14 @@ the former directory. Incoming file or pipe text is ignored. Output uses command
 buffers, supporting overwrite, append and pipes. Argument rejection and refusals
 opening this command's input or output occur before the swap.
 
+`scan [-d] [object]` lists the native inventory of an object, defaulting to the
+current body's room. The `-d` flag traverses nested inventories. Reports retain
+clone filenames, shorten /domains/ to ^ and /wiz/ to ~, quote short descriptions,
+and use [no short] for nil descriptions; empty strings appear as "". Inventories
+are visited in reverse native order; no upstream ordering guarantee is implied.
+Output uses command buffers, supporting files, pipes and paging. Incoming file
+or pipe text is ignored. Argument and stdio refusals preserve shell/body state.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
