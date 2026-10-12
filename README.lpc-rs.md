@@ -565,6 +565,19 @@ Usage, short-search and no-match messages stay on screen. Redirected usage or a
 short search produces empty output; a no-match result still writes one newline
 to the redirected file or next pipeline stage.
 
+`flist [-i] <object>` lists resolved function names in a fixed 79-column table.
+With `-i`, rows sort by defining program and then name. Inherited functions name
+their defining program; overrides name the target program. Clones share their
+program origins. Foreign objects expose public functions; self-inspection can
+include private and protected functions. Object paths and `me`, `here` and
+`shell` aliases use the normal object resolver.
+
+Reports support stdout, file, append and pipe routing, with normal paging on
+screen; incoming input is ignored. Reports are buffered and can exceed the
+8,192-byte string-concatenation limit, including large `flist me` listings.
+The shell catches the error and accepts the next command. Overwrite redirection
+removes the previous file before report construction, so failure leaves it absent.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

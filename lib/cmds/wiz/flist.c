@@ -34,3 +34,8 @@ void main(mixed *arg, mapping f)
                        implode(sort_array(functions(target), 1), "\n"));
    out(output);
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg, flags);
+}
