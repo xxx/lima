@@ -30,7 +30,7 @@ void main(mixed *arg)
    foreach (string target in targets)
    {
       target = trim(target);
-      if (!user_exists(target))
+      if (!sizeof(regexp(({target}), "^[a-z][a-z0-9]*$")) || !user_exists(target))
       {
          outf("%-13s%-30s[Only in your Imagination]\n", capitalize(lower_case(target)), "Does not exist ");
       }
@@ -45,4 +45,10 @@ void main(mixed *arg)
          outf("%-13s%-30s[%-s]\n", capitalize(lower_case(target)), "Not Currently On ", "Physical Storage");
       }
    }
+}
+
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

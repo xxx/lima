@@ -605,6 +605,17 @@ Reports go directly to the screen without paging. Redirection overwrites with
 empty output, append preserves existing text, and pipes receive no report.
 Incoming file or pipe text is ignored.
 
+`where` reports account IDs and their current bodies' room filenames and short
+descriptions. With no targets it lists connected users that have bodies; named
+targets retain their order and duplicates. Names may be separated by spaces or
+commas. It reports saved accounts without an active connected body as offline
+and unknown names as nonexistent. Character names do not replace account IDs.
+
+Lookup remains case-sensitive. Noncanonical text gets the nonexistent-name row
+without entering the ported registry's canonical-name API. Reports use command
+output buffers, supporting overwrite, append, pipes and normal paging. Incoming
+file or pipe text is ignored.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
