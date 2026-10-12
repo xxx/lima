@@ -555,6 +555,16 @@ empty fields, and returns zero for empty or newline-only text. Existing word
 counting splits on spaces, tabs and newlines and includes empty boundary gaps:
 an empty file reports one word, and a trailing newline adds an empty word gap.
 
+`apropos <text>` searches help-topic names using case-sensitive literal
+substrings. Results group names by category and sort category labels, omitting
+the leading help directory. Each matching file contributes its topic name,
+including duplicates. Quotes remain literal; the shell trims outer whitespace.
+
+Reports support stdout, file, append and pipe routing; incoming input is ignored.
+Usage, short-search and no-match messages stay on screen. Redirected usage or a
+short search produces empty output; a no-match result still writes one newline
+to the redirected file or next pipeline stage.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

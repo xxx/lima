@@ -18,6 +18,8 @@ inherit CMD;
 string generate_category(string file)
 {
    string *st = explode(file, "/");
+   if (st[0] == "")
+      st = st[1..];
    return implode(st[1..sizeof(st)-2], "/");
 }
 
@@ -73,4 +75,9 @@ void main(string s)
    if (yt == "\n")
       write("No help files match your word.\n");
    out(yt);
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
