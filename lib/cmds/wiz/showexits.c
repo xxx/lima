@@ -56,6 +56,11 @@ void main()
       }
       else
          Short = "None";
-      outf("%s:  %s (%s)\n", dir, Short, dest);
+      outf("%s:  %s (%s)\n", dir, Short, dest || "0");
    }
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main();
 }

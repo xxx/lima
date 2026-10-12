@@ -622,6 +622,14 @@ change the room being reported. Extra arguments and incoming file or pipe text
 are ignored. Reports use command output buffers, supporting overwrite, append,
 pipes and normal paging for multiline room descriptions.
 
+`showexits` reports every exit direction from the current body's room, including
+hidden exits, and loads ordinary destinations to obtain their short descriptions.
+Failed loads display "Under construction"; nil short descriptions become empty
+text. A missing destination is shown as None (0). Destinations beginning with `#`
+are printed verbatim, including their own line endings. Extra arguments and
+incoming file or pipe text are ignored. Reports use command output buffers,
+supporting overwrite, append, pipes and paging.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
