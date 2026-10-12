@@ -32,3 +32,9 @@ void main(string arg)
    }
    printf("\n");
 }
+
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}

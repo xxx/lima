@@ -587,6 +587,13 @@ Nonfinal pipeline output separates names with newlines, preserving empty names
 and a final newline. Reports support normal paging. Arguments and incoming file
 or pipe input are ignored.
 
+`livings` counts attackable clones that are not player bodies, grouped by both
+short description and base program path. Clones without an environment or in
+rooms that forbid combat are omitted. Arguments and incoming input are ignored.
+
+Reports go directly to the screen without paging. Under redirection, overwrite
+writes an empty file, append retains existing text, and pipes receive no report.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
