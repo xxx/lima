@@ -15,10 +15,21 @@ void main()
 {
    mapping info;
    float x, fraction;
+   int elapsed;
 
    info = rusage();
-   // time is in msec, convert to sec
-   x = (info["utime"] + info["stime"]) / 1000;
-   fraction = x / uptime();
+   elapsed = uptime();
+   if (!elapsed || !has_key(info, "utime") || !has_key(info, "stime"))
+   {
+      out("CPU usage: unavailable.\n");
+      return;
+   }
+   x = (info["utime"] + info["stime"]) / 1000.0;
+   fraction = x / elapsed;
    outf("CPU usage: %2.2f%%\n", fraction * 100);
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed stdin, mixed implode_info)
+{
+   main();
 }

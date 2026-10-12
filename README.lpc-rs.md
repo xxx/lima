@@ -529,6 +529,12 @@ and spacing are preserved. Its direct user messages stay on screen under file or
 pipe redirection: overwrite produces an empty file and append preserves existing
 contents. Incoming file or pipe input is ignored.
 
+`cpu` reports the driver process's accumulated user and system CPU time as a
+percentage of elapsed driver uptime. Milliseconds are retained, and parallel work
+can exceed 100%. Zero uptime or unavailable CPU counters produces `CPU usage:
+unavailable.`. Output supports stdout, files and pipes; arguments and incoming
+input are ignored.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
