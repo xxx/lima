@@ -578,6 +578,15 @@ screen; incoming input is ignored. Reports are buffered and can exceed the
 The shell catches the error and accepts the next command. Overwrite redirection
 removes the previous file before report construction, so failure leaves it absent.
 
+`users` lists connected user IDs in the order returned by the driver. Connections
+still logging in display `(login)`; empty string IDs remain empty. When you are
+the only connected user, it prints `You are the only person logged in!`.
+
+Final output separates names with spaces, including file and append redirection.
+Nonfinal pipeline output separates names with newlines, preserving empty names
+and a final newline. Reports support normal paging. Arguments and incoming file
+or pipe input are ignored.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

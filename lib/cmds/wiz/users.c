@@ -21,6 +21,7 @@ void main()
 {
    object *ulist = users();
    string ustring;
+   string *names;
 
    if (sizeof(ulist) <= 0)
    {
@@ -32,8 +33,14 @@ void main()
       out(sprintf("You are the only person logged in!\n"));
       return;
    }
+   names = map(ulist->query_userid(), (: $1 ? $1 : "(login)" :));
    if (end_of_pipeline())
-      out(implode(ulist->query_userid(), ( : $1 + " " + ($2 ? $2 : "(login)") :), "")[1..] + "\n");
+      out(implode(names, " ") + "\n");
    else
-      out((implode(ulist->query_userid(), ( : $1 + "\n" + ($2 ? $2 : "(login)") :), "")[1..] + "\n"));
+      out((implode(names, "\n") + "\n"));
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main();
 }
