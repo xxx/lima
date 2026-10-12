@@ -523,6 +523,12 @@ a group. Delays use whole seconds; elapsed timers show a blank delay. The listin
 does not run callbacks. Output supports stdout, files and pipes; extra arguments
 and incoming input are ignored.
 
+`date` displays local driver time. `date -s [text]` prints a source-comment
+stamp with your body name, using `Created` when text is omitted; supplied quotes
+and spacing are preserved. Its direct user messages stay on screen under file or
+pipe redirection: overwrite produces an empty file and append preserves existing
+contents. Incoming file or pipe input is ignored.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
