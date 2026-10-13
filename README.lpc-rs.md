@@ -720,6 +720,19 @@ ordinary delivery path. Existing `home` behavior does not check a failed move
 before continuing its messages and conditional look; the port retains that
 behavior.
 
+`trans <object>` uses the existing wizard object rule and moves a target into
+the caller body's room. Self and already-present targets retain their current
+messages; a failed move reports the existing generic refusal. The target sees
+its private transport message and forced look, while room broadcasts keep their
+current recipient exclusions and `Someone` suppression.
+
+The port adds protected dispatch. Linked targets supply their user as the
+logical player for `force_look`; unlinked targets supply the target itself.
+The earlier catch/restore/rethrow adaptation restores the caller's player on
+success and look failure. Command buffers support files and pipes; incoming
+text is ignored, and target/body messages retain ordinary delivery. Current
+name-based self checks and the placement of the short-name fallback remain.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
