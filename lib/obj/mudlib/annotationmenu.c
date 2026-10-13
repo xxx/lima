@@ -44,7 +44,7 @@ void rcv_can_ed(string y_or_n)
       new_annotation.read_only = 1;
       break;
    default:
-      get_input_then_call(( : rcv_can_ed:), "yes or no? ");
+      get_input_then_call(rcv_can_ed, "yes or no? ");
       return;
    }
    ANNOTATION_D->add_annotation(annotation_target, new_annotation);
@@ -60,8 +60,7 @@ void end_edit(string *annotation)
       return;
    }
    new_annotation.text = implode(annotation, "\n");
-   get_input_then_call((
-                           : rcv_can_ed:),
+   get_input_then_call(rcv_can_ed,
                        "Allow anyone to remove this "
                        "annotation? ");
 }
@@ -70,7 +69,7 @@ private
 void rcv_title(string title)
 {
    new_annotation.title = title;
-   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : end_edit:));
+   clone_object (EDIT_OB, EDIT_TEXT, 0, end_edit);
 }
 
 private
@@ -78,7 +77,7 @@ void add_annotation()
 {
    new_annotation = new (class annotation);
    new_annotation.author = this_body()->query_userid();
-   get_input_then_call(( : rcv_title:), "Subject: ");
+   get_input_then_call(rcv_title, "Subject: ");
 }
 
 private
@@ -150,7 +149,7 @@ void see_it(int index)
                     "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n%s\n",
                     a.title, capitalize(a.author), a.date, a.text);
 
-   more(output, 0, ( : done_seeing_it:));
+   more(output, 0, done_seeing_it);
 }
 
 private
@@ -198,13 +197,13 @@ void create(object o)
    add_section_item(toplevel, main);
    add_section_item(toplevel, other);
 
-   quit_item = new_menu_item("Quit", ( : quit_menu_application:), "q");
+   quit_item = new_menu_item("Quit", quit_menu_application, "q");
    goto_main_menu_item = new_menu_item("Return to main menu", toplevel, "m");
 
    // Add items to the toplevel (main) menu.
-   add_menu_item(main, new_menu_item("Add annotation", ( : add_annotation:), "a"));
-   add_menu_item(main, new_menu_item("View annotations", ( : see_annotations:), "v"));
-   add_menu_item(main, new_menu_item("Remove an annotation", ( : remove_annotation:), "r"));
+   add_menu_item(main, new_menu_item("Add annotation", add_annotation, "a"));
+   add_menu_item(main, new_menu_item("View annotations", see_annotations, "v"));
+   add_menu_item(main, new_menu_item("Remove an annotation", remove_annotation, "r"));
    add_menu_item(other, quit_item);
 }
 

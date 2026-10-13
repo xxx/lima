@@ -811,6 +811,21 @@ its ordinary move fails. In that case the parent and decoration remain, earlier
 movement remains committed and no clean message is sent. The command retains this
 shared cleanup/permission behavior.
 
+`discuss object` adds protected dispatch and uses the account object's `is_user()`
+role in place of `userp`, retaining the connected-body exclusion. This deliberately
+protects never-connected Lima accounts and permits interactive ordinary objects.
+Nine annotation-menu callbacks use bare function names; captured view/remove
+indices retain their existing closures. Add/view/remove, editor cancellation,
+yes/no retry, readonly author/admin rules and foreign readonly refusal are retained.
+The daemon still keys annotations by base name and returns deep copies; saved
+annotation classes restore through its ordinary startup method.
+
+Menus, editor and pager remain interactive and bypass command output buffers.
+Files/pipes are empty, append preserves prior text and incoming command text does
+not supply editor input. Editor and pager completion return to the annotation
+menu; quitting restores the shell. Existing pager blank lines and the menu's
+source warning about concurrent annotation index changes remain.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
