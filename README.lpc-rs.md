@@ -779,10 +779,10 @@ file, the existing filename-argument error is retained.
 `dest object` retains the general object rule. The port adds protected dispatch.
 The command calls `do_remove`, sends its ordinary player-message or nil-short
 filename output, then invokes the existing destruction wrapper and `remove`.
-Linked player bodies select their user, but the current port policy refuses
-that destruction even with an administrator caller: the command privilege is
-capped below the protected user object. This remains an outstanding port gap;
-the message is sent while user, body, shell and connection stay live.
+Linked player bodies use the linked user's existing `remove()` routine after
+the command message. That routine tears down the input stack, mailbox/mailer,
+body, owned call-outs, shell and connection. Ordinary objects retain the generic
+destruction wrapper. Cleanup errors propagate through the existing shell handler.
 Callback return values
 are ignored; callback movement does not change the selected target. The existing
 wrapper handles contained objects and normal equipment cleanup. A real stock

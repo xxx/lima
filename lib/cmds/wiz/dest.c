@@ -32,7 +32,12 @@ void main(mixed *arg)
       write("Destructing: " + file_name(ob) + "\n");
    }
    if (member_array(ob, bodies()) != -1)
+   {
       ob = ob->query_link();
+      if (ob)
+         ob->remove();
+      return;
+   }
    destruct(ob);
    return;
 }
