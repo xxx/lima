@@ -705,6 +705,21 @@ keeps its current data, registration and persistence API. Output uses command
 buffers for files, pipes and paging; incoming text is ignored. Native connection
 metadata is displayed as provided by the existing inspection efuns.
 
+`goto <object>` keeps the existing wizard object rule: room filenames resolve
+through the shell directory, while a player or item selects its environment.
+`me` and `here` retain their shortcut meanings. The port adds protected dispatch
+and retains body movement, same-room twitching, force-look behavior and direct
+string refusal messages.
+
+`home [wizard-name]` keeps its raw-string rule. With no name it uses the body's
+permanent workroom or a cached temporary workroom; named visits require the
+existing workroom file. Brief mode suppresses its look command. The earlier
+`clone_object` adaptation remains. Both commands use existing output buffers
+and ignore incoming text. Body messages and room descriptions retain their
+ordinary delivery path. Existing `home` behavior does not check a failed move
+before continuing its messages and conditional look; the port retains that
+behavior.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
