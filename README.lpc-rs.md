@@ -679,6 +679,19 @@ comparator. Output uses command buffers for files, pipes and paging; incoming
 text is ignored. Login/logout registration and daemon persistence keep their
 existing API and record format.
 
+`people [flags]` displays connected bodies in frame columns. With no flags it
+uses `people_flags`, or `anFwh` when that variable is unset. Flags are raw
+characters rather than getopt options. Role filters retain their `W`, `A`, `P`
+precedence; wizard-only columns, visible-body filtering for nonwizard callers,
+and the direct menu-entry function retain their existing handling.
+
+The port supplies protected command dispatch, uses nil for absent string
+arguments and passes an environment filename to `filename_ellipsis`. `bodies()`
+already returns live body objects, so no zero subtraction is needed. Shared
+frame layout, column selection by width, headers and footer state remain as
+implemented by Lima. Output uses command buffers for files, pipes and paging;
+incoming text is ignored.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

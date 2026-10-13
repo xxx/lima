@@ -79,7 +79,7 @@ string get_who_string(string arg)
    int debug;
    int path_mod = 20;
    int env_mod = 25;
-   object *b = bodies() - ({0});
+   object *b = bodies();
    string bad_flags = "";
    string *args = ({});
    string tmp;
@@ -166,7 +166,7 @@ string get_who_string(string arg)
       case "f":
          if (wizardp(this_user()))
             frame_add_column("Path", map(b, (
-                                                : environment($1) ? filename_ellipsis((environment($1)), 40) : "(lost?)"
+                                                : environment($1) ? filename_ellipsis(file_name(environment($1)), 40) : "(lost?)"
                                                 :)));
          break;
       case "t":
@@ -233,8 +233,7 @@ void main(string arg)
 {
    string outtie;
    if (arg == "")
-      arg = 0;
-   msgs = 0;
+      arg = nil;
    msgs = ({});
    outtie = get_who_string(arg);
    if (sizeof(msgs))
@@ -245,6 +244,11 @@ void main(string arg)
 void player_menu_entry()
 {
    bare_init();
-   main(0);
+   main(nil);
    done_outputing();
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
