@@ -27,7 +27,7 @@ void main(mixed *arg)
       out("Failed to load file.\n");
       return;
    }
-   if (!size && !inherits("/std/object.c", o))
+   if (!size && member_array("/std/object.c", deep_inherit_list(o)) == -1)
    {
       destruct(o);
       out("clone [filename]\n");
@@ -45,4 +45,9 @@ void main(mixed *arg)
       out("Ok. (It is in your inventory.)\n");
    o->on_clone();
    return;
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

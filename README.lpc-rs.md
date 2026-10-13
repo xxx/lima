@@ -758,6 +758,24 @@ delivery rather than command buffers, so redirected command output is empty and
 incoming file or pipe text is ignored. A target-message error occurs after the
 move and stops the later broadcast under the existing shell error handling.
 
+`clone [source-file]` keeps the optional compiled-file rule and current-file
+fallback. The earlier `clone_object` adaptation remains; the port adds protected
+dispatch and uses `deep_inherit_list` for the fallback's standard-object ancestry
+check. That check requires an ancestor and excludes the base program itself.
+
+Fresh copies run `create` before placement, then the command calls `on_clone`
+after inventory placement, room fallback or a failed placement. Gettable copies
+prefer inventory; nongettable copies and inventory refusals fall back to the room.
+A failed move to both destinations retains an unplaced copy. The current-file
+fallback destroys a copy without the required ancestry and reports usage. If
+existing master policy refuses that cleanup, the error leaves an unplaced copy.
+
+Status text uses command buffers for files and pipes; player messages retain
+ordinary delivery. Incoming text is ignored. Initialization failure rolls back
+the failed copy, while a later callback error retains its completed placement
+and prevents flushing the buffered status. With no filename or selected current
+file, the existing filename-argument error is retained.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
