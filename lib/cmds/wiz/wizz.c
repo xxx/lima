@@ -62,3 +62,8 @@ void main(string arg)
    tell_from_inside(start_room, sprintf("%s is whisked away on %s!\n", name, arg));
    tell_environment(this_body(), sprintf("%s arrives on %s!\n", name, arg), 0, ({this_body()}));
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}

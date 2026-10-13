@@ -733,6 +733,18 @@ success and look failure. Command buffers support files and pipes; incoming
 text is ignored, and target/body messages retain ordinary delivery. Current
 name-based self checks and the placement of the short-name fallback remain.
 
+`wizz [mount-text]` returns the caller to the wizard lounge. It keeps the raw
+string command rule: supplied text, including quotes, is used as the mount
+description; omitted text selects an existing random description. Already being in the
+lounge produces the existing twitch; movement failure reports the generic
+refusal without a look or arrival messages.
+
+The port adds protected dispatch. Successful movement retains forced look,
+caller confirmation, origin/destination broadcasts and exact `Someone`
+suppression. Command output supports files and pipes, while body/room messages
+retain ordinary delivery; incoming text is ignored. A failed forced look leaves
+the completed move intact and prevents the later confirmation and broadcasts.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
