@@ -25,3 +25,8 @@ void main(mixed *arg)
    tell(arg[0], "You are being moved to " + arg[1]->short() + "\n");
    tell_from_inside(arg[1], arg[0]->a_short() + " has been magically transported here.\n", 0, ({arg[0]}));
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}

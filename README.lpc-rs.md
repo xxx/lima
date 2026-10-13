@@ -745,6 +745,19 @@ suppression. Command output supports files and pipes, while body/room messages
 retain ordinary delivery; incoming text is ignored. A failed forced look leaves
 the completed move intact and prevents the later confirmation and broadcasts.
 
+`Move <object> <object>` keeps the existing two-object wizard rule and adds
+protected dispatch. Object aliases, held objects, players and object paths retain
+the existing resolver. The command calls the source's ordinary `move` method,
+then tells it the destination description and broadcasts into the destination,
+excluding the source from that broadcast's contents delivery. Body movement does
+not force a look. Caller shell state and directory remain independent of movement.
+
+The current command ignores a refused move and continues its transport messages;
+that upstream behavior is retained. Messages use ordinary target/container
+delivery rather than command buffers, so redirected command output is empty and
+incoming file or pipe text is ignored. A target-message error occurs after the
+move and stops the later broadcast under the existing shell error handling.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
