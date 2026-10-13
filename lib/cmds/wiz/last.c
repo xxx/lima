@@ -55,7 +55,7 @@ void main(mixed *arg, mapping flags)
             outf("No information for: %s\n", user);
          else
          {
-            int is_on = find_user(user) != 0;
+            int is_on = !!find_user(user);
             outf(is_on ? "%s logged on at %s from %s\n" : "%s logged out at %s from %s\n", user, ctime(last[0]),
                  last[1]);
          }
@@ -65,7 +65,7 @@ void main(mixed *arg, mapping flags)
 
    minimum = 0;
    maximum = time();
-   count = to_int(flags["n"]);
+   count = to_int(flags["n"] || 0);
 
    if (flags["d"])
       minimum = time() - (to_int(flags["d"]) * SECS_PER_DAY);
@@ -92,7 +92,7 @@ void main(mixed *arg, mapping flags)
       i = 0;
    for (; i < sizeof(times); ++i)
    {
-      int is_on = find_user(times[i][1]) != 0;
+      int is_on = !!find_user(times[i][1]);
 
       if (times[i][1])
       {
@@ -103,4 +103,9 @@ void main(mixed *arg, mapping flags)
    if (!flags["s"])
 
       outf(simple_divider());
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg, flags);
 }

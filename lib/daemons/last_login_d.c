@@ -89,7 +89,7 @@ nomask mixed *query_times(int skip_sort)
    if (skip_sort)
       return times;
 
-   return sort_array(times, 1);
+   return sort_array(times, (: ($1[0] > $2[0]) - ($1[0] < $2[0]) :));
 }
 
 nomask void remove_user(string userid, int skip_save)

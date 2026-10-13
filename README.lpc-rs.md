@@ -665,6 +665,20 @@ such reports are partial; this command does not initialize parent programs.
 Output uses command buffers for files, pipes and paging. Incoming file or pipe
 text is ignored. Existing optional-argument and stdio refusals retain shell state.
 
+`last [-s] [-n count] [-d days] [-D days] [users...]` displays saved login
+history. Named users are matched after lowercasing; online status follows the
+existing account-name lookup. Named lookups ignore the
+history-list filters. List mode orders records by timestamp, excludes future
+records by default and uses inclusive day bounds. Omitted or zero counts show
+all records; a positive count selects the newest records. Existing leading-
+integer conversion and negative-count behavior are retained.
+
+The port supplies a zero default before converting an omitted count, tests user
+presence by truthiness and sorts daemon records with an explicit timestamp
+comparator. Output uses command buffers for files, pipes and paging; incoming
+text is ignored. Login/logout registration and daemon persistence keep their
+existing API and record format.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
