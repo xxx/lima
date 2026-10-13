@@ -49,7 +49,7 @@ varargs string print_tree(string file, string func, int indent)
       return ("  " * indent) + "Couldn't find object: " + file + "\n";
    }
    result = ("  " * indent) + file + ":\n";
-   if (func && (function_exists(func, ob) + ".c") == file)
+   if (func && function_exists(func, ob) == base_name(ob))
    {
       result += ("  " * indent) + "  [defined]\n";
       found = 1;
@@ -87,8 +87,13 @@ void main(mixed *arg)
    {
       target = arg[0];
       file = base_name(target);
-      func = 0;
+      func = nil;
    }
 
    out(print_tree(file, func));
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

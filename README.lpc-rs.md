@@ -652,6 +652,19 @@ word-boundary wrapping and continuation indentation retain the existing policy.
 No-wrap, prompt, blob and simplified output keep their existing handling;
 redirected command output retains its exact bytes.
 
+`showtree [function] source` reports the loaded inheritance tree, or the branches
+containing visible definitions of a bare function name. Shared ancestors appear
+along each inheritance route. Private and protected definitions are hidden by
+native function inspection. A missing function gives only the tracing heading
+when all parents are loaded. Source names and object aliases resolve through the
+wizard file rule; clone aliases select their prototype source.
+
+Traversal uses existing objects and reports "Couldn't find object" for an
+unloaded parent. Compiled inheritance alone does not create parent objects, so
+such reports are partial; this command does not initialize parent programs.
+Output uses command buffers for files, pipes and paging. Incoming file or pipe
+text is ignored. Existing optional-argument and stdio refusals retain shell state.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
