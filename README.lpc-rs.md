@@ -692,6 +692,19 @@ frame layout, column selection by width, headers and footer state remain as
 implemented by Lima. Output uses command buffers for files, pipes and paging;
 incoming text is ignored.
 
+`whoip [account-or-address]` displays connected users and saved login-address
+history. With no argument it includes connections still at login. Online
+account lookup displays everyone sharing that connection address, then that
+account's stored addresses. Address lookup displays matching connected users
+and the saved account list for the exact address key.
+
+The port supplies protected dispatch for the existing raw-string command rule.
+Names and history keys retain their case-sensitive handling; the existing
+numeric-prefix/hostname branches and report wording remain. The history daemon
+keeps its current data, registration and persistence API. Output uses command
+buffers for files, pipes and paging; incoming text is ignored. Native connection
+metadata is displayed as provided by the existing inspection efuns.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
