@@ -796,6 +796,21 @@ object and previously sent message. A self-removing `do_remove` leaves its objec
 gone and the later filename-status concatenation raises an error. Existing shell
 handling catches these errors and rearms input; no guard or policy change is added.
 
+`clean [object]` adds protected command dispatch and uses
+`sizeof(all_inventory(...))` for the inventory emptiness check. With no argument
+it cleans the caller's room; an explicit target stays while ordinary contents
+are removed recursively. Living objects and real `add_item` decorations are skipped
+by the command, and `do_remove` is not called. Removal callbacks run before the
+ordinary clean message. Errors retain prior completed changes and return through
+the existing shell handler; files/pipes remain empty while player messages go
+directly to users.
+
+The existing contents wrapper may move a skipped living child out of a removed
+parent, then refuse recursive destruction of a protected attached decoration after
+its ordinary move fails. In that case the parent and decoration remain, earlier
+movement remains committed and no clean message is sent. The command retains this
+shared cleanup/permission behavior.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

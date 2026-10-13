@@ -31,7 +31,7 @@ void clean_object(object ob)
          continue;
       if (base_name(obs[i]) == SIMPLE_OB)
          continue;
-      if (first_inventory(obs[i]))
+      if (sizeof(all_inventory(obs[i])))
          clean_object(obs[i]);
       destruct(obs[i]);
    }
@@ -45,4 +45,9 @@ void main(mixed *arg)
    clean_object(arg[0]);
    this_body()->do_player_message("clean");
    return;
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
