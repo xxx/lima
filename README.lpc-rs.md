@@ -826,6 +826,20 @@ not supply editor input. Editor and pager completion return to the annotation
 menu; quitting restores the shell. Existing pager blank lines and the menu's
 source warning about concurrent annotation index changes remain.
 
+`fix body` adds protected dispatch, keeps the parsed target in an `object`
+local, clears its busy body reference with `nil`, and binds the next callback's
+arguments with `call_out(&fix_body(body, ++step), FIX_PAUSE)`. The two-second
+interval and existing class-identity check remain. Real body methods diagnose
+styles, rebuild missing/invalid torsos and reroll zero stats. Call-outs preserve
+the caller's player/body context under the port configuration; they do not have
+an interactive call context. Diagnostics and target notifications bypass command
+buffers, so files/pipes remain empty and incoming text is ignored.
+
+An unexpected callback error stops the chain and leaves the command busy while
+its remembered caller body remains live. Clearing the underlying fault alone
+therefore does not restart it. This existing command limitation is retained;
+normal terminal completion clears the busy reference and leaves shell input ready.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

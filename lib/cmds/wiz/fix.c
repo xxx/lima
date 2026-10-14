@@ -90,19 +90,18 @@ varargs void fix_body(object body, int step)
    default:
       wrfix("Repairing " + body->query_name() + " done.", FIXED);
       tell(body, "Your body has been repaired. Feel any better?");
-      user = 0;
+      user = nil;
       return;
       break;
    }
 
-   call_out("fix_body", FIX_PAUSE, body, ++step);
+   call_out(&fix_body(body, ++step), FIX_PAUSE);
 }
 
 private
 void main(mixed *arg)
 {
-   if (objectp(arg[0]))
-      arg = arg[0];
+   object target = arg[0];
 
    if (user)
    {
@@ -110,8 +109,13 @@ void main(mixed *arg)
       return;
    }
 
-   if (arg->is_body())
+   if (target->is_body())
    {
-      fix_body((object)arg);
+      fix_body(target);
    }
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
