@@ -840,6 +840,20 @@ its remembered caller body remains live. Clearing the underlying fault alone
 therefore does not restart it. This existing command limitation is retained;
 normal terminal completion clears the busy reference and leaves shell input ready.
 
+`start [object]` adds protected dispatch and retains the optional-object rule
+and private handler. Querying reports the existing start location or configured
+fallback; setting records the resolved object's filename without moving the body.
+Living objects are refused. Nonliving objects, including live clones, remain
+accepted; an unavailable stored path falls back without clearing the saved string.
+The command does not save immediately. A later ordinary body save persists the
+location, and the actual body constructor restores it. Ordinary command buffers
+support overwrite, append and pipelines; redirected incoming text is ignored.
+
+The unchanged body methods retain loadability checks and movement fallback after
+a stored destination refuses arrival. START and WIZARD_START currently name the
+same configured room, so their role-dependent branches do not yield different
+paths under this port configuration.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
