@@ -868,6 +868,14 @@ remain in query_timers(). Expired records also remain. `timer 0` returns
 "Bad parameters." and does not stop a pending timer, despite the upstream command
 comment. These existing source limitations are documented and retained.
 
+`ilocate` adds protected dispatch to its existing private handler. The registered
+single-string argument passes through the real IMUD locate module, which lowercases
+the requested name. Confirmation uses command buffers, including files and pipes;
+incoming text is ignored. Missing/excess arguments are rejected by command rules.
+The rule also accepts quoted empty/spaced strings and flag-looking names; the port
+retains that source behavior. Local checks capture the outgoing request at an
+in-memory transport boundary; they do not confirm remote delivery or replies.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
