@@ -935,6 +935,20 @@ ignore incoming text, and return from the real pager to the wizard shell. Six
 focused checks cover thirty registered inputs and twelve complete compile checks.
 No new command or driver code is needed; these counting and parsing policies remain.
 
+`objfind <filename>` uses its existing dispatcher, native object enumeration and
+mapping callbacks. It matches `base_name` exactly, including prototypes and
+surviving clones, and reports each object's current environment or `nil` when
+unplaced. Moving or retiring an instance and removing/reloading a prototype affect
+the next report. The command replaces its stored result mapping on each query.
+
+There is no typed command rule: missing arguments, literal quotes, relative names,
+`.c` suffixes, clone suffixes, globs, flag-looking text and extra words simply
+produce an empty mapping unless the raw text exactly matches a base name. Unicode
+filenames work. Reports support files, append and pipelines, ignore incoming text,
+and return from the real pager to the wizard shell. Five focused checks cover
+thirty registered inputs and twelve complete compile checks. No new command or
+driver code is needed; these filename-selection policies remain.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
