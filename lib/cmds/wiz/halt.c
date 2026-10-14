@@ -15,3 +15,8 @@ void main()
    all_inventory(environment(this_body()))->stop_fight();
    this_body()->simple_action("$N $vhalt combat in the room.");
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main();
+}

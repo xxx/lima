@@ -1005,6 +1005,22 @@ tree-entry selection policy is retained. Six checks cover twenty-nine registered
 inputs and twelve positive complete compile checks. No daemon or native API
 change is needed; reports preserve the tested configured trees and shell state.
 
+`halt` adds protected dispatch to its existing zero-argument handler. It stops
+combat for direct room occupants, clearing primary/secondary targets and cancelling
+their repeating combat timers. Ordinary room objects without `stop_fight` are
+harmless. Independent fights in another room or nested inventory keep their state;
+the existing combat methods still remove reciprocal target references when needed.
+Repeated calls, restarted fights, unused raw arguments and no active combat work.
+
+The actor sees "You halt combat in the room." and nearby observers see the actor
+halt combat. Carried bodies hear the room announcement; remote bodies do not.
+These body messages bypass command output buffers: overwrite/pipe destinations
+stay empty, append retains prior text and incoming text is ignored. Five focused
+checks cover seventeen shell inputs and fourteen positive complete compile checks,
+including actual target/timer state, message recipients and following shell input.
+No native API, combat-module or message-module change is needed. Timed pulse
+delivery and whole-library/startup qualification retain their earlier scope.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
