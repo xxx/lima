@@ -51,5 +51,10 @@ void main(mixed *args, mapping flags)
          channel_name = "plyr_" + channel_name;
    }
 
-   out(TIMER_D->add_timer(args[0], flags["r"], channel_name, args[2]));
+   out(TIMER_D->add_timer(args[0], !!flags["r"], channel_name, args[2] || 0));
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg, flags);
 }

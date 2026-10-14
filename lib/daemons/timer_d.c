@@ -23,6 +23,7 @@ class timer_info
 ** This maps timer owners to a timer_info structure.
 */
 nosave private mapping timers;
+private nosave int timer_call_out;
 
 void create()
 {
@@ -71,7 +72,7 @@ nomask void process_timer(object owner)
    if (t)
    {
       data.time_left -= t;
-      call_out("process_timer", t, owner);
+      timer_call_out = call_out(&process_timer(owner), t);
    }
 }
 
@@ -108,8 +109,8 @@ varargs nomask string add_timer(int delay,      /* timer delay */
    info.notify_period = notify;
    timers[owner] = info;
 
-   remove_call_out("process_timer");
-   call_out("process_timer", t, owner);
+   remove_call_out(timer_call_out);
+   timer_call_out = call_out(&process_timer(owner), t);
 
    if (channel)
    {

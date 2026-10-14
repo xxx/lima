@@ -854,6 +854,20 @@ a stored destination refuses arrival. START and WIZARD_START currently name the
 same configured room, so their role-dependent branches do not yield different
 paths under this port configuration.
 
+`timer` adds protected dispatch, normalizes the repeat flag to an integer
+boolean and supplies zero for an omitted notification interval. The daemon binds
+the owner into callbacks and keeps one native call-out handle for replacement
+and rescheduling. One-shot expiration,
+periodic notices, repeat cycles, public/internal channel names and explicit owners
+use the real timer/channel methods. Confirmations use command buffers, while later
+notices go directly to the owner or channel; incoming text is ignored.
+
+The daemon retains its existing global replacement behavior: setting another
+owner's timer cancels the currently pending callback, although both owners' records
+remain in query_timers(). Expired records also remain. `timer 0` returns
+"Bad parameters." and does not stop a pending timer, despite the upstream command
+comment. These existing source limitations are documented and retained.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
