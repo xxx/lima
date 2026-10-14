@@ -949,6 +949,23 @@ and return from the real pager to the wizard shell. Five focused checks cover
 thirty registered inputs and twelve complete compile checks. No new command or
 driver code is needed; these filename-selection policies remain.
 
+`idfind <id>` uses its existing dispatcher and asks each loaded object's `id()`
+method whether it matches the raw text. Objects without that method are omitted;
+prototypes and surviving clones are included when they identify themselves.
+Lima's normal ID method matches aliases exactly and is case-sensitive. Multiword,
+Unicode and literal quoted IDs work according to those methods; the command adds
+no quote stripping or plural expansion. Environments update after movement,
+retirement and prototype reconfiguration, with `nil` for unplaced objects.
+
+Matched reports support files, append and pipelines, ignore incoming text and
+return from the real pager to the wizard shell. Missing input prints "Idfind
+what?" directly and keeps the previous stored report: file/pipe outputs remain
+empty and append preserves prior bytes. A throwing `id()` method aborts the query,
+retains the old results with the newly selected ID, and leaves later queries
+usable. Seven checks cover thirty-nine inputs and fifteen complete compile checks,
+including a real ID host. No new command or driver code is needed; these source
+policies remain.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
