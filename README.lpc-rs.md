@@ -888,6 +888,20 @@ prints an empty "Other data:" line; protocol zero omits that line. These source
 behaviors are retained. Validation uses local cached metadata and does not contact
 an intermud service.
 
+`cmd` adds protected dispatch to its existing private handler. Its object-plus-
+string-list rule resolves targets and joins words, preserving player-body refusal
+and permissive handling of other objects. The action module forwards the raw
+player-command argument, an empty flags mapping and nil input/output routes to
+CMD. Empty-string route placeholders previously prevented the real version command
+from running. Player-command lookup, parser fallback and NPC/player context
+restoration remain unchanged; real NPC speech, emotes and version output pass.
+
+Incoming file/pipe text is ignored. The wizard command does not capture target
+output: direct target messages and player-refusal diagnostics bypass its output
+routes. Objects without do_game_command still silently do nothing. The NPC action
+module retains its raw player-command lookup without applying typed command rules
+or adding pipelines. These source policies are retained; no native API is added.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

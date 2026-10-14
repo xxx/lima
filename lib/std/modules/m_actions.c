@@ -94,7 +94,7 @@ void do_game_command(string str)
 
       winner = CMD_D->find_cmd_in_path(verb, ({CMD_DIR_PLAYER "/"}));
       if (arrayp(winner))
-         winner[0]->call_main("", "", "", "", "", "", argument);
+         winner[0]->call_main(argument, ([]), nil, nil, nil, nil, argument);
       else if (environment())
       {
          mixed result = efun::parse_sentence(str, 0, nil, nil, this_object(), this_user());

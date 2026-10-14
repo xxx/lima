@@ -28,3 +28,8 @@ void main(mixed *arg)
    }
    arg[0]->do_game_command(implode(arg[1], " "));
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}
