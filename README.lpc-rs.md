@@ -920,6 +920,21 @@ The driver's 8,192 UTF-8 byte string-concatenation limit remains; the shipped
 while narrower queries remain usable. The daemon's separate changelog export
 method is outside these checks. No native API or shared policy is changed.
 
+`objcount [minimum]` uses its existing protected dispatcher and native object
+enumeration. Omitted and zero minima become one; it prints counts strictly above
+the effective minimum, including any loaded prototype. With a prototype present,
+`objcount 2` therefore prints a group containing two clones as a count of three.
+When a prototype has been removed, the same total-count test remains; it does not
+calculate clone counts separately. Clone retirement and prototype reload update
+the next report. Negative minima include groups containing only a prototype.
+
+The existing numeric command rule accepts signed integers, quoted numbers and
+integer prefixes; `2junk` and `2.5` are parsed as two. Nonnumeric or quoted-empty arguments and excess
+arguments retain usage diagnostics. Reports support files, append and pipelines,
+ignore incoming text, and return from the real pager to the wizard shell. Six
+focused checks cover thirty registered inputs and twelve complete compile checks.
+No new command or driver code is needed; these counting and parsing policies remain.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
