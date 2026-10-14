@@ -876,6 +876,18 @@ The rule also accepts quoted empty/spaced strings and flag-looking names; the po
 retains that source behavior. Local checks capture the outgoing request at an
 in-memory transport boundary; they do not confirm remote delivery or replies.
 
+`mudinfo` adds protected dispatch to its existing private handler. It retains
+raw arguments without a command-rule prototype, the local-name default, ASCII
+case-insensitive glob-prefix matching, sorted cached records and status calculations.
+Matching reports use command buffers for files/pipes, incoming text is ignored,
+and the real pager returns to the wizard shell. Cached rows remain unchanged.
+
+The no-match diagnostic still goes directly to the user through printf and bypasses
+file/pipe routing. Quotes remain literal in raw patterns. An empty other-data mapping
+prints an empty "Other data:" line; protocol zero omits that line. These source
+behaviors are retained. Validation uses local cached metadata and does not contact
+an intermud service.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
