@@ -239,7 +239,7 @@ void execute_script(string name)
    running_script = name;
    running_step = 0;
    started_at = time();
-   call_out("next_step", step_pause);
+   call_out(next_step, step_pause);
 }
 
 // This function matches /include/npcscript.h - make sure to change this if you edit the include file.
@@ -281,21 +281,22 @@ int state_update(string state)
                                                    " step (#" + running_step + ") started at " + ctime(started_at) +
                                                    ".");
          recover();
-         running_script = 0;
+         running_script = nil;
          running_step = 0;
          started_at = 0;
       }
-      return;
+      return 0;
    }
    // If this is a script name, execute it.
    else if (member_array(state, keys(scripts)) != -1)
    {
       execute_script(state);
-      return;
+      return 0;
    }
 
    // Let people know we were told to do something we do not know how to do.
    this_object()->do_game_command("mumble " + state);
+   return 0;
 }
 
 // Internal public function so it can be called via call_out().
@@ -309,7 +310,7 @@ void next_step()
    if (running_step >= sizeof(scripts[running_script]))
    {
       STATE_D->remove_from_queue(this_object(), "recovery");
-      running_script = 0;
+      running_script = nil;
       running_step = 0;
       return;
    }
@@ -326,7 +327,7 @@ void next_step()
    }
 
    if (debug)
-      tell(debug, "<050>Debug for <res>" + this_object() + "\n" + "Step <190>" + running_step + "<050> in <190>" +
+      tell(debug, "<050>Debug for <res>" + sprintf("%O", this_object()) + "\n" + "Step <190>" + running_step + "<050> in <190>" +
                       running_script + "<050> is <190>" + step_type(step.type) +
                       (step.action ? "\n<050>Action: <res>" + step.action : "") +
                       (step.multiple ? "\n<050>Multiple: <res>" + sprintf("%O", step.multiple) : "") +
@@ -358,7 +359,7 @@ void next_step()
             running_step--;
          }
          else
-            step.multiple = 0;
+            step.multiple = nil;
       }
       else if (step.action)
       {
@@ -374,7 +375,7 @@ void next_step()
       {
          npc->do_game_command(parts[1]);
       }
-      npc = 0;
+      npc = nil;
       break;
    case SCRIPT_TRIGGER:
       return;
@@ -393,7 +394,7 @@ void next_step()
    {
       // Reset script tracking.
       STATE_D->remove_from_queue(this_object(), "recovery");
-      running_script = 0;
+      running_script = nil;
       running_step = 0;
       started_at = 0;
 
@@ -409,7 +410,7 @@ void next_step()
 
    // If next step is not a trigger, run it in call_out().
    if (step.type != SCRIPT_TRIGGER)
-      call_out("next_step", next_call_out);
+      call_out(next_step, next_call_out);
    else
    {
       // Triggers are added immediately.
@@ -421,7 +422,7 @@ void triggered(string pattern)
 {
    this_object()->remove_pattern(pattern);
    running_step++;
-   call_out("next_step", step_pause);
+   call_out(next_step, step_pause);
 }
 
 //: FUNCTION status
@@ -430,7 +431,7 @@ void triggered(string pattern)
 // See also ``query_running_script()``.
 int *status()
 {
-   return running_script ? ({running_step, sizeof(scripts[running_script])}) : 0;
+   return running_script ? ({running_step, sizeof(scripts[running_script])}) : nil;
 }
 
 //: FUNCTION query_running_script

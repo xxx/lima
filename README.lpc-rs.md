@@ -1055,6 +1055,26 @@ No native API, selection-policy or cleanup change is needed. The existing test
 dummy's incompatible inherited method arity is recorded separately; the audit
 uses Lima's flea NPC. Startup and full inventory qualification retain earlier scope.
 
+`scripts` adds protected dispatch and inspects the actual NPC-script module.
+The module adapts call-outs to bare function callbacks, absent references/status
+to nil, state-update results to explicit integers and debug objects to explicit
+formatting. Its API and step logic remain. Both LPC files retain CRLF endings.
+
+Empty/prototype-only activity keeps the no-running message. Active clones in
+other rooms and without an environment appear; inactive clones and prototypes
+are excluded. Exact columns, truncation, current-step/count text, simplified and
+ASCII progress bars pass. Real wait/description/action progression, callback
+execution, debug output, completion and recovery are checked while inspection
+leaves state and scheduled timer IDs unchanged. Direct printf bypasses command
+buffers: overwrite/pipe files stay empty, append retains prior text and incoming
+text is ignored. Raw arguments are ignored.
+
+Six focused checks cover twenty-seven shell inputs and seventeen positive complete
+compile checks, including Robert and the state daemon. No native API change is
+needed. Explicit callback advancement is tested; timed delivery, full file-script
+parsing, triggers and NPC-action routing await their own audit. Startup and full
+inventory qualification retain earlier scope.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
