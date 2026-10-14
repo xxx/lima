@@ -966,6 +966,16 @@ usable. Seven checks cover thirty-nine inputs and fifteen complete compile check
 including a real ID host. No new command or driver code is needed; these source
 policies remain.
 
+`profile` currently reports "Function profiling not enabled." through command
+buffers. The port does not define `__PROFILE_FUNCTIONS__`; its enabled profiling
+functions are excluded from the compiled command. No per-function timings or
+profiling API are provided by this verified branch. Bare, filename, `-total` and
+`all` forms retain the same diagnostic and ignore incoming text. Files, append
+and pipelines preserve its exact bytes, and following shell commands remain
+usable. Three focused checks cover twelve registered inputs and nine complete
+compile checks. No new command or driver code is needed for this configured
+branch; enabled function profiling remains separate work.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
