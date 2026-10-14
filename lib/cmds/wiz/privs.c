@@ -26,3 +26,8 @@ void main(mixed input)
    printf("Write: %O\n", tmp[keys(tmp)[0]][0]);
    return;
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}

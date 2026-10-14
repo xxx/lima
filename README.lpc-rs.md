@@ -990,6 +990,21 @@ The original missing-dispatch and dispatcher-only controls are retained; the
 adapted diagnostic performs no verb actions. Native parsing and the body module
 are unchanged. Enabled parser debugging remains separate work.
 
+`privs [path]` adds protected dispatch to its existing handler. It resolves raw
+path text through the current wizard directory and reports configured read/write
+privilege metadata. Existing and inherited entries, current-directory defaults
+and relative/dot paths work. Quotes, flags, globs and extra words retain their
+literal path meaning; no command-rule prototype is added.
+
+The handler prints directly and bypasses command output buffers: overwrite/pipe
+destinations stay empty, append preserves prior text and incoming text is ignored.
+For `/`, it prints the first returned child entry rather than the root's effective
+privileges. Under the initial configuration this yields `Read: -1` and
+`Write: Mudlib:help`, although effective root values are zero/one. This existing
+tree-entry selection policy is retained. Six checks cover twenty-nine registered
+inputs and twelve positive complete compile checks. No daemon or native API
+change is needed; reports preserve the tested configured trees and shell state.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
