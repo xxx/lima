@@ -58,5 +58,11 @@ void main(string str)
 
    header = "LIMA changes " + (version ? " for " + version : "");
 
-   out(LIMA_D->get_did_info(time() + 10000, ({header, ("-" * (sizeof(header))), ""}), pattern, 0, version));
+   mixed problem = catch(out(LIMA_D->get_did_info(time() + 10000, ({header, ("-" * (sizeof(header))), ""}), pattern, nil, version)));
+   if (problem) out(problem + "\n");
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

@@ -10,7 +10,7 @@
 inherit M_GLOB;
 inherit M_ACCESS;
 
-mapping did;
+mapping did = ([]);
 
 private
 nomask int start_index(string version, int after)
@@ -35,7 +35,7 @@ nomask string *get_entries(int after, string *header, string pattern, string ver
       did[version] = ({});
 
    if (index >= sizeof(did[version]))
-      return 0;
+      return nil;
 
    if (!header)
       output = ({"Change Log", "**********", ""});
@@ -45,7 +45,7 @@ nomask string *get_entries(int after, string *header, string pattern, string ver
 
    for (; index < sizeof(did[version]); index++)
    {
-      if (!pattern || regexp(did[version][index][1], pattern))
+      if (!pattern || sizeof(regexp(({did[version][index][1]}), pattern)))
          output += explode(sprintf("%s: %s", ctime(did[version][index][0]), did[version][index][1]), "\n") + ({""});
    }
 
@@ -124,8 +124,8 @@ protected
 nomask void restore_me()
 {
    string fn = create_file_name();
-   if (unguarded(1, ( : file_size, fn + __SAVE_EXTENSION__:)) > 0)
-      unguarded(1, ( : restore_object, fn, 1 :));
+   if (unguarded(1, &file_size(fn + __SAVE_EXTENSION__)) > 0)
+      unguarded(1, &restore_object(fn, 1));
 }
 
 void save_me()

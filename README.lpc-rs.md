@@ -902,6 +902,24 @@ routes. Objects without do_game_command still silently do nothing. The NPC actio
 module retains its raw player-command lookup without applying typed command rules
 or adding pipelines. These source policies are retained; no native API is added.
 
+`lima` adds protected dispatch to its raw version/pattern handler. Its daemon
+restores saved history through explicitly bound callbacks, starts with an empty
+mapping when no save exists, and uses native array regex matching with an explicit
+match count. Typed absent results and the unused continuation use `nil`; the
+numeric-zero version sentinel remains excluded from listing.
+
+Sorted versions, help, raw argument parsing, chronological entries, case-sensitive
+glob/anchor matching and multiline text retain their source behavior. Empty
+versions report "No recent changes."; a pattern matching no entries retains the
+report header. Command buffers support files and pipes, incoming text is ignored,
+and the real pager returns to the wizard shell. Reads preserve the restored cache.
+
+The command reports regex and oversized-report errors through its output buffer.
+The driver's 8,192 UTF-8 byte string-concatenation limit remains; the shipped
+`1.1a2` full history exceeds it and reports "overflow in string concatenation",
+while narrower queries remain usable. The daemon's separate changelog export
+method is outside these checks. No native API or shared policy is changed.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
