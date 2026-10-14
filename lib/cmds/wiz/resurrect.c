@@ -47,3 +47,8 @@ void main(string arg)
       this_body()->targetted_action("$N $vget the impression $t doesn't need any help.\n", target);
    }
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}

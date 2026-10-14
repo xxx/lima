@@ -1021,6 +1021,22 @@ including actual target/timer state, message recipients and following shell inpu
 No native API, combat-module or message-module change is needed. Timed pulse
 delivery and whole-library/startup qualification retain their earlier scope.
 
+`resurrect [player]` adds protected dispatch to the existing handler. Bare input,
+`me` and `myself` select your body; named lookup uses connected players, including
+players in another room. Reincarnation clears the dead flag and restores disabled
+limbs to one health point. It does not fully heal the body. Living self and missing
+targets keep their diagnostics; living named players receive the existing action.
+
+Action messages use ordinary names for dead bodies. Naming yourself follows the
+named-target branch and delivers your message twice; its existing reflexive and
+doesn't-need-help wording is retained. Case, quotes, flags and extra words remain
+literal raw names. Direct write diagnostics and body messages bypass command output
+buffers: overwrite/pipe destinations stay empty, append retains prior text and
+incoming text is ignored. Six focused checks cover thirty-two shell inputs and
+fourteen positive complete compile checks, using actual connected users, bodies,
+lookup, reincarnation and messages. No native API or health/message change is
+needed. Full death/corpse lifecycle and startup qualification retain earlier scope.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
