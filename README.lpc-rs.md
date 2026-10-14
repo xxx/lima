@@ -976,6 +976,20 @@ usable. Three focused checks cover twelve registered inputs and nine complete
 compile checks. No new command or driver code is needed for this configured
 branch; enabled function profiling remains separate work.
 
+`parse` is reserved for parser debugging and keeps "Parse what?" for missing
+input. Supplied text currently reports "Parser debugging is not available on
+this driver." through command buffers. Native `parse_sentence` accepts but
+ignores its legacy debug argument, so forwarding levels one/two would execute
+matching actions and display the body's numeric result. The port command avoids
+that body call until a real parser-trace API is available.
+
+The unavailable diagnostic supports files, append and pipelines, ignores incoming
+text and leaves shell state intact. Six checks cover eighteen registered inputs,
+twelve complete positive compile checks and six direct native/body controls.
+The original missing-dispatch and dispatcher-only controls are retained; the
+adapted diagnostic performs no verb actions. Native parsing and the body module
+are unchanged. Enabled parser debugging remains separate work.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

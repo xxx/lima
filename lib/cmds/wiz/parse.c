@@ -23,18 +23,16 @@ inherit CMD;
 private
 void main(string str)
 {
-   int flag = 1;
    if (!str)
    {
       out("Parse what?\n");
       return;
    }
 
-   if (sizeof(str) > 3 && str[0..2] == "-v ")
-   {
-      flag = 2;
-      str = str[3..];
-   }
+   out("Parser debugging is not available on this driver.\n");
+}
 
-   out(this_body()->do_game_command(str, flag));
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
