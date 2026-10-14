@@ -33,3 +33,8 @@ void main(string arg)
    mobs->remove();
    write("Killed " + sizeof(mobs) + " '" + arg + "'.\n");
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}

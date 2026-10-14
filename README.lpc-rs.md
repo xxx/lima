@@ -1037,6 +1037,24 @@ fourteen positive complete compile checks, using actual connected users, bodies,
 lookup, reincarnation and messages. No native API or health/message change is
 needed. Full death/corpse lifecycle and startup qualification retain earlier scope.
 
+`killmobs <id|filename>` adds protected dispatch to its existing handler. Filename
+selection strips optional `.c`, resolves absolute/relative/dot paths and removes
+matching non-body clones across the whole object space, including other rooms
+and carried inventory. Prototypes and bodies stay; ordinary nonliving clones
+also qualify. Actual removal runs hooks and clears inventory membership rather
+than performing combat death or awarding experience.
+
+Name lookup retains existing path normalization: `flea` becomes `/flea` and does
+not match a plain NPC name. An object named `/auditmob` matches normalized
+`auditmob`; one named `auditmob` does not. Quotes, flags, extra words and globs
+remain literal. Direct usage/count messages bypass command buffers: overwrite/
+pipe destinations stay empty, append retains prior text and incoming text is
+ignored. Six focused checks cover thirty-one shell inputs and sixteen positive
+complete compile checks, with actual NPC/object removal and following shell input.
+No native API, selection-policy or cleanup change is needed. The existing test
+dummy's incompatible inherited method arity is recorded separately; the audit
+uses Lima's flea NPC. Startup and full inventory qualification retain earlier scope.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
