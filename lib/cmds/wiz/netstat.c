@@ -21,7 +21,7 @@ void main()
    // OLD_SOCKET is deprecated and should not be used in new code.
    // It is kept here for compatibility with existing code.
    sockets = children(OLD_SOCKET)+children(SOCKET);
-   if (!sockets || sockets == ({}))
+   if (!sizeof(sockets))
    {
       out("No sockets active.\n");
    }
@@ -30,4 +30,9 @@ void main()
       for (int i = 0; i < sizeof(sockets); i++)
          out("" + sockets[i]->stat_me());
    }
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main();
 }

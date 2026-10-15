@@ -13,13 +13,15 @@ With the lpc-rs checkout beside this one and its CLI built, check a command with
 ../lpc-rs/target/debug/lpc-rs-lpcc -c lpc-rs.env --check lib/cmds/player/mudlist.c
 ```
 
-The 15 October 2026 whole-library check compiles **753 of 1,180 .c files** with
-no timeouts or crashes. Player commands are 65/67, wizard commands 72/81, guild
-commands 0/4, verbs 90/90, transitional commands 49/49 and transitional
-administrator commands 9/9. These standalone counts include optional and partial
-sources and are not a completion percentage. Nine wizard and four guild commands
-still need their CMD dispatch adaptation. Experimental `random2` remains deferred
-and `suicide` is disabled upstream.
+The last whole-library check, on 15 October 2026 before the todo/netstat batch,
+compiles **753 of 1,180 .c files** with no timeouts or crashes. A later 95-target
+command/support check reaches **74/81 wizard commands**, with todo/netstat the
+only new successes and no regressions. Retained counts are player 65/67, guild
+0/4, verbs 90/90, transitional 49/49 and transitional administrator 9/9. These
+standalone counts include optional and partial sources and are not a completion
+percentage. Seven wizard and four guild commands remain with shared tool/guild
+or driver-diagnostic dependencies. Experimental random2 remains deferred and
+suicide is disabled upstream.
 
 A fresh production-driver check passes 30 checkpoints covering account/character
 creation, menu, Grand Hall entry, look/inventory, logout and saved-account/body
@@ -32,6 +34,12 @@ directories, then recreates all seven RST categories. Only the disposable IMUD
 router/OOB addresses use loopback; a local receive-only endpoint is used, without
 a live I3 session. Existing wear/wield, loadout, armour and equipment-restoration
 audits remain completed. Source-wide migration remains incomplete.
+
+Todo passes inline submission with literal redirection text, editor completion
+and abort; two actual news posts survive restart. Netstat passes ordinary/ignored
+arguments and plain redirected output, and works again after saved login. Both
+use protected CMD entry and unchanged shared implementations. Netstat counts an
+empty socket list explicitly, preserving the driver's array identity semantics.
 
 The focused runtime counts below retain their original scopes. Mudlist passes
 13 cases using both actual shells; `su` passes refresh, race-change and password-
