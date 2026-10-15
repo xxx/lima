@@ -47,8 +47,8 @@ mapping emotions = ([ECSTASY:0, ADMIRATION:0, TERROR:0, AMAZEMENT:0]);
 mapping blackboard = ([]);
 mapping node_list, parents;
 
-private function arrival_fn = ( : action_arrival:);
-private function departure_fn = ( : action_departure:);
+private function arrival_fn = action_arrival;
+private function departure_fn = action_departure;
 
 private function my_hook;
 
@@ -209,7 +209,7 @@ void do_game_command(string str)
 
       winner = CMD_D->find_cmd_in_path(verb, ({CMD_DIR_PLAYER "/"}));
       if (arrayp(winner))
-         winner[0]->call_main("", "", "", "", "", "", argument);
+         winner[0]->call_main(argument, ([]), nil, nil, nil, nil, argument);
       else if (environment())
       {
          mixed result = efun::parse_sentence(str, 0, nil, nil, this_object(), this_user());
@@ -524,7 +524,7 @@ void start_behaviour()
 {
    if (!node_list)
       init_tree();
-   add_hook("move", ( : action_movement:));
+   add_hook("move", action_movement);
    if (env = environment(this_object()))
    {
       env->add_hook("object_arrived", arrival_fn);

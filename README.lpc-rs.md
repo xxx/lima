@@ -1117,6 +1117,24 @@ The fixture preloads all 21 stock recipes and the real crafting daemon before
 creating Goblins. Cold setup reached the unchanged 4,000 ms budget while compiling
 the crafting registry; these prepared-runtime checks do not establish cold startup.
 
+The behavior-tree command runner passes literal arguments, empty mapping flags
+and nil route slots to ordinary CMD handlers. The former empty-string tuple
+skipped those handlers during route validation. Raw no-redirection commands and
+native parser fallback retain their existing paths. NPC user/body context is
+preserved inside handlers, and the original player is restored before returning
+or rethrowing a handler error.
+
+Movement, arrival and departure hooks use bare named function pointers, so moving
+into a room registers the real arrival callbacks and records newly arriving beings.
+
+Six focused checks include sixteen positive complete compile checks and five
+following shell inputs. Actual evaluation callbacks execute look-around,
+limb-configured own-status and study-beings, including real arrival hooks,
+association registration and a parser-dispatched look at the newcomer. The
+own-status check clears stale limb blackboard entries for the fixture's unwounded
+state. Full leaf coverage, autonomous timing and cold crafting startup retain
+their separate scope; the same 21-recipe warmup and 4,000 ms budget remain.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
