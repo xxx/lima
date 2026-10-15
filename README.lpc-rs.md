@@ -13,17 +13,32 @@ With the lpc-rs checkout beside this one and its CLI built, check a command with
 ../lpc-rs/target/debug/lpc-rs-lpcc -c lpc-rs.env --check lib/cmds/player/mudlist.c
 ```
 
-The retained player checks compile 65 of 67 player commands and all 12 supporting
-targets. Mudlist passes 13 runtime cases using both actual shells. `su` passes
-refresh, race-change and password-modal checks; its existing account/character
-lookup limitation is recorded in the port notes. Experimental `random2` remains
-deferred and `suicide` is disabled upstream.
+The 15 October 2026 whole-library check compiles **753 of 1,180 .c files** with
+no timeouts or crashes. Player commands are 65/67, wizard commands 72/81, guild
+commands 0/4, verbs 90/90, transitional commands 49/49 and transitional
+administrator commands 9/9. These standalone counts include optional and partial
+sources and are not a completion percentage. Nine wizard and four guild commands
+still need their CMD dispatch adaptation. Experimental `random2` remains deferred
+and `suicide` is disabled upstream.
 
+A fresh production-driver check passes 30 checkpoints covering account/character
+creation, menu, Grand Hall entry, look/inventory, logout and saved-account/body
+restoration in a new process. Both processes exit normally. Cold boot and
+saved-account restart each load 151 preloads with zero failures, satisfying this
+configured lifecycle checkpoint. RST cleanup uses its existing unguarded helper;
+native mkdir accounts for directories removed earlier in the same transaction.
+The restart regression removes two seeded obsolete files and two nested output
+directories, then recreates all seven RST categories. Only the disposable IMUD
+router/OOB addresses use loopback; a local receive-only endpoint is used, without
+a live I3 session. Existing wear/wield, loadout, armour and equipment-restoration
+audits remain completed. Source-wide migration remains incomplete.
+
+The focused runtime counts below retain their original scopes. Mudlist passes
+13 cases using both actual shells; `su` passes refresh, race-change and password-
+modal checks, with its account/character lookup limitation recorded separately.
 Wizard directory navigation passes seven cases covering 28 inputs, including
 saved directory history and current-file restoration after shell recreation.
-Focused checks compile 15 of 81 wizard commands, 18 of 49 transitional commands
-and all 9 navigation support targets. The existing root-origin `cd -` edge is
-recorded separately in the port notes.
+Its root-origin `cd -` edge remains recorded in the port notes.
 
 `ls` passes eight cases covering 29 shell inputs and two external calls. Checks
 cover flags, metadata and loaded markers, globbing, plain/ANSI output, pipelines

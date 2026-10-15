@@ -79,7 +79,7 @@ void scan_mudlib()
    dirs_to_do = ({"/"});
    if (!last_time)
    {
-      delete_directory(RST_DIR);
+      unguarded(1, &delete_directory(RST_DIR));
       if (!make_directories())
       {
          printf("*** Run '@RST_D->complete_rebuild()' as an ADMIN to initiate the autodoc system.\n"
