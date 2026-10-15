@@ -192,7 +192,7 @@ int create_script_from_file(string name, string file)
          if (content[0..1] == "(:")
          {
             mixed *args = parse_to_types(explode(content[2.. < 3], ","));
-            scripts[name] += ({step(SCRIPT_ACTION, ( : call_other, this_object(), args:))});
+            scripts[name] += ({step(SCRIPT_ACTION, (: call_other(this_object(), $(args)[0], $(args)[1..]...) :))});
          }
          else
             scripts[name] += ({step(SCRIPT_ACTION, content)});

@@ -1075,6 +1075,22 @@ needed. Explicit callback advancement is tested; timed delivery, full file-scrip
 parsing, triggers and NPC-action routing await their own audit. Startup and full
 inventory qualification retain earlier scope.
 
+NPC script files now bind a function action's parsed method name separately from
+its argument list. Consecutive integer/string argument lists and zero-argument
+calls execute correctly; the former closure silently skipped the call while
+advancing the script. The change preserves CRLF and the existing parser/step API.
+Comments, blank lines, trailing newlines, absolute/relative paths, WAIT/DESC,
+ordered `@@` commands and NPC-action routing are checked. Existing NPC targets
+receive the action; missing targets and bodies are skipped.
+
+Normal WAIT-to-TRIGGER handoff, real message matching, queued response execution,
+pattern removal and following function completion work. Two existing limitations
+remain: a first-step trigger is unarmed, and adjacent triggers prearm the later
+pattern before the earlier one matches. An out-of-order later match can advance
+prematurely. Six focused checks include sixteen positive complete compile checks
+and five following shell inputs. Callback execution is explicit; broker timing,
+arbitrary expression syntax and trigger-engine changes require their own review.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
