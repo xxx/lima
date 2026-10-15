@@ -5,12 +5,12 @@
 inherit M_ACCESS;
 inherit M_INPUT;
 
-// Most of these fields can be left blank (i.e. 0) if irrelevant or unwanted.
-// key == 0 means "leave a blank line"
-// proto == 0 means no prototype
-// priv == 0 means no restriction
-// status == 0 means no info
-// args == 0 means no arguments
+// Most of these fields can be left blank (i.e. nil) if irrelevant or unwanted.
+// key == nil means "leave a blank line"
+// proto == nil means no prototype
+// priv == nil means no restriction
+// status == nil means no info
+// args == nil means no arguments
 class command_info
 {
    string key; // A one character string giving the key to be pressed to
@@ -27,10 +27,15 @@ class command_info
 protected class command_info *
 defaults();
 
-// Overload these
-string module_name();
-string module_key();
-class command_info *module_commands();
+string module_name()
+{
+   return "main";
+}
+
+class command_info *module_commands()
+{
+   return ({});
+}
 
 mixed module_priv()
 {
@@ -52,7 +57,7 @@ nomask string parent_name()
 
    // parents must always reside in /obj/tasktool
    if (strsrch(path, "/obj/tasktool") != 0)
-      return 0;
+      return nil;
 
    return path;
 }
@@ -155,18 +160,15 @@ class command_info *defaults()
             new (class command_info, key
                  : "m", desc
                  : "previous menu", action
-                 : (
-                     : do_main_menu:)),
+                 : do_main_menu),
             new (class command_info, key
                  : "q", desc
                  : "quit", action
-                 : (
-                     : do_quit:)),
+                 : do_quit),
             new (class command_info, key
                  : "?", desc
                  : "help", action
-                 : (
-                     : do_help:))});
+                 : do_help)});
 }
 
 // setup
@@ -174,15 +176,14 @@ void begin_menu();
 
 string menu_prompt()
 {
-   return "(TaskTool:" + module_name() + ") [" +
-          implode(commands,
-                  (
-                      : ((class command_info)$2)->key ? $1 + ((class command_info)$2)->key : $1:),
-                  "") +
-          "] > ";
+   string keys = "";
+   foreach (class command_info comm in commands)
+      if (comm.key)
+         keys += comm.key;
+   return "(TaskTool:" + module_name() + ") [" + keys + "] > ";
 }
 
-void create()
+void create(string task_id)
 {
    set_privilege(1);
 
@@ -191,7 +192,7 @@ void create()
       return;
 
    // No init of commands.. write_menu() does that for now.
-   prompt = ( : menu_prompt:);
+   prompt = menu_prompt;
 
    if (clonep())
    {
@@ -263,7 +264,7 @@ void handle_input(string str)
 protected
 nomask void do_modal_func()
 {
-   modal_func(( : handle_input:), prompt);
+   modal_func(handle_input, prompt);
 }
 
 void begin_menu()
@@ -278,5 +279,5 @@ void begin_menu()
 
    write_menu();
 
-   modal_push(( : handle_input:), prompt);
+   modal_push(handle_input, prompt);
 }

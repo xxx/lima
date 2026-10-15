@@ -15,12 +15,12 @@ With the lpc-rs checkout beside this one and its CLI built, check a command with
 
 The last whole-library check, on 15 October 2026 before the command batches,
 compiles **753 of 1,180 .c files** with no timeouts or crashes. Later bounded
-checks reached 76/81 wizard and 4/4 guild commands after unittest. The latest
-114-target iftp check reaches **77/81 wizard commands**, retains **4/4 guild
-commands**, and passes all 29 complete supporting objects, with no regressions.
+checks reached 77/81 wizard and 4/4 guild commands after iftp. The latest
+117-target tasktool check reaches **78/81 wizard commands**, retains **4/4 guild
+commands**, and passes all 32 supporting objects, with no regressions.
 Other retained counts are player 65/67, verbs 90/90, transitional 49/49 and
 transitional administrator 9/9. These standalone counts include optional and
-partial sources and are not a completion percentage. Four wizard commands remain
+partial sources and are not a completion percentage. Three wizard commands remain
 with shared tool or driver-diagnostic dependencies. Experimental random2 remains
 deferred and suicide is disabled upstream.
 
@@ -75,6 +75,14 @@ lookup, help, directory handling, usage errors, all exit aliases, client removal
 and saved-account restart. The actual IMUD daemon and client are used. This
 qualifies the local client flow; live I3 file transfers/listing and alternate
 configurations retain their separate scope.
+
+Tasktool's actual menu and task daemon now support native callbacks, constructor
+signatures, prompt construction and nil values. Registered input verifies task
+creation, three-level navigation, completion rules, first/middle/last removal,
+parent/root exits and menu cleanup. Nested removal preserves the full parent ID;
+creation time is typed as an integer. Two saved root tasks and a completed child
+restore through the real menu after restart. Admin-tool compositions and task APIs
+outside the menu retain their separate scope.
 
 The focused runtime counts below retain their original scopes. Mudlist passes
 13 cases using both actual shells; `su` passes refresh, race-change and password-

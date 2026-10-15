@@ -27,7 +27,7 @@ nomask string query_title(string task_id)
    mixed *task = find_task(task_id);
 
    if (!task)
-      return 0;
+      return nil;
 
    return task[TASK_TITLE];
 }
@@ -39,7 +39,7 @@ nomask string query_description(string task_id)
    mixed *task = find_task(task_id);
 
    if (!task)
-      return 0;
+      return nil;
 
    return task[TASK_DESC];
 }
@@ -51,14 +51,14 @@ nomask string query_owner(string task_id)
    mixed *task = find_task(task_id);
 
    if (!task)
-      return 0;
+      return nil;
 
    return task[TASK_OWNER];
 }
 
 //: FUNCTION query_creation_time
 // Return the creation time of a given task.
-nomask string query_creation_time(string task_id)
+nomask int query_creation_time(string task_id)
 {
    mixed *task = find_task(task_id);
 
@@ -75,7 +75,7 @@ nomask string query_status(string task_id)
    mixed *task = find_task(task_id);
 
    if (!task)
-      return 0;
+      return nil;
 
    return task[TASK_STATUS];
 }
@@ -111,7 +111,7 @@ nomask mixed *query_sub_tasks(string task_id)
    mixed *task = find_task(task_id);
 
    if (!task)
-      return 0;
+      return nil;
 
    return deep_copy(task[TASK_SUB]);
 }
@@ -277,17 +277,17 @@ nomask private *find_task(string task_id)
    mixed *t_id, task;
 
    if (!task_id)
-      return 0;
+      return nil;
 
    t_id = map(explode(task_id, "."), ( : to_int($1) :));
 
    if (sizeof(t_id) == 0 || member_array(0, t_id) != -1)
-      return 0;
+      return nil;
 
    foreach (int n in t_id)
    {
       if (sizeof(arr) < n)
-         return 0;
+         return nil;
 
       task = arr[n - 1];
       arr = arr[n - 1][TASK_SUB];
@@ -301,12 +301,10 @@ nomask private *find_task(string task_id)
 // Returns "0" for a top-level task.
 nomask string resolve_parent_id(string task_id)
 {
-   mixed *parent_id = explode(task_id, ".")[ < 2.. < 2];
-
-   if (sizeof(parent_id) == 0)
+   string *parts = explode(task_id, ".");
+   if (sizeof(parts) < 2)
       return "0";
-
-   return parent_id[0];
+   return implode(parts[0..<2], ".");
 }
 
 //: FUNCTION query_task
@@ -330,7 +328,7 @@ varargs nomask mixed *query_tasks(string task_id)
    task = find_task(task_id);
 
    if (!task)
-      return 0;
+      return nil;
 
    return task[TASK_SUB];
 }
@@ -344,7 +342,7 @@ string add_task(string parent_id, string title, string description, string who)
    string new_id;
 
    if (!title || sizeof(title) == 0)
-      return 0;
+      return nil;
 
    new_task = TASK_ARRAY;
 
@@ -354,7 +352,7 @@ string add_task(string parent_id, string title, string description, string who)
    new_task[TASK_CTIME] = time();
    new_task[TASK_STATUS] = "open";
 
-   if (parent_id == "0" || parent_id == 0)
+   if (parent_id == "0" || parent_id == nil)
    {
       tasks += ({new_task});
       new_id = "" + (sizeof(tasks));
@@ -364,7 +362,7 @@ string add_task(string parent_id, string title, string description, string who)
       mixed *task = find_task(parent_id);
 
       if (!task)
-         return 0;
+         return nil;
 
       task[TASK_SUB] += ({new_task});
       new_id = parent_id + "." + (sizeof(task[TASK_SUB]));
@@ -383,21 +381,20 @@ mixed *remove_task(string task_id)
 
    // This catches problems with task_id being invalid.
    if (!task)
-      return 0;
+      return nil;
 
    if (parent_id == "0")
    {
       int n = to_int(task_id) - 1;
 
-      tasks = tasks[0..n - 1] + tasks[n + 1.. < 1];
+      tasks[n..n] = ({});
    }
    else
    {
       mixed *parent = find_task(parent_id);
-      mixed *p_sub = parent[TASK_SUB];
       int n = to_int(explode(task_id, ".")[ < 1]) - 1;
 
-      parent[TASK_SUB] = p_sub[0..n - 1] + p_sub[n + 1.. < 1];
+      parent[TASK_SUB][n..n] = ({});
    }
 
    save_me();

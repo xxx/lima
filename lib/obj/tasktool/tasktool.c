@@ -4,8 +4,6 @@
 
 inherit __DIR__ "internal/base";
 
-class command_info *module_commands(string);
-
 string our_task;
 class command_info *our_defaults;
 
@@ -30,14 +28,14 @@ void finish_add_task(string title, string desc)
 
 nomask private void my_add_task(string title)
 {
-   input_one_arg("Description: ", ( : finish_add_task, title:));
+   input_one_arg("Description: ", &finish_add_task(title));
 }
 
 nomask private void my_complete_task(string task_id)
 {
-   int result;
+   mixed result;
 
-   if (our_task != 0)
+   if (our_task != nil)
       task_id = our_task + "." + task_id;
 
    result = TASK_D->complete_task(task_id);
@@ -60,7 +58,7 @@ nomask private void my_complete_task(string task_id)
 
 nomask private void my_remove_task(string task_id)
 {
-   if (our_task != 0)
+   if (our_task != nil)
       task_id = our_task + "." + task_id;
 
    if (!TASK_D->remove_task(task_id))
@@ -78,7 +76,7 @@ class command_info *module_commands()
    class command_info *ret = ({});
    int n = 1;
 
-   if (our_task != 0)
+   if (our_task != nil)
    {
       mixed *t = TASK_D->query_task(our_task);
 
@@ -96,7 +94,7 @@ class command_info *module_commands()
          string file = base_name();
          string task_id = key;
 
-         if (our_task != 0)
+         if (our_task != nil)
             task_id = our_task + "." + task_id;
 
          name = TASK_D->query_title(task_id);
@@ -107,8 +105,7 @@ class command_info *module_commands()
          ret += ({new (class command_info, key
                        : key, desc
                        : name, action
-                       : (
-                             : clone_object, file, task_id:),
+                       : &clone_object(file, task_id),
                          status
                        : status)});
       }
@@ -121,8 +118,7 @@ class command_info *module_commands()
             : "a", proto
             : "[title]", args
             : ({"Title: "}), action
-            : (
-                  : my_add_task:),
+            : my_add_task,
               desc
             : "add task"),
 
@@ -130,8 +126,7 @@ class command_info *module_commands()
             : "c", proto
             : "[id]", args
             : ({"Task ID: "}), action
-            : (
-                  : my_complete_task:),
+            : my_complete_task,
               desc
             : "complete task"),
 
@@ -139,8 +134,7 @@ class command_info *module_commands()
             : "r", proto
             : "[id]", args
             : ({"Task ID: "}), action
-            : (
-                  : my_remove_task:),
+            : my_remove_task,
               desc
             : "remove task"),
    });
@@ -182,27 +176,24 @@ void create(string task_id)
       });
 
       /* Only set up "previous menu" option if not top-level. */
-      if (our_task != 0)
+      if (our_task != nil)
       {
          our_defaults += ({
              new (class command_info, key
                   : "m", desc
                   : "previous menu", action
-                  : (
-                      : do_main_menu:)),
+                  : do_main_menu),
          });
       }
 
       our_defaults += ({new (class command_info, key
                              : "q", desc
                              : "quit", action
-                             : (
-                                 : do_quit:)),
+                             : do_quit),
                         new (class command_info, key
                              : "?", desc
                              : "help", action
-                             : (
-                                 : do_help:))});
+                             : do_help)});
 
       if (file_name(previous_object()) != CMD_OB_TASKTOOL && base_name(previous_object()) != TASKTOOL)
       {
@@ -211,6 +202,6 @@ void create(string task_id)
          return;
       }
 
-      ::create();
+      ::create(task_id);
    }
 }
