@@ -70,5 +70,5 @@ void races()
 
 nomask class command_info *module_commands()
 {
-   return ({new (class command_info, key : "s", desc : "race stats overview", action : ( : races:))});
+   return ({new (class command_info, key : "s", desc : "race stats overview", action : races)});
 }
