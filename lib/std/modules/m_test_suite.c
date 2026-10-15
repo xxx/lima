@@ -8,17 +8,17 @@
 // .. code-block:: c
 //    inherit M_TEST_SUITE;
 //
-//    void my_test()
+//    int my_test()
 //    {
 //       return 1;
 //    }
 //
 //    void init_tests()
 //    {
-//       add_test_true("Some test",(: my_test:));
+//       add_test_true("Some test",my_test);
 //    }
 //
-// If you use ``add_test_true()`` the function succeeds if it returns 1 (anything that evaluates to true), and fails on
+// If you use ``add_test_true()`` the function succeeds if it returns 1, and fails on
 // 0. If you use ``add_test_fail()``, quite the opposite. This allows both to assume something fails and something
 // succeeds.
 //
@@ -64,10 +64,10 @@ varargs void add_test(string desc, function f, mixed args, int assertion)
    class test t = new (class test);
    if (!arrayp(args))
       args = ({});
-   t->desc = desc;
-   t->f = f;
-   t->args = args;
-   t->assertion = assertion;
+   t.desc = desc;
+   t.f = f;
+   t.args = args;
+   t.assertion = assertion;
 
    tests += ({t});
 }
@@ -102,7 +102,7 @@ object clone(string file)
    if (err)
    {
       debug("Failed to clone " + file);
-      return 0;
+      return nil;
    }
    return ob;
 }
@@ -114,7 +114,7 @@ object lab_clone(string file)
 {
    object ob = clone(file);
    if (!ob)
-      return 0;
+      return nil;
    ob->move(LAB);
    return ob;
 }
@@ -191,20 +191,20 @@ varargs int inv_do(object who, string doo, string what, string check, int fail_o
 }
 
 //: FUNCTION add_test_true
-// Add a test to the queue that should be considered successful if it returns a value evaluating to true.
+// Add a test to the queue that should be considered successful if it returns 1.
 //  .. code-block:: c
-//     add_test_true("Unwield longsword", ( : check_unwield, "sword" :));
-//     add_test_true("Dualwield longsword", ( : check_dualwield, "longsword" :));
+//     add_test_true("Unwield longsword", &check_unwield("sword"));
+//     add_test_true("Dualwield longsword", &check_dualwield("longsword"));
 varargs void add_test_true(string desc, function f, mixed args)
 {
    add_test(desc, f, args, ASSERT_TRUE);
 }
 
 //: FUNCTION add_test_fail
-// Add a test to the queue that should be considered successful if it returns a value evaluating to false.
+// Add a test to the queue that should be considered successful if it returns 0.
 //  .. code-block:: c
-//     add_test_fail("Wield greataxe", ( : check_wield, "axe" :));
-//     add_test_fail("Wield longsword", ( : check_wield, "longsword" :));
+//     add_test_fail("Wield greataxe", &check_wield("axe"));
+//     add_test_fail("Wield longsword", &check_wield("longsword"));
 varargs void add_test_fail(string desc, function f, mixed args)
 {
    add_test(desc, f, args, ASSERT_FALSE);
@@ -242,6 +242,13 @@ int query_success()
 int query_fail()
 {
    return fail;
+}
+
+nomask void remove_suite()
+{
+   if (previous_object() != find_object(TEST_D))
+      error("Only the test daemon can remove this suite.\n");
+   destruct();
 }
 
 void create()

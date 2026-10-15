@@ -32,9 +32,9 @@ int clean_up()
 
 void init_tests()
 {
-   add_test_true("Clone actor to lab", ( : clone_actors:));
-   add_test_fail("Fail to salvage sword while wielded", ( : check_salvage, "sword" :));
-   add_test_true("Unwield sword", ( : check_unwield, "sword" :));
-   add_test_true("Salvage sword", ( : check_salvage, "sword" :));
-   add_test_true("Clean up", ( : clean_up:));
+   add_test_true("Clone actor to lab", clone_actors);
+   add_test_fail("Fail to salvage sword while wielded", &check_salvage("sword"));
+   add_test_true("Unwield sword", &check_unwield("sword"));
+   add_test_true("Salvage sword", &check_salvage("sword"));
+   add_test_true("Clean up", clean_up);
 }

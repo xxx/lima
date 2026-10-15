@@ -164,15 +164,15 @@ void init_tests()
       items += ({"armour/" + a}); // Replace the armour/ portion of the string in preperation for cloning
    }
 
-   add_test_true("Clone Actor to lab", ( : clone_actors:));
+   add_test_true("Clone Actor to lab", clone_actors);
 
    /* Clones all Weapons and Armours*/
    foreach (string i in items)
    {
-      add_test_true("Clone weapon: " + i, ( : clone_items, i:));
+      add_test_true("Clone weapon: " + i, &clone_items(i));
    }
 
-   add_test_true("Check weapons", ( : check_weapons:));
-   add_test_true("Check armour", ( : check_armours:));
-   add_test_true("Clean up", ( : clean_up:));
+   add_test_true("Check weapons", check_weapons);
+   add_test_true("Check armour", check_armours);
+   add_test_true("Clean up", clean_up);
 }

@@ -15,7 +15,8 @@ void test_suite(string suite_file, int debug)
    if (debug != -1)
       write("Loading fresh suite " + suite_file + " ...");
    suite = find_object(suite_file);
-   destruct(suite); // Dest once, then load again to make sure we have a new one.
+   if (suite)
+      suite->remove_suite();
    suite = load_object(suite_file);
    if (debug != -1)
       write("Running suite " + suite_file + " ...");

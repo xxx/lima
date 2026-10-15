@@ -57,3 +57,9 @@ void main(string arg)
    else
       TEST_D->test_suite(args[0], debug);
 }
+
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}

@@ -13,15 +13,16 @@ With the lpc-rs checkout beside this one and its CLI built, check a command with
 ../lpc-rs/target/debug/lpc-rs-lpcc -c lpc-rs.env --check lib/cmds/player/mudlist.c
 ```
 
-The last whole-library check, on 15 October 2026 before the todo/netstat batch,
-compiles **753 of 1,180 .c files** with no timeouts or crashes. A later 95-target
-command/support check reached 74/81 wizard commands after todo/netstat; the
-subsequent 104-target guild/governance check reaches **75/81**. The latest
-105-target SPECIAL check retains 75/81 wizard commands and reaches **4/4 guild
-commands**, with no regressions. Other retained counts are player 65/67, verbs 90/90, transitional 49/49 and
-transitional administrator 9/9. These standalone counts include optional and partial sources and are not a completion
-percentage. Six wizard commands remain with shared tool or driver-diagnostic
-dependencies. Experimental random2 remains deferred and suicide is disabled upstream.
+The last whole-library check, on 15 October 2026 before the command batches,
+compiles **753 of 1,180 .c files** with no timeouts or crashes. Later bounded
+checks reached 75/81 wizard and 4/4 guild commands after SPECIAL. The latest
+112-target unittest check reaches **76/81 wizard commands**, retains **4/4 guild
+commands**, and passes all 27 complete supporting objects, with no regressions.
+Other retained counts are player 65/67, verbs 90/90, transitional 49/49 and
+transitional administrator 9/9. These standalone counts include optional and
+partial sources and are not a completion percentage. Five wizard commands remain
+with shared tool or driver-diagnostic dependencies. Experimental random2 remains
+deferred and suicide is disabled upstream.
 
 A fresh production-driver check passes 30 checkpoints covering account/character
 creation, menu, Grand Hall entry, look/inventory, logout and saved-account/body
@@ -57,6 +58,15 @@ command-pipeline cases check cleanup order, nesting and error propagation, and t
 actual roundhouse callback retains its two-second delay. Registered shell checks
 exercise the four command gates. These checks do not qualify full special-combat
 gameplay or change existing targeting/reflex policy.
+
+Unittest's command and shared suite framework now support native class fields,
+callback values and nil object results. All five bundled suites compile after
+38 callback registrations are converted; their test bodies are unchanged. Suites
+remove themselves at the test daemon's request so reruns get fresh objects under
+the existing master policy. A focused suite verifies callback arguments, expected
+pass/fail counts, normal/debug output, quiet execution through the daemon API,
+error propagation, fresh loads and restart. Full bundled gameplay assertions and
+the separate test dummy remain unqualified by these framework checks.
 
 The focused runtime counts below retain their original scopes. Mudlist passes
 13 cases using both actual shells; `su` passes refresh, race-change and password-

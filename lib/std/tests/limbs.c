@@ -88,20 +88,20 @@ int clean_up()
 
 void init_tests()
 {
-   add_test_true("Clone actor to lab", ( : clone_actors:));
-   add_test_true("Clone 5 pieces of equipment", ( : clone_items:));
-   add_test_true("Wield longsword", ( : check_wield, "longsword" :));
-   add_test_fail("Wield greataxe", ( : check_wield, "axe" :));
-   add_test_true("Unwield longsword", ( : check_unwield, "sword" :));
-   add_test_true("Dualwield longsword", ( : check_dualwield, "longsword" :));
-   add_test_true("Unwield longsword", ( : check_unwield, "sword" :));
-   add_test_true("Dualwield greataxe", ( : check_dualwield, "axe" :));
-   add_test_fail("Wield longsword", ( : check_wield, "longsword" :));
-   add_test_true("Dualwield greataxe", ( : check_dualwield, "axe" :));
-   add_test_true("Unwield all", ( : check_unwield_all:));
-   add_test_true("Wear gloves", ( : check_wear, "gloves" :));
-   add_test_true("Wear jacket", ( : check_wear, "jacket" :));
-   add_test_true("Wear vest", ( : check_wear, "vest" :));
-   add_test_true("Remove all", ( : check_remove_all:));
-   add_test_true("Clean up", ( : clean_up:));
+   add_test_true("Clone actor to lab", clone_actors);
+   add_test_true("Clone 5 pieces of equipment", clone_items);
+   add_test_true("Wield longsword", &check_wield("longsword"));
+   add_test_fail("Wield greataxe", &check_wield("axe"));
+   add_test_true("Unwield longsword", &check_unwield("sword"));
+   add_test_true("Dualwield longsword", &check_dualwield("longsword"));
+   add_test_true("Unwield longsword", &check_unwield("sword"));
+   add_test_true("Dualwield greataxe", &check_dualwield("axe"));
+   add_test_fail("Wield longsword", &check_wield("longsword"));
+   add_test_true("Dualwield greataxe", &check_dualwield("axe"));
+   add_test_true("Unwield all", check_unwield_all);
+   add_test_true("Wear gloves", &check_wear("gloves"));
+   add_test_true("Wear jacket", &check_wear("jacket"));
+   add_test_true("Wear vest", &check_wear("vest"));
+   add_test_true("Remove all", check_remove_all);
+   add_test_true("Clean up", clean_up);
 }

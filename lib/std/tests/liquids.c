@@ -56,11 +56,11 @@ int clean_up()
 
 void init_tests()
 {
-   add_test_true("Clone actor to lab", ( : clone_actors:));
-   add_test_true("Clone liquid personal items", ( : clone_items:));
-   add_test_true("Check bottle is empty", ( : check_bottle_empty:));
-   add_test_true("Check fill bottle", ( : check_fill_bottle:));
-   add_test_true("Check bottle has 10 drinks", ( : check_bottle_full:));
-   add_test_true("Drink 10 drinks", ( : check_drink_fluid:));
-   add_test_true("Clean up", ( : clean_up:));
+   add_test_true("Clone actor to lab", clone_actors);
+   add_test_true("Clone liquid personal items", clone_items);
+   add_test_true("Check bottle is empty", check_bottle_empty);
+   add_test_true("Check fill bottle", check_fill_bottle);
+   add_test_true("Check bottle has 10 drinks", check_bottle_full);
+   add_test_true("Drink 10 drinks", check_drink_fluid);
+   add_test_true("Clean up", clean_up);
 }

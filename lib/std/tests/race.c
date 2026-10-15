@@ -136,9 +136,9 @@ int clean_up()
 
 void init_tests()
 {
-   add_test_true("Load all races", ( : load_races:));
-   add_test_true("Check adjustment sums", ( : check_adj_sums:));
-   add_test_true("Check short_description()", ( : check_descriptions:));
-   add_test_true("No duplicate races", ( : check_duplicate_races:));
-   add_test_true("Clean up", ( : clean_up:));
+   add_test_true("Load all races", load_races);
+   add_test_true("Check adjustment sums", check_adj_sums);
+   add_test_true("Check short_description()", check_descriptions);
+   add_test_true("No duplicate races", check_duplicate_races);
+   add_test_true("Clean up", clean_up);
 }
