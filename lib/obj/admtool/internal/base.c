@@ -3,12 +3,12 @@
 inherit MENUS;
 inherit M_ACCESS;
 
-// Most of these fields can be left blank (i.e. 0) if irrelevant or unwanted.
-// key == 0 means "leave a blank line"
-// proto == 0 means no prototype
-// priv == 0 means no restriction
-// who == 0 means no info
-// args == 0 means no arguments
+// Most of these fields can be left blank (i.e. nil) if irrelevant or unwanted.
+// key == nil means "leave a blank line"
+// proto == nil means no prototype
+// priv == nil means no restriction
+// who == nil means no info
+// args == nil means no arguments
 class command_info
 {
    string key; // A one character string giving the key to be pressed to
@@ -31,10 +31,25 @@ class menu_item goto_main_menu_item;
 class section main;
 class section other;
 
-// Overload these
-string module_name();
-string module_key();
-class command_info *module_commands();
+string module_name()
+{
+   return "main";
+}
+
+string module_key()
+{
+   return nil;
+}
+
+string module_user()
+{
+   return nil;
+}
+
+class command_info *module_commands()
+{
+   return ({});
+}
 // setup
 void begin_menu();
 
@@ -56,7 +71,7 @@ private nomask string parent_name()
    // ### should be OB_ADMTOOL or something...
    //  the top level object has no parent
    if (path == "/obj/admtool/admtool3")
-      return 0;
+      return nil;
 
    idx = strsrch(path, "/", -1);
    path = path[0..idx - 1];
@@ -107,10 +122,13 @@ void create()
    if (strsrch(base_name(), "internal") != -1)
       return;
 
+   if (!clonep())
+      return;
+
    toplevel = new_menu(mud_name() + " Administration Tool");
-   quit_item = new_menu_item("Quit", ( : do_quit:), "q");
-   help_item = new_menu_item("Help", ( : do_help:), "?");
-   goto_main_menu_item = new_menu_item("Return to main menu", ( : do_main_menu:), "m");
+   quit_item = new_menu_item("Quit", do_quit, "q");
+   help_item = new_menu_item("Help", do_help, "?");
+   goto_main_menu_item = new_menu_item("Return to main menu", do_main_menu, "m");
 
    main = new_section("Main", "accent");
    other = new_section("Other", "warning");
@@ -128,7 +146,7 @@ void create()
    {
       add_menu_item(
           main, new_menu_item(mc.desc + (mc.proto ? " " + mc.proto : "") + (mc.who ? " (" + mc.who[1.. < 2] + ")" : ""),
-                              mc.action, mc.key, 0, 0, mc.args, mc.priv));
+                              mc.action, mc.key, 0, nil, mc.args, mc.priv));
    }
 
    if (clonep())
@@ -203,7 +221,7 @@ private void handle_input(string str)
 
 protected nomask void do_modal_func()
 {
-   modal_func(( : handle_input:), prompt);
+   modal_func(handle_input, prompt);
 }
 
 void begin_menu()

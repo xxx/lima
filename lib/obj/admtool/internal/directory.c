@@ -20,7 +20,7 @@ class command_info *module_commands()
       who = file->module_user();
 
       if (key)
-         ret += ({new (class command_info, key : key, desc : name, action : ( : clone_object, file:), who : who)});
+         ret += ({new (class command_info, key : key, desc : name, action : &clone_object(file), who : who)});
    }
 
    return ret;
