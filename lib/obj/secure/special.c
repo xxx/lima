@@ -91,7 +91,7 @@ varargs int skill_rank(object b, string s)
 private
 object *targets(object adv)
 {
-   return adv->query_targets() - ({0});
+   return adv->query_targets() - ({nil});
 }
 
 void check_config()
@@ -127,7 +127,7 @@ int skill_check(object attacker, object target)
 }
 
 private
-deferred_start_fight(object adv, object target)
+void deferred_start_fight(object adv, object target)
 {
    adv->start_fight(target);
 }
@@ -139,10 +139,30 @@ int special_check(object attacker, object target)
 }
 
 private
+void perform_special(object b, object selected_target)
+{
+   if (!selected_target)
+   {
+      TBUG("No target?");
+   }
+
+   // Target aquired at this point, must check reflex last since we spend reflex
+   // points when w check for them
+   if (!spend_reflex(b))
+   {
+      write("You do not have " + reflex_cost + " reflex points to do this.\n");
+      return;
+   }
+
+   special(b, selected_target);
+}
+
+private
 void main(string arg)
 {
    object b = this_body();
    object selected_target;
+   function finish;
 
    // We cannot be called without checking rank of other skill
    if (other_skill_rank && other_skill_name)
@@ -197,7 +217,7 @@ void main(string arg)
          if (selected_target->attackable() && selected_target != b)
          {
             if (starts_fight)
-               defer(( : deferred_start_fight, b, selected_target:));
+               finish = &deferred_start_fight(b, selected_target);
          }
          else
          {
@@ -205,7 +225,7 @@ void main(string arg)
                write(capitalize("You cannot attack yourself.\n"));
             else
                write(capitalize(selected_target->short()) + " cannot be attacked.\n");
-            selected_target = 0;
+            selected_target = nil;
             return;
          }
       }
@@ -234,24 +254,26 @@ void main(string arg)
       }
    }
 
-   if (!selected_target)
+   if (!finish)
    {
-      TBUG("No target?");
-   }
-
-   // Target aquired at this point, must check reflex last since we spend reflex
-   // points when w check for them
-   if (!spend_reflex(b))
-   {
-      write("You do not have " + reflex_cost + " reflex points to do this.\n");
+      perform_special(b, selected_target);
       return;
    }
 
-   special(b, selected_target);
+   mixed problem = catch(perform_special(b, selected_target));
+   // Starting combat belongs to this command's exit, including an error exit.
+   evaluate(finish);
+   if (problem)
+      throw(problem);
 }
 
 void create()
 {
    setup();
    check_config();
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

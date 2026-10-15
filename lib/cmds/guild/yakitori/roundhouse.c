@@ -64,7 +64,7 @@ void special(object attacker, object target)
       {
          attacker->targetted_action("$N roundhouse $vkick $p1 $o. Whap!", target, limb);
          target->hurt_us((rank * 7) + random(5), limb);
-         call_out("jab", 2, attacker, target);
+         call_out(&jab(attacker, target), 2);
       }
    }
 }

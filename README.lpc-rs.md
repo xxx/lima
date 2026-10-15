@@ -16,13 +16,12 @@ With the lpc-rs checkout beside this one and its CLI built, check a command with
 The last whole-library check, on 15 October 2026 before the todo/netstat batch,
 compiles **753 of 1,180 .c files** with no timeouts or crashes. A later 95-target
 command/support check reached 74/81 wizard commands after todo/netstat; the
-subsequent 104-target guild/governance check reaches **75/81**, with no regressions.
-Retained counts are player 65/67, guild 0/4, verbs 90/90, transitional 49/49 and
-transitional administrator 9/9. These
-standalone counts include optional and partial sources and are not a completion
-percentage. Six wizard and four guild commands remain with shared tool/special
-or driver-diagnostic dependencies. Experimental random2 remains deferred and
-suicide is disabled upstream.
+subsequent 104-target guild/governance check reaches **75/81**. The latest
+105-target SPECIAL check retains 75/81 wizard commands and reaches **4/4 guild
+commands**, with no regressions. Other retained counts are player 65/67, verbs 90/90, transitional 49/49 and
+transitional administrator 9/9. These standalone counts include optional and partial sources and are not a completion
+percentage. Six wizard commands remain with shared tool or driver-diagnostic
+dependencies. Experimental random2 remains deferred and suicide is disabled upstream.
 
 A fresh production-driver check passes 30 checkpoints covering account/character
 creation, menu, Grand Hall entry, look/inventory, logout and saved-account/body
@@ -49,7 +48,15 @@ restart pass. Ten known absent array values in the bundled guild save use explic
 nil; every other original byte and actual integer is preserved by that adaptation.
 The catalog retains its existing nosave declaration and rebuilds on restart. No
 native zero-import rule or class validation changes. Full mission/buff execution,
-guild rooms/NPCs and SPECIAL/defer remain separate from this foundation.
+guild rooms/NPCs remain separate from this foundation.
+
+All four guild special commands now compile through their shared SPECIAL base.
+Its single function-exit combat callback uses a local catch/cleanup/rethrow wrapper,
+retaining normal, early and error exits; no generic defer API is added. Controlled
+command-pipeline cases check cleanup order, nesting and error propagation, and the
+actual roundhouse callback retains its two-second delay. Registered shell checks
+exercise the four command gates. These checks do not qualify full special-combat
+gameplay or change existing targeting/reflex policy.
 
 The focused runtime counts below retain their original scopes. Mudlist passes
 13 cases using both actual shells; `su` passes refresh, race-change and password-
