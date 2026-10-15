@@ -145,5 +145,5 @@ void create(string g)
    if (!clonep())
       return;
    query_mission_ctrl();
-   call_out("artefact_message", 2, guild + " new buff \"" + name + "\"");
+   call_out(&artefact_message(guild + " new buff \"" + name + "\""), 2);
 }

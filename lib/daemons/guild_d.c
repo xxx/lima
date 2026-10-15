@@ -46,8 +46,6 @@ mapping guild_log = ([]);
 private
 mapping buff_list = ([]);
 private
-mapping guild_favours = ([]);
-private
 mapping guild_skills = ([]);
 private
 mapping guild_abbrevs = ([]);
@@ -112,7 +110,7 @@ void create()
 {
    set_privilege(1);
    restore_me();
-   call_out("internal_add_to_queue", 1);
+   call_out(internal_add_to_queue, 1);
    load_missions();
    load_favours();
 
@@ -184,7 +182,7 @@ string find_guild_dir(string g)
       if (gs && member_array(g, gs) != -1)
          return gdir;
    }
-   return 0;
+   return nil;
 }
 
 object *belongs_to(string guild)
@@ -304,7 +302,7 @@ void set_guild_title(string name, string title)
       error("insufficient privilege");
 
    guild_check(name);
-   DEFN(name)->guild_title = title;
+   DEFN(name).guild_title = title;
    save_me();
 }
 
@@ -314,7 +312,7 @@ void set_guild_banned(string name, string *banned...)
       error("insufficient privilege");
 
    guild_check(name);
-   DEFN(name)->guild_banned = banned;
+   DEFN(name).guild_banned = banned;
    save_me();
 }
 
@@ -324,7 +322,7 @@ void set_guild_prereq(string name, string *prereq...)
       error("insufficient privilege");
 
    guild_check(name);
-   DEFN(name)->guild_prereq = prereq;
+   DEFN(name).guild_prereq = prereq;
    save_me();
 }
 
@@ -334,7 +332,7 @@ void set_guild_allies(string name, string *allies...)
       error("insufficient privilege");
 
    guild_check(name);
-   DEFN(name)->guild_allies = allies;
+   DEFN(name).guild_allies = allies;
    save_me();
 }
 
@@ -344,7 +342,7 @@ void set_guild_exclusive(string name, string *exclusive...)
       error("insufficient privilege");
 
    guild_check(name);
-   DEFN(name)->guild_exclusive = exclusive;
+   DEFN(name).guild_exclusive = exclusive;
    save_me();
 }
 
@@ -354,7 +352,7 @@ void set_guild_attributes(string name, string *attributes...)
       error("insufficient privilege");
 
    guild_check(name);
-   DEFN(name)->guild_attributes = attributes;
+   DEFN(name).guild_attributes = attributes;
    save_me();
 }
 
@@ -364,7 +362,7 @@ void set_guild_begone(string name, int begone)
       error("insufficient privilege");
 
    guild_check(name);
-   DEFN(name)->guild_begone = begone;
+   DEFN(name).guild_begone = begone;
    save_me();
 }
 
@@ -374,7 +372,7 @@ void set_guild_suspend_level(string name, int suspend_level)
       error("insufficient privilege");
 
    guild_check(name);
-   DEFN(name)->guild_suspend_level = suspend_level;
+   DEFN(name).guild_suspend_level = suspend_level;
    save_me();
 }
 
@@ -384,7 +382,7 @@ void set_guild_prospectus(string name, string prospectus)
       error("insufficient privilege");
 
    guild_check(name);
-   DEFN(name)->guild_prospectus = prospectus;
+   DEFN(name).guild_prospectus = prospectus;
    save_me();
 }
 
@@ -394,7 +392,7 @@ void set_guild_sees_secret(string name, int sees_secret)
       error("insufficient privilege");
 
    guild_check(name);
-   DEFN(name)->guild_sees_secret = sees_secret;
+   DEFN(name).guild_sees_secret = sees_secret;
    save_me();
 }
 
@@ -404,7 +402,7 @@ void set_guild_is_secret(string name, int is_secret)
       error("insufficient privilege");
 
    guild_check(name);
-   DEFN(name)->guild_is_secret = is_secret;
+   DEFN(name).guild_is_secret = is_secret;
    save_me();
 }
 
@@ -414,7 +412,7 @@ void set_guild_need_all(string name, int need_all)
       error("insufficient privilege");
 
    guild_check(name);
-   DEFN(name)->guild_need_all = need_all;
+   DEFN(name).guild_need_all = need_all;
    save_me();
 }
 
@@ -424,86 +422,86 @@ void set_guild_tier(string name, int tier)
       error("insufficient privilege");
 
    guild_check(name);
-   DEFN(name)->guild_tier = tier;
+   DEFN(name).guild_tier = tier;
    save_me();
 }
 
 string query_guild_title(string name)
 {
    guild_check(name);
-   return DEFN(name)->guild_title;
+   return DEFN(name).guild_title;
 }
 
 string *query_guild_banned(string name)
 {
    guild_check(name);
-   return DEFN(name)->guild_banned;
+   return DEFN(name).guild_banned;
 }
 
 string *query_guild_prereq(string name)
 {
    guild_check(name);
-   return DEFN(name)->guild_prereq;
+   return DEFN(name).guild_prereq;
 }
 
 string *query_guild_allies(string name)
 {
    guild_check(name);
-   return DEFN(name)->guild_allies;
+   return DEFN(name).guild_allies;
 }
 
 string *query_guild_exclusive(string name)
 {
    guild_check(name);
-   return DEFN(name)->guild_exclusive;
+   return DEFN(name).guild_exclusive;
 }
 
 string *query_guild_attributes(string name)
 {
    guild_check(name);
-   return DEFN(name)->guild_attributes;
+   return DEFN(name).guild_attributes;
 }
 
 int query_guild_begone(string name)
 {
    guild_check(name);
-   return DEFN(name)->guild_begone;
+   return DEFN(name).guild_begone;
 }
 
 int query_guild_suspend_level(string name)
 {
    guild_check(name);
-   return DEFN(name)->guild_suspend_level;
+   return DEFN(name).guild_suspend_level;
 }
 
 string query_guild_prospectus(string name)
 {
    guild_check(name);
-   return DEFN(name)->guild_prospectus;
+   return DEFN(name).guild_prospectus;
 }
 
 int query_guild_sees_secret(string name)
 {
    guild_check(name);
-   return DEFN(name)->guild_sees_secret;
+   return DEFN(name).guild_sees_secret;
 }
 
 int query_guild_is_secret(string name)
 {
    guild_check(name);
-   return DEFN(name)->guild_is_secret;
+   return DEFN(name).guild_is_secret;
 }
 
 int query_guild_need_all(string name)
 {
    guild_check(name);
-   return DEFN(name)->guild_need_all;
+   return DEFN(name).guild_need_all;
 }
 
 int query_guild_tier(string name)
 {
    guild_check(name);
-   return DEFN(name)->guild_tier;
+   return DEFN(name).guild_tier;
 }
 
 /* given the player's current guilds, can they join the new one? */
@@ -517,13 +515,13 @@ mixed guild_is_ok(string name, string *player_guilds)
    guild_check(name);
 
    /* check the new guild's prerequisites against the current guilds */
-   prereq = DEFN(name)->guild_prereq;
+   prereq = DEFN(name).guild_prereq;
    if (prereq)
    {
       string *common = prereq & player_guilds;
 
       /* do we have to have ALL the prereqs? or just one? */
-      if (DEFN(name)->guild_need_all)
+      if (DEFN(name).guild_need_all)
       {
          if (sizeof(common) != sizeof(prereq))
          {
@@ -549,14 +547,14 @@ mixed guild_is_ok(string name, string *player_guilds)
    ** are banned (the player cannot be in ANY guilds except the guilds
    ** that are prerequisites).
    */
-   banned = DEFN(name)->guild_banned;
+   banned = DEFN(name).guild_banned;
    if (sizeof(banned) && banned[0] == "all" && sizeof(player_guilds - prereq))
    {
       return "cannot join while a member of other guilds";
    }
 
-   exclusive = DEFN(name)->guild_exclusive;
-   sees_secret = DEFN(name)->guild_sees_secret;
+   exclusive = DEFN(name).guild_exclusive;
+   sees_secret = DEFN(name).guild_sees_secret;
 
    foreach (string item in player_guilds)
    {
@@ -565,20 +563,20 @@ mixed guild_is_ok(string name, string *player_guilds)
       /* if this item is in the new guild's banned list, punt */
       if (banned && member_array(item, banned) != -1)
       {
-         return DEFN(item)->guild_title;
+         return DEFN(item).guild_title;
       }
 
       /* if the guild in question has secret attrs and we can't see them,
      then skip it and go on to the next guild */
-      if (!sees_secret && DEFN(item)->guild_is_secret)
+      if (!sees_secret && DEFN(item).guild_is_secret)
          continue;
 
       /* if any attributes are in common between the excluded list and
      the guild's attributes, then punt */
-      attributes = DEFN(item)->guild_attributes;
+      attributes = DEFN(item).guild_attributes;
       if (exclusive && attributes && sizeof(exclusive & attributes) > 0)
       {
-         return DEFN(item)->guild_title;
+         return DEFN(item).guild_title;
       }
    }
 
@@ -676,13 +674,13 @@ string *query_guilds()
 
 int state_update()
 {
-   active_missions -= ({0});
+   active_missions -= ({nil});
    foreach (object mis_ob in active_missions)
    {
       if (mis_ob && !mis_ob->run_mission())
          mis_ob->end_mission();
    }
-   active_buffs -= ({0});
+   active_buffs -= ({nil});
    foreach (object buff in active_buffs)
    {
       if (buff && !buff->apply_favour())

@@ -156,7 +156,7 @@ void remove()
       GUILD_D->add_log(guild, "Tier " + tier + " mission '" + name + "' failed.");
    artefact_message(guild + " mission ended. Thank you for your assistance");
    query_mission_ctrl()->end_mission();
-   call_out("real_remove", 5);
+   call_out(real_remove, 5);
 }
 
 string query_name()
@@ -181,7 +181,7 @@ void begin_mission()
 
 void end_mission()
 {
-   call_out("remove", 10);
+   call_out(remove, 10);
 }
 
 void create(string g)
@@ -193,6 +193,6 @@ void create(string g)
       return;
    query_mission_ctrl();
 
-   call_out("artefact_message", 2, guild + " mission just started. Tune into our channel");
+   call_out(&artefact_message(guild + " mission just started. Tune into our channel"), 2);
    begin_mission();
 }

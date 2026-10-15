@@ -11,7 +11,7 @@ string hiscore_who;
 int hiscore;
 mapping scraps_received = ([]);
 
-void setup()
+void setup(string g)
 {
    set_length(15);
    set_mission_data(1, "Making Bullets");

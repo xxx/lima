@@ -47,7 +47,7 @@ int remove_manager(string what, string manager)
 {
    int s = sizeof(managers[what]);
    if (!managers[what])
-      return;
+      return 0;
    managers[what] -= ({manager});
    save_me();
    return sizeof(managers);

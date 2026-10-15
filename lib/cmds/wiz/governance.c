@@ -85,18 +85,18 @@ varargs void gather_info(string g, int step, string last, string s)
       {
          if (strlen(s))
             write("** Invalid option '" + s + "', 'q' to quit.\n");
-         modal_simple(( : gather_info, g, 1, "" :), PROMPT);
+         modal_simple(&gather_info(g, 1, ""), PROMPT);
          return;
       }
       if (s == "p")
       {
          print_guilds();
-         modal_simple(( : gather_info, g, 1, "" :), PROMPT);
+         modal_simple(&gather_info(g, 1, ""), PROMPT);
          return;
       }
       if (s == "q")
          return;
-      modal_simple(( : gather_info, g, 2, s:), "Enter name >");
+      modal_simple(&gather_info(g, 2, s), "Enter name >");
       break;
    case 2:
       if (last == "l")
@@ -119,7 +119,7 @@ varargs void gather_info(string g, int step, string last, string s)
 
       cache_governance();
       gather_info(g, 0, "");
-      modal_simple(( : gather_info, g, 1, "" :), PROMPT);
+      modal_simple(&gather_info(g, 1, ""), PROMPT);
       break;
    }
 }
@@ -133,9 +133,14 @@ void main(string arg)
    if (strlen(arg) && member_array(arg, guilds) != -1)
    {
       gather_info(arg, 0, "");
-      modal_simple(( : gather_info, arg, 1, "" :), PROMPT);
+      modal_simple(&gather_info(arg, 1, ""), PROMPT);
       return;
    }
 
    print_guilds();
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }

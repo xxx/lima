@@ -7,7 +7,7 @@ string hiscore_who;
 int hiscore;
 mapping wood_received = ([]);
 
-void setup()
+void setup(string g)
 {
    set_length(60);
    set_mission_data(2, "Wood gathering (Large)");

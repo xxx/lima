@@ -2,7 +2,7 @@ inherit "/domains/std/guild/favour/std_favour";
 
 // FAVOUR: XP Buff Small
 
-void setup()
+void setup(string g)
 {
    set_mission_data(1, "XP Buff Small");
    set_length(30);
