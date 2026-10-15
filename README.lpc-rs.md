@@ -1091,6 +1091,20 @@ prematurely. Six focused checks include sixteen positive complete compile checks
 and five following shell inputs. Callback execution is explicit; broker timing,
 arbitrary expression syntax and trigger-engine changes require their own review.
 
+`smartmobs` adds protected CMD dispatch; its report logic and formatting stay
+unchanged. The empty report prints the Object/Parses/Env/Mood header and ignores
+raw arguments. Direct printf bypasses command output buffers: overwrite/pipe
+destinations stay empty, append retains existing text, and incoming text is ignored.
+The audit's four focused checks cover fourteen shell inputs and thirteen positive complete
+compile checks, with two expected original compilation failures.
+
+Populated reports remain unqualified. The actual BEHAVIOUR_TREE Goblin host fails
+compilation in the navigation cluster; a temporary assignment-parentheses fix
+exposes base-cluster nil/callback/optional-separator adaptations. M_SMARTMOVE alone
+does not provide is_smart, parses_made or emotion_string. Those real behavior-tree
+dependencies need their own port before populated rows or running AI can be tested.
+No native API or AI engine change is included in this adaptation.
+
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 

@@ -26,3 +26,8 @@ void main(string str)
       printf("%-50.50O %-7d %-20.20s %s", s, parses_made, env, mood);
    }
 }
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
+}
