@@ -75,7 +75,7 @@ nomask rcv_min_level(string mission, string giver, string controller, string min
       return;
    }
 
-   modal_simple(( : rcv_max_level, mission, giver, controller, min_level_int:), "Minimum level required? ");
+   modal_simple(&rcv_max_level(mission, giver, controller, min_level_int), "Maximum level required? ");
 }
 
 private
@@ -97,7 +97,7 @@ nomask rcv_controller(string mission, string giver, string controller)
 
    controller = absolute_path(controller) + ".c";
 
-   modal_simple(( : rcv_min_level, mission, giver, controller:), "Minimum level required? ");
+   modal_simple(&rcv_min_level(mission, giver, controller), "Minimum level required? ");
 }
 
 private
@@ -119,30 +119,26 @@ nomask rcv_giver(string mission, string giver)
 
    giver = absolute_path(giver) + ".c";
 
-   modal_simple(( : rcv_controller, mission, giver:), "Filename for the controller? ");
+   modal_simple(&rcv_controller(mission, giver), "Filename for the controller? ");
 }
 
 private
 nomask void rcv_add_mission(string mission_name)
 {
-   string *result;
-
    mission_name = lower_case(trim(mission_name));
    if (mission_name == "")
       return;
 
-   modal_simple(( : rcv_giver, mission_name:), "Filename for mission giver? ");
+   modal_simple(&rcv_giver(mission_name), "Filename for mission giver? ");
 }
 
 private
 nomask void rcv_remove_mission(string mission_name)
 {
-   string *result;
-
    mission_name = lower_case(trim(mission_name));
 
-   result = MISSION_D->unregister_mission(mission_name);
-   if (!result)
+   int removed = MISSION_D->unregister_mission(mission_name);
+   if (!removed)
       write("ERROR: '" + mission_name + "' no such mission exists.\n");
    else
       printf("Removed mission '%s'.\n", mission_name);
@@ -153,20 +149,17 @@ nomask class command_info *module_commands()
    return ({new (class command_info, key
                  : "l", desc
                  : "list missions", action
-                 : (
-                     : list_missions:)),
+                 : list_missions),
             new (class command_info, key
                  : "a", proto
                  : "[name]", desc
                  : "add a mission", args
                  : ({"New mission name? "}), action
-                 : (
-                     : rcv_add_mission:)),
+                 : rcv_add_mission),
             new (class command_info, key
                  : "r", proto
                  : "[name]", desc
                  : "remove a mission", args
                  : ({"Remove which mission? "}), action
-                 : (
-                     : rcv_remove_mission:))});
+                 : rcv_remove_mission)});
 }

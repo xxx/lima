@@ -114,7 +114,7 @@ int quest_exists(string d, string q)
 {
    if (!quests[d])
       return 0;
-   return quests[d][q];
+   return !!quests[d][q];
 }
 
 mapping query_quests()

@@ -28,7 +28,7 @@ string *create_footer(mapping config)
    return ({"", "#endif /* __" + include_name + "__ */", ""});
 }
 
-string *create_config(mapping config)
+string create_config(mapping config)
 {
    string *out;
    if (!config || !mappingp(config) || !has_key(config, "config"))
@@ -38,9 +38,9 @@ string *create_config(mapping config)
 
    foreach (string key in sort_array(keys(config), 1))
    {
-      class config c = config[key];
       if (key == "config")
          continue;
+      class config c = config[key];
       out += ({"", "// " + c.text, DEFAULT_PREAMBLE + " " + c.default_value});
       if (c.range)
          out += ({RANGE_PREAMBLE + " " + c.range});
@@ -93,7 +93,7 @@ mapping read_config(string f)
             c.type = (default_value == "yes" || default_value == "no" ? "boolean"
                                                                       : (strsrch(value, "\"") != -1 ? "string" : type));
 
-            helptext = default_value = range = type = 0;
+            helptext = default_value = range = type = nil;
             config["" + sprintf("%3.3d", count)] = c;
             count++;
          }
@@ -106,11 +106,11 @@ mapping read_config(string f)
             c.default_value = default_value;
             c.type = (default_value == "yes" || default_value == "no" ? "boolean" : type);
 
-            helptext = default_value = range = type = 0;
+            helptext = default_value = range = type = nil;
             config["" + sprintf("%3.3d", count)] = c;
             count++;
          }
       }
    }
-   return valid ? config : 0;
+   return valid ? config : nil;
 }

@@ -93,7 +93,7 @@ nomask void show_guild(string name)
       str += temp;
    }
    str += "Begone level: " + GUILD_D->query_guild_begone(name) + "\n";
-   str += "Suspend level: " + GUILD_D->query_guild_suspend(name) + "\n";
+   str += "Suspend level: " + GUILD_D->query_guild_suspend_level(name) + "\n";
    if (GUILD_D->query_guild_sees_secret(name))
       str += "Sees secret.\n";
    else
@@ -132,7 +132,7 @@ nomask void set_title2(string name, string title)
 private
 nomask void set_title(string name)
 {
-   modal_simple(( : set_title2, name:), "Title? ");
+   modal_simple(&set_title2(name), "Title? ");
 }
 
 private
@@ -145,7 +145,7 @@ private
 nomask void prospectus(string name)
 {
    write("Prospectus for guild " + name + ":\n");
-   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : send_prospectus, name:));
+   clone_object (EDIT_OB, EDIT_TEXT, 0, &send_prospectus(name));
 }
 
 private
@@ -156,7 +156,7 @@ nomask void ban(string name, string guild)
       GUILD_D->set_guild_banned(name, guild);
       return;
    }
-   GUILD_D->set_guild_banned(name, GUILD_D->query_guild_banned(name) + ({guild}));
+   GUILD_D->set_guild_banned(name, (GUILD_D->query_guild_banned(name) + ({guild}))...);
 }
 
 private
@@ -167,7 +167,7 @@ nomask void prereq(string name, string guild)
       GUILD_D->set_guild_prereq(name, guild);
       return;
    }
-   GUILD_D->set_guild_prereq(name, GUILD_D->query_guild_prereq(name) + ({guild}));
+   GUILD_D->set_guild_prereq(name, (GUILD_D->query_guild_prereq(name) + ({guild}))...);
 }
 
 private
@@ -178,7 +178,7 @@ nomask void ally(string name, string guild)
       GUILD_D->set_guild_allies(name, guild);
       return;
    }
-   GUILD_D->set_guild_allies(name, GUILD_D->query_guild_allies(name) + ({guild}));
+   GUILD_D->set_guild_allies(name, (GUILD_D->query_guild_allies(name) + ({guild}))...);
 }
 
 private
@@ -189,7 +189,7 @@ nomask void exclude(string name, string attr)
       GUILD_D->set_guild_exclusive(name, attr);
       return;
    }
-   GUILD_D->set_guild_exclusive(name, GUILD_D->query_guild_exclusive(name) + ({attr}));
+   GUILD_D->set_guild_exclusive(name, (GUILD_D->query_guild_exclusive(name) + ({attr}))...);
 }
 
 private
@@ -200,7 +200,7 @@ nomask void attrib(string name, string attr)
       GUILD_D->set_guild_attributes(name, attr);
       return;
    }
-   GUILD_D->set_guild_attributes(name, GUILD_D->query_guild_attributes(name) + ({attr}));
+   GUILD_D->set_guild_attributes(name, (GUILD_D->query_guild_attributes(name) + ({attr}))...);
 }
 
 private
@@ -212,7 +212,7 @@ nomask void begone(string name, string level)
 private
 nomask void suspend(string name, string level)
 {
-   GUILD_D->set_guild_suspend(name, to_int(level));
+   GUILD_D->set_guild_suspend_level(name, to_int(level));
 }
 
 private
@@ -266,15 +266,13 @@ nomask class command_info *module_commands()
        new (class command_info, key
             : "l", desc
             : "list guilds", action
-            : (
-                : list_guilds:)),
+            : list_guilds),
        new (class command_info, key
             : "v", proto
             : "[name]", desc
             : "View a guild", args
             : ({"Which guild? "}), action
-            : (
-                : show_guild:)),
+            : show_guild),
        new (class command_info, key
             : "g", proto
             : "[name]", desc
@@ -282,8 +280,7 @@ nomask class command_info *module_commands()
             : "[Mudlib]", priv
             : "Mudlib", args
             : ({"What name? "}), action
-            : (
-                : add_guild:)),
+            : add_guild),
        new (class command_info, key
             : "r", proto
             : "[name]", desc
@@ -291,8 +288,7 @@ nomask class command_info *module_commands()
             : "[Mudlib]", priv
             : "Mudlib", args
             : ({"What name? "}), action
-            : (
-                : remove_guild:)),
+            : remove_guild),
        new (class command_info, key
             : "t", proto
             : "[name]", desc
@@ -300,8 +296,7 @@ nomask class command_info *module_commands()
             : "[Mudlib]", priv
             : "Mudlib", args
             : ({"What name? "}), action
-            : (
-                : set_title:)),
+            : set_title),
        new (class command_info, key
             : "p", proto
             : "[name]", desc
@@ -309,8 +304,7 @@ nomask class command_info *module_commands()
             : "[Mudlib]", priv
             : "Mudlib", args
             : ({"What name? "}), action
-            : (
-                : prospectus:)),
+            : prospectus),
        new (class command_info, key
             : "b", proto
             : "[name] [guild to be banned]", desc
@@ -318,8 +312,7 @@ nomask class command_info *module_commands()
             : "[Mudlib]", priv
             : "Mudlib", args
             : ({"What name? ", "Which guild? "}), action
-            : (
-                : ban:)),
+            : ban),
        new (class command_info, key
             : "P", proto
             : "[name] [guild to be needed]", desc
@@ -327,8 +320,7 @@ nomask class command_info *module_commands()
             : "[Mudlib]", priv
             : "Mudlib", args
             : ({"What name? ", "Which guild? "}), action
-            : (
-                : prereq:)),
+            : prereq),
        new (class command_info, key
             : "A", proto
             : "[name] [ally]", desc
@@ -336,8 +328,7 @@ nomask class command_info *module_commands()
             : "[Mudlib]", priv
             : "Mudlib", args
             : ({"What name? ", "Which guild? "}), action
-            : (
-                : ally:)),
+            : ally),
        new (class command_info, key
             : "e", proto
             : "[name] [attribute]", desc
@@ -345,8 +336,7 @@ nomask class command_info *module_commands()
             : "[Mudlib]", priv
             : "Mudlib", args
             : ({"What name? ", "Which attribute? "}), action
-            : (
-                : exclude:)),
+            : exclude),
        new (class command_info, key
             : "a", proto
             : "[name] [attribute]", desc
@@ -354,8 +344,7 @@ nomask class command_info *module_commands()
             : "[Mudlib]", priv
             : "Mudlib", args
             : ({"What name? ", "Which attribute? "}), action
-            : (
-                : attrib:)),
+            : attrib),
        new (class command_info, key
             : "B", proto
             : "[name] [level]", desc
@@ -363,8 +352,7 @@ nomask class command_info *module_commands()
             : "[Mudlib]", priv
             : "Mudlib", args
             : ({"What name? ", "Begone level? "}), action
-            : (
-                : begone:)),
+            : begone),
        new (class command_info, key
             : "s", proto
             : "[name] [level]", desc
@@ -372,8 +360,7 @@ nomask class command_info *module_commands()
             : "[Mudlib]", priv
             : "Mudlib", args
             : ({"What name? ", "Suspend level? "}), action
-            : (
-                : suspend:)),
+            : suspend),
        new (class command_info, key
             : "S", proto
             : "[name]", desc
@@ -381,8 +368,7 @@ nomask class command_info *module_commands()
             : "[Mudlib]", priv
             : "Mudlib", args
             : ({"What name? "}), action
-            : (
-                : see_secret:)),
+            : see_secret),
        new (class command_info, key
             : "i", proto
             : "[name]", desc
@@ -390,8 +376,7 @@ nomask class command_info *module_commands()
             : "[Mudlib]", priv
             : "Mudlib", args
             : ({"What name? "}), action
-            : (
-                : is_secret:)),
+            : is_secret),
        new (class command_info, key
             : "n", proto
             : "[name]", desc
@@ -399,7 +384,6 @@ nomask class command_info *module_commands()
             : "[Mudlib]", priv
             : "Mudlib", args
             : ({"What name? "}), action
-            : (
-                : need_all:)),
+            : need_all),
    });
 }

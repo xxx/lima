@@ -44,8 +44,7 @@ nomask class command_info *module_commands()
        new (class command_info, key
             : "l", desc
             : "list damage types", action
-            : (
-                : list_damage_types:)),
+            : list_damage_types),
        new (class command_info, key
             : "a", proto
             : "[name]", desc
@@ -53,8 +52,7 @@ nomask class command_info *module_commands()
             : "[Mudlib]", priv
             : "Mudlib", args
             : ({"What name? "}), action
-            : (
-                : add_damage_type:)),
+            : add_damage_type),
        new (class command_info, key
             : "r", proto
             : "[name]", desc
@@ -62,7 +60,6 @@ nomask class command_info *module_commands()
             : "[Mudlib]", priv
             : "Mudlib", args
             : ({"What name? "}), action
-            : (
-                : remove_damage_type:)),
+            : remove_damage_type),
    });
 }

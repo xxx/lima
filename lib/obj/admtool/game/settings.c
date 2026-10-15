@@ -41,6 +41,8 @@ void get_config_setting(string key, class config c, mixed result)
    if (stringp(result) && result == "q")
    {
       write("Aborting ...");
+      settings = nil;
+      new_settings = ([]);
       return;
    }
 
@@ -97,21 +99,21 @@ void save_config(string input)
    {
       string file_contents = config_ed->create_config(new_settings);
       string file_name = new_settings["config"];
-      unguarded(1, ( : write_file, file_name, file_contents, 1 :));
+      unguarded(1, &write_file(file_name, file_contents, 1));
       write("Saved to " + file_name + ".");
-      settings = 0;
+      settings = nil;
       new_settings = ([]);
       return;
    }
    write("Aborting ...");
-   settings = 0;
+   settings = nil;
    new_settings = ([]);
 }
 
 private
 varargs void configure_file(string selection)
 {
-   int s = to_int(selection);
+   int s = selection ? to_int(selection) : 0;
    class config c;
    string key;
 
@@ -129,7 +131,7 @@ varargs void configure_file(string selection)
 
    if (!sizeof(keys(settings)))
    {
-      input_one_arg("%^YELLOW%^Save changes?%^RESET%^ (y/N): ", ( : save_config:));
+      input_one_arg("%^YELLOW%^Save changes?%^RESET%^ (y/N): ", save_config);
       return;
    }
 
@@ -149,15 +151,15 @@ varargs void configure_file(string selection)
    {
    case "integer":
       write("(Default: " + c.default_value + ", Value: " + c.current_value + ")");
-      input_one_arg("[" + c.range + "]: ", ( : get_config_setting, key, c:));
+      input_one_arg("[" + c.range + "]: ", &get_config_setting(key, c));
       break;
    case "boolean":
       write("(Default is: " + c.default_value + ", Value: " + (c.define == 1 ? "yes" : "no") + ")");
-      input_one_arg("[y/n]: ", ( : get_config_setting, key, c:));
+      input_one_arg("[y/n]: ", &get_config_setting(key, c));
       break;
    case "string":
       write("(Default is: \"" + c.default_value + "\", Value: " + (c.current_value) + ")");
-      input_one_arg("(String): ", ( : get_config_setting, key, c:));
+      input_one_arg("(String): ", &get_config_setting(key, c));
       break;
    }
 }
@@ -169,7 +171,7 @@ void select_file()
          "the changes. After changing settings here, reboot " +
          mud_name() + ".\nType 'q' at any time to abort.%^RESET%^\n");
    list_configs();
-   input_one_arg("Which file do you want to configure? ", ( : configure_file:));
+   input_one_arg("Which file do you want to configure? ", configure_file);
 }
 
 nomask class command_info *module_commands()
@@ -181,12 +183,10 @@ nomask class command_info *module_commands()
        new (class command_info, key
             : "l", desc
             : "list config files", action
-            : (
-                : list_configs:)),
+            : list_configs),
        new (class command_info, key
             : "c", desc
             : "configure config file", action
-            : (
-                : select_file:)),
+            : select_file),
    });
 }

@@ -26,10 +26,10 @@ nomask void list_skills()
 
    result = ({sprintf("%-20s %s", "Skill", "Internal name"), ("-" * 40)}) +
             map(
-                skills, function(string name) {
+                skills, (: [string name] {
                    string *parts = explode(name, "/");
                    return sprintf("%-20s %s", ("   " * (sizeof(parts) - 1)) + parts[ < 1], name);
-                });
+                } :));
 
    more(result);
 }
@@ -47,7 +47,7 @@ nomask void rcv_add_skill(string skill_name)
    if (!result)
       write("ERROR: skill already exists.\n");
    else
-      printf("Added: %s.\n", format_list(result));
+      printf("Added: %s.\n", format_list(result, nil));
 }
 
 private
@@ -61,7 +61,7 @@ nomask void rcv_remove_skill(string skill_name)
    if (!result)
       write("ERROR: no such skill exists.\n");
    else
-      printf("Removed: %s.\n", format_list(result));
+      printf("Removed: %s.\n", format_list(result, nil));
 }
 
 nomask class command_info *module_commands()
@@ -69,20 +69,17 @@ nomask class command_info *module_commands()
    return ({new (class command_info, key
                  : "l", desc
                  : "list skills", action
-                 : (
-                     : list_skills:)),
+                 : list_skills),
             new (class command_info, key
                  : "a", proto
                  : "[name]", desc
                  : "add a skill", args
                  : ({"New skill name? "}), action
-                 : (
-                     : rcv_add_skill:)),
+                 : rcv_add_skill),
             new (class command_info, key
                  : "r", proto
                  : "[name]", desc
                  : "remove a skill", args
                  : ({"Remove which skill? "}), action
-                 : (
-                     : rcv_remove_skill:))});
+                 : rcv_remove_skill)});
 }

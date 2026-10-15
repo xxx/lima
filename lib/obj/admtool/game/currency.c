@@ -50,11 +50,13 @@ private
 nomask void set_exchange_rate(string type, string rate_str)
 {
    int rate = to_int(rate_str);
-   MONEY_D->set_exchange_rate(type, rate);
    if (rate < 1)
       printf("The exchange rate has to be at least 1\n");
    else
+   {
+      MONEY_D->set_exchange_rate(type, rate);
       printf("Exchange rate for \"%s\" set to %d.\n", type, rate);
+   }
 }
 
 private
@@ -90,7 +92,7 @@ nomask void add_denomination2(string type, string name, string plural, string fa
 private
 nomask void add_denomination1(string type, string name)
 {
-   input_two_args("Plural of denomination? ", "Exchange rate factor? ", ( : add_denomination2, type, name:));
+   input_two_args("Plural of denomination? ", "Exchange rate factor? ", &add_denomination2(type, name));
 }
 
 private
@@ -115,8 +117,7 @@ nomask class command_info *module_commands()
        new (class command_info, key
             : "c", desc
             : "list currencies", action
-            : (
-                : list_currencies:)),
+            : list_currencies),
        new (class command_info, key
             : "A", proto
             : "[type] [plural name]", desc
@@ -124,8 +125,7 @@ nomask class command_info *module_commands()
             : "[Mudlib:daemons]", priv
             : "Mudlib:daemons", args
             : ({"What type? ", "What plural name? "}), action
-            : (
-                : add_currency:)),
+            : add_currency),
        new (class command_info, key
             : "R", proto
             : "[type]", desc
@@ -133,8 +133,7 @@ nomask class command_info *module_commands()
             : "[Mudlib:daemons]", priv
             : "Mudlib:daemons", args
             : ({"What type? "}), action
-            : (
-                : remove_currency:)),
+            : remove_currency),
        new (class command_info, key
             : "e", proto
             : "[type] [rate]", desc
@@ -142,15 +141,13 @@ nomask class command_info *module_commands()
             : "[Mudlib:daemons]", priv
             : "Mudlib:daemons", args
             : ({"What type? ", "What rate? "}), action
-            : (
-                : set_exchange_rate:)),
+            : set_exchange_rate),
        new (class command_info, key
             : "d", proto
             : "[type]", desc
             : "list denominations", args
             : ({"What type? "}), action
-            : (
-                : list_denomination:)),
+            : list_denomination),
        new (class command_info, key
             : "a", proto
             : "[type] [denomination]", desc
@@ -158,8 +155,7 @@ nomask class command_info *module_commands()
             : "Mudlib:daemons", who
             : "[Mudlib:daemons]", args
             : ({"What type? ", "Add which denomination? "}), action
-            : (
-                : add_denomination1:)),
+            : add_denomination1),
        new (class command_info, key
             : "", desc
             : "(creates currency type if needed)"),
@@ -170,7 +166,6 @@ nomask class command_info *module_commands()
             : "Mudlib:daemons", who
             : "[Mudlib:daemons]", args
             : ({"Remove which denomination? "}), action
-            : (
-                : remove_denomination:)),
+            : remove_denomination),
    });
 }

@@ -269,7 +269,7 @@ void add_denomination(string type, string name, string plural, float factor)
    else
    {
       denominations[type] |= ({name});
-      denominations[type] = sort_array(denominations[type], ( : compare_denominations:));
+      denominations[type] = sort_array(denominations[type], compare_denominations);
    }
    save_me();
 }

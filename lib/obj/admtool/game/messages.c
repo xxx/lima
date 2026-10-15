@@ -43,20 +43,17 @@ nomask class command_info *module_commands()
        new (class command_info, key
             : "l", desc
             : "list message set and types", action
-            : (
-                : stat_messages:)),
+            : stat_messages),
        new (class command_info, key
             : "r", desc
             : "refresh messages", action
-            : (
-                : refresh_messages:)),
+            : refresh_messages),
        new (class command_info, key
             : "t", proto
             : "[msg type]", desc
             : "test message type", args
-            : ({"Which msg?\n" + format_list(MESSAGES_D->combat_messages())}), action
-            : (
-                : test_message:)),
+            : ({"Which msg?\n" + format_list(MESSAGES_D->combat_messages(), nil)}), action
+            : test_message),
 
    });
 }

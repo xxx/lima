@@ -34,17 +34,17 @@ nomask void print_body(string cmd, string bodytype)
       foreach (string key, class limb val in body_info)
       {
          string *type = ({});
-         if (LIMB_VITAL & val->flags)
+         if (LIMB_VITAL & val.flags)
             type += ({"vital"});
-         if (LIMB_WIELDING & val->flags)
+         if (LIMB_WIELDING & val.flags)
             type += ({"wielding"});
-         if (LIMB_MOBILE & val->flags)
+         if (LIMB_MOBILE & val.flags)
             type += ({"mobile"});
-         if (LIMB_SYSTEM & val->flags)
+         if (LIMB_SYSTEM & val.flags)
             type += ({"system"});
-         if (LIMB_ATTACKING & val->flags)
+         if (LIMB_ATTACKING & val.flags)
             type += ({"attacking"});
-         output += sprintf("%-20s %-15d %-15s %-15s\n", key, val->health, val->parent ? val->parent : "None",
+         output += sprintf("%-20s %-15d %-15s %-15s\n", key, val.health, val.parent ? val.parent : "None",
                            implode(type, ", "));
       }
    else
@@ -79,7 +79,7 @@ nomask void set_limb_flags(string bodytype, string limb, int health, string pare
    {
       if (limbflags > 31)
       {
-         input_one_arg("Limb flags cannot sum to more than 31: ", ( : set_limb_flags, bodytype, limb, health, parent:));
+         input_one_arg("Limb flags cannot sum to more than 31: ", &set_limb_flags(bodytype, limb, health, parent));
          return;
       }
    }
@@ -108,8 +108,7 @@ nomask void set_limb_flags(string bodytype, string limb, int health, string pare
          default:
             input_one_arg("Only 'vital', 'wielding', 'mobile', 'attacking' and 'system' flags are allowed\n"
                           "Please reenter: ",
-                          (
-                              : set_limb_flags, bodytype, limb, health, parent:));
+                          &set_limb_flags(bodytype, limb, health, parent));
             return;
          }
       }
@@ -120,8 +119,10 @@ nomask void set_limb_flags(string bodytype, string limb, int health, string pare
 private
 nomask void set_limb_parent(string bodytype, string limb, int health, string parent)
 {
+   if (parent == "")
+      parent = nil;
 
-   input_one_arg("Limb Flags: ", ( : set_limb_flags, bodytype, limb, health, parent:));
+   input_one_arg("Limb Flags: ", &set_limb_flags(bodytype, limb, health, parent));
 }
 
 private
@@ -129,10 +130,10 @@ nomask void set_limb_health(string bodytype, string limb, string health)
 {
    if (!to_int(health))
    {
-      input_one_arg("You must enter an integer value: ", ( : set_limb_health, bodytype, limb:));
+      input_one_arg("You must enter an integer value: ", &set_limb_health(bodytype, limb));
       return;
    }
-   input_one_arg("Parent Limb: ", ( : set_limb_parent, bodytype, limb, to_int(health) :));
+   input_one_arg("Parent Limb: ", &set_limb_parent(bodytype, limb, to_int(health)));
 }
 
 private
@@ -144,7 +145,7 @@ nomask void add_limb(string cmd, string bodytype, string limb)
       write("That body does not exist.\n");
       return;
    }
-   input_one_arg("Health: ", ( : set_limb_health, bodytype, limb:));
+   input_one_arg("Health: ", &set_limb_health(bodytype, limb));
 }
 
 private
@@ -184,50 +185,39 @@ nomask class command_info *module_commands()
                  : "p", proto
                  : "[bodytype]", args
                  : ({"Bodytype: "}), action
-                 : (
-                       : print_body, "p"
-                       :),
+                 : &print_body("p"),
                    desc
                  : "print body type"),
             new (class command_info, key
                  : "l", desc
                  : "list body types", action
-                 : (
-                     : list_body_types:)),
+                 : list_body_types),
             new (class command_info, key
                  : "a", proto
                  : "[bodytype] [limb]", args
                  : ({"Bodytype: ", "Limb: "}), action
-                 : (
-                       : add_limb, "a"
-                       :),
+                 : &add_limb("a"),
                    desc
                  : "add limb to body type"),
             new (class command_info, key
                  : "r", proto
                  : "[bodytype] [limb]", args
                  : ({"Bodytype: ", "Limb: "}), action
-                 : (
-                       : remove_limb, "r"
-                       :),
+                 : &remove_limb("r"),
                    desc
                  : "remove limb from body type"),
             new (class command_info, key
                  : "A", proto
                  : "[bodytype]", args
                  : ({"Bodytype: "}), action
-                 : (
-                       : add_body, "R"
-                       :),
+                 : &add_body("R"),
                    desc
                  : "add body type"),
             new (class command_info, key
                  : "R", proto
                  : "[bodytype]", args
                  : ({"Bodytype: "}), action
-                 : (
-                       : remove_body, "R"
-                       :),
+                 : &remove_body("R"),
                    desc
                  : "remove body type")});
 }

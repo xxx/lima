@@ -15,7 +15,7 @@ nomask string module_key()
 private
 nomask void list_quests()
 {
-   more(QUEST_D->quest_dump());
+   more(QUEST_D->quest_dump(nil));
 }
 
 private
@@ -23,7 +23,7 @@ nomask void get_milestone(string domain, string quest_name, int value, string fi
 {
    if (!stringp(s) || !strlen(s))
    {
-      s = 0;
+      s = nil;
    }
    QUEST_D->add_quest(domain, quest_name, value, file, s);
 
@@ -41,8 +41,7 @@ nomask void get_master(string domain, string quest_name, int value, string maste
       return;
    }
 
-   modal_simple((
-                    : get_milestone, domain, quest_name, value, file:),
+   modal_simple(&get_milestone(domain, quest_name, value, file),
                 "If this is a quest endpoint, give a one line description of the quest for\nplayers, or else hit enter "
                 "(and nothing else!): ");
 }
@@ -52,7 +51,7 @@ nomask void get_value(string domain, string quest_name, string pts_as_string)
 {
    int value = to_int(pts_as_string);
    printf("Quest %s' value is set at %d points.\n", quest_name, value);
-   modal_simple(( : get_master, domain, quest_name, value:), "What file can dole out these points? ");
+   modal_simple(&get_master(domain, quest_name, value), "What file can dole out these points? ");
 }
 
 private
@@ -70,13 +69,13 @@ nomask void add_quest(string domain, string name)
       write("Not a valid quest name.\n");
       return;
    }
-   if (QUEST_D->quest_exists(name))
+   if (QUEST_D->quest_exists(domain, name))
    {
       write("That quest already exists.\n");
       return;
    }
 
-   modal_simple(( : get_value, domain, name:), "How many points is this quest item worth? ");
+   modal_simple(&get_value(domain, name), "How many points is this quest item worth? ");
 }
 
 private
@@ -87,13 +86,13 @@ nomask void add_quest_name(string domain, string name)
       write("Not a valid quest name.\n");
       return;
    }
-   if (QUEST_D->quest_exists(name))
+   if (QUEST_D->quest_exists(domain, name))
    {
       write("That quest already exists.\n");
       return;
    }
 
-   modal_simple(( : get_quest_name, domain, name:), "What name should players see? ");
+   modal_simple(&get_quest_name(domain, name), "What name should players see? ");
 }
 
 private
@@ -105,8 +104,7 @@ nomask void add_quest_domain(string domain)
       return;
    }
 
-   modal_simple((
-                    : add_quest, domain:),
+   modal_simple(&add_quest(domain),
                 "Format: [quest]:[taskname], example 'pirate:foundCave'.\nWhat quest/task name?");
 }
 
@@ -119,7 +117,7 @@ nomask void quest_name(string domain)
       return;
    }
 
-   modal_simple(( : add_quest_name, domain:), "What quest name? (base part excluding :part)  ");
+   modal_simple(&add_quest_name(domain), "What quest name? (base part excluding :part)  ");
 }
 
 private
@@ -139,7 +137,7 @@ nomask void remove_quest(string domain, string name)
 private
 nomask void remove_quest_domain(string domain)
 {
-   modal_simple(( : remove_quest, domain:), "Which quest? ");
+   modal_simple(&remove_quest(domain), "Which quest? ");
 }
 
 private
@@ -153,34 +151,29 @@ nomask class command_info *module_commands()
    return ({new (class command_info, key
                  : "l", desc
                  : "list all places to get points", action
-                 : (
-                     : list_quests:)),
+                 : list_quests),
             new (class command_info, key
                  : "L", proto
                  : "[domain]", desc
                  : "list all quests for domain", args
                  : ({"Which domain? "}), action
-                 : (
-                     : dump_domain:)),
+                 : dump_domain),
             new (class command_info, key
                  : "a", proto
                  : "[domain]", desc
                  : "add quest points for a goal", args
                  : ({"Which domain? "}), action
-                 : (
-                     : add_quest_domain:)),
+                 : add_quest_domain),
             new (class command_info, key
                  : "r", proto
                  : "[domain]", desc
                  : "remove quest points for a goal", args
                  : ({"Which domain? "}), action
-                 : (
-                     : remove_quest_domain:)),
+                 : remove_quest_domain),
             new (class command_info, key
                  : "n", proto
                  : "[domain]", desc
                  : "add quest name", args
                  : ({"Which domain? "}), action
-                 : (
-                     : quest_name:))});
+                 : quest_name)});
 }

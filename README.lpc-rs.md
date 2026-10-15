@@ -15,12 +15,14 @@ With the lpc-rs checkout beside this one and its CLI built, check a command with
 
 The last whole-library check, on 15 October 2026 before the command batches,
 compiles **753 of 1,180 .c files** with no timeouts or crashes. The latest bounded
-admtool daemon check covers **141 targets**: **79/81 wizard entries**, **4/4 guild
-entries** and **56/56 supporting objects**, with no regressions. The admtool tree
-compiles **25/34 targets**, with nine failing leaves in other categories. All ten
-daemon menus have navigation coverage and selected local report/edit flows pass;
-admtool as a whole remains unfinished. Two entry files (socketinfo and treefor)
-and the remaining controller/action work stay open. Other retained counts are
+admtool game check covers **158 targets**: **79/81 wizard entries**, **4/4 guild
+entries** and **73/73 supporting objects**, with no regressions. Admtool's target
+set compiles **30/34**, with four failing leaves in the remaining categories.
+All ten daemon and nine game menus have navigation coverage and selected local
+report/edit flows pass. Seven game daemon saves and an edited configuration file
+survive restart, alongside the prior group/alias checks. Admtool as a whole remains
+unfinished: six controllers and untested actions stay open. Two wizard entry files
+(socketinfo and treefor) remain. Other retained counts are
 player 65/67, verbs 90/90, transitional 49/49 and transitional administrator 9/9.
 These counts include optional and partial sources and are not a completion
 percentage. Experimental random2 remains deferred and suicide is disabled upstream.
