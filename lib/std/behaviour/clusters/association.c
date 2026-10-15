@@ -179,7 +179,7 @@ void register_kill(object mykill, int xp)
    neutralize_emotion(RAGE);
    mod_emotion(ECSTASY, 1);
    mod_emotion(ADMIRATION, 1);
-   call_out("get_all_from_corpse", 1 + random(2));
+   call_out(get_all_from_corpse, 1 + random(2));
 }
 
 void i_met(object who)
@@ -206,7 +206,7 @@ mixed indirect_give_obj_to_liv(object ob, object liv)
 
 void clean_assoc()
 {
-   assoc = filter_mapping(assoc, ( : $1:));
+   assoc = filter(assoc, ( : $1:));
 }
 
 varargs void threat_emotions(object *people, int left)
@@ -264,7 +264,7 @@ object *potential_targets()
    m_delete(assoc, 0);
    potentials = keys(assoc);
    potentials = filter(potentials, ( : $1 && present($1, environment()) :));
-   potentials = sort_array(keys(assoc), ( : evaluate_targets:), -1);
+   potentials = sort_array(keys(assoc), evaluate_targets);
    easy_targets = filter(potentials, ( : assoc[$1]["attitude"] < 0 && assoc[$1]["threat_level"] > 0 :));
    if (sizeof(easy_targets))
    {

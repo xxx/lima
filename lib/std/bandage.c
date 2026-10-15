@@ -1,6 +1,6 @@
 /* Do not remove the headers from this file! see /USAGE for more info. */
 
-inherit OBJ;
+inherit OBJ bandage_object;
 inherit M_GETTABLE;
 inherit M_HEALING;
 
@@ -11,12 +11,12 @@ int is_bandage()
 
 float query_value()
 {
-   return (float)(query_heal_value());
+   return to_float(query_heal_value());
 }
 
 void mudlib_setup()
 {
-   object::mudlib_setup();
+   bandage_object::mudlib_setup();
    set_id("bandage");
    set_adj("simple");
    set_heal_value(5);

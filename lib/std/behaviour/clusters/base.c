@@ -55,7 +55,7 @@ private function my_hook;
 private object env;
 
 private int delay_time = 5;   // Default delay time for leaves.
-private object debugee = 0;   // The body of the person debugging us.
+private object debugee = nil;   // The body of the person debugging us.
 private string *queue = ({}); // Queue of nodes that must be processed.
 
 private object *arrived = ({});
@@ -125,7 +125,7 @@ string print_queue()
 {
    string out = "";
    int i = 1;
-   return format_list(queue);
+   return format_list(queue, nil);
 }
 
 mapping query_nodes()
@@ -153,12 +153,12 @@ void reset_tree()
 
 class node front()
 {
-   return sizeof(queue) ? node_list[queue[0]] : 0;
+   return sizeof(queue) ? node_list[queue[0]] : nil;
 }
 
 class node parent(class node node)
 {
-   return node && parents[node.name] ? node_list[parents[node.name]] : 0;
+   return node && parents[node.name] ? node_list[parents[node.name]] : nil;
 }
 
 class node pop()
@@ -238,7 +238,7 @@ int query_observers()
 void behaviour_call()
 {
    if (query_observers() && behaviour_call_out == 0)
-      behaviour_call_out = call_out("behaviour_call", delay_time);
+      behaviour_call_out = call_out(behaviour_call, delay_time);
    evaluate_node();
    behaviour_call_out = 0;
 }
@@ -292,7 +292,7 @@ void action_arrival(object who)
    if (who->query_link())
    {
       if (query_observers() == 1 && behaviour_call_out == 0)
-         behaviour_call_out = call_out("behaviour_call", delay_time);
+         behaviour_call_out = call_out(behaviour_call, delay_time);
    }
 }
 
@@ -310,7 +310,7 @@ void action_movement()
    env->add_hook("object_arrived", arrival_fn);
    env->add_hook("object_left", departure_fn);
    if (behaviour_call_out == 0 && query_observers())
-      behaviour_call_out = call_out("behaviour_call", delay_time);
+      behaviour_call_out = call_out(behaviour_call, delay_time);
 }
 
 int debugging()
@@ -326,7 +326,7 @@ void debug(mixed s)
 
 void debug_me(int i)
 {
-   debugee = i ? this_body() : 0;
+   debugee = i ? this_body() : nil;
 }
 
 void set_blackboard(string key, mixed value)
@@ -395,7 +395,7 @@ string emotion_string()
 
    if (!sizeof(ems))
       ems = ({"indifference"});
-   return (sizeof(ems) > 1 ? "a mixture of " : "") + format_list(ems);
+   return (sizeof(ems) > 1 ? "a mixture of " : "") + format_list(ems, nil);
 }
 
 mapping emotion_names()
@@ -415,7 +415,7 @@ void neutralize_emotion(int emotion)
 {
    if (emotion < 0 || emotion > 7)
       error("Unknown emotion state '" + emotion + "'. States defined in /include/behaviour.h.\n" +
-            format_list(EMOTION_STRINGS));
+            format_list(EMOTION_STRINGS, nil));
    if (emotion > 3)
       emotion -= 4;
 
@@ -438,7 +438,7 @@ void mod_emotion(int emotion, int mod)
    // Some guard rails
    if (emotion < 0 || emotion > 7)
       error("Unknown emotion state '" + emotion + "'. States defined in /include/behaviour.h.\n" +
-            format_list(EMOTION_STRINGS));
+            format_list(EMOTION_STRINGS, nil));
    if (emotion > 3)
    {
       emotion -= 4;
@@ -532,7 +532,7 @@ void start_behaviour()
    }
 
    if (query_observers())
-      behaviour_call_out = call_out("behaviour_call", delay_time);
+      behaviour_call_out = call_out(behaviour_call, delay_time);
 }
 
 void stop_behaviour_call()

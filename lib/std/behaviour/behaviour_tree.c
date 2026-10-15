@@ -50,6 +50,14 @@ void reset_last_failed_leaves()
    last_failed_leaves = ({});
 }
 
+private int evaluation_pending()
+{
+   foreach (mixed *timer in query_call_outs())
+      if (function_name(timer[1]) == "evaluate_node")
+         return 1;
+   return 0;
+}
+
 varargs int evaluate_node()
 {
    class node node, parent;
@@ -60,7 +68,7 @@ varargs int evaluate_node()
    {
       debug("<161>Queue empty - missing node? Restarting from <069>ROOT<res>.");
       frontpush("root");
-      return;
+      return 0;
    }
 
    debug("<214>Evaluating node: <043>" + node.name + "<res>"); // <214>Queue: <043>" + print_queue() + "<res>");
@@ -74,7 +82,7 @@ varargs int evaluate_node()
       parses++;
       if (query_observers())
          evaluate_node();
-      return;
+      return 0;
       break;
    case NODE_SEQUENCE:
       // We're done in the sequence
@@ -179,11 +187,11 @@ varargs int evaluate_node()
    if (node.delay > 0)
    {
       debug("<077>Queue delay: " + node.delay + " seconds.<res>");
-      if (find_call_out("evaluate_node") == -1)
-         call_out("evaluate_node", debugging() ? clamp(node.delay, 3, 20) : node.delay);
+      if (!evaluation_pending())
+         call_out(evaluate_node, debugging() ? clamp(node.delay, 3, 20) : node.delay);
    }
    else
-      evaluate_node(parent);
+      evaluate_node();
 }
 
 int parses_made()
@@ -199,7 +207,7 @@ int is_smart()
 void start_behaviour()
 {
    base::start_behaviour();
-   if (find_call_out("evaluate_node") == -1)
+   if (!evaluation_pending())
       evaluate_node();
 }
 

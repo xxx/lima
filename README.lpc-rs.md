@@ -1098,12 +1098,24 @@ destinations stay empty, append retains existing text, and incoming text is igno
 The audit's four focused checks cover fourteen shell inputs and thirteen positive complete
 compile checks, with two expected original compilation failures.
 
-Populated reports remain unqualified. The actual BEHAVIOUR_TREE Goblin host fails
-compilation in the navigation cluster; a temporary assignment-parentheses fix
-exposes base-cluster nil/callback/optional-separator adaptations. M_SMARTMOVE alone
-does not provide is_smart, parses_made or emotion_string. Those real behavior-tree
-dependencies need their own port before populated rows or running AI can be tested.
-No native API or AI engine change is included in this adaptation.
+The behavior-tree compatibility changes allow actual Goblin clones to initialize
+and appear in `smartmobs`, including clones in other rooms or without an environment.
+Prototype exclusion, parse counts, moods, environment truncation and unchanged
+inspection state are checked. Populated reports retain the direct-output routing
+and ignored-argument behavior described above.
+
+Five LPC files adapt reference defaults, class absence, typed callbacks, default
+format_list separators, surplus callback arguments, navigation's assignment/return,
+and the bandage's inherit alias/value conversion. Pending evaluation checks use
+owned call-out introspection. Existing tree, leaf and targeting rules remain.
+Seven focused checks include seventeen positive complete compile checks, two
+expected original failures and sixteen registered shell inputs. Initial root and
+leaf progression and explicit execution of an actual evaluation callback are
+covered; full autonomous AI and timer lifecycle remain separate.
+
+The fixture preloads all 21 stock recipes and the real crafting daemon before
+creating Goblins. Cold setup reached the unchanged 4,000 ms budget while compiling
+the crafting registry; these prepared-runtime checks do not establish cold startup.
 
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.

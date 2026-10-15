@@ -14,7 +14,7 @@ void do_game_command(string str);
 int has_room_changed();
 int im_bored();
 void room_checked();
-void do_wander();
+int do_wander();
 int player_did_arrive(string dir);
 void moving();
 int query_emotion(mixed emotion);
@@ -115,8 +115,8 @@ int do_wander()
       directions = environment(this_object())->query_exit_directions();
 
    /* Stop if there are no directions (this takes care of blue prints*/
-   if (!directions || !i = sizeof(directions))
-      return;
+   if (!directions || !(i = sizeof(directions)))
+      return EVAL_FAILURE;
 
    chosen_dir = directions[random(i)];
 
