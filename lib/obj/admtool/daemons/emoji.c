@@ -41,13 +41,14 @@ nomask void show_emoji_data(string emoji)
    string *members;
 
    emoji = lower_case(emoji);
-   members = sort_array(EMOJI_D->get_emoji_data()[emoji], 1);
+   members = EMOJI_D->get_emoji_data()[emoji];
    if (!members)
    {
       printf("There is no emoji named '%s'.\n", emoji);
    }
    else
    {
+      members = sort_array(members, 1);
       printf("emoji %s:\n", emoji);
 
       switch (sizeof(members))
@@ -122,7 +123,7 @@ nomask void add_data_to_emoji2(string emoji, string utfchar, string replacement)
 private
 nomask void add_data_to_emoji(string emoji)
 {
-   input_two_args("UTF8 Char? ", "Replacement (default empty)? ", ( : add_data_to_emoji2, emoji:));
+   input_two_args("UTF8 Char? ", "Replacement (default empty)? ", &add_data_to_emoji2(emoji));
 }
 
 private
@@ -140,37 +141,32 @@ nomask class command_info *module_commands()
    return ({new (class command_info, key
                  : "l", desc
                  : "list emojis", action
-                 : (
-                     : list_emojis:)),
+                 : list_emojis),
             new (class command_info, key
                  : "s", proto
                  : "[emoji]", desc
                  : "show an emoji's data", args
                  : ({"Show data for which emoji? "}), action
-                 : (
-                     : show_emoji_data:)),
+                 : show_emoji_data),
             new (class command_info, key
                  : "a", proto
                  : "[emoji]", desc
                  : "add emoji (or overwrite)", who
                  : "[Mudlib:]", args
                  : ({"Add to which emoji? "}), action
-                 : (
-                     : add_data_to_emoji:)),
+                 : add_data_to_emoji),
             new (class command_info, key
                  : "d", proto
                  : "[emoji]", desc
                  : "delete a emoji", args
                  : ({"Delete which emoji? "}), who
                  : "[Mudlib:]", action
-                 : (
-                     : delete_emoji:)),
+                 : delete_emoji),
             new (class command_info, key
                  : "r", proto
                  : "[emoji]", desc
                  : "remove data from a emoji", who
                  : "[Mudlib:]", args
                  : ({"Remove from which emoji? "}), action
-                 : (
-                     : remove_user_from_emoji:))});
+                 : remove_user_from_emoji)});
 }

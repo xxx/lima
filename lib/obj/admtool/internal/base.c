@@ -86,7 +86,7 @@ private nomask string parent_name()
 private nomask void do_main_menu()
 {
    modal_pop();
-   parent->display_current_menu();
+   parent->do_help();
    destruct();
 }
 
@@ -108,7 +108,7 @@ protected nomask int write_error(string err)
    return 0;
 }
 
-protected nomask void do_help()
+nomask void do_help()
 {
    display_current_menu();
 }
@@ -221,7 +221,7 @@ private void handle_input(string str)
 
 protected nomask void do_modal_func()
 {
-   modal_func(handle_input, prompt);
+   modal_func(parse_menu_input, get_current_prompt);
 }
 
 void begin_menu()

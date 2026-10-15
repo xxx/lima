@@ -120,7 +120,7 @@ nomask void rcv_first_of_two(string arg2_prompt, function fp, string arg1)
    }
    else
    {
-      modal_simple(( : evaluate, fp, arg1:), sprintf(arg2_prompt, arg1));
+      modal_simple(&evaluate(fp, arg1), sprintf(arg2_prompt, arg1));
    }
 }
 
@@ -146,7 +146,7 @@ varargs nomask void input_two_args(string arg1_prompt, string arg2_prompt, funct
    }
    else
    {
-      modal_simple(( : rcv_first_of_two, arg2_prompt, fp:), arg1_prompt);
+      modal_simple(&rcv_first_of_two(arg2_prompt, fp), arg1_prompt);
    }
 }
 

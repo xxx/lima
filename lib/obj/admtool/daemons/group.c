@@ -34,13 +34,14 @@ nomask void show_group_members(string group)
    string *members;
 
    group = lower_case(group);
-   members = sort_array(GROUP_D->get_group_data()[group], 1);
+   members = GROUP_D->get_group_data()[group];
    if (!members)
    {
       printf("There is no group named '%s'.\n", group);
    }
    else
    {
+      members = sort_array(members, 1);
       printf("Group %s:\n", group);
 
       switch (sizeof(members))
@@ -128,52 +129,45 @@ nomask class command_info *module_commands()
    return ({new (class command_info, key
                  : "l", desc
                  : "list groups", action
-                 : (
-                     : list_groups:)),
+                 : list_groups),
             new (class command_info, key
                  : "s", proto
                  : "[group]", desc
                  : "show a group's members", args
                  : ({"Show members of which group? "}), action
-                 : (
-                     : show_group_members:)),
+                 : show_group_members),
             new (class command_info, key
                  : "c", proto
                  : "[group]", desc
                  : "create a group", args
                  : ({"Name for the new group? "}), who
                  : "[Mudlib:]", action
-                 : (
-                     : create_group:)),
+                 : create_group),
             new (class command_info, key
                  : "d", proto
                  : "[group]", desc
                  : "delete a group", args
                  : ({"Delete which group? "}), who
                  : "[Mudlib:]", action
-                 : (
-                     : delete_group:)),
+                 : delete_group),
             new (class command_info, key
                  : "u", proto
                  : "[user]", desc
                  : "show user's groups ", args
                  : ({"Show groups for which user? "}), action
-                 : (
-                     : show_users_groups:)),
+                 : show_users_groups),
             new (class command_info, key
                  : "a", proto
                  : "[user] [group]", desc
                  : "add user to a group", who
                  : "[Mudlib:]", args
                  : ({"Add which user? ", "Add '%s' to which group? "}), action
-                 : (
-                     : add_user_to_group:)),
+                 : add_user_to_group),
             new (class command_info, key
                  : "r", proto
                  : "[user] [group]", desc
                  : "remove a user from a group", who
                  : "[Mudlib:]", args
                  : ({"Remove which user? ", "Remove '%s' from which group? "}), action
-                 : (
-                     : remove_user_from_group:))});
+                 : remove_user_from_group)});
 }

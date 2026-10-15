@@ -75,7 +75,7 @@ nomask void rcv_remove_newsgroup(string group_name)
 }
 
 private
-void rcv_archive_group(string group, int days)
+void rcv_archive_group(string group, string days)
 {
    if (member_array(group, NEWS_D->get_groups()) == -1)
    {
@@ -175,75 +175,62 @@ nomask class command_info *module_commands()
        new (class command_info, key
             : "l", desc
             : "List newsgroups.", action
-            : (
-                : list_newsgroups:)),
+            : list_newsgroups),
        new (class command_info, key
             : "a", proto
             : "[group]", desc
             : "Add a new newsgroup", args
             : ({"New newsgroup name? "}), action
-            : (
-                : rcv_add_newsgroup:)),
+            : rcv_add_newsgroup),
        new (class command_info, key
             : "r", proto
             : "[group]", desc
             : "Remove a newsgroup", args
             : ({"Remove which newsgroup? "}), action
-            : (
-                : rcv_remove_newsgroup:)),
+            : rcv_remove_newsgroup),
        new (class command_info, key
             : "A", proto
             : "[group] [#days]", desc
             : "Archive a group", args
             : ({"Which newsgroup? ", "How many days? "}), action
-            : (
-                : rcv_archive_group:)),
+            : rcv_archive_group),
        new (class command_info, key
             : "T", desc
             : "Show archive times of groups", action
-            : (
-                : rcv_show_archive_times:)),
+            : rcv_show_archive_times),
        new (class command_info, key
             : "f", proto
             : "[group] [email]", desc
             : "Forward a group to an email address", args
             : ({"Which newsgroup? ", "Email destination? "}), action
-            : (
-                : rcv_forward_mail:)),
+            : rcv_forward_mail),
        new (class command_info, key
             : "u", proto
             : "[group] [email]", desc
             : "Remove an email a group is forwarded to", args
             : ({"Which newsgroup? ", "Email address (0 for all) "}), action
-            : (
-                : rcv_unforward_mail:)),
+            : rcv_unforward_mail),
        new (class command_info, key
             : "L", proto
             : "[group]", desc
             : "List emails a group is forwarded to", args
             : ({"Which newsgroup? "}), action
-            : (
-                : rcv_list_forward_newsgroup:)),
+            : rcv_list_forward_newsgroup),
        new (class command_info, key
             : "R", proto
             : "[prefix] [restrict]", desc
             : "Set the read restrictions of a prefix", args
             : ({"Which prefix? ", "restriction? "}), action
-            : (
-                : call_other, NEWS_D, "set_read_restriction"
-                :)),
+            : &call_other(NEWS_D, "set_read_restriction")),
        new (class command_info, key
             : "W", proto
             : "[prefix] [restrict]", desc
             : "Set the write restrictions of a prefix", args
             : ({"Which prefix? ", "Restriction? "}), action
-            : (
-                : call_other, NEWS_D, "set_write_restriction"
-                :)),
+            : &call_other(NEWS_D, "set_write_restriction")),
        new (class command_info, key
             : "S", desc
             : "Show the prefix restrictions", action
-            : (
-                : show_restrictions:)),
+            : show_restrictions),
    });
 }

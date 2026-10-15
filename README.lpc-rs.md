@@ -14,17 +14,16 @@ With the lpc-rs checkout beside this one and its CLI built, check a command with
 ```
 
 The last whole-library check, on 15 October 2026 before the command batches,
-compiles **753 of 1,180 .c files** with no timeouts or crashes. Later bounded
-checks reached 78/81 wizard and 4/4 guild entries after tasktool. The latest
-125-target admtool core check reaches **79/81 wizard entries**, retains **4/4 guild
-entries**, and passes all 40 supporting objects, with no regressions. Admtool's
-root menu is validated; its category actions remain unfinished. Two entry files
-(socketinfo and treefor) and that controller work remain. A separate admtool tree
-check compiles 23/34 targets, with eleven leaf compile failures and all 25 leaf
-actions still unqualified. Other retained counts are player 65/67, verbs 90/90,
-transitional 49/49 and transitional administrator 9/9. These standalone counts
-include optional and partial sources and are not a completion percentage.
-Experimental random2 remains deferred and suicide is disabled upstream.
+compiles **753 of 1,180 .c files** with no timeouts or crashes. The latest bounded
+admtool daemon check covers **141 targets**: **79/81 wizard entries**, **4/4 guild
+entries** and **56/56 supporting objects**, with no regressions. The admtool tree
+compiles **25/34 targets**, with nine failing leaves in other categories. All ten
+daemon menus have navigation coverage and selected local report/edit flows pass;
+admtool as a whole remains unfinished. Two entry files (socketinfo and treefor)
+and the remaining controller/action work stay open. Other retained counts are
+player 65/67, verbs 90/90, transitional 49/49 and transitional administrator 9/9.
+These counts include optional and partial sources and are not a completion
+percentage. Experimental random2 remains deferred and suicide is disabled upstream.
 
 A fresh production-driver check passes 30 checkpoints covering account/character
 creation, menu, Grand Hall entry, look/inventory, logout and saved-account/body
@@ -86,12 +85,15 @@ creation time is typed as an integer. Two saved root tasks and a completed child
 restore through the real menu after restart. Admin-tool compositions and task APIs
 outside the menu retain their separate scope.
 
-Admtool's root now uses native callbacks and nil metadata, and builds menu layouts
-only for clones. Reading the four category prototypes' metadata no longer builds
-all leaf menus. Root/help/input validation/quit/reentry and saved login pass, with
-zero leaf prototypes loaded and no remaining root clones. No category is hidden
-or stubbed. The leaf controllers remain a separate open porting item: eleven fail
-compilation, and even compiling actions still need callback/data and runtime review.
+Admtool's root uses native callbacks/nil metadata and builds layout only for
+clones, so category discovery leaves unopened controllers unloaded. All ten
+daemon menus now open, render help and return to their parents. Shared two-argument
+prompts and alias input resumption work; selected group/alias edits persist through
+restart, and colour/domain/method/channel reports run against real daemons. Global
+alias defaults retain their existing shell-creation snapshot behavior, so the saved
+alias becomes usable after a fresh login. Fixed loopback channel metadata supplies
+nonempty I3 reports without a live router. The other fifteen controllers and
+untested administrative actions remain open; no menu or daemon is stubbed.
 
 The focused runtime counts below retain their original scopes. Mudlist passes
 13 cases using both actual shells; `su` passes refresh, race-change and password-

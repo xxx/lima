@@ -93,7 +93,7 @@ void list_colours()
    mapping colours = ANSI_D->query_translations()[0];
    tmp = ANSI_D->defaults();
    tmp = sort_array(keys(tmp), 1);
-   tmp = map(tmp, ( : restrict_modify:));
+   tmp = map(tmp, restrict_modify);
    write("Default colours (wiz-only in CAPs)\n");
    printf("<bld>%-30.30s   %-20.20s   %-30.30s<res>", "Colour name", "Selected", "Colour example");
    write("------------------------------------------------------------------------------------");
@@ -124,34 +124,29 @@ nomask class command_info *module_commands()
    return ({new (class command_info, key
                  : "l", desc
                  : "list default colours", action
-                 : (
-                     : list_colours:)),
+                 : list_colours),
             new (class command_info, key
                  : "a", proto
                  : "[colour] [value]", desc
                  : "add default colour (only ANSI accepted)", args
                  : ({"Colour code? ", "Value? "}), action
-                 : (
-                     : receive_add_colour:)),
+                 : receive_add_colour),
             new (class command_info, key
                  : "r", proto
                  : "[colour]", desc
                  : "remove default colour", args
                  : ({"Remove which colour? "}), action
-                 : (
-                     : receive_remove_colour:)),
+                 : receive_remove_colour),
             new (class command_info, key
                  : "w", proto
                  : "[colour]", desc
                  : "make colour wiz-only", args
                  : ({"Make which colour wiz-only? "}), action
-                 : (
-                     : restrict:)),
+                 : restrict),
             new (class command_info, key
                  : "p", proto
                  : "[colour]", desc
                  : "make colour player-usable", args
                  : ({"Make which colour player-usable? "}), action
-                 : (
-                     : unrestrict:))});
+                 : unrestrict)});
 }

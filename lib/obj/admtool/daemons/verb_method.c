@@ -86,42 +86,36 @@ nomask class command_info *module_commands()
        new (class command_info, key
             : "l", desc
             : "list methods", action
-            : (
-                : list_methods:)),
+            : list_methods),
        new (class command_info, key
             : "e", proto
             : "[method]", desc
             : "list method equivalents", args
             : ({"Method: "}), action
-            : (
-                : list_method_equivalents:)),
+            : list_method_equivalents),
        new (class command_info, key
             : "a", proto
             : "[method] [equiv, equiv, ...]", desc
             : "add method", args
             : ({"Method: ", "Equivs (seperate by commas): "}), action
-            : (
-                : receive_add_method:)),
+            : receive_add_method),
        new (class command_info, key
             : "A", proto
             : "[method] [equiv]", desc
             : "add an equivalent to a method", args
             : ({"Add to which method? ", "Add what equivalent? "}), action
-            : (
-                : receive_add_method_equivalent:)),
+            : receive_add_method_equivalent),
        new (class command_info, key
             : "r", proto
             : "[method]", desc
             : "remove method", args
             : ({"Remove which method? "}), action
-            : (
-                : receive_remove_method:)),
+            : receive_remove_method),
        new (class command_info, key
             : "R", proto
             : "[method] [equiv]", desc
             : "remove equivalent from method", args
             : ({"Remove from which method? ", "Remove which equivalent? "}), action
-            : (
-                : receive_remove_method_equivalent:)),
+            : receive_remove_method_equivalent),
    });
 }

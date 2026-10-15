@@ -99,7 +99,7 @@ nomask void handle_a(string cmd, string name, string expansion)
       type = 0;
    else
       type = 1;
-   modal_func(( : add_alias, name, expansion, type:), "Xalias?  [yn (default n)] ");
+   modal_func(&add_alias(name, expansion, type), "Xalias?  [yn (default n)] ");
 }
 
 private
@@ -130,32 +130,24 @@ nomask class command_info *module_commands()
 {
    return ({new (class command_info, key
                  : "l", action
-                 : (
-                       : handle_l, "l"
-                       :),
+                 : &handle_l("l"),
                    desc
                  : "list global player aliases"),
             new (class command_info, key
                  : "L", action
-                 : (
-                       : handle_l, "L"
-                       :),
+                 : &handle_l("L"),
                    desc
                  : "list global wizard aliases"),
             new (class command_info, key
                  : "a", proto
                  : "[alias [expansion]]", args
                  : ({"Alias: ", "Expansion: "}), action
-                 : (
-                       : handle_a, "a"
-                       :),
+                 : &handle_a("a"),
                    desc
                  : "add a global player alias"),
             new (class command_info, key
                  : "A", action
-                 : (
-                       : handle_a, "A"
-                       :),
+                 : &handle_a("A"),
                    args
                  : ({"Alias: ", "Expansion: "}), proto
                  : "[alias [expansion]]", desc
@@ -164,16 +156,12 @@ nomask class command_info *module_commands()
                  : "r", proto
                  : "[alias]", args
                  : ({"Alias: "}), action
-                 : (
-                       : handle_r, "r"
-                       :),
+                 : &handle_r("r"),
                    desc
                  : "remove a global player alias"),
             new (class command_info, key
                  : "R", action
-                 : (
-                       : handle_r, "R"
-                       :),
+                 : &handle_r("R"),
                    proto
                  : "[alias]", args
                  : ({"Alias: "}), desc

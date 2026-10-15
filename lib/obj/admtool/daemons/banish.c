@@ -99,45 +99,35 @@ nomask class command_info *module_commands()
             : "B", args
             : ({"Banish who? ", "Banish them why? "}), proto
             : "[name] [reason]", action
-            : (
-                  : call_other, BANISH_D, "banish_name"
-                  :),
+            : &call_other(BANISH_D, "banish_name"),
               desc
             : "banish a name"),
        new (class command_info, key
             : "b", args
             : ({"Banish which site? ", "Banish them why? "}), proto
             : "[name] [reason]", action
-            : (
-                  : call_other, BANISH_D, "banish_site"
-                  :),
+            : &call_other(BANISH_D, "banish_site"),
               desc
             : "banish a site"),
        new (class command_info, key
             : "U", proto
             : "[name]", args
             : ({"Unbanish which name? "}), action
-            : (
-                  : call_other, BANISH_D, "unbanish_name"
-                  :),
+            : &call_other(BANISH_D, "unbanish_name"),
               desc
             : "unbanish a name"),
        new (class command_info, key
             : "u", proto
             : "[name]", args
             : ({"Unbanish which site? "}), action
-            : (
-                  : call_other, BANISH_D, "unbanish_site"
-                  :),
+            : &call_other(BANISH_D, "unbanish_site"),
               desc
             : "unbanish a site"),
        new (class command_info, key
             : "R", proto
             : "[who]", args
             : ({"Who? "}), action
-            : (
-                  : call_other, BANISH_D, "add_registered"
-                  :),
+            : &call_other(BANISH_D, "add_registered"),
               desc
             : "add a registered user"),
        new (class command_info, key
@@ -147,15 +137,12 @@ nomask class command_info *module_commands()
                   "Who? ",
               }),
               action
-            : (
-                  : call_other, BANISH_D, "remove_registered"
-                  :),
+            : &call_other(BANISH_D, "remove_registered"),
               desc
             : "remove a registered user"),
        new (class command_info, key
             : "s", action
-            : (
-                  : show_registered_users:),
+            : show_registered_users,
               desc
             : "show the registered users of a site"),
    });

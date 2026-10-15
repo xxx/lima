@@ -35,11 +35,9 @@ nomask void detail_list_channels()
       return;
    }
 
-   write(implode(({""}) + sort_array(keys(chanlist), 1),
-                 (
-                     : $1 + sprintf("    %-20s %-20s %s\n", $2, $(chanlist)[$2][0],
-                                    $(({"unrestricted", "restricted", "filtered"}))[$(chanlist)[$2][1]], )
-                     :)));
+   foreach (string channel in sort_array(keys(chanlist), 1))
+      printf("    %-20s %-20s %s\n", channel, chanlist[channel][0],
+             ({"unrestricted", "restricted", "filtered"})[chanlist[channel][1]]);
 }
 
 private
@@ -47,7 +45,7 @@ nomask void list_channels()
 {
    mapping chanlist = IMUD_D->query_chanlist();
 
-   chanlist = filter_mapping(chanlist, ( : $(chanlist)[$1][0] == mud_name() :));
+   chanlist = filter(chanlist, ( : $(chanlist)[$1][0] == mud_name() :));
 
    write("Owned Channels:");
    if (sizeof(chanlist) == 0)
@@ -56,15 +54,13 @@ nomask void list_channels()
       return;
    }
 
-   write(implode(
-       ({""}) + sort_array(keys(chanlist), 1),
-       (
-           : $1 + sprintf("    %s/%s\n", $2, $(({"unrestricted", "restricted", "filtered"}))[$(chanlist)[$2][1]])
-           :)));
+   foreach (string channel in sort_array(keys(chanlist), 1))
+      printf("    %s/%s\n", channel,
+             ({"unrestricted", "restricted", "filtered"})[chanlist[channel][1]]);
 }
 
 private
-nomask void rcv_add_channel(string channel_name, int type)
+nomask void rcv_add_channel(string channel_name, string type)
 {
    channel_name = lower_case(trim(channel_name));
    if (channel_name == "")
@@ -216,42 +212,36 @@ nomask class command_info *module_commands()
        new (class command_info, key
             : "O", desc
             : "list owned channels", action
-            : (
-                : list_channels:)),
+            : list_channels),
 
        new (class command_info, key
             : "l", desc
             : "list channels which are being listened to", action
-            : (
-                : listened_channels:)),
+            : listened_channels),
 
        new (class command_info, key
             : "C", desc
             : "list all channels", action
-            : (
-                : list_all_channels:)),
+            : list_all_channels),
 
        new (class command_info, key
             : "D", desc
             : "Detailed list of channels", action
-            : (
-                : detail_list_channels:)),
+            : detail_list_channels),
 
        new (class command_info, key
             : "a", proto
             : "[name] [type 0-2]", desc
             : "add owned channel", args
             : ({"New channel name? ", "Add type (0 = unrestricted, 1 = restricted, 2 = filtered)"}), action
-            : (
-                : rcv_add_channel:)),
+            : rcv_add_channel),
 
        new (class command_info, key
             : "r", proto
             : "[name]", desc
             : "remove owned channel", args
             : ({"Channel name to remove? "}), action
-            : (
-                : rcv_remove_channel:)),
+            : rcv_remove_channel),
 
        new (class command_info, key
             : "A", proto
@@ -259,8 +249,7 @@ nomask class command_info *module_commands()
             : "allow mud to our owned channel", args
             : ({"Channel name? ", "Allowed mud? "}), priv
             : "Mudlib:daemons", action
-            : (
-                : allow_mud_on_our_channel:)),
+            : allow_mud_on_our_channel),
 
        new (class command_info, key
             : "D", proto
@@ -268,24 +257,21 @@ nomask class command_info *module_commands()
             : "disallow mud from our owned channel", args
             : ({"Channel name? ", "Disallowed mud name? "}), priv
             : "Mudlib:daemons", action
-            : (
-                : disallow_mud_on_our_channel:)),
+            : disallow_mud_on_our_channel),
 
        new (class command_info, key
             : "L", proto
             : "[name]", desc
             : "listen to an intermud channel", args
             : ({"Channel name to listen to? "}), action
-            : (
-                : rcv_listen_channel:)),
+            : rcv_listen_channel),
 
        new (class command_info, key
             : "I", proto
             : "[name]", desc
             : "ignore an intermud channel", args
             : ({"Channel name to ignore? "}), action
-            : (
-                : rcv_ignore_channel:)),
+            : rcv_ignore_channel),
        new (class command_info,
 
             key
@@ -294,8 +280,7 @@ nomask class command_info *module_commands()
             : "block a mud from intermud queries", args
             : ({"Mud name to block? "}), priv
             : "Mudlib:daemons", action
-            : (
-                : rcv_block_mud:)),
+            : rcv_block_mud),
 
        new (class command_info, key
             : "u", proto
@@ -303,15 +288,13 @@ nomask class command_info *module_commands()
             : "unblock a mud from intermud queries", args
             : ({"Mud name to unblock? "}), priv
             : "Mudlib:daemons", action
-            : (
-                : rcv_unblock_mud:)),
+            : rcv_unblock_mud),
 
        new (class command_info, key
             : "B", desc
             : "list muds blocked from intermud queries", priv
             : "Mudlib:daemons", action
-            : (
-                : list_blocked_muds:)),
+            : list_blocked_muds),
 
    });
 }
