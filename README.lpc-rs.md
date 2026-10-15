@@ -15,14 +15,14 @@ With the lpc-rs checkout beside this one and its CLI built, check a command with
 
 The last whole-library check, on 15 October 2026 before the command batches,
 compiles **753 of 1,180 .c files** with no timeouts or crashes. The latest bounded
-admtool mudinfo check covers **177 targets**: **79/81 wizard entries**, **4/4 guild
-entries** and **92/92 supporting targets**, with no regressions. Admtool's set now
+socketinfo check covers **178 targets**: **80/81 wizard entries**, **4/4 guild
+entries** and **93/93 supporting targets**, with no regressions. Admtool's set
 compiles **34/34**. All 25 leaf menus have navigation coverage and selected report/
 edit flows pass; administrative actions not exercised retain their prior scope.
 The races report matches six source definitions, and the native memory diagnostic
 ranks 274 loaded objects (257 after restart) with positive, descending estimates.
-Rows use separate strings within the driver's size limit. The two wizard entry
-files socketinfo and treefor remain. Other retained counts are
+Rows use separate strings within the driver's size limit. Treefor is the remaining
+wizard entry. Other retained counts are
 player 65/67, verbs 90/90, transitional 49/49 and transitional administrator 9/9.
 These counts include optional and partial sources and are not a completion
 percentage. Experimental random2 remains deferred and suicide is disabled upstream.
@@ -45,6 +45,14 @@ and abort; two actual news posts survive restart. Netstat passes ordinary/ignore
 arguments and plain redirected output, and works again after saved login. Both
 use protected CMD entry and unchanged shared implementations. Netstat counts an
 empty socket list explicitly, preserving the driver's array identity semantics.
+
+`socketinfo` uses native query_sockets mappings and a command-specific master
+query grant. It reports native handles, states, stream/listener kinds and numeric
+address/port pairs, with `-` for unknown endpoints. Six shell inputs and two after
+restart verify the actual loopback stream/listener and wrapper metadata, ignored
+arguments/input and the existing direct-output route (redirection creates an empty
+file). Each report row is written separately within the driver's string limit.
+All earlier login/menu/report checks remain; both 151-preload boots are clean.
 
 Guild catalog/governance loading and native persistence now work in the selected
 distinct-nil configuration. Four stock mission definitions and one favour load;
@@ -94,8 +102,9 @@ prompts and alias input resumption work; selected group/alias edits persist thro
 restart, and colour/domain/method/channel reports run against real daemons. Global
 alias defaults retain their existing shell-creation snapshot behavior, so the saved
 alias becomes usable after a fresh login. Fixed loopback channel metadata supplies
-nonempty I3 reports without a live router. The other fifteen controllers and
-untested administrative actions remain open; no menu or daemon is stubbed.
+nonempty I3 reports without a live router. All 25 leaf controllers now open as
+described above; untested administrative actions retain their scope. No menu or
+daemon is stubbed.
 
 The focused runtime counts below retain their original scopes. Mudlist passes
 13 cases using both actual shells; `su` passes refresh, race-change and password-

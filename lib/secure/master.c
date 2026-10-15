@@ -558,8 +558,12 @@ int valid_override(string file, string efun_name, string main_file)
 
 int valid_socket(object ob, string what, mixed *info)
 {
-   if (!ob || previous_object() != ob || base_name(ob) != SOCKET || !clonep(ob) ||
-       !arrayp(info) || sizeof(info) != 5)
+   if (!ob || previous_object() != ob || !arrayp(info) || sizeof(info) != 5)
+      return 0;
+   if (what == "query")
+      return ob == find_object("/cmds/wiz/socketinfo") &&
+             info[0] == -1 && info[1] == nil && info[2] == "" && info[3] == 0 && info[4] == nil;
+   if (base_name(ob) != SOCKET || !clonep(ob))
       return 0;
    switch (what)
    {

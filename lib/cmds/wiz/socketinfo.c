@@ -4,20 +4,27 @@
 //$$ see: netstat
 // USAGE: ``socketinfo``
 //
-// Displays details of sockets
+// Displays native socket handles, states, kinds and numeric address/port pairs.
 //
 // .. TAGS: RST
 
 inherit CMD;
 
-private
-void main(string str)
+private string endpoint_text(mixed endpoint)
 {
-   string ret = "Fd    State      Mode       Local Address          Remote Address\n"
-                "--  ---------  --------  ---------------------  ---------------------\n";
-   foreach (mixed *item in socket_status())
-   {
-      ret += sprintf("%2d  %|9s  %|8s  %-21s  %-21s\n", item[0], item[1], item[2], item[3], item[4]);
-   }
-   write(ret);
+   return endpoint ? sprintf("%s %d", endpoint[0], endpoint[1]) : "-";
+}
+
+private void main()
+{
+   write("Handle  State       Kind      Local Address          Remote Address\n"
+         "------  ----------  --------  ---------------------  ---------------------\n");
+   foreach (mapping item in query_sockets(-1))
+      write(sprintf("%6d  %-10s  %-8s  %-21s  %s\n", item["handle"], item["state"], item["kind"],
+                    endpoint_text(item["local"]), endpoint_text(item["remote"])));
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main();
 }
