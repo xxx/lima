@@ -125,5 +125,5 @@ void create(string mudname)
    printf("Accessing: %s\n", IMUD_D->canon_mudname(mudname));
    remote_mudname = mudname;
 
-   modal_push(( : rcv_command:), "iftp> ");
+   modal_push(rcv_command, "iftp> ");
 }

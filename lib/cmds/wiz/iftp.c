@@ -47,7 +47,7 @@ void main(string arg)
       foreach (test in matches)
          if (lower_case(test) == mudname)
          {
-            matches = 0;
+            matches = nil;
             break;
          }
       if (!matches)
@@ -57,4 +57,10 @@ void main(string arg)
    }
 
    clone_object (IFTP_OB, mudname);
+}
+
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main(arg);
 }
