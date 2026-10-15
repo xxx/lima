@@ -158,8 +158,10 @@ nomask void list_dir_privs(string arg)
          w_tree[dir] = sprintf("(read: %s)", priv);
    }
 
-   output = implode(({""}) + sort_array(keys(w_tree), 1), ( : $1 + $2 + "   " + $(w_tree)[$2] + "\n" :)) + "\n";
-   more(output);
+   output = "";
+   foreach (dir in sort_array(keys(w_tree), 1))
+      output += dir + "   " + w_tree[dir] + "\n";
+   more(output + "\n");
 }
 
 private
@@ -202,80 +204,68 @@ nomask class command_info *module_commands()
        new (class command_info, key
             : "p", desc
             : "privileges", action
-            : (
-                : privilege_owners:)),
+            : privilege_owners),
        new (class command_info, key
             : "s", proto
             : "[priv]", desc
             : "show sub-privileges", who
             : "[admin/owner]", args
             : ({"Show information for which privilege? "}), action
-            : (
-                : receive_privilege_for_show:)),
+            : receive_privilege_for_show),
        new (class command_info, key
             : "n", proto
             : "[priv]", desc
             : "define new privilege", who
             : "[admin/owner]", args
             : ({"Define which privilege? "}), action
-            : (
-                : receive_privilege_for_define:)),
+            : receive_privilege_for_define),
        new (class command_info, key
             : "u", proto
             : "[priv]", desc
             : "undefine privilege", who
             : "[admin/owner]", args
             : ({"Undefine which privilege? "}), action
-            : (
-                : receive_privilege_for_undefine:)),
+            : receive_privilege_for_undefine),
        new (class command_info, key
             : "a", proto
             : "[priv [priv]]", desc
             : "add a privilege to another", who
             : "[admin/owner]", args
             : ({"Adding which user (to a priv) ? ", "Add '%s' to which privilege? "}), action
-            : (
-                : receive_privilege_for_add:)),
+            : receive_privilege_for_add),
        new (class command_info, key
             : "d", proto
             : "[priv [priv]]", desc
             : "delete a privilege from another", who
             : "[admin/owner]", args
             : ({"Remove which user (from a priv) ? ", "Remove '%s' from which privilege? "}), action
-            : (
-                : receive_privilege_for_remove:)),
+            : receive_privilege_for_remove),
        new (class command_info, key
             : "l", proto
             : "[dir]", desc
             : "list directory protections", args
             : ({"Which directory? "}), action
-            : (
-                : list_dir_privs:)),
+            : list_dir_privs),
        new (class command_info, key
             : "w", proto
             : "[dir priv]", desc
             : "set a directory's write protection", who
             : "[parent priv]", args
             : ({"Set which directory's write privilege? ", "Set '%s' to what privilege? "}), action
-            : (
-                : perform_set_dir_priv, 1
-                :)),
+            : &perform_set_dir_priv(1)),
        new (class command_info, key
             : "r", proto
             : "[dir priv]", desc
             : "set a directory's read protection", who
             : "[admin]", args
             : ({"Set which directory's read privilege? ", "Set '%s' to what privilege? "}), action
-            : (
-                : perform_set_dir_priv, 0
-                :)),
+            : &perform_set_dir_priv(0)),
        new (class command_info, key
             : "c", proto
             : "[dir]", desc
             : "clear a directory's protection", who
             : "[parent priv]", args
             : ({"Clear which directory's privileges? "}), action
-            : (
-                : perform_clear_dir_priv:)),
+            : perform_clear_dir_priv),
    });
 }

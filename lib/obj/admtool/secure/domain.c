@@ -161,73 +161,60 @@ nomask class command_info *module_commands()
        new (class command_info, key
             : "l", desc
             : "list domains", action
-            : (
-                : list_domains:)),
+            : list_domains),
        new (class command_info, key
             : "s", desc
             : "show domain information", proto
             : "[domain]", args
             : ({"Show information on which domain? "}), action
-            : (
-                : show_domain_info:)),
+            : show_domain_info),
        new (class command_info, key
             : "c", desc
             : "create a domain", proto
             : "[domain]", who
             : "[admin]", args
             : ({"Name for the new domain? "}), action
-            : (
-                : create_domain, 0
-                :)),
+            : &create_domain(0)),
        new (class command_info, key
             : "C", desc
             : "create abstract domain (no dir)", proto
             : "[domain]", who
             : "[admin]", args
             : ({"Name for the new domain? "}), action
-            : (
-                : create_domain, 1
-                :)),
+            : &create_domain(1)),
        new (class command_info, key
             : "d", desc
             : "delete a domain", proto
             : "[domain]", who
             : "[admin]", args
             : ({"Delete which domain? "}), action
-            : (
-                : delete_domain:)),
+            : delete_domain),
        new (class command_info, key
             : "u", desc
             : "show user's domains", proto
             : "[user]", args
             : ({"Show information for which user? "}), action
-            : (
-                : show_users_domains:)),
+            : show_users_domains),
        new (class command_info, key
             : "a", desc
             : "add user to a domain", who
             : "[lord]", proto
             : "[user] [domain]", args
             : ({"Add which user? ", "Add '%s' to which domain? "}), action
-            : (
-                : add_user_to_domain, 0
-                :)),
+            : &add_user_to_domain(0)),
        new (class command_info, key
             : "A", desc
             : "add user as a lord of the domain", who
             : "[lord]", proto
             : "[user] [domain]", args
             : ({"Add which user as a lord? ", "Add '%s' to which domain? "}), action
-            : (
-                : add_user_to_domain, 1
-                :)),
+            : &add_user_to_domain(1)),
        new (class command_info, key
             : "r", desc
             : "remove a user from a domain", who
             : "[lord]", proto
             : "[user] [domain]", args
             : ({"Remove which user? ", "Remove '%s' from which domain? "}), action
-            : (
-                : remove_user_from_domain:)),
+            : remove_user_from_domain),
    });
 }

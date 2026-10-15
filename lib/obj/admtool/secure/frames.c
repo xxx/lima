@@ -51,7 +51,7 @@ void show_theme(string theme)
    set_style(this_user()->frames_style());
    set_theme(theme);
    set_width(this_user()->query_screen_width());
-   write("Frame colour example:\n" + frame_colour_demo(0, theme, this_user()->query_screen_width() / 3 - 20) + "\n\n");
+   write("Frame colour example:\n" + frame_colour_demo(nil, theme, this_user()->query_screen_width() / 3 - 20) + "\n\n");
    write("Frame colour array  : " + implode(map(explode(colours[theme][0], ","), (
                                                                                      : "<" + $1 + ">" + $1 + "<res>"
                                                                                      :)),
@@ -115,7 +115,7 @@ void write_config()
       write("Nothing changed, nothing to save.");
       return;
    }
-   content += sprintf("%O", colours) + ";\n\n// Automatically generated file, do not edit by hand. Use admtool.\n";
+   content += sprintf("%Q", colours) + ";\n\n// Automatically generated file, do not edit by hand. Use admtool.\n";
    write_file(FRAME_INCLUDE_FILE, content, 1);
    write(FRAME_INCLUDE_FILE + " updated.");
 }
@@ -126,69 +126,56 @@ nomask class command_info *module_commands()
        new (class command_info, key
             : "l", desc
             : "list frame themes", action
-            : (
-                : stat_frames:)),
+            : stat_frames),
        new (class command_info, key
             : "p", desc
             : "palette", action
-            : (
-                : show_palette:)),
+            : show_palette),
        new (class command_info, key
             : "a", proto
             : "[theme]", args
             : ({"Theme: "}), action
-            : (
-                  : add_theme:),
+            : add_theme,
               desc
             : "add new theme"),
        new (class command_info, key
             : "s", proto
             : "[theme]", args
             : ({"Theme: "}), action
-            : (
-                  : show_theme:),
+            : show_theme,
               desc
             : "show theme details"),
        new (class command_info, key
             : "g", proto
             : "[theme] [colour]", args
             : ({"Theme: ", "Gradient (CSV): "}), action
-            : (
-                  : change_colour, "gradient"
-                  :),
+            : &change_colour("gradient"),
               desc
             : "change theme GRADIENT colour (comma seperated list)"),
        new (class command_info, key
             : "t", proto
             : "[theme] [colour]", args
             : ({"Theme: ", "Colour: "}), action
-            : (
-                  : change_colour, "title"
-                  :),
+            : &change_colour("title"),
               desc
             : "change theme TITLE colour"),
        new (class command_info, key
             : "a", proto
             : "[theme] [colour]", args
             : ({"Theme: ", "Colour: "}), action
-            : (
-                  : change_colour, "accent"
-                  :),
+            : &change_colour("accent"),
               desc
             : "change theme ACCENT colour"),
        new (class command_info, key
             : "w", proto
             : "[theme] [colour]", args
             : ({"Theme: ", "Colour: "}), action
-            : (
-                  : change_colour, "warning"
-                  :),
+            : &change_colour("warning"),
               desc
             : "change theme WARNING colour"),
        new (class command_info, key
             : "W", action
-            : (
-                  : write_config:),
+            : write_config,
               desc
             : "write to .h file (do you have a backup?)"),
    });

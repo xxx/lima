@@ -39,12 +39,7 @@ nomask void nuke_user(string userid, int skip_save)
    }
    else
    {
-      // A bit ugly, but does the job. We'd rather store user info in user files than create a daemon to track all
-      // these.
-      bodies = restore_variable(
-          filter(explode(read_file(LINK_PATH(userid) + __SAVE_EXTENSION__), "\n"), (
-                                                                                             : $1[0..5] == "bodies"
-                                                                                             :))[0][7..]);
+      bodies = restore_map(LINK_PATH(userid))["bodies"];
    }
 
    /* Remove each player for the user */
@@ -99,7 +94,7 @@ nomask void receive_name_for_nuking(string name)
    }
 
    printf("Are you sure you want to nuke '%s' ? ", capitalize(name));
-   modal_simple(( : confirm_nuking, name:));
+   modal_simple(&confirm_nuking(name));
 }
 
 private
@@ -191,7 +186,7 @@ nomask void receive_name_for_reset(string name)
    }
 
    printf("Enter new password: ");
-   modal_simple(( : enter_new_password, name:));
+   modal_simple(&enter_new_password(name));
 }
 
 private
@@ -261,12 +256,12 @@ private
 nomask void receive_days_for_purge(string days)
 {
    int limit = time() - (to_int(days) * SECS_PER_DAY);
-   mixed *times = filter(LAST_LOGIN_D->query_times(), ( : $1[0] <= $(limit) :));
+   mixed *times = filter(LAST_LOGIN_D->query_times(0), ( : $1[0] <= $(limit) :));
 
    printf("You will nuke %d users that have not logged on after %s.\n"
           "Are you sure? ",
           sizeof(times), ctime(limit));
-   modal_simple(( : confirm_purge, times:));
+   modal_simple(&confirm_purge(times));
 }
 
 nomask class command_info *module_commands()
@@ -276,24 +271,21 @@ nomask class command_info *module_commands()
             : "n", proto
             : "[name]", args
             : ({"Who should be nuked? "}), action
-            : (
-                  : receive_name_for_nuking:),
+            : receive_name_for_nuking,
               desc
             : "nuke a user"),
        new (class command_info, key
             : "w", proto
             : "[name]", args
             : ({"Who should be wizzed? "}), action
-            : (
-                  : receive_name_for_wiz:),
+            : receive_name_for_wiz,
               desc
             : "wiz a user"),
        new (class command_info, key
             : "d", proto
             : "[name]", args
             : ({"Who should be de-wizzed? "}), action
-            : (
-                  : receive_name_for_dewiz:),
+            : receive_name_for_dewiz,
               desc
             : "dewiz a user"),
 #ifdef USE_WIZ_POSITION
@@ -301,8 +293,7 @@ nomask class command_info *module_commands()
             : "p", proto
             : "[name] [position]", args
             : ({"Set position for who? ", "Set %s's postion to what? "}), action
-            : (
-                  : receive_position_for_wiz:),
+            : receive_position_for_wiz,
               desc
             : "give a wizard a position"),
 #endif
@@ -310,16 +301,14 @@ nomask class command_info *module_commands()
             : "r", proto
             : "[name]", args
             : ({"Reset password of which offline user? "}), action
-            : (
-                  : receive_name_for_reset:),
+            : receive_name_for_reset,
               desc
             : "reset password for offline user"),
        new (class command_info, key
             : "P", proto
             : "[days]", args
             : ({"How many days since their last login? "}), action
-            : (
-                  : receive_days_for_purge:),
+            : receive_days_for_purge,
               desc
             : "Purge users not logged in within N days"),
    });
