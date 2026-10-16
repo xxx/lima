@@ -14,12 +14,13 @@ With the lpc-rs checkout beside this one and its CLI built, check a command with
 ```
 
 The current standalone-source inventory, on 15 October 2026 against native
-`b1355532` and this checkout at `7bcd6943`, compiles **818 of 1,180 .c files**:
-**362 fail, with no timeouts or crashes**. The identical target set gains **65
-successes with no lost successes** since the preceding 753/1,180 checkpoint.
-These counts include optional and inherited-only sources and are not a completion
-percentage. Selected composition review confirms 32 failed fragments inside passing
-complete hosts; remaining failures still need consumer-specific review.
+`e6822728` and this checkout at `39da199b`, compiles **924 of 1,180 .c files**:
+**256 fail, with no timeouts or crashes**. The identical target set gains **106
+successes without regressions** since the preceding 818/1,180 checkpoint: 88 school,
+11 ranged/ammunition and seven NPC/account sources. Counts include optional and
+inherited-only sources and are not a completion percentage. **58 failed fragments**
+have verified passing complete hosts. Further fragments and source/API adaptations
+remain to be reviewed.
 
 Command compilation is player **65/67**, wizard **81/81**, guild **4/4**, verbs
 **90/90**, transitional **49/49** and transitional administrator **9/9**. The two
@@ -66,9 +67,16 @@ address-only overrides; no new source fixture/helper or permission grant.
 
 Absent/zero bank-account lookup, non-base-denomination exchange, Harry following,
 duplicate/unique stock and wander-area removal retain separate source scopes.
-Yakitori cashier still blocks on a private inherited call. Whole-source counts
-above remain historical; next refresh the inventory before selecting another
-complete dependency family. Existing equipment and TCP scopes stay closed.
+Yakitori cashier still blocks on a private inherited call. The NPC implementation
+is committed in `39da199b`. The refreshed inventory repeats compilation only;
+the preceding 881-input runtime evidence retains its scope. Existing equipment
+and TCP work stays closed.
+
+Next audit the 22 standard junk examples with their material-spawner/stateful/junk
+bases (25 targets). Twenty examples first need float weight/value arguments; the
+spawner and dirt-pile initializer expose shared return/path/contract boundaries.
+Review actual search consumers before selecting a patch; no source adapter is
+adopted by this inventory checkpoint.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
