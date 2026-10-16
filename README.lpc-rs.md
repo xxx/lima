@@ -89,10 +89,19 @@ fixtures, earlier bank restoration and other accepted checks remain. Original
 message/yield/capacity/fertilizer/setup quirks retain their scopes. The full-source
 924/1,180 count above remains the preceding measured inventory.
 
-Next audit the vehicle base and its Camaro/horse consumers; they share a known
-integer-zero return in a string function. Review complete callers and later
-diagnostics before selecting adapters, keeping reserved native discussions and completed equipment/
-TCP work separate.
+The vehicle audit has a four-file proposal, not yet adopted. It adapts nil string
+returns, native callbacks/mixed movement payloads, object-valued driver state,
+canonical movement registration and explicit empty exit/dismount rules. Camaro
+and shared frameworks remain unchanged. All 12 complete targets compile. The
+22-input focused run passes basic entry, a driving round trip, exit, mount and
+dismount with actual driver identity, plus two clean 151-preload boots and saved
+login. Native forwarding/class controls pass; no new native feature is proposed.
+
+Next adopt the proposal and validate ordinary drivers/passengers, handover,
+descriptions and notifications with retained regression coverage. Legacy direct
+mount helpers, all aliases, following/room-hook interactions and detailed message
+wiring keep their separate scopes. This audit does not replay/replace the prior
+1052-input production run or update the whole-source inventory above.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
