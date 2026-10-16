@@ -144,10 +144,30 @@ connected-player vehicle handovers remain. Same six fixtures/two address overrid
 no new LPC test helper or grant. The whole-source 924/1,180 remains its measured
 inventory; the two additions are not counted by arithmetic.
 
-Next audit PARAM_OBJ with recorder, button, panel and transcript; those general
-parameterized objects have not migrated to virtual_blueprint. Broader coordinate
-policy, idle cleanup, unrelated game quirks, completed equipment/TCP work and
-reserved native discussions retain their scopes.
+The recorder/PARAM_OBJ audit has a three-file proposal, not yet adopted. All five
+family sources compile in the baseline, but recorder construction fails on its
+parameterized button clone paths. The existing object factory already creates
+labelled independent clones. Recorder can call it directly and replenish missing
+buttons by label on reset, retaining the container's panel reset. Button needs its
+native long callback and normal press check; delayed pop_up callbacks use bound
+pointers. A one-line live-object filter in container reset removes stale destroyed
+children under distinct nil. PARAM_OBJ/panel/transcript and native code stay.
+
+All **14 complete targets compile** in the disposable proposal. The final
+**106.43s**, **108-input** focused run passes all 30 lifecycle checkpoints,
+both clean 151-preload boots, saved login and normal exits. Two recorder instances,
+normal button/description/read/take paths, record/append/overwrite transcripts,
+six delayed callbacks, missing-child replacement, preserved surviving buttons,
+idempotent reset, silence and cleanup pass. Same six fixtures/two address overrides,
+no new LPC helper or grant. The prior 1318-input full replay remains retained,
+without being replayed in this audit; whole-source 924/1,180 stays measured.
+
+Next adopt the three-file proposal and retain full regression coverage. General
+parameterized virtual names are unnecessary for this consumer; its factory remains
+an explicit clone API. Original playback/message policy and retired attic code stay
+separate. An RST/closed-committer shutdown panic was observed in the baseline at
+SIGTERM, not in the final run; it is recorded separately without a native fix claim.
+Completed equipment/TCP work and reserved native discussions remain separate.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
