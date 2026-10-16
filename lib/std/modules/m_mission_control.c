@@ -17,7 +17,7 @@ void give_to_mission_obj(object ob)
 
 void given_item(object ob)
 {
-   call_out("give_to_mission_obj", 2, ob);
+   call_out(&give_to_mission_obj(ob), 2);
 }
 
 object query_active_mission()
@@ -33,7 +33,7 @@ void set_active_mission(object am)
 
 void end_mission()
 {
-   active_mis = 0;
+   active_mis = nil;
    receives = 0;
 }
 
@@ -57,7 +57,7 @@ void mission_setup()
            "missionwho":"Right now, every member of " + capitalize(guild) + ".",
                   "box":"The box contains our resources. You may look in there, but you cannot take from the box.", ]));
    set_start(({"who"}));
-   this_object()->add_hook("object_arrived", ( : given_item:));
+   this_object()->add_hook("object_arrived", given_item);
    this_object()->add_id("mission_ctrl_npc_guild");
 }
 

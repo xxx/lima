@@ -26,7 +26,7 @@ void do_give_obj_to_liv(object ob, object liv)
 
 void do_give_obs_to_liv(object *info, object liv)
 {
-   handle_obs(info, ( : do_give_obj_to_liv:), liv);
+   handle_obs(info, do_give_obj_to_liv, liv);
 }
 
 mixed can_give_wrd_str_to_liv(string amount, string str, object who)
