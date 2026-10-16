@@ -484,6 +484,33 @@ The retained first replay hit the existing 4000ms cold-load budget before paper;
 source/helpers/limits stayed unchanged for the retry.
 Evidence: /tmp/lima-writing-20261016.
 
+Paper support is committed as **0bceb674** (native notes **99d7faf3**). The new
+physical mailbox/leaflet audit is separate from the user-mail system. A two-file
+temporary proposal explicitly converts their mass constants, preserving mailbox
+16.0, leaflet 1.0, integer capacity 4, anchored refusal, IDs/text and relative
+leaflet population. Dedicated LPC stays unchanged pending adoption; headers/LF/
+final newline, native API/code/config/master/privilege/framework/fixtures remain.
+
+**14/14** complete targets compile. Focused **69.49s / 62 inputs** uses the actual
+entrance-room constructor and passes closed visibility/read/get refusal, normal
+open/close/repeat/open-up, look-at contents, read auto-acquisition/full text/three
+IDs, get/put/drop and anchored refusal. Four unit-mass leaflets fit and a normal
+fifth put refuses without mutation. Explicit public reset calls replace a missing
+leaflet once without duplicating an existing one; natural reset timing is untested.
+Stock fillers/one temporary ID are instance controls, with no new LPC helper/body/
+host/grant. The inherited generic look-in parser refusal stays unchanged; public
+look_in hooks and ordinary open/look-at content display pass. The retained initial
+failure was an incorrect test expectation about that refusal's wording.
+
+All 30 checkpoints, both clean 151-preload boots, saved login and normal exits pass
+without failed apply/runtime input error/STATE_D failure/panic. The room prop is
+restored to one closed mailbox/leaflet; empty-handed player returns to Grand Hall.
+Prop restart persistence is not qualified. Same six fixtures/two address overrides,
+distinct nil/preserved player/4000ms and actual master/simuls/user/body/parser remain.
+Prior 2082 + 10 restored-favour / 426.29s replay and 966/1182 sweep keep measured scope.
+Next adopt with retained full replay after writing and before mission/expiry/favour.
+Evidence: /tmp/lima-mailbox-props-audit-20261016.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
