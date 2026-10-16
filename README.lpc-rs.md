@@ -34,9 +34,15 @@ The school/tutorial family has 88 failing examples, mostly first blocked by trai
 include semicolons, with text-block syntax and other later errors still to audit.
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
-an upstream bug or a missing efun. Ranged weapons/ammunition are the recommended
-next consumer group: 11 failed targets reach two shared definitions. Source-wide
-migration, optional configurations/services and broader gameplay remain incomplete.
+an upstream bug or a missing efun. The ranged/ammunition audit finds nine source
+adapters that let all 11 family targets compile in a temporary copy: an explicit
+array collector, a parameterless short-description adapter, nil object sentinels
+and float values. A default fire-mode list also needs initialization; a standalone
+method control verifies it and retains flattened array calls. These changes are
+proposed, with no dedicated LPC source changes or normal-game combat qualification
+yet. Apply them next and check actual clone descriptions and matching pistol/clip
+flows. Bundled crossbow/quarrel configuration, other source families, optional
+services and broader gameplay remain separate.
 
 The retained production-driver check passes 30 checkpoints covering account/character
 creation, menu, Grand Hall entry, look/inventory, logout and saved-account/body
