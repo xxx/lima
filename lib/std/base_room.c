@@ -377,7 +377,7 @@ void arrival(object who)
 // that will be evaluated to create a string.
 // The call_out() in the room is only called if players are in the room,
 // so using this will be okay even for many rooms.
-varargs void set_room_chat(mixed chat, int interval = 15, int chance)
+varargs void set_room_chat(mixed chat, int interval = 15, int chance = 0)
 {
    if (interval <= 0)
       error("Room chat interval must be positive.\n");
