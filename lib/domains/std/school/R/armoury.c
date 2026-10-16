@@ -1,11 +1,9 @@
-#include "../school.h";
+#include "../school.h"
 inherit INDOOR_ROOM;
 
 void setup(){
     set_brief("Wizard's armoury");
-    set_long(@MAY
-The armoury.
-MAY
+    set_long("The armoury.\n"
     );
     set_exits( ([
 	"corridor" : R "corridor06",

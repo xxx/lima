@@ -1,39 +1,31 @@
-#include "../school.h";
+#include "../school.h"
 inherit INDOOR_ROOM;
 
 void setup(){
     set_brief("Wizard's Zoo [home of monsters]");
-    set_long(@KAAN
-The zoo... Home of our monsters
-KAAN
+    set_long("The zoo... Home of our monsters\n"
     );
 
     add_item("anvil",  
-      ([ "look" :(@KAAN
-Its a white hot anvil made the hardest substance you have ever seen. This 
-preheated source for smithing eliminates the need for a hearth to forge 
-weapons. A smith only has to place his item on it and state it to be 
-melted to the percentage of the object's melting point.
-KAAN),             
+      ([ "look" :("Its a white hot anvil made the hardest substance you have ever seen. This \n"
+                  "preheated source for smithing eliminates the need for a hearth to forge \n"
+                  "weapons. A smith only has to place his item on it and state it to be \n"
+                  "melted to the percentage of the object's melting point.\n"),
       ]) );
 
 
     add_item("computer",  
-      ([ "look" :(@KAAN
-Yep its a neat computer. Its marvelously thin at only 1 inch thick 
-without a cluncky box to go with it because its all imbeded inside the 
-back of the monitor like a PADD.
-KAAN),             
+      ([ "look" :("Yep its a neat computer. Its marvelously thin at only 1 inch thick \n"
+                  "without a cluncky box to go with it because its all imbeded inside the \n"
+                  "back of the monitor like a PADD.\n"),
       ]) );
 
     add_item("walls",  
-      ([ "look" :(@KAAN
-The walls are bright and clean. They they seem to be made of a substance 
-that is heat sinking to keep the shop cool. There are two racks of 
-current weapon types. One consisting of lightsabers and another 
-consisting of swords. Under the racks is a sign that reads "Under 
-Construction. More weapon types to come soon to a blacksmith near you."
-KAAN),             
+      ([ "look" :("The walls are bright and clean. They they seem to be made of a substance \n"
+                  "that is heat sinking to keep the shop cool. There are two racks of \n"
+                  "current weapon types. One consisting of lightsabers and another \n"
+                  "consisting of swords. Under the racks is a sign that reads \"Under \n"
+                  "Construction. More weapon types to come soon to a blacksmith near you.\"\n"),
       ]) );
 
     set_exits( ([

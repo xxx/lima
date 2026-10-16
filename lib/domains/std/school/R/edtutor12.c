@@ -1,34 +1,32 @@
 // May's Ed Tutorial for Wizards
 
-#include "../school.h";
+#include "../school.h"
 inherit INDOOR_ROOM;
 
 void setup(){
   set_brief("Ed Tutorial 12");
-  set_long(@MAY
-ed testroom.c
-n
-1z
-z
-x
-
-ed testroom.c
-n
-1,$p
-x
-
-
-ed testroom.c
-n
-1,$p
-w
-q
-
-Emergency way out 
-ed testroom.c
-n
-Q
-MAY
+  set_long("ed testroom.c\n"
+           "n\n"
+           "1z\n"
+           "z\n"
+           "x\n"
+           "\n"
+           "ed testroom.c\n"
+           "n\n"
+           "1,$p\n"
+           "x\n"
+           "\n"
+           "\n"
+           "ed testroom.c\n"
+           "n\n"
+           "1,$p\n"
+           "w\n"
+           "q\n"
+           "\n"
+           "Emergency way out \n"
+           "ed testroom.c\n"
+           "n\n"
+           "Q\n"
   );
   set_exits( ([
     "south" : R + "edtutor11",

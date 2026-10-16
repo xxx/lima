@@ -1,24 +1,22 @@
-#include "../school.h";
+#include "../school.h"
 inherit INDOOR_ROOM;
 
 void setup(){
     set_brief("Further information from dbxframe");
-    set_long(@LORIEL
-Each of the steps which led up to an error can be shown with dbxframe.
-This will display a few lines of code either side, and variable values.
-Using the previous example, and abbreviating the display:
-'dbxframe 3'
-------/obj/secure/shell.c:116 - shell_input("tail execute")
-locals:
----------------------------------------------------------------
-        input = input[1..];
-    else
-        input = expand_alias(input);
-    if ( input != "" )
-=>      execute_command(input);
-}
-
-LORIEL
+    set_long("Each of the steps which led up to an error can be shown with dbxframe.\n"
+             "This will display a few lines of code either side, and variable values.\n"
+             "Using the previous example, and abbreviating the display:\n"
+             "'dbxframe 3'\n"
+             "------/obj/secure/shell.c:116 - shell_input(\"tail execute\")\n"
+             "locals:\n"
+             "---------------------------------------------------------------\n"
+             "        input = input[1..];\n"
+             "    else\n"
+             "        input = expand_alias(input);\n"
+             "    if ( input != \"\" )\n"
+             "=>      execute_command(input);\n"
+             "}\n"
+             "\n"
     );
     set_exits( ([
 	"backward" : R "problems02",

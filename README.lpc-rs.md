@@ -30,14 +30,22 @@ All 25 admtool leaves retain navigation and selected report/edit coverage. The r
 report matches six definitions; memory reports rank 274/257 objects across restart
 using nonadditive estimates and separate strings within the driver's size limit.
 
-The school audit identifies source-only syntax adapters for all 88 files:
-87 active include semicolons and 104 outer text blocks. A temporary conversion
-compiles 88/88, and native literal execution preserves all 46,222 extracted text
-bytes. Three stale map/return-exit references also have reviewed corrections;
-all 87 room nodes are statically reachable. Six of ten referenced object sources
-compile, while four NPC sources still block five lessons' NPCs. Native example
-snippets also need review. These are temporary controls, with no dedicated school
-source changes, full-room runtime qualification or new whole-source inventory yet.
+The school batch converts all 88 sources to native strings/includes, corrects
+three stale map/return-exit paths and updates 13 native example texts. All 104
+final text values are checked, with 91 unchanged from upstream; 11 complete
+displayed examples compile. Bounded source checks pass **109/109**. The room-chat
+chance has an explicit default to preserve supplied intervals under the current
+compiler; a non-trailing-default reproducer is recorded for a separate fix.
+
+The new normal-game run visits 45 school rooms and views 31 selected lessons,
+covering maps, navigation, item aliases/actions, native examples and all three
+room-chat forms. It retains all 596 prior first-session command records and adds
+**203 school inputs**. All 30 lifecycle checkpoints, both clean 151-preload boots,
+saved login and normal exits pass. Five lessons' NPC dependencies remain unvisited
+and unchanged; accountant, wander, Harry and vendor need the next coherent audit.
+Other historical prose/partial examples remain outside these checks. The whole-
+source inventory above remains the earlier measurement.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source

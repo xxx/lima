@@ -1,12 +1,10 @@
-#include "../school.h";
+#include "../school.h"
 inherit INDOOR_ROOM;
 
 void setup(){
     set_brief("Corridor");
-    set_long(@LORIEL
-This corridor leads new wizards onwards from the school,
-gaining knowledge as they proceed.
-LORIEL
+    set_long("This corridor leads new wizards onwards from the school,\n"
+             "gaining knowledge as they proceed.\n"
     );
     set_exits( ([
     "pantry" : R "pantry",

@@ -1,34 +1,21 @@
 // Yourwizname   Date   (example:  May  02 Feb 2001)
 
-#include "../school.h";
+#include "../school.h"
 inherit INDOOR_ROOM;
 
 void setup(){
     set_brief("Skeleton Room Requirements");
-    set_long(@MAY
-#include "yourareaname.h";
-inherit INDOOR_ROOM;
-void setup(){
-    set_light(1);
-    set_area("schoolroom");
-    set_brief("Skeleton Room");
-    set_long(@YOURWIZNAME
-This is your basic room (skeleton room).
-YOURWIZNAME
-    );
-    add_item("desk",  
-      ([ "look" :(@YOURWIZNAME
-Item descriptions go here
-YOURWIZNAME),             
-      ]) );
-    set_exits( ([
-        "may" : R + "workroom",
-      ]) );
-    set_objects( (["/wiz/kaan/obj/kaan_throne" : 1,
-//or set_objects( ([O + "filename" : 1,
-      ]) );
-}
-MAY
+    set_long("#include \"/domains/std/school/school.h\"\n"
+             "inherit INDOOR_ROOM;\n"
+             "\n"
+             "void setup() {\n"
+             "    set_area(\"schoolroom\");\n"
+             "    set_brief(\"Skeleton Room\");\n"
+             "    set_long(\"This is your basic room (skeleton room).\\n\");\n"
+             "    add_item(\"desk\", ([\"look\":\"Item descriptions go here.\\n\"]));\n"
+             "    set_exits(([\"school\":R \"school\"]));\n"
+             "    set_objects(([O \"map\":1]));\n"
+             "}\n"
     );
     set_exits( ([
 	"rooms" : R "room",

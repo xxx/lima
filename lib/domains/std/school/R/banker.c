@@ -1,29 +1,27 @@
-#include "../school.h";
+#include "../school.h"
 inherit INDOOR_ROOM;
 
 void setup(){
     set_brief("How to make a banker");
-    set_long(@MAY
-
-Start with a file similar to simple npc.
-Inheriting M_VENDOR as well.
-
-Additional items needed in setup() :
-
-//Short name (or id) for the bank
-  set_bank_id("lima");
-
-//Formal name for the bank
-  set_bank_name("The Imperial Bank of the Bean");
-
-//Type of currency it keeps accounts in
-  set_currency_type("dollar");
-
-//Fee charged it your cash is in the 'wrong' currency (%)
-  set_exchange_fee(5);
-
-}
-MAY
+    set_long("\n"
+             "Start with a file similar to simple npc.\n"
+             "Inheriting M_VENDOR as well.\n"
+             "\n"
+             "Additional items needed in setup() :\n"
+             "\n"
+             "//Short name (or id) for the bank\n"
+             "  set_bank_id(\"lima\");\n"
+             "\n"
+             "//Formal name for the bank\n"
+             "  set_bank_name(\"The Imperial Bank of the Bean\");\n"
+             "\n"
+             "//Type of currency it keeps accounts in\n"
+             "  set_currency_type(\"dollar\");\n"
+             "\n"
+             "//Fee charged it your cash is in the 'wrong' currency (%)\n"
+             "  set_exchange_fee(5);\n"
+             "\n"
+             "}\n"
     );
     set_exits( ([
 	"monsters" : R "zoo",

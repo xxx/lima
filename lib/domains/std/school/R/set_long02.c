@@ -1,20 +1,17 @@
-#include "../school.h";
+#include "../school.h"
 inherit INDOOR_ROOM;
 
 void setup(){
-    set_brief("Room set_long - old style");
-    set_long(@MAY
-The 'old style' starts and finishes with TOKENS.
-By convention capitalised name, preceded by @ at the start.
-
-set_long(@YOURWIZNAME
-You type in the text that you want to say, returning each line like an
-old fashioned typewriter.  This is quick and simple.  However, it imposes
-your line wrapping on the player looking at the room, and his preferences
-for line wrapping may be different from yours.
-YOURWIZNAME
-);
-MAY
+    set_brief("Room set_long - explicit line breaks");
+    set_long("Use explicit newline escapes when the positions of line breaks matter.\n"
+             "Adjacent quoted strings form one description:\n"
+             "\n"
+             "set_long(\"The first line of a sign.\\n\"\n"
+             "         \"The second line of the sign.\\n\");\n"
+             "\n"
+             "Each \\n in the source inserts a newline into the displayed text.\n"
+             "For paragraphs that clients should wrap, the next lesson shows how to join\n"
+             "source lines with spaces instead.\n"
     );
     set_exits( ([
 	"backward" : R "set_long01",

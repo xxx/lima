@@ -1,25 +1,21 @@
-#include "../school.h";
+#include "../school.h"
 inherit INDOOR_ROOM;
 
 void setup(){
     set_brief("How to make a monster wear and wield");
-    set_long(@MAY
-inherit ADVERSARY;
-void setup() {
-    ::setup();
-    set_name("Monster");
-    set_id("monster");
-    set_gender(1);
-    set_proper_name("Frank the Monster");
-    set_in_room_desc("Frank the Monster");
-    set_long(@KYLISSA
-  This is a very scary monster.
-KYLISSA
-    );
-    set_wielding(WIZ_DIR+"/kylissa/gotham/W/skull_sword");
-    set_wearing(WIZ_DIR+"/kylissa/gotham/A/skull_plate");
-}
-MAY
+    set_long("inherit ADVERSARY;\n"
+             "void setup() {\n"
+             "    ::setup();\n"
+             "    set_name(\"Monster\");\n"
+             "    set_id(\"monster\");\n"
+             "    set_gender(1);\n"
+             "    set_proper_name(\"Frank the Monster\");\n"
+             "    set_in_room_desc(\"Frank the Monster\");\n"
+             "    set_long(\"  This is a very scary monster.\\n\"\n"
+             "    );\n"
+             "    set_wielding(\"/domains/std/weapon/sword\");\n"
+             "    set_wearing(\"/domains/std/armour/chainmail\");\n"
+             "}\n"
     );
     set_exits( ([
 	"monsters" : R + "zoo",

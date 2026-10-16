@@ -1,25 +1,23 @@
-#include "../school.h";
+#include "../school.h"
 inherit INDOOR_ROOM;
 
 void setup(){
     set_brief("Unix Commands");
-    set_long(@LANCELOT
-Basic Unix Commands (Write these down)
-cd - change directory
-ls - list the files in the current directory
-pwd - show (print) working directory
-more - view the specified file, with pauses
-cat - view the specified file, without pauses
-tail - view the last few lines of specified file
-ed - edit the specified file
-rm - removes file
-mv - move or rename
-mkdir - make directory
-rmdir - remove directory
-grep - search file(s) for specified text
-
-Use 'help <command>' for further details
-LANCELOT
+    set_long("Basic Unix Commands (Write these down)\n"
+             "cd - change directory\n"
+             "ls - list the files in the current directory\n"
+             "pwd - show (print) working directory\n"
+             "more - view the specified file, with pauses\n"
+             "cat - view the specified file, without pauses\n"
+             "tail - view the last few lines of specified file\n"
+             "ed - edit the specified file\n"
+             "rm - removes file\n"
+             "mv - move or rename\n"
+             "mkdir - make directory\n"
+             "rmdir - remove directory\n"
+             "grep - search file(s) for specified text\n"
+             "\n"
+             "Use 'help <command>' for further details\n"
 );
 
     set_exits( ([
