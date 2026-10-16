@@ -106,11 +106,29 @@ admin grant; both accounts save and log out normally. Both clean 151-preload boo
 all 30 lifecycle checkpoints, the original saved login and bank restoration pass.
 Same six retained fixtures/two address overrides; no new LPC helper or grant.
 
-Next audit the four remaining standard rooms: Labroom, Labyrinth, V_Plains and
-caves/Sloping_Tunnel. Legacy direct mount helpers, all aliases, following/other
-room-hook interactions and detailed message-template behavior retain their scopes.
-Existing entry/exit wording and horse arrival/departure quirks are unchanged.
-The full-source 924/1,180 count remains its preceding measured inventory.
+The remaining-standard-room audit has a six-file proposal, not yet adopted.
+It adds the omitted format_list separator, nil factory declines and explicit
+file_name receiver, forwards BASE_ROOM constructor arguments, corrects the
+entrance server's case and uses the tunnel's live set_default_error API. The
+constructor forwarding, case mismatch and stale tunnel method also occur in the
+original source; they are concrete dependency defects rather than native gaps.
+Headers/LF remain. **13/13 complete targets compile** in the disposable proposal.
+
+The **72.69s** focused run passes all 30 lifecycle checkpoints, both clean
+151-preload boots and saved login. Its **69 audit inputs** check four Labroom
+cases, three maze factory rooms, the entrance, all **64 plains cells/256 exits**
+and normal tunnel refusal/movement. Same six fixtures/two address overrides, no
+new helper or grant. The preceding 1117-input full gameplay run is retained without
+being replayed; the whole-source 924/1,180 remains its measured inventory.
+
+Virtual paths remain unported: Lima returns a configured clone from compile_object,
+while native expects a blueprint path and initializes the requested virtual object.
+The load/string-receiver controls confirm that mismatch; replacing the object by
+its filename would lose configuration. Lowercase maze routing also needs its own
+case adaptation. Recommend adopting the six bounded corrections, then migrating
+virtual factories to initialize from the requested identity under the existing
+native contract. Broader parameterized objects, coordinate policy, legacy mount/
+message/alias/follower work and reserved native discussions retain their scopes.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
