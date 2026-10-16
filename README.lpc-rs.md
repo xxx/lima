@@ -194,6 +194,28 @@ behavior remain original source behavior. No native feature is recommended. The
 whole-source count remains its measured inventory. Equipment/TCP, native observations
 and reserved discussions stay separate. Evidence: /tmp/lima-guild-artefact-20261016.
 
+
+The mission-controller audit after **3ad685f6** has a temporary two-file proposal:
+native bound delivery call-out, nil clearing and bare arrival callback in
+std/modules/m_mission_control.c, plus bare give dispatch in cmds/verbs/give.c.
+The old give closure returns a function without moving the item. **21/21** complete
+targets compile in the proposal. Its **95.73s / 61-input** focused run passes
+normal room/controller reuse, inactive refusal, actual give/two-second salvage,
+preserved contributor context, manual end/delayed destruction and active-buff board
+rendering, plus 30 lifecycle checkpoints, two clean 151-preload boots and saved login.
+Same six fixtures/two address overrides, no new helper or grant; no dedicated source
+or native implementation is adopted. The prior 1500-input replay retains its scope.
+
+Unmodified favour logic replaces the active-mission pointer and leaves the buff's
+own expiry at time(), despite a future cached expiry. A state update applies then
+immediately clears XP while that cache stays. Original-source review confirms the
+controller/clock statements; no upstream driver is executed. These source issues
+remain unpatched. Purchase accounting, sustained/restored favours, full rewards and
+automatic mission expiry are unqualified; cleanup clears the diagnostic cache.
+Next adopt the two reviewed adapters with the full replay, then review that bounded
+favour lifecycle correction. No native feature is recommended. Evidence:
+/tmp/lima-mission-controller-audit-20261016.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
