@@ -72,11 +72,21 @@ is committed in `39da199b`. The refreshed inventory repeats compilation only;
 the preceding 881-input runtime evidence retains its scope. Existing equipment
 and TCP work stays closed.
 
-Next audit the 22 standard junk examples with their material-spawner/stateful/junk
-bases (25 targets). Twenty examples first need float weight/value arguments; the
-spawner and dirt-pile initializer expose shared return/path/contract boundaries.
-Review actual search consumers before selecting a patch; no source adapter is
-adopted by this inventory checkpoint.
+The junk/material-spawner audit has a 22-file proposal, not yet adopted: 26 float
+weight/value arguments, explicit void return/nil path handling and dirt-pile
+configuration through the normal setup hook. All 25 family targets compile in
+the disposable library; 22 normal clones plus a supplied-loot dirt constructor
+initialize successfully. Item masses/values/metadata and spawner attachment,
+intervals and STATE_D registration pass. The focused 120-input constructor run
+passes all 30 lifecycle checkpoints, both clean 151-preload boots and saved login.
+It retains existing fixtures/policies and does not qualify searches/cooldowns or
+replace the preceding 881-input production evidence. Whole-source counts above
+remain the actual adopted inventory.
+
+Next adopt the reviewed proposal and test normal searches, delayed completion,
+default/custom loot, repeated-search refusal and cooldown expiry. Headers and
+CRLF must be preserved. Existing random-trash setup, fertilizer weight and
+alternate-message/capacity behaviors retain their separate source scopes.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
