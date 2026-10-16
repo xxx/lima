@@ -1,7 +1,6 @@
 /* Do not remove the headers from this file! see /USAGE for more info. */
 
-inherit ADVERSARY;
-inherit M_ACCOUNTANT;
+inherit ACCOUNTANT;
 
 void setup()
 {
@@ -15,5 +14,5 @@ void setup()
    set_bank_id("Bean");
    set_bank_name("The Imperial Bank of the Bean");
    set_currency_type("gold");
-   set_exchange_fee(5);
+   set_exchange_fee(5.0);
 }

@@ -41,29 +41,34 @@ The new normal-game run visits 45 school rooms and views 31 selected lessons,
 covering maps, navigation, item aliases/actions, native examples and all three
 room-chat forms. It retains all 596 prior first-session command records and adds
 **203 school inputs**. All 30 lifecycle checkpoints, both clean 151-preload boots,
-saved login and normal exits pass. Five lessons' NPC dependencies remain unvisited
-and unchanged; their accountant, wander, Harry and vendor dependencies are audited
+saved login and normal exits pass. Five lessons' NPC dependencies were unvisited
+in that run; their accountant, wander, Harry and vendor support is described
 below.
 Other historical prose/partial examples remain outside these checks. The whole-
 source inventory above remains the earlier measurement.
 
-The follow-up NPC dependency audit has a seven-file source proposal for banker,
-wander/dragon, Harry and vendor adapters; it is not adopted yet. All four compile
-and initialize as native livings in the disposable library. Shopkeeper constructs
-five stock entries and preserves fractional cost. The focused constructor run
-passes all 30 lifecycle checkpoints, both clean 151-preload boots and saved login;
-its 16 inputs are audit controls, without replaying/replacing the accepted school
-run or qualifying financial, timed-wander, trigger or purchase behavior.
+The NPC support batch adapts 11 source files: accountant/wander/Harry/vendor,
+explicit parent setup, banker lesson, required account-daemon expressions and
+list/buy rule order. Native API, master policy and configuration are unchanged.
+**124/124** bounded targets compile. The final normal-game run retains all **799**
+preceding first-session command lines and adds **82 NPC inputs** (**881 total**).
+All 30 lifecycle checkpoints, both clean 151-preload boots, saved login and normal
+exits pass. All five remaining NPC lessons are visited with their actual spawns.
 
-Complete-consumer checks pass 14/15: the four NPCs, three bases, five school rooms
-and two world rooms pass; Yakitori cashier retains a private inherited-call blocker.
-Proposed adapters use existing ACCOUNTANT parent initialization, native callback/
-closure/nil forms, float prices and object remove() cleanup, without a new native
-API or master grant. The banker lesson also needs corrected ACCOUNTANT/5.0 advice.
-Existing bank lookup, wander-area removal and duplicate stock quirks remain separate
-source observations. Next adopt the adapters and verify ordinary interactions and
-the five remaining school rooms. Configuration, original checkout and historical
-whole-source counts remain unchanged.
+Banker menus, rates, deposit/withdrawal/two exchange paths, wallet/transaction
+results and fresh-process account restoration pass. Dragon moves by a real
+scheduled callback using public 2-second/unrestricted-area controls, then its
+example settings are restored. Harry's laugh and native block-nod responses pass.
+Vendor list/filter/explicit selection, sword and coloured-stick buy/sell paths
+work through normal commands. The player returns empty-handed to the Grand Hall
+with original wallet/pager state restored. Same six retained fixtures and two
+address-only overrides; no new source fixture/helper or permission grant.
+
+Absent/zero bank-account lookup, non-base-denomination exchange, Harry following,
+duplicate/unique stock and wander-area removal retain separate source scopes.
+Yakitori cashier still blocks on a private inherited call. Whole-source counts
+above remain historical; next refresh the inventory before selecting another
+complete dependency family. Existing equipment and TCP scopes stay closed.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically

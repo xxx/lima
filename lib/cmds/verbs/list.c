@@ -97,5 +97,5 @@ void do_list_str_from_liv(string item, object vendor)
 
 void create()
 {
-   add_rules(({"", "from LIV", "STR", "STR from LIV"}));
+   add_rules(({"", "from LIV", "STR from LIV", "STR"}));
 }

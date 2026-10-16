@@ -28,23 +28,23 @@ void setup()
    add_pattern("%s has left the game.", ( : "say Why did " + $1 + " quit the game ?" :));
    add_pattern("%s gets %s.", ( : "say Why did " + $1 + " take " + $2 + " ?" :));
    add_pattern("%s drops %s.", ( : "say Why did " + $1 + " drop " + $2 + " ?" :));
-   add_pattern("%s kicks at you.", ( : "kick " + $1:), 0, 0, LISTEN_PRIVATE);
-   add_pattern("%s kisses you.", "blush", 0, 0, LISTEN_PRIVATE);
+   add_pattern("%s kicks at you.", ( : "kick " + $1:), nil, nil, LISTEN_PRIVATE);
+   add_pattern("%s kisses you.", "blush", nil, nil, LISTEN_PRIVATE);
    add_pattern(
-       "%s nods.", function() {
+       "%s nods.", (: {
           respond("nod sol*");
           respond("think did I miss something?");
-       });
+       } :));
    add_pattern("%s laughs.", "say Did I miss a joke?");
    add_pattern("%s chuckles.", "smirk");
    add_pattern("%s boggles.", "bog");
    add_pattern("%s enters", ( : "say Hi " + $1 + ", nice to see you !" :));
-   add_pattern("%s leaves %s.\n", ( : "go " + $2:));
+   add_pattern("%s leaves %s.\n", ( : stringp($2) ? "go " + $2 : 0 :));
 
    // This subrule says that the right hand side will give us a string
    // we should sprintf() the name into, with the additional stipulation
    // that we ignore other Harry's
-   add_pattern("%s says: %s.", ( : ($2 && $1 != "Harry the affectionate") ? sprintf($2, $1) : 0 :), 0, "say_rule");
+   add_pattern("%s says: %s.", ( : ($2 && $1 != "Harry the affectionate") ? sprintf($2, $1) : 0 :), nil, "say_rule");
    add_sub_pattern("say_rule", "yes", "say I disagree");
    add_sub_pattern("say_rule", "right", "no", "say I disagree");
    add_sub_pattern("say_rule", "shut up", "say Why do you want me to shut up?");

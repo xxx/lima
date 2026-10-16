@@ -176,8 +176,7 @@ void exchange3b(string currency1, string denomination2)
       amount2 = to_int(player->query_amt_currency(currency1) * rate1 * factor / rate2);
       write("You can get up to " + MONEY_D->denomination_to_string(amount2, denomination2) + ".\n");
       input_one_arg("How many " + MONEY_D->query_plural(denomination2) + " do you want? ",
-                    (
-                        : exchange4b, currency1, denomination2:));
+                    &exchange4b(currency1, denomination2));
    }
    else
    {
@@ -226,7 +225,7 @@ void exchange3(string denomination, mixed answer)
    if (amount > 0)
    {
       if (player->query_amt_money(denomination) >= amount)
-         input_one_arg("Which currency do you want? ", ( : exchange4, denomination, amount:));
+         input_one_arg("Which currency do you want? ", &exchange4(denomination, amount));
       else
          write("You don't have " + MONEY_D->denomination_to_string(amount, denomination) + ".\n");
    }
@@ -239,8 +238,8 @@ void exchange2(string denomination)
       if (denomination == deposit_currency ||
           (!MONEY_D->is_denomination(denomination) && MONEY_D->is_currency(denomination)))
       {
-         printf("You have %s.\n", MONEY_D->currency_to_string(player->query_money(denomination), denomination));
-         input_one_arg("Which denomination do you want? ", ( : exchange3b, denomination:));
+         printf("You have %s.\n", MONEY_D->currency_to_string(player->query_amt_currency(denomination), denomination));
+         input_one_arg("Which denomination do you want? ", &exchange3b(denomination));
       }
       else if (MONEY_D->is_denomination(denomination))
       {
@@ -250,8 +249,7 @@ void exchange2(string denomination)
             write("You have " + MONEY_D->currency_to_string(player->query_amt_money(denomination), denomination) +
                   " .\n");
             input_one_arg("How many " + MONEY_D->query_plural(denomination) + " do you want to exchange? ",
-                          (
-                              : exchange3, denomination:));
+                          &exchange3(denomination));
          }
          else
             write("You don't have any " + denomination + ".\n");
@@ -265,9 +263,9 @@ void exchange2(string denomination)
 
 void exchange1()
 {
-   write("\n\nNotice: The " + bank_name + " applies an exchange fee of " + exchange_fee +
+   write("\n\nNotice: The " + bank_name + " applies an exchange fee of " + sprintf("%g", exchange_fee) +
          "% for all transactions.\n\n");
-   input_one_arg("Which currency or denomination do you want to exchange? ", ( : exchange2:));
+   input_one_arg("Which currency or denomination do you want to exchange? ", exchange2);
 }
 
 void deposit3(string denomination, mixed answer)
@@ -299,8 +297,7 @@ void deposit2(string denomination)
       if (MONEY_D->query_currency(denomination) == deposit_currency)
       {
          input_one_arg("How many " + MONEY_D->query_plural(denomination) + " do you want to deposit? ",
-                       (
-                           : deposit3, denomination:));
+                       &deposit3(denomination));
       }
       else
       {
@@ -315,10 +312,10 @@ void deposit2(string denomination)
 
 void deposit1()
 {
-   float money = player->query_money()[deposit_currency];
+   float money = player->query_money()[deposit_currency] || 0.0;
 
    write("You have " + MONEY_D->currency_to_string(money, deposit_currency) + ".\n");
-   input_one_arg("Which denomination would you like to deposit? ", ( : deposit2:));
+   input_one_arg("Which denomination would you like to deposit? ", deposit2);
 }
 
 void withdraw3(string denomination, mixed answer)
@@ -332,7 +329,7 @@ void withdraw3(string denomination, mixed answer)
          player->add_money(denomination, amount);
          printf("You withdraw %s.\n", MONEY_D->denomination_to_string(amount, denomination));
          printf("Your new account balance is %s.\n\n",
-                MONEY_D->currency_to_string(ACCOUNT_D->query_account(bank_id, player), deposit_currency));
+                MONEY_D->currency_to_string(ACCOUNT_D->query_account(bank_id, player, deposit_currency), deposit_currency));
       }
       else
       {
@@ -348,8 +345,7 @@ void withdraw2(string denomination)
       if (MONEY_D->query_currency(denomination) == deposit_currency)
       {
          input_one_arg("How many " + MONEY_D->query_plural(denomination) + " do you want to withdraw? ",
-                       (
-                           : withdraw3, denomination:));
+                       &withdraw3(denomination));
       }
       else
          write(capitalize(denomination) + " is not a denomination of " + deposit_currency + ".\n");
@@ -364,7 +360,7 @@ void withdraw1()
 {
    printf("Your current account balance is %s.\n\n",
           MONEY_D->currency_to_string(ACCOUNT_D->query_account(bank_id, player, deposit_currency), deposit_currency));
-   input_one_arg("Which denomination do you want to withdraw? ", ( : withdraw2:));
+   input_one_arg("Which denomination do you want to withdraw? ", withdraw2);
 }
 
 void quit_menu()
@@ -376,7 +372,7 @@ void quit_menu()
       was_busy--;
       do_game_command("say Next one please");
    }
-   player = 0;
+   player = nil;
 }
 
 void mudlib_setup()
@@ -387,12 +383,12 @@ void mudlib_setup()
    add_section_item(toplevel, main);
    add_section_item(toplevel, other);
 
-   add_menu_item(main, new_menu_item("Show the money you have", ( : show_money:), "s"));
-   add_menu_item(main, new_menu_item("List exchange rates", ( : show_rates:), "l"));
-   add_menu_item(main, new_menu_item("Exchange currencies", ( : exchange1:), "x"));
-   add_menu_item(main, new_menu_item("Deposit money", ( : deposit1:), "d"));
-   add_menu_item(main, new_menu_item("Withdraw money", ( : withdraw1:), "w"));
-   add_menu_item(other, new_menu_item("Quit", ( : quit_menu:), "q"));
+   add_menu_item(main, new_menu_item("Show the money you have", show_money, "s"));
+   add_menu_item(main, new_menu_item("List exchange rates", show_rates, "l"));
+   add_menu_item(main, new_menu_item("Exchange currencies", exchange1, "x"));
+   add_menu_item(main, new_menu_item("Deposit money", deposit1, "d"));
+   add_menu_item(main, new_menu_item("Withdraw money", withdraw1, "w"));
+   add_menu_item(other, new_menu_item("Quit", quit_menu, "q"));
    set_id("accountant");
 }
 
@@ -412,7 +408,7 @@ void begin_conversation()
       do_game_command("say Hello " + this_body()->short() + ", welcome to " + bank_name +
                       ". We will be pleased to exchange your "
                       "money for only a minor fee of " +
-                      exchange_fee +
+                      sprintf("%g", exchange_fee) +
                       "%. "
                       "You can deposit your money in " +
                       MONEY_D->query_plural(deposit_currency) + ".\n");

@@ -88,5 +88,5 @@ void do_buy_str_from_liv(string arg, object liv)
 
 void create()
 {
-   add_rules(({"STR", "STR from LIV"}));
+   add_rules(({"STR from LIV", "STR"}));
 }

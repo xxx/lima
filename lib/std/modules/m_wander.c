@@ -44,9 +44,9 @@ int max_moves = 4;
 private
 nosave int counting_moves;
 private
-nosave function arrive_func = ( : player_did_arrive:);
+nosave function arrive_func = player_did_arrive;
 private
-nosave function move_hook = ( : moving:);
+nosave function move_hook = moving;
 
 //: FUNCTION set_wander_area
 // Set the area(s) that an NPC can wander in.  If this is not set
@@ -211,7 +211,7 @@ void start_wandering()
       return;
    }
    environment()->add_hook("person_arrived", arrive_func);
-   call = call_out(( : do_wander:), query_wander_time());
+   call = call_out(do_wander, query_wander_time());
    reset_moves();
 }
 
@@ -258,7 +258,7 @@ void move_me(string direction)
       stop_wandering();
       return;
    }
-   call = call_out(( : do_wander:), query_wander_time());
+   call = call_out(do_wander, query_wander_time());
 }
 
 private
@@ -274,7 +274,7 @@ void do_wander()
       directions = environment(this_object())->query_exit_directions();
 
    /* Stop if there are no directions (this takes care of blue prints*/
-   if (!directions || !i = sizeof(directions))
+   if (!directions || !(i = sizeof(directions)))
       return;
 
    chosen_dir = directions[random(i)];
@@ -282,7 +282,7 @@ void do_wander()
    /* If the file is null or a null string try to move again next time */
    if (!file || file == "")
    {
-      call = call_out(( : do_wander:), query_wander_time());
+      call = call_out(do_wander, query_wander_time());
       return;
    }
    /* If the destination is not loaded, do so */
@@ -294,7 +294,7 @@ void do_wander()
    /* If still no destination it won't load, try again next time */
    if (!dest)
    {
-      call = call_out(( : do_wander:), query_wander_time());
+      call = call_out(do_wander, query_wander_time());
       return;
    }
 
@@ -309,12 +309,12 @@ void do_wander()
          }
          else
          {
-            call = call_out(( : do_wander:), query_wander_time());
+            call = call_out(do_wander, query_wander_time());
          }
       }
       else
       {
-         call = call_out(( : do_wander:), query_wander_time());
+         call = call_out(do_wander, query_wander_time());
       }
    }
    else

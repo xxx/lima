@@ -221,7 +221,7 @@ void stat_me()
 {
    int people = 0;
    int account = 0;
-   float amount = 0;
+   float amount = 0.0;
    string *currencies = ({});
 
    foreach (string bank, mapping peoples in accounts)
@@ -241,8 +241,8 @@ void stat_me()
 
    write("ACCOUNT_D stats:\n----------------\n" + "Number of Banks: " + sizeof(accounts) + "\n" +
          "Number of People with accounts: " + people + "\n" + "Number of accounts: " + account + "\n" +
-         "Number of currencies: " + sizeof(currencies) + " (" + format_list(currencies) + ")\n" +
-         "Total amount: " + amount + "\n" + "Average/account: " + (amount / account) + "\n");
+         "Number of currencies: " + sizeof(currencies) + " (" + format_list(currencies, nil) + ")\n" +
+         "Total amount: " + sprintf("%g", amount) + "\n" + "Average/account: " + sprintf("%g", amount / account) + "\n");
 }
 
 void clean_up()

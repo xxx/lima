@@ -38,7 +38,7 @@ problem lies in ob->move(this_object()), and vehicles are too large.
 #ifdef VENDOR_COST_MULT
 #define COST_MULT VENDOR_COST_MULT
 #else
-#define COST_MULT 1
+#define COST_MULT 1.0
 #define SELL_MULT 0.5
 #define CHA_MULT 0.4
 #define CHA_MULT_SELL 0.2
@@ -51,7 +51,7 @@ class item
    string short;
    string long;
    string file;
-   int value;
+   float value;
    string *ids;
    int amount;
    mixed *args;
@@ -129,7 +129,7 @@ class item init_item(object ob, mixed *setup_args)
                : ob->short(), long
                : ob->long(), ids
                : ob->query_id() + ({ob->short(), ob->plural_short()}), value
-               : ob->query_value(), amount : 1, args
+               : to_float(ob->query_value()), amount : 1, args
                : setup_args);
    if (item.long[ < 1] != '\n')
       item.long += "\n";
@@ -157,7 +157,7 @@ varargs void add_sell(string file, int amt, mixed *setup_args)
 
    if (!arrayp(setup_args))
       setup_args = ({});
-   file = evaluate_path(file, 0, 1);
+   file = evaluate_path(file, nil, 1);
 
    // If we already have this item in store with same setup_args,
    // just increase the amount of these in store.
@@ -180,7 +180,7 @@ varargs void add_sell(string file, int amt, mixed *setup_args)
          item.amount = amt;
          item.file = base_name(ob);
          stored_items[++max_item_number] = item;
-         destruct(ob);
+         ob->remove();
       }
       else
          error("No such item: " + file + "\n");
@@ -220,7 +220,7 @@ void add_sell_object(object ob)
          return;
       }
    }
-   item = init_item(ob, 0);
+   item = init_item(ob, nil);
    item.objects = ({ob});
    stored_items[++max_item_number] = item;
 }
@@ -395,14 +395,14 @@ void buy_object(object ob)
    case 0: /* object is not unique, so just keep the filename. */
       file = base_name(ob);
       add_sell(file, 1, ob->setup_args());
-      destruct(ob);
+      ob->remove();
       break;
    case 1: /* object is unique */
       add_sell_object(ob);
       ob->move(load_object(unique_inv));
       break;
    case 2: /* object is destroyable(), so don't sell it */
-      destruct(ob);
+      ob->remove();
       break;
    }
 }
@@ -460,7 +460,7 @@ string ask_about_items(string item)
              " for sale for " + cost_names[0] + ". " + replace_string(stored_items[keys[0]].long, "\n", " ");
    default:
       item_names = map(item_names, ( : add_article($1) :));
-      return "I have both " + format_list(item_names) + ". Which one of those are you interested in?";
+      return "I have both " + format_list(item_names, nil) + ". Which one of those are you interested in?";
    }
 }
 
@@ -563,7 +563,7 @@ int test_sell(object ob)
 }
 
 protected
-int sell_object(object ob, int value)
+int sell_object(object ob, float value)
 {
    float exchange_rate = to_float(MONEY_D->query_exchange_rate(currency_type));
    float cost;
