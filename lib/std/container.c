@@ -575,7 +575,7 @@ mixed *make_objects_if_needed()
    foreach (string relation, class relation_data object_data in relations)
    {
       /* Loop through each element of the mapping */
-      object_data.contents -= ({0});
+      object_data.contents = filter(object_data.contents, objectp);
       foreach (string file, mixed parameters in object_data.create_on_reset)
       {
          int num = 1;

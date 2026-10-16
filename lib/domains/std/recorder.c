@@ -6,6 +6,8 @@
 // Future: Allow stopping partway through a play
 // Future: Make rewinds and fast forwards take time.
 
+#include <move.h>
+
 inherit CONTAINER;
 inherit M_GETTABLE;
 
@@ -16,6 +18,28 @@ nosave string transcript = "";
 private
 string current_button = "stop";
 
+private
+void make_buttons_if_needed()
+{
+   foreach (string button in ({"play", "record", "rewind", "fast forward", "stop"}))
+   {
+      object *present_buttons = filter(all_inventory(this_object()),
+          (: base_name($1) == __DIR__ "recorder/button" && member_array($(button), $1->query_id()) != -1 :));
+      if (!sizeof(present_buttons))
+      {
+         object ob = (__DIR__ "recorder/button")->virtual_create(button);
+         if (ob->move(this_object(), "#CLONE#") != MOVE_OK)
+            error("Couldn't install recorder button.\n");
+      }
+   }
+}
+
+void reset()
+{
+   ::reset();
+   make_buttons_if_needed();
+}
+
 void setup()
 {
    set_in_room_desc("A recording device sits on the ground.");
@@ -24,11 +48,10 @@ void setup()
    set_id("recorder", "player");
    set_relations("in");
    set_default_relation("in");
-   set_objects((["recorder/button/play":1,
-               "recorder/button/record":1, "recorder/button/rewind":1, "recorder/button/fast forward":1,
-                 "recorder/button/stop":1, "recorder/panel":1, ]));
+   set_objects((["recorder/panel":1]));
    set_max_capacity(LARGE);
    set_hide_contents(1);
+   make_buttons_if_needed();
 }
 
 string get_current_button()
@@ -99,7 +122,7 @@ void fast_forward()
    }
    at_beginning = 0;
    object_event("There is a soft whirring from the machine.");
-   call_out(( : "pop_up", "fast forward" :), 2);
+   call_out(&pop_up("fast forward"), 2);
 }
 
 void rewind()
@@ -113,7 +136,7 @@ void rewind()
    }
    at_beginning = 1;
    object_event("There is a soft whirring from the machine.");
-   call_out(( : "pop_up", "rewind" :), 2);
+   call_out(&pop_up("rewind"), 2);
 }
 
 void receive_outside_msg(string s)

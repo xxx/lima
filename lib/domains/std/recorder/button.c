@@ -11,6 +11,11 @@ string my_long()
           (this_button == environment()->get_current_button() ? "down" : "up") + ".";
 }
 
+mixed direct_press_obj(object ob)
+{
+   return default_object_checks();
+}
+
 void do_press(string name)
 {
    environment()->pop_up_and_replace(this_button);
@@ -20,7 +25,7 @@ void setup(string button)
 {
    set_id("button", button);
    set_adj(button, "small", "black");
-   set_long(( : my_long:));
+   set_long(my_long);
    this_button = button;
    set_size(1);
    set_getmsg("#It's securely held by the recorder.");

@@ -144,30 +144,30 @@ connected-player vehicle handovers remain. Same six fixtures/two address overrid
 no new LPC test helper or grant. The whole-source 924/1,180 remains its measured
 inventory; the two additions are not counted by arithmetic.
 
-The recorder/PARAM_OBJ audit has a three-file proposal, not yet adopted. All five
-family sources compile in the baseline, but recorder construction fails on its
-parameterized button clone paths. The existing object factory already creates
-labelled independent clones. Recorder can call it directly and replenish missing
-buttons by label on reset, retaining the container's panel reset. Button needs its
-native long callback and normal press check; delayed pop_up callbacks use bound
-pointers. A one-line live-object filter in container reset removes stale destroyed
-children under distinct nil. PARAM_OBJ/panel/transcript and native code stay.
+The three recorder adapters are now adopted exactly: direct per-label object
+factory construction/replenishment, native callbacks/normal button press check,
+and live-object container reset cleanup. Headers/LF remain. PARAM_OBJ, panel and
+transcript need no edit; native code, master and configuration stay unchanged.
+**14/14 complete targets compile** from dedicated source.
 
-All **14 complete targets compile** in the disposable proposal. The final
-**106.43s**, **108-input** focused run passes all 30 lifecycle checkpoints,
-both clean 151-preload boots, saved login and normal exits. Two recorder instances,
-normal button/description/read/take paths, record/append/overwrite transcripts,
-six delayed callbacks, missing-child replacement, preserved surviving buttons,
-idempotent reset, silence and cleanup pass. Same six fixtures/two address overrides,
-no new LPC helper or grant. The prior 1318-input full replay remains retained,
-without being replayed in this audit; whole-source 924/1,180 stays measured.
+The final **276.80s** full replay retains the preceding gameplay families
+(1321 replay records) and adds **108 recorder inputs** (**1429 total**).
+Two independent recorders, normal descriptions/button/read/take paths, record/
+append/overwrite transcripts, six delayed callbacks, missing-child replacement,
+four surviving button identities, idempotent reset, silence and cleanup pass.
+Both clean 151-preload boots, all 30 lifecycle checkpoints, saved login, banker
+restoration and normal exits pass alongside the prior room/vehicle/search/state/
+menu/command checks. Generated maze cases use the unchanged helper and current
+layout; recorder inputs match the accepted focused audit. Same six fixtures/two
+address overrides, no new LPC helper or grant. Final logs contain no failed apply
+or background panic.
 
-Next adopt the three-file proposal and retain full regression coverage. General
-parameterized virtual names are unnecessary for this consumer; its factory remains
-an explicit clone API. Original playback/message policy and retired attic code stay
-separate. An RST/closed-committer shutdown panic was observed in the baseline at
-SIGTERM, not in the final run; it is recorded separately without a native fix claim.
-Completed equipment/TCP work and reserved native discussions remain separate.
+The earlier RST shutdown observation remains recorded separately without a native
+fix/resolution claim. Generic virtual parameter names are unnecessary for these
+buttons; PARAM_OBJ remains an explicit clone factory. Original playback/message
+policy, attic code, equipment/TCP and reserved native discussions remain separate.
+The whole-source **924/1,180** remains the earlier measured inventory. Next refresh
+the complete source inventory before choosing another consumer family.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
