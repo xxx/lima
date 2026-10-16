@@ -38,7 +38,7 @@ string get_arrival_msg()
    string riders;
 
    if (!(riders = get_riders_as_string()))
-      return 0;
+      return nil;
 
    return capitalize(the_short()) + " trots off, carrying " + riders + ".\n";
 }
@@ -48,7 +48,7 @@ string get_departure_msg()
    string riders;
 
    if (!(riders = get_riders_as_string()))
-      return 0;
+      return nil;
 
    if (sizeof(get_riders()) != 1)
    {

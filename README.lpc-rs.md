@@ -89,19 +89,28 @@ fixtures, earlier bank restoration and other accepted checks remain. Original
 message/yield/capacity/fertilizer/setup quirks retain their scopes. The full-source
 924/1,180 count above remains the preceding measured inventory.
 
-The vehicle audit has a four-file proposal, not yet adopted. It adapts nil string
+The vehicle batch adopts the reviewed four-file proposal exactly: nil string
 returns, native callbacks/mixed movement payloads, object-valued driver state,
-canonical movement registration and explicit empty exit/dismount rules. Camaro
-and shared frameworks remain unchanged. All 12 complete targets compile. The
-22-input focused run passes basic entry, a driving round trip, exit, mount and
-dismount with actual driver identity, plus two clean 151-preload boots and saved
-login. Native forwarding/class controls pass; no new native feature is proposed.
+canonical enter/leave registration and explicit empty exit/dismount rules. Camaro
+and shared frameworks remain unchanged; headers/LF are retained. No native API,
+master-policy or configuration change. **12/12 complete targets compile**.
 
-Next adopt the proposal and validate ordinary drivers/passengers, handover,
-descriptions and notifications with retained regression coverage. Legacy direct
-mount helpers, all aliases, following/room-hook interactions and detailed message
-wiring keep their separate scopes. This audit does not replay/replace the prior
-1052-input production run or update the whole-source inventory above.
+The final **274.44s** run retains the preceding gameplay sequence
+(1056 retained command inputs) and adds **61 vehicle inputs** (**1117 total**).
+Two real connected accounts exercise both constructors, outside/inside descriptions,
+passenger refusal to drive, four driving round trips and driver handover in both
+vehicles. All eight movements produce the expected driver views plus passenger
+views or outside-observer notifications. Driver flags/object identity and final
+clearing pass. The second account uses unchanged AUTO_WIZ guest status, with no
+admin grant; both accounts save and log out normally. Both clean 151-preload boots,
+all 30 lifecycle checkpoints, the original saved login and bank restoration pass.
+Same six retained fixtures/two address overrides; no new LPC helper or grant.
+
+Next audit the four remaining standard rooms: Labroom, Labyrinth, V_Plains and
+caves/Sloping_Tunnel. Legacy direct mount helpers, all aliases, following/other
+room-hook interactions and detailed message-template behavior retain their scopes.
+Existing entry/exit wording and horse arrival/departure quirks are unchanged.
+The full-source 924/1,180 count remains its preceding measured inventory.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically

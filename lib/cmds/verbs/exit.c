@@ -19,7 +19,7 @@ void do_exit()
    // This only works if env is an exit.
    if (env->is_exit())
    {
-      env->do_verb_rule("exit");
+      env->do_verb_rule("exit", "");
       return;
    }
 

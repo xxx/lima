@@ -97,7 +97,7 @@ string get_riders_as_string()
 
    if (!sizeof(riders))
    {
-      return 0;
+      return nil;
    }
 
    // Return a string that's a comma seperated list of the riders.
@@ -137,28 +137,28 @@ mixed enter_check()
    return 1;
 }
 
-void change_driving_hook_func(string direction)
+void change_driving_hook_func(mixed direction)
 {
    object *new_driver = get_riders();
-   this_body()->set_driving_vehicle(0);
+   this_body()->set_driving_vehicle(nil);
    if (sizeof(new_driver))
    {
-      new_driver[0]->set_driving_vehicle(1);
+      new_driver[0]->set_driving_vehicle(this_object());
       new_driver[0]->simple_action("$N $vmove into the drivers position.", new_driver[0]);
    }
 }
 
-void set_driving_hook_func(string direction)
+void set_driving_hook_func(mixed direction)
 {
    if (sizeof(get_riders()) == 1)
-      this_body()->set_driving_vehicle(1);
+      this_body()->set_driving_vehicle(this_object());
 }
 
 void mudlib_setup()
 {
    ::mudlib_setup();
-   change_driving_hook = ( : change_driving_hook_func:);
-   set_driving_hook = ( : set_driving_hook_func:);
+   change_driving_hook = change_driving_hook_func;
+   set_driving_hook = set_driving_hook_func;
    /* Add the relations that should more than likely exist on all vehicles.
     * It seems as though "on" is really the only one that is applicable.
     * If it isn't, well then remove the relation and add the appropriate one*/
@@ -166,8 +166,8 @@ void mudlib_setup()
    set_default_relation("in");
    add_hook("person_arrived", set_driving_hook);
    add_hook("person_left", change_driving_hook);
-   add_method("get in", this_object(), ( : enter_check:));
-   add_method("get out", ( : environment(this_object()) :));
-   set_default_enter_message(( : default_message, 1 :));
-   set_default_exit_message(( : default_message, 0 :));
+   add_method("enter", this_object(), enter_check);
+   add_method("leave", ( : environment(this_object()) :));
+   set_default_enter_message(&default_message(1));
+   set_default_exit_message(&default_message(0));
 }

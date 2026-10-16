@@ -23,7 +23,7 @@ void do_dismount_obj(object ob)
 
 void do_dismount()
 {
-   environment(this_body())->do_verb_rule("dismount");
+   environment(this_body())->do_verb_rule("dismount", "");
 }
 
 void create()
