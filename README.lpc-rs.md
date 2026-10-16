@@ -13,21 +13,32 @@ With the lpc-rs checkout beside this one and its CLI built, check a command with
 ../lpc-rs/target/debug/lpc-rs-lpcc -c lpc-rs.env --check lib/cmds/player/mudlist.c
 ```
 
-The last whole-library check, on 15 October 2026 before the command batches,
-compiles **753 of 1,180 .c files** with no timeouts or crashes. The latest bounded
-treefor check covers **178 targets**: **81/81 wizard entries**, **4/4 guild
-entries** and **93/93 supporting targets**, with no regressions. Admtool's set
-compiles **34/34**. All 25 leaf menus have navigation coverage and selected report/
-edit flows pass; administrative actions not exercised retain their prior scope.
-The races report matches six source definitions, and the native memory diagnostic
-ranks 274 loaded objects (257 after restart) with positive, descending estimates.
-Rows use separate strings within the driver's size limit. All wizard entries in
-this bounded inventory now compile. Other retained counts are
-player 65/67, verbs 90/90, transitional 49/49 and transitional administrator 9/9.
-These counts include optional and partial sources and are not a completion
-percentage. Experimental random2 remains deferred and suicide is disabled upstream.
+The current standalone-source inventory, on 15 October 2026 against native
+`b1355532` and this checkout at `7bcd6943`, compiles **818 of 1,180 .c files**:
+**362 fail, with no timeouts or crashes**. The identical target set gains **65
+successes with no lost successes** since the preceding 753/1,180 checkpoint.
+These counts include optional and inherited-only sources and are not a completion
+percentage. Selected composition review confirms 32 failed fragments inside passing
+complete hosts; remaining failures still need consumer-specific review.
 
-A fresh production-driver check passes 30 checkpoints covering account/character
+Command compilation is player **65/67**, wizard **81/81**, guild **4/4**, verbs
+**90/90**, transitional **49/49** and transitional administrator **9/9**. The two
+player entries remain experimental random2 (deferred) and suicide (disabled upstream).
+All 17 tracked core objects, all 22 std/classes files and all eight Pinto examples
+compile. The prior bounded treefor set remains **178/178**, and admtool's set **34/34**.
+All 25 admtool leaves retain navigation and selected report/edit coverage. The race
+report matches six definitions; memory reports rank 274/257 objects across restart
+using nonadditive estimates and separate strings within the driver's size limit.
+
+The school/tutorial family has 88 failing examples, mostly first blocked by trailing
+include semicolons, with text-block syntax and other later errors still to audit.
+Other first blockers include typed nil/float/value adaptations, callbacks, override
+signatures and containing-object methods. A standalone failure is not automatically
+an upstream bug or a missing efun. Ranged weapons/ammunition are the recommended
+next consumer group: 11 failed targets reach two shared definitions. Source-wide
+migration, optional configurations/services and broader gameplay remain incomplete.
+
+The retained production-driver check passes 30 checkpoints covering account/character
 creation, menu, Grand Hall entry, look/inventory, logout and saved-account/body
 restoration in a new process. Both processes exit normally. Cold boot and
 saved-account restart each load 151 preloads with zero failures, satisfying this
