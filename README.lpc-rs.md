@@ -345,6 +345,29 @@ Rust gate; preceding **1871 inputs + 10 restored-favour / 413.0s** full replay,
 30 checkpoints/two clean 151-preload boots and saved login/bank retain their scopes.
 Evidence: /tmp/lima-guild-source-inventory-20261016.
 
+Inventory notes are committed as **92098d7c** (native **dab12c75**). The next
+slow-healing/consumable audit leaves a **five-file temporary proposal**. Slowheal
+uses explicit numeric conversion, an appropriate mixed parser guard, bound native
+callback and an object predicate for active healing. A real bucket's missing flag
+returns nil and otherwise falsely blocks the first item. Pain killers matches the
+inherited parser argument; pet treats preserve integer FOOD values/multiplier and
+deluxe weight1.0. Cigarette/joint need no edits. Raw headers/LF/CRLF/final newline,
+healing/fuel/timing policy and distinct nil/preserved player/4000ms remain.
+
+**27/27** complete targets compile. Focused **115.86s / 108-input** gameplay
+passes all 30 lifecycle checkpoints, two clean 151-preload boots, saved login and
+normal exits, without failed apply/runtime input error/panic. Real eat/light/smoke,
+refusals, ordinary non-healer inventory, second-active guard, values and treat bites
+pass. An actual natural 30s callback heals again and decrements9->8. Terminal checks
+explicitly cancel pending timers and call public timed_healing(0); full natural
+course/disconnect/transfer are not qualified. Controls and inventory restore.
+
+Dedicated LPC/native source remains unchanged; only audit notes are pending.
+Same six fixtures/two address overrides, no new helper/body/host/grant. Next adopt
+with retained full replay before saved-favour preparation. Prior 1871 + 10 restored-
+favour replay and 966/1182 inventory retain their scopes; no Rust gate or native
+feature change. Evidence: /tmp/lima-consumables-audit-20261016.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
