@@ -42,9 +42,28 @@ covering maps, navigation, item aliases/actions, native examples and all three
 room-chat forms. It retains all 596 prior first-session command records and adds
 **203 school inputs**. All 30 lifecycle checkpoints, both clean 151-preload boots,
 saved login and normal exits pass. Five lessons' NPC dependencies remain unvisited
-and unchanged; accountant, wander, Harry and vendor need the next coherent audit.
+and unchanged; their accountant, wander, Harry and vendor dependencies are audited
+below.
 Other historical prose/partial examples remain outside these checks. The whole-
 source inventory above remains the earlier measurement.
+
+The follow-up NPC dependency audit has a seven-file source proposal for banker,
+wander/dragon, Harry and vendor adapters; it is not adopted yet. All four compile
+and initialize as native livings in the disposable library. Shopkeeper constructs
+five stock entries and preserves fractional cost. The focused constructor run
+passes all 30 lifecycle checkpoints, both clean 151-preload boots and saved login;
+its 16 inputs are audit controls, without replaying/replacing the accepted school
+run or qualifying financial, timed-wander, trigger or purchase behavior.
+
+Complete-consumer checks pass 14/15: the four NPCs, three bases, five school rooms
+and two world rooms pass; Yakitori cashier retains a private inherited-call blocker.
+Proposed adapters use existing ACCOUNTANT parent initialization, native callback/
+closure/nil forms, float prices and object remove() cleanup, without a new native
+API or master grant. The banker lesson also needs corrected ACCOUNTANT/5.0 advice.
+Existing bank lookup, wander-area removal and duplicate stock quirks remain separate
+source observations. Next adopt the adapters and verify ordinary interactions and
+the five remaining school rooms. Configuration, original checkout and historical
+whole-source counts remain unchanged.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
