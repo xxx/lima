@@ -7,7 +7,6 @@
 inherit ADVERSARY;
 inherit M_GUILD_MEMBER;
 inherit M_ASSISTANCE;
-inherit M_ASSISTANCE;
 
 void setup()
 {
@@ -25,7 +24,7 @@ void setup()
    set_which_guild("yakitori");
    set_wearing("../armor/uniform");
    add_helper("yakitory_member");
-   set_objects((["^nuke/consumable/sake":1]));
+   set_objects((["^std/consumable/sake":1]));
 }
 
 void under_attack_by(object who)

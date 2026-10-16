@@ -270,7 +270,7 @@ void show_menu(object ob)
    }
    printf("    %%^MENU_CHOICE%%^q%%^RESET%%^: Quit talking to " + query_name() + ".\n");
 
-   modal_simple(( : continue_conversation, ob:), "[choice] :>");
+   modal_simple(&continue_conversation(ob), "[choice] :>");
 }
 
 //: FUNCTION do_action
@@ -295,7 +295,8 @@ void do_action(object ob, mixed action)
          {
             if (sscanf(add, "%s@@%s", add, remove) == 2)
                current[ob] -= explode(remove, ",");
-            current[ob] += explode(add, ",");
+            if (strlen(add))
+               current[ob] += explode(add, ",");
          }
 
          if (sscanf(action, "%s#T#%s", action, train) == 2)

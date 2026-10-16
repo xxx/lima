@@ -52,21 +52,22 @@ object *ignored()
 }
 
 private
-mixed handle_blocks(string dir)
+int allow_kitchen_entry(string dir, object body)
 {
-   /* is the player above the level restriction? */
-   if (this_body()->query_member_guild("yakitori"))
+   if (body->query_member_guild("yakitori"))
    {
-      this_object()->targetted_action(choice(member_actions), this_body());
-      return 0;
+      this_object()->targetted_action(choice(member_actions), body);
+      return 1;
    }
-   if (member_array(this_body(), solvers) != -1)
+   if (member_array(body, solvers) != -1)
    {
-      this_object()->targetted_action("$N $vsmile and $vsay, \"Oh, you can see kitchen now!\"", this_body());
-      return 0;
+      this_object()->targetted_action("$N $vsmile and $vsay, \"Oh, you can see kitchen now!\"", body);
+      return 1;
    }
 
-   return ::handle_blocks(dir);
+   this_object()->targetted_action("$N $vstep out infront of $t.\n\"No visitors in kitchen!\", $n $vsnarl.",
+                                   body, dir, this_object());
+   return 0;
 }
 
 void setup()
@@ -123,5 +124,5 @@ void setup()
    ]));
    set_start(({"good", "manager"}));
    add_block("west");
-   set_block_action("$N $vstep out infront of $t.\n\"No visitors in kitchen!\", $n $vsnarl.");
+   set_block_action(allow_kitchen_entry);
 }

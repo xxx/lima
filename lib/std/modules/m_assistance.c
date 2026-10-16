@@ -83,6 +83,6 @@ void get_help()
 {
    foreach (object helper in query_helpers())
    {
-      call_out(( : callout_help:), random(3) + 1, helper);
+      call_out(&callout_help(helper), random(3) + 1);
    }
 }

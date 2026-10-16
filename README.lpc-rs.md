@@ -294,6 +294,33 @@ inputs but hit 4000ms during second-boot compilation; failure evidence remains a
 no limit increase/native performance fix is claimed. Evidence:
 /tmp/lima-yakitori-shop-audit-20261016.
 
+Yakitori outfit/shop audit notes are committed in **7c07095e** (native **ab29ded1**).
+The five source adapters are adopted with one indentation-only cleanup; all other
+proposal bytes, headers/LF/CRLF/final newline remain. Uniform uses existing armour/
+damage names, cashier supplies the public exit-block callback, delivery boy keeps
+one assistance inherit and actual std sake, and concrete assistance/conversation
+sites bind callbacks natively. Empty option additions are skipped. No native API/
+source, master, privilege, config, registry or fixture change.
+
+**37/37** complete targets compile. Full **413.0s** replay passes **1871
+first-session inputs**, including **69 Yakitori inputs**, plus the retained
+**10 restored-favour inputs**, all 30 lifecycle checkpoints, both clean 151-preload
+boots, saved login/bank restoration and normal exits, without failed apply/runtime
+input error/STATE_D error/worker panic. Prior 1810-input scope remains with unchanged
+helpers and retained sequence comparisons; repeated observations and actual saved/
+generated/menu values can vary. Real uniform wear/coverage, cashier conversations/
+access/purchase, two equipped delivery boys and the scheduled one-shot same-room
+assistance callback pass under public target/health/special controls. Natural attack
+dispatch, adjacent assistance and full combat/AI retain their separate scope.
+
+The new helper cleans up before retained mission/expiry/favour preparation and actual
+restoration. Same six fixtures/two address overrides, distinct nil/preserved player/
+4000ms; no new helper/body/grant. Earlier cold-preload timeout evidence remains; no
+native performance fix is claimed. Next commit this adoption and refresh the source
+inventory before selecting the next complete-object family. The 957/1182 sweep
+retains its measured scope without additive estimates. Evidence:
+/tmp/lima-yakitori-shop-20261016.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
