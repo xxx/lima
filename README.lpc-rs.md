@@ -435,6 +435,28 @@ writable-paper example/M_WRITING_SURFACE hook boundary after committing this cha
 WIP burnable std/paper.c stays separate. The 966/1182 sweep retains measured scope;
 no Rust gate or native performance fix. Evidence: /tmp/lima-camera-20261016.
 
+Camera support is committed as **c9ec2f52** (native notes **d5fc3fb4**).
+The writable-paper audit isolates a string/function hook boundary already present
+in the reviewed upstream source. A one-file temporary M_WRITING_SURFACE proposal
+stores one private nosave callback returning the current description and reuses its
+identity for add/remove. The paper, existing write verb and shared hooks stay.
+Original wording, 100-character paper, set_space/add_text policy and raw source
+headers/LF/final newline remain; dedicated LPC is unchanged pending adoption.
+
+**11/11** complete targets compile. Focused **71.26s / 61 inputs** passes both
+write/inscribe forms, repeated writing, exact-fit and overflow checks without
+mutation, stable paper-owned callback/unrelated stock callback coexistence,
+actual look text and get/drop retention. All 30 checkpoints, both clean
+151-preload boots, saved account login and normal exits pass without failed apply,
+runtime input error or panic. This does not qualify written-item persistence across
+restart; items are cleaned first. Same six fixtures/two address overrides and
+actual master/simuls/user/body/parser; distinct nil/preserved player/4000ms stay.
+No new LPC helper/body/host/grant or native change. Next adopt with retained full
+replay after camera cleanup and before mission/expiry/favour setup. Prior
+2028 + 10 restored-favour / 413.38s replay and 966/1182 sweep retain measured scope.
+The separate WIP burnable std/paper.c remains outside this audit. Evidence:
+/tmp/lima-writing-audit-20261016.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
