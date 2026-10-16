@@ -8,5 +8,5 @@ void setup()
    add_adj("old", "useless");
    set_direct_salvage((["wood scrap":2]));
    set_long("This is old useless mop can be used for firewood, that's it.");
-   set_weight(3);
+   set_weight(3.0);
 }

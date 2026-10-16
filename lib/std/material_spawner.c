@@ -100,11 +100,14 @@ void give_material()
       int y = yield();
 
       if (!y)
-         return fail_search();
+      {
+         fail_search();
+         return;
+      }
 
       for (int i = 0; i < y; i++)
       {
-         string mat = evaluate_path(choice(material), 0, 1);
+         string mat = evaluate_path(choice(material), nil, 1);
          object m = clone_object (mat);
          if (m)
             mats += ({m});

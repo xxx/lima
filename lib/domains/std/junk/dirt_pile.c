@@ -2,7 +2,7 @@
 
 inherit MATERIAL_SPAWNER;
 
-void mudlib_setup(string loot)
+void setup(string loot)
 {
    set_id("dirt", "dirt pile", "pile of dirt", "pile");
    add_adj("large");

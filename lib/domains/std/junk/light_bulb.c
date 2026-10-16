@@ -14,5 +14,5 @@ void setup()
       set_direct_salvage((["copper scrap":1, "glass shard":2]));
 
    set_long("A simple white light bulb, cracked on one side.");
-   set_weight(1);
+   set_weight(1.0);
 }

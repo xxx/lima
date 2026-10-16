@@ -9,5 +9,5 @@ void setup()
    set_direct_salvage((["circuit":2, "silver scrap":1, "molded plastic":1]));
    set_long("A small circuit board that have been inserted into a larger motherboard. Its components seems partially "
             "burned.");
-   set_weight(1);
+   set_weight(1.0);
 }

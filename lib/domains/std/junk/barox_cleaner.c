@@ -9,5 +9,5 @@ void setup()
    set_direct_salvage((["waste antiseptic":2, "waste acid":1, "fiberglass spool":1]));
    set_long("This blue carbon box contains a detergant produced by Barox Chemical. This box is the consumer grade "
             "detergent.");
-   set_weight(1);
+   set_weight(1.0);
 }

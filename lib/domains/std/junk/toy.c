@@ -10,5 +10,5 @@ void setup()
    set_adj(adj);
    set_salvageable((["mechanic":50, "metal":30, "plastic":20]));
    set_long("A small " + adj + " toy, a bit dented and worn. Meant for kids probably?");
-   set_weight(1);
+   set_weight(1.0);
 }

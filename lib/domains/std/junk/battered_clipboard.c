@@ -12,6 +12,6 @@ void setup()
    }
    else
       set_direct_salvage((["wood scrap":2, "loose spring":1]));
-   set_weight(1);
+   set_weight(1.0);
    set_long("A wooden clipboard with a spring mechanism at the top.");
 }

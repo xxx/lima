@@ -7,6 +7,6 @@ void setup()
    set_id("cigar box", "box");
    set_direct_salvage((["raw cloth":3, "fiberglass spool":1, "wood scrap":2]));
    set_long("A beautiful wooden cigarbox with the words 'Hoja Dulce' on the top.");
-   set_value(40);
-   set_weight(1);
+   set_value(40.0);
+   set_weight(1.0);
 }
