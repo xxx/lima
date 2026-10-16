@@ -76,23 +76,31 @@ void setup()
 {
 }
 
-object virtual_create(string arg)
+private
+int *parse_virtual_coordinates(string arg)
 {
-   int idx = member_array('/', arg);
-   int x;
-   int y;
+   int x, y;
+
+   if (sscanf(arg, "%d/%d", x, y) != 2 || sprintf("%d/%d", x, y) != arg ||
+       x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT)
+      return nil;
+   return ({x, y});
+}
+
+string virtual_blueprint(string arg)
+{
+   if (!parse_virtual_coordinates(arg))
+      return nil;
+   return __DIR__ "grid_room";
+}
+
+private
+void configure_room(object room, int x, int y)
+{
    string exit_n;
    string exit_e;
    string exit_s;
    string exit_w;
-   object room;
-   setup();
-
-   if (idx == -1)
-      return nil;
-
-   x = to_int(arg[0..idx - 1]);
-   y = to_int(arg[idx + 1..]);
 
    if (y == 0)
       exit_n = NORTH_EDGE(x);
@@ -114,14 +122,35 @@ object virtual_create(string arg)
    if (!exit_e)
       exit_e = GRID_ROOM(x + 1, y);
 
-   room = clone_object (OUTDOOR_ROOM);
    room->set_brief(brief_desc);
    room->set_long(ROOM_DESC(x, y));
    room->add_exit("north", exit_n);
    room->add_exit("east", exit_e);
    room->add_exit("south", exit_s);
    room->add_exit("west", exit_w);
+}
 
+void configure_virtual_room(object room, string arg)
+{
+   int *coordinates;
+
+   setup();
+   coordinates = parse_virtual_coordinates(arg);
+   if (!coordinates)
+      error("Invalid grid room coordinates.\n");
+   configure_room(room, coordinates[0], coordinates[1]);
+}
+
+object virtual_create(string arg)
+{
+   int idx = member_array('/', arg);
+   object room;
+
+   setup();
+   if (idx == -1)
+      return nil;
+   room = clone_object (OUTDOOR_ROOM);
+   configure_room(room, to_int(arg[0..idx - 1]), to_int(arg[idx + 1..]));
    return room;
 }
 

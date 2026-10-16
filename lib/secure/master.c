@@ -17,10 +17,10 @@
 private
 mapping errors = ([]);
 
-object compile_object(string path)
+string compile_object(string path)
 {
    string pname;
-   object ob;
+   string blueprint;
 
    pname = path;
 
@@ -37,8 +37,8 @@ object compile_object(string path)
 
       if (file_size(pname + ".c") >= 0)
       {
-         if (ob = pname->virtual_create(path[idx + 1..]))
-            return ob;
+         if (blueprint = pname->virtual_blueprint(path[idx + 1..]))
+            return blueprint;
       }
    }
 }

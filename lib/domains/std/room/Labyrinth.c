@@ -96,6 +96,24 @@ object virtual_create(string arg)
    return clone_object (__DIR__ "Labroom", x, y, value(x, y - 1), value(x + 1, y), value(x, y + 1), value(x - 1, y));
 }
 
+int *query_room_configuration(string arg)
+{
+   int x, y;
+
+   if (sscanf(arg, "%d,%d", x, y) != 2 || sprintf("%d,%d", x, y) != arg || !is_valid(x, y))
+      return nil;
+   return ({x, y, value(x, y - 1), value(x + 1, y), value(x, y + 1), value(x - 1, y)});
+}
+
+string virtual_blueprint(string arg)
+{
+   if (!query_room_configuration(arg))
+      return nil;
+   if (arg == "0,0")
+      return __DIR__ "labyrinth/0,0";
+   return __DIR__ "Labroom";
+}
+
 int entrance_has_east()
 {
    return data[1][0] == ' ';

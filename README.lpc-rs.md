@@ -122,13 +122,32 @@ both clean 151-preload boots, saved login and normal exits pass. Same six fixtur
 two address overrides, no new helper or grant. The whole-source **924/1,180**
 remains the preceding measured inventory.
 
-Virtual room loading remains unported: Lima's configured-clone result conflicts
-with the native blueprint-path contract, as the retained load/string-receiver
-controls confirm. The entrance case correction does not fix lowercase generated
-maze routing. Next migrate virtual factories to return blueprints and initialize
-the actual requested virtual objects while preserving maze/grid configuration.
-Broader parameterized objects, coordinate policy, unrelated game quirks, completed
-equipment/TCP work and reserved native discussions remain separate.
+The grid/maze virtual-room migration now uses the native blueprint-path contract.
+Master lookup asks virtual_blueprint without constructing a room clone. The new
+grid_room blueprint configures its actual requested identity through the grid
+server; Labroom obtains its coordinate/direction configuration from the maze server.
+A lowercase labyrinth proxy delegates to the uppercase server, sharing the same
+maze state. Legacy direct object factories remain available. Six source files
+change (four existing/two additions); native code, authorization hooks and
+configuration stay unchanged. **14/14 complete targets compile**.
+
+Focused **90.96s** and full **281.52s** runs pass both clean
+151-preload boots, all 30 lifecycle checkpoints, saved login and normal exits.
+The full replay retains the prior gameplay families (1182 records, including
+69 room controls) and adds **136 virtual inputs** (**1318 total**). The known
+failed-load block becomes positive loading/identity/reuse controls; other room
+cases remain. All **64 plains cells/256 exits** and **49 reachable maze cells**
+match server data/configuration and requested names. Thirteen normal movement
+commands, lookup reuse, independent properties, two destruction/recreation cases,
+no factory room clones and explicit cleanup pass. Banker restoration and both
+connected-player vehicle handovers remain. Same six fixtures/two address overrides,
+no new LPC test helper or grant. The whole-source 924/1,180 remains its measured
+inventory; the two additions are not counted by arithmetic.
+
+Next audit PARAM_OBJ with recorder, button, panel and transcript; those general
+parameterized objects have not migrated to virtual_blueprint. Broader coordinate
+policy, idle cleanup, unrelated game quirks, completed equipment/TCP work and
+reserved native discussions retain their scopes.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
