@@ -457,6 +457,33 @@ replay after camera cleanup and before mission/expiry/favour setup. Prior
 The separate WIP burnable std/paper.c remains outside this audit. Evidence:
 /tmp/lima-writing-audit-20261016.
 
+Writable-paper audit notes are committed as **0034b8dd** (native **31b43d61**).
+The one M_WRITING_SURFACE change now exactly matches the audited proposal: a private
+nosave callback returns current text and retains function identity for add/remove;
+hook declarations match the host. Paper/verb/shared hooks stay unchanged, as do
+headers/LF/final newline, original wording and capacity/add_text policy.
+
+**75/75** complete targets compile. Full **426.29s / 2082 first-session
+inputs**, including **60 paper inputs**, plus **10 restored-favour inputs**,
+passes all 30 checkpoints, both clean 151-preload boots, saved login/bank and normal
+exits without failed apply/runtime input error/STATE_D failure/panic. Prior
+2028-input scope remains with unchanged helpers and retained sequence comparison.
+Both write/inscribe forms, accumulated/exact-fit/overflow text, stable paper-owned
+callback/unrelated callback coexistence, actual look and get/drop retention pass.
+Fresh clones start blank; written-item restart persistence is not qualified.
+
+Cleanup precedes retained mission/expiry/favour setup and actual restoration. Only
+one unused informational print was removed from the audited helper; all assertions
+and actions remain. Same six fixtures/two address overrides and actual master/
+simuls/user/body/parser; distinct nil/preserved player/4000ms stay. No native API/
+code/config/master/privilege/framework/fixture change or new LPC helper/body/host/
+grant. Implementation/updated notes are pending. Next audit the physical small
+mailbox/leaflet room props, separate from the completed user-mail system. The
+966/1182 sweep retains measured scope; no native performance fix is claimed.
+The retained first replay hit the existing 4000ms cold-load budget before paper;
+source/helpers/limits stayed unchanged for the retry.
+Evidence: /tmp/lima-writing-20261016.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source

@@ -6,9 +6,10 @@ private
 int char_left = 100;
 string *msgs = ({});
 string extra;
+private nosave function extra_hook = (: extra :);
 
-void add_hook(string, mixed);
-void remove_hook(string, mixed);
+void add_hook(string, function);
+void remove_hook(string, function);
 
 //: FUNCTION set_space
 // Set the maximum number of characters that can fit on the writing surface
@@ -36,7 +37,7 @@ int query_space_left()
 // first.
 void add_text(string str)
 {
-   remove_hook("extra_long", extra);
+   remove_hook("extra_long", extra_hook);
 
    char_left -= strlen(str);
    if (msgs)
@@ -49,7 +50,7 @@ void add_text(string str)
       msgs = ({str});
       extra = "There is 1 thing written on it:\n\t'" + str + "'\n";
    }
-   add_hook("extra_long", extra);
+   add_hook("extra_long", extra_hook);
 }
 
 /* parser interaction */
