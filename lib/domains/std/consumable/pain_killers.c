@@ -16,7 +16,7 @@ void setup()
    set_expire_message("$N $vseem to get a slight headache again.");
 }
 
-int direct_eat_obj()
+mixed direct_eat_obj(object ob)
 {
    return 1;
 }

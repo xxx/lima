@@ -368,6 +368,28 @@ with retained full replay before saved-favour preparation. Prior 1871 + 10 resto
 favour replay and 966/1182 inventory retain their scopes; no Rust gate or native
 feature change. Evidence: /tmp/lima-consumables-audit-20261016.
 
+Consumable audit notes are committed as **3dab1202** (native **026c4c82**).
+The five LPC adapters now match the audited proposal exactly: numeric/parser fixes,
+bound native timer and a truthy object predicate for healing flags. Original values,
+fuel/timing/count policy and raw headers/LF/CRLF/final newline remain. No native API/
+code/config/master/privilege/framework/fixture change; distinct nil/preserved player/
+4000ms stay. Cigarette/joint need no source edits.
+
+**62/62** complete targets compile. Full **470.4s / 1989 first-session
+inputs**, including **108 consumable inputs**, plus **10 restored-favour inputs**
+passes all 30 lifecycle checkpoints, both clean 151-preload boots, saved login/bank
+and normal exits, without failed apply/runtime input error/STATE_D error/panic.
+Prior 1871-input scope remains with unchanged helpers/retained comparisons. Actual
+commands, guards, values/treat bites and a natural 30s healing callback pass. Terminal
+checks explicitly cancel timers and call public timed_healing(0); the full course/
+disconnect/transfer remains separate. Controls clean up before retained mission/
+expiry/favour setup and restoration. Same six fixtures/two address overrides.
+
+Implementation/updated notes are pending. Next audit camera/button/picture after
+committing this adoption; inspect actual constructors/press/photo delivery. The
+966/1182 sweep retains its measured scope without additive counts. No Rust gate or
+native performance fix is claimed. Evidence: /tmp/lima-consumables-20261016.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source

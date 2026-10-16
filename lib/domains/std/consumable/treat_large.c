@@ -14,7 +14,7 @@ void setup()
    set_last_eat_action("$N $vsnack a large pet treat.");
 }
 
-float query_value()
+int query_value()
 {
    return ::query_value() * 5;
 }

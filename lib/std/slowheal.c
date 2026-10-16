@@ -44,7 +44,7 @@ int query_value()
    // Don't modify this, since it's balanced against all the other healing types.
    float heal_mod = 0.2;
 
-   return to_int((float)query_fuel() * query_heal_value() * heal_mod);
+   return to_int(to_float(query_fuel()) * query_heal_value() * heal_mod);
 }
 
 //: FUNCTION set_consume_message
@@ -115,15 +115,14 @@ void mudlib_setup()
    set_expire_message("Slowheal expired. If you see this message, report to a scientist!\n");
 }
 
-int direct_consume_obj()
+mixed direct_consume_obj()
 {
    return 1;
 }
 
 void do_consume()
 {
-   object *healers = all_inventory(environment())->query_healing();
-   healers -= ({0});
+   object *healers = filter(all_inventory(environment()), (: $1->query_healing() :));
    if (sizeof(healers) > 0)
    {
       tell(this_body(), "You can't use two at once!\n");
@@ -152,7 +151,7 @@ void timed_healing(int remaining)
 
    if (remaining > 0)
    {
-      call_out("timed_healing", 30, remaining - 1);
+      call_out(&timed_healing(remaining - 1), 30);
    }
    else
    {
