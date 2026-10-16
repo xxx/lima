@@ -321,6 +321,30 @@ inventory before selecting the next complete-object family. The 957/1182 sweep
 retains its measured scope without additive estimates. Evidence:
 /tmp/lima-yakitori-shop-20261016.
 
+Yakitori support is committed as **65ce9796** (native notes **b03a0811**).
+The subsequent inventory checks all **1182 sources**: **966 compile, 216 fail,
+zero timeouts/crashes, 252.849s**. All **957** previous successes remain;
+nine previous failures now compile, with unchanged source set. All **25 bundled
+guild sources** and the artefact menu compile. This is an actual sweep, not an
+additive estimate or completion percentage.
+
+**61** failures are confirmed composed fragments, including the mission-control
+module's newly confirmed real NPC composition. Changed conversation source is
+revalidated with greeter/cashier hosts; prior classifications retain fresh host
+passes. The other **155 failures** include unreviewed host parts and optional/
+legacy sources, not 155 established complete-object bugs or native gaps.
+Remaining first diagnostics/source locations match the prior sweep.
+
+Next audit **std/slowheal.c** and six consumable examples: cigarette, joint, pain
+killers and deluxe/large/small pet treats. All currently fail. Review numeric/
+parser contracts and actual delayed healing before adapters, preserving dosage/
+timing policy; no source proposal is made here. Raw source/pinned-original/line-
+ending review is retained. Distinct nil/preserved player/4000ms and source/config/
+binaries remain unchanged; this checkpoint changes notes only. No new gameplay or
+Rust gate; preceding **1871 inputs + 10 restored-favour / 413.0s** full replay,
+30 checkpoints/two clean 151-preload boots and saved login/bank retain their scopes.
+Evidence: /tmp/lima-guild-source-inventory-20261016.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
