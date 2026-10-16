@@ -265,6 +265,35 @@ delayed-log persistence is not newly qualified. Next audit the remaining Yakitor
 uniform, cashier/shop and delivery-boy consumers. The 957/1182 whole-source count
 remains its preceding sweep. Evidence: /tmp/lima-mission-expiry-20261016.
 
+Playerless guild logging is committed as **9e2f5a31** (native notes **b0274b98**).
+The subsequent Yakitori uniform/cashier/shop/delivery-boy audit leaves a **five-file
+temporary proposal**; dedicated LPC/native implementation remains unchanged.
+Existing ARMOUR/armour-class and slashing/lightning damage names replace stale
+uniform names, delivery boy retains one assistance inherit and the bundled std sake,
+and cashier uses the existing exit-block callback API without changing privacy.
+Conversation/assistance use native bound callbacks; conversation skips an empty
+option addition. Headers/LF/CRLF/final newline and configured distinct nil/preserved
+player/4000ms remain; no native API/master/privilege/registry/fixture changes.
+
+**17/17** complete targets compile; **83.98s / 76-input** focused gameplay
+passes 30 lifecycle checkpoints, two clean 151-preload boots, saved login and normal
+exits, without failed apply/runtime input error/panic. Real uniform wear/remove and
+coverage, cashier/kitchen constructors, outsider/member/solver exits, numbered
+riddle/rejection, actual domain-gold skewer purchase and two equipped delivery boys
+with sake pass. A one-shot helper-bound callback executes against a stock same-room
+helper/flea under public target/health/special controls; natural player-attack hooks,
+adjacent assistance and autonomous combat are not claimed. Same six fixtures/two
+address overrides, no new helper/body/grant, controls/inventory restored.
+
+Next adopt the reviewed proposal with the retained production replay, before
+mission/expiry/favour preparation. Earlier 1810 first-session + 10 restored-favour
+replay and 957/1182 whole-source sweep retain their measured scopes without replay
+or additive count here. Broader original-game policy/native observations and
+reserved inheritance/cache work stay separate. An earlier run passed all 75 gameplay
+inputs but hit 4000ms during second-boot compilation; failure evidence remains and
+no limit increase/native performance fix is claimed. Evidence:
+/tmp/lima-yakitori-shop-audit-20261016.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
