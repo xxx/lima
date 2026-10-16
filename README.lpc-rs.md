@@ -15,14 +15,14 @@ With the lpc-rs checkout beside this one and its CLI built, check a command with
 
 The last whole-library check, on 15 October 2026 before the command batches,
 compiles **753 of 1,180 .c files** with no timeouts or crashes. The latest bounded
-socketinfo check covers **178 targets**: **80/81 wizard entries**, **4/4 guild
+treefor check covers **178 targets**: **81/81 wizard entries**, **4/4 guild
 entries** and **93/93 supporting targets**, with no regressions. Admtool's set
 compiles **34/34**. All 25 leaf menus have navigation coverage and selected report/
 edit flows pass; administrative actions not exercised retain their prior scope.
 The races report matches six source definitions, and the native memory diagnostic
 ranks 274 loaded objects (257 after restart) with positive, descending estimates.
-Rows use separate strings within the driver's size limit. Treefor is the remaining
-wizard entry. Other retained counts are
+Rows use separate strings within the driver's size limit. All wizard entries in
+this bounded inventory now compile. Other retained counts are
 player 65/67, verbs 90/90, transitional 49/49 and transitional administrator 9/9.
 These counts include optional and partial sources and are not a completion
 percentage. Experimental random2 remains deferred and suicide is disabled upstream.
@@ -53,6 +53,15 @@ restart verify the actual loopback stream/listener and wrapper metadata, ignored
 arguments/input and the existing direct-output route (redirection creates an empty
 file). Each report row is written separately within the driver's string limit.
 All earlier login/menu/report checks remain; both 151-preload boots are clean.
+
+`treefor` uses native syntax_tree to inspect a checked statement-body wrapper
+without running it or creating a scratch object/source file. It prints escaped
+lines directly, with usage and compile-error recovery. Eleven first-session and
+three saved-login inputs cover arithmetic, captures, spreads, literal controls,
+errors/retry and a 24,033-byte report containing all 100 locals. Existing account,
+menu/report and lifecycle checks remain. Supplied code keeps normal source/dependency
+permissions. The command's output format is native frontend diagnostics rather than
+FluffOS compiler-node arrays; codefor remains the separate disassembly tool.
 
 Guild catalog/governance loading and native persistence now work in the selected
 distinct-nil configuration. Four stock mission definitions and one favour load;

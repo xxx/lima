@@ -4,163 +4,51 @@
 // By Beek - derived from codefor, which was derived from eval
 
 //: COMMAND
-// USAGE: ``treefor <lpc expression>``
+//$$ see: codefor
+// USAGE: ``treefor <lpc statements>``
 //
-// Shows the driver's internal representation of the expression.
+// Displays the driver's checked frontend tree without executing the statements.
 //
 // >``treefor int x; int y; return x+y;``
 //
-//(return ("binary op" "+" ("opcode_1" "local" 0)("opcode_1" "local" 1)))
-//
 // .. TAGS: RST
+
+#include <msgtypes.h>
 
 inherit CMD;
 
-#define SYNTAX "USAGE:  treefor <lpc expression>\n"
-
-private
-void ind(int indent)
+void create()
 {
-   outf("%*-' 's", indent, "");
+   ::create();
+   no_redirection();
 }
 
-private
-int dump(mixed *value, int indent, int flag)
+#define SYNTAX "USAGE:  treefor <lpc statements>\n"
+
+private void main(string str)
 {
-   mixed val;
-   int subindent;
-   // LBUG(value);
-   if (!sizeof(value))
-      return flag;
-   if (!stringp(value[0]))
-      return flag;
-
-   switch (value[0])
+   if (!str || str == "")
    {
-   case "two values":
-      if (flag)
-      {
-         outf("\n");
-         subindent = indent + 4;
-      }
-      else
-         subindent = indent;
-
-      if (dump(value[1], subindent, 0))
-         outf("\n");
-
-      if (dump(value[2], subindent, 0))
-         ;
-      outf("\n");
-
-      return 0;
-   case "efun":
-      if (!flag)
-         ind(indent);
-      outf("(efun %O (", value[1]);
-      flag = 1;
-
-      foreach (val in value[2])
-      {
-         if (arrayp(val))
-         {
-            if (flag)
-               outf(" ");
-            flag = dump(val, indent + 2, flag);
-         }
-         else
-         {
-            if (!flag)
-               ind(indent);
-            outf(" %O", val);
-            flag = 1;
-         }
-      }
-
-      if (!flag)
-         ind(indent);
-      outf(" )");
-      flag = 1;
-
-      foreach (val in value[3..])
-      {
-         if (arrayp(val))
-         {
-            if (flag)
-               outf(" ");
-            flag = dump(val, indent + 2, flag);
-         }
-         else
-         {
-            if (!flag)
-               ind(indent);
-            outf(" %O", val);
-            flag = 1;
-         }
-      }
-      if (!flag)
-         ind(indent);
-      outf(")");
-      return 1;
-   default:
-      if (!flag)
-         ind(indent);
-      outf("(%O", value[0]);
-      flag = 1;
-
-      foreach (val in value[1..])
-      {
-         if (arrayp(val))
-         {
-            if (flag)
-               outf(" ");
-            flag = dump(val, indent + 2, flag);
-         }
-         else
-         {
-            if (!flag)
-               ind(indent);
-            outf(" %O", val);
-            flag = 1;
-         }
-      }
-      if (!flag)
-         ind(indent);
-      outf(")");
-      return 1;
+      write(SYNTAX);
+      return;
    }
+
+   mixed failure = catch {
+      string source = "#include <mudlib.h>\n"
+                      "#include <daemons.h>\n"
+                      "#include <config.h>\n"
+                      "mixed eval_function(){\n" + str + ";\n}\n";
+      foreach (string line in syntax_tree("/tmp/TREEFOR", source))
+      {
+         tell(this_user(), line, TREAT_AS_BLOB | MSG_PROMPT);
+         tell(this_user(), "\n", TREAT_AS_BLOB | MSG_PROMPT);
+      }
+   };
+   if (failure)
+      write("treefor: " + failure + "\n");
 }
 
-void main(string str)
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
 {
-   string tmp_file;
-   string initial_write_to_file;
-   mixed ret;
-   object o;
-
-   initial_write_to_file = "#include <mudlib.h> \n"
-                           "#include <daemons.h>\n"
-                           "#include <config.h>\n"
-                           "mixed eval_function(){\n return __TREE__{";
-   tmp_file = "/tmp/EVAL.c";
-   rm(tmp_file);
-   if (o = find_object(tmp_file))
-      destruct(o);
-   if (!write_file(tmp_file, initial_write_to_file))
-   {
-      out("eval: Unable to write to " + tmp_file + ". \n"); // shouldn't happen.
-      return 0;
-   }
-   write_file(tmp_file, str + "; };\n");
-   write_file(tmp_file, "}\n");
-
-   if (ret = find_object(tmp_file))
-      destruct(ret);
-   ret = tmp_file->eval_function();
-   rm(tmp_file);
-
-   destruct(find_object(tmp_file));
-   dump(ret, 0, 0);
-   outf("\n");
-   return;
+   main(arg);
 }
