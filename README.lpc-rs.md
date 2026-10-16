@@ -390,6 +390,26 @@ committing this adoption; inspect actual constructors/press/photo delivery. The
 966/1182 sweep retains its measured scope without additive counts. No Rust gate or
 native performance fix is claimed. Evidence: /tmp/lima-consumables-20261016.
 
+Consumable support is committed as **109b22a0** (native notes **9c0eaf32**).
+The next camera audit leaves a **one-file temporary button proposal**: explicit
+mass conversion preserving SMALL=4 and a concrete press guard with default visibility/
+short checks. Camera/picture and the existing callback stay. No native API/code,
+config/master/privilege/framework/fixture change; headers/LF/final newline remain.
+
+**11/11** complete targets compile. Focused **71.22s / 46 inputs** passes
+all 30 checkpoints, two clean 151-preload boots, saved login and normal exits, without
+failed apply/runtime input error/panic. Normal press/push creates four photos
+(three carrier/one room), capturing two room descriptions and retaining old text
+after movement. Get refuses button removal and preserves its child. In-memory
+M_SAVE roundtrips preserve picture long and a single reconstructed camera button
+that still presses; fresh-driver item restoration is not qualified.
+
+Only audit notes are pending; dedicated LPC/native implementation stays unchanged.
+Same six fixtures/two address overrides, distinct nil/preserved player/4000ms,
+no new LPC helper/body/host/grant. Prior 1989 + 10 restored-favour replay and 966/1182
+sweep retain their measured scopes. Next adopt with retained full replay after
+consumables and before saved-favour setup. Evidence: /tmp/lima-camera-audit-20261016.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
