@@ -243,24 +243,27 @@ The 957/1182 whole-source inventory remains its preceding sweep. Evidence:
 /tmp/lima-favour-lifecycle-20261016.
 
 
-Favour lifecycle fixes are committed in **2843e0c6**. The mission completion/expiry
-audit has a temporary one-file proposal: guild add_log keeps the body's name when
-present and uses 'system' for playerless events. Baseline real scheduler expiry
-pays 500 favour but fails cleanup on nil this_body; the original source has the same
-assumption. **22/22** complete targets compile with the proposal. Its **111.78s /
-172-input** focused run passes actual playerless STATE_D success/failure expiry,
-normal gifts yielding 20/2 wood, rewards 500/0, controller clearing, 10/5s cleanup,
-system logs, both clean 151-preload boots, all 30 lifecycle checkpoints and saved
-login. Public duration/queue APIs accelerate timing; no direct manual ending is used.
-Same six fixtures/two address overrides, no new helper/grant or native feature.
+Mission-expiry audit notes are committed in **cd678206**. The reviewed single
+guild_d.c change now uses the body's existing name when present and 'system' for
+playerless logs. Header/LF/final newline remain. No native API/code, master,
+privilege, configuration, reward formula, clock or fixture change.
 
-No dedicated LPC source is adopted by this audit. Next adopt the single log adapter
-with the retained full replay, inserting the expiry helper before favour saved-state
-preparation. The previous 1639-input replay plus 10 restored-favour checks and
-957/1182 inventory retain their scopes. Multiple contributors/offline rewards,
-other recipes, overlap/repeat-end and broad reward policy remain separate; cleanup
-explicitly flushes diagnostic logs, so autonomous delayed-log persistence is not
-newly qualified. Evidence: /tmp/lima-mission-expiry-audit-20261016.
+**22/22** complete targets compile. Final **369.75s** full replay passes
+**1810 first-session inputs plus the retained 10 restored-favour inputs**, both
+clean 151-preload boots, all 30 lifecycle checkpoints, saved login/bank restoration
+and normal exits. Prior meaningful 1639-input coverage remains, adding **169
+expiry inputs** before favour saved-state preparation. Real playerless STATE_D
+expiry pays 500 for completed small wood/20 scraps and zero for incomplete/two
+scraps, clears the controller, performs 10/5s cleanup and logs system outcomes.
+Normal gifts and public duration/queue APIs exercise actual scheduler ending.
+Favour restoration and all prior families pass; same six fixtures/two address
+overrides, no new helper/grant, failed apply or worker panic.
+
+Multiple-contributor/offline rewards, other recipes, overlap/repeat-end and broad
+policy remain separate; cleanup explicitly flushes diagnostic logs, so autonomous
+delayed-log persistence is not newly qualified. Next audit the remaining Yakitori
+uniform, cashier/shop and delivery-boy consumers. The 957/1182 whole-source count
+remains its preceding sweep. Evidence: /tmp/lima-mission-expiry-20261016.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically

@@ -1128,6 +1128,8 @@ int remove_material(string guild, string m, int count)
 void add_log(string guild, string log)
 {
    int size;
+   object body = this_body();
+   string who = body ? body->query_name() : "system";
 
    if (log[ < 1] == '\n')
       log = log[0.. < 2];
@@ -1135,7 +1137,7 @@ void add_log(string guild, string log)
    if (!guild_log[guild])
       guild_log[guild] = ({});
 
-   guild_log[guild] += ({ctime(time()) + ": <" + this_body()->query_name() + "> " + log});
+   guild_log[guild] += ({ctime(time()) + ": <" + who + "> " + log});
    size = sizeof(guild_log[guild]);
    if (size > GUILD_LOG_HISTORY_SIZE)
    {
