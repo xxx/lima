@@ -30,8 +30,14 @@ All 25 admtool leaves retain navigation and selected report/edit coverage. The r
 report matches six definitions; memory reports rank 274/257 objects across restart
 using nonadditive estimates and separate strings within the driver's size limit.
 
-The school/tutorial family has 88 failing examples, mostly first blocked by trailing
-include semicolons, with text-block syntax and other later errors still to audit.
+The school audit identifies source-only syntax adapters for all 88 files:
+87 active include semicolons and 104 outer text blocks. A temporary conversion
+compiles 88/88, and native literal execution preserves all 46,222 extracted text
+bytes. Three stale map/return-exit references also have reviewed corrections;
+all 87 room nodes are statically reachable. Six of ten referenced object sources
+compile, while four NPC sources still block five lessons' NPCs. Native example
+snippets also need review. These are temporary controls, with no dedicated school
+source changes, full-room runtime qualification or new whole-source inventory yet.
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
