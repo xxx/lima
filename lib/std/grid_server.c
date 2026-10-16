@@ -28,7 +28,7 @@ nosave private string brief_desc;
 
 #define GRID_HEIGHT sizeof(grid_desc_id)
 #define GRID_WIDTH sizeof(grid_desc_id[0])
-#define GRID_ROOM(x, y) (file_name() + "/" + (x) + "/" + (y))
+#define GRID_ROOM(x, y) (file_name(this_object()) + "/" + (x) + "/" + (y))
 
 #define ROOM_DESC(x, y) descriptions[grid_desc_id[y][x] - '0']
 
@@ -89,7 +89,7 @@ object virtual_create(string arg)
    setup();
 
    if (idx == -1)
-      return 0;
+      return nil;
 
    x = to_int(arg[0..idx - 1]);
    y = to_int(arg[idx + 1..]);

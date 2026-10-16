@@ -28,6 +28,6 @@ void setup(int x, int y, int north, int east, int south, int west)
    }
    set_brief("Labyrinth");
    set_long("You are in a small corridor in a large labyrinth.  " +
-            (sizeof(dirs) > 1 ? "Passages lead " : "A passage leads ") + format_list(dirs) + ".\n");
+            (sizeof(dirs) > 1 ? "Passages lead " : "A passage leads ") + format_list(dirs, nil) + ".\n");
    set_default_error("Cold stone bars your way.\n");
 }

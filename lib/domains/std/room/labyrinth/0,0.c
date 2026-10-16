@@ -2,7 +2,7 @@
 
 inherit INDOOR_ROOM;
 
-#define LABYRINTH "/domains/std/room/labyrinth.c"
+#define LABYRINTH "/domains/std/room/Labyrinth.c"
 
 void setup()
 {

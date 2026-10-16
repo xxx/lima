@@ -88,7 +88,7 @@ int can_hold_water()
 
 void create(mixed *args...)
 {
-   container::create();
+   container::create(args...);
 
    // cloned rooms will already have this stuff happen... We need this
    // because setup() is the way people configure mudlib objects.

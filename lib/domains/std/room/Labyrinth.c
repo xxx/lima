@@ -92,7 +92,7 @@ object virtual_create(string arg)
    int x, y;
 
    if (sscanf(arg, "%d,%d", x, y) != 2)
-      return 0;
+      return nil;
    return clone_object (__DIR__ "Labroom", x, y, value(x, y - 1), value(x + 1, y), value(x, y + 1), value(x - 1, y));
 }
 
