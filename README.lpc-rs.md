@@ -410,6 +410,31 @@ no new LPC helper/body/host/grant. Prior 1989 + 10 restored-favour replay and 96
 sweep retain their measured scopes. Next adopt with retained full replay after
 consumables and before saved-favour setup. Evidence: /tmp/lima-camera-audit-20261016.
 
+Camera audit notes are committed as **61122c8e** (native **3740cd3c**). The one
+button-file change now exactly matches the audited proposal: explicit mass conversion
+preserves 4, and a concrete press guard retains default visibility/short checks.
+Camera/picture and the existing callback/get/do_not_restore behavior stay. No native
+API/code/config/master/privilege/framework/fixture change; headers/LF/newline remain.
+
+**72/72** complete targets compile. Full **413.38s / 2028 first-session
+inputs**, including **50 camera inputs**, plus **10 restored-favour inputs**,
+passes all 30 checkpoints, both clean 151-preload boots, saved login/bank and normal
+exits, without failed apply/runtime input error/STATE_D failure/panic. Prior 1989-input
+scope remains with unchanged helpers and retained comparisons. Four real press/push
+photos deliver 3 to carrier/1 to room, preserve two room descriptions and old snapshots
+after movement. In-memory M_SAVE picture/camera roundtrips preserve text and one
+rebuilt button that still presses; fresh-driver item restoration remains separate.
+
+Camera cleanup precedes retained mission/expiry/favour setup and actual restoration.
+A retained first-run test failure came from randomized discarded-camera sentences;
+the helper now compares six valid full snapshots differing only in that line, with
+all other text exact. Focused 78.44s/50 inputs passes; source/RNG stay unchanged.
+Same six fixtures/two address overrides, distinct nil/preserved player/4000ms; no new
+LPC helper/body/host/grant. Implementation/updated notes are pending. Next audit the
+writable-paper example/M_WRITING_SURFACE hook boundary after committing this change.
+WIP burnable std/paper.c stays separate. The 966/1182 sweep retains measured scope;
+no Rust gate or native performance fix. Evidence: /tmp/lima-camera-20261016.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
