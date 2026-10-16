@@ -106,7 +106,6 @@ object query_mission_ctrl()
 {
    if (!mission_ctrl)
       mission_ctrl = GUILD_D->mission_ctrl_npc(guild);
-   mission_ctrl->set_active_mission(this_object());
 
    return mission_ctrl;
 }
@@ -144,6 +143,5 @@ void create(string g)
 
    if (!clonep())
       return;
-   query_mission_ctrl();
    call_out(&artefact_message(guild + " new buff \"" + name + "\""), 2);
 }

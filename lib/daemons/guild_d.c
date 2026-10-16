@@ -120,7 +120,7 @@ void create()
          foreach (string buff, int end_at in buffs)
          {
             TBUG("buff: " + buff + " end_at: " + end_at);
-            if (time() < end_at - 30)
+            if (time() < end_at)
             {
                if (guild_favour_obs[tier] && guild_favour_obs[tier][buff])
                   start_favour(tier, buff, guild, end_at);
@@ -692,7 +692,7 @@ int state_update()
       {
          foreach (string buff, int end_at in buffs)
          {
-            if (time() > end_at - 30)
+            if (time() >= end_at)
             {
                m_delete(buffs, buff);
                buff_list[tier][guild] = buffs;
@@ -1004,13 +1004,14 @@ varargs int start_favour(int tier, string name, string guild, int end_time)
       filename = base_name(favour_ob);
       favour_length = favour_ob->query_length();
       buff_ob = clone_object (filename, guild);
-      if (end_time)
-         buff_ob->set_ends_at(end_time);
+      if (!end_time)
+         end_time = time() + (60 * buff_ob->query_length());
+      buff_ob->set_ends_at(end_time);
       if (!buff_list[tier])
          buff_list[tier] = ([]);
       if (!buff_list[tier][guild])
          buff_list[tier][guild] = ([]);
-      buff_list[tier][guild][name] = end_time ? end_time : time() + (60 * buff_ob->query_length());
+      buff_list[tier][guild][name] = end_time;
       active_buffs += ({buff_ob});
       save_me();
    }

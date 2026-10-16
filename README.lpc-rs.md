@@ -218,6 +218,30 @@ remain unqualified. Next review bounded favour expiry/controller-ownership
 corrections. Broader game policy and native observations retain their scope.
 Evidence: /tmp/lima-mission-controller-20261016.
 
+
+Controller/give support is committed in **6816385f**. Two further LPC corrections
+fix the observed favour lifecycle issues: guild_d supplies object/cache the same
+absolute expiry and uses that deadline on restore/cleanup; std_favour preserves
+the actual mission and resolves its controller lazily. Headers/LF/final-newline
+state remain. No native API/code, master, privilege, configuration or fixture change.
+
+**21/21** targets compile. Focused **99.16s** passes 75 first-session and 10 restored
+inputs. Final **391.16s** replay passes **1639 first-session inputs plus 10 new
+restored-favour inputs**, both clean 151-preload boots, all 30 lifecycle checkpoints,
+saved login/bank restoration and normal exits. Prior meaningful 1562-input coverage
+remains, with positive mission/favour expectations and explicit cleanup. Two normal
+purchases charge 500 once each; XP persists across updates, mission delivery still
+works, and actual deadline expiry clears XP/object/cache. Restart preserves the
+saved epoch/balance/member and applies without loading guild rooms. Same six
+fixtures/two address overrides; no helper/grant, failed apply or worker panic.
+
+The eager restore diagnostic's four-second limit remains unchanged; deferred
+controller lookup removes the unnecessary room/NPC construction. Broad native
+compiler performance is not claimed resolved. Next audit mission completion and
+autonomous expiry; broader reward/stacking/cancellation policy stays separate.
+The 957/1182 whole-source inventory remains its preceding sweep. Evidence:
+/tmp/lima-favour-lifecycle-20261016.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
