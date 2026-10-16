@@ -7,12 +7,14 @@ inherit M_GETTABLE;
 
 int level = 1;
 string *guild_modules = ({});
+private nosave function owner_killed_hook;
 
 void module_received();
 void artefact_moved();
 
 void setup()
 {
+   owner_killed_hook = owner_killed;
    set_id(GUILD_ARTEFACT, "guild_artefact_ob");
    add_adj("L" + level);
    set_long("A simple " + GUILD_ARTEFACT +
@@ -23,9 +25,9 @@ void setup()
    set_default_relation("in");
    set_max_capacity(10);
    set_mass(0.1);
-   add_hook("object_arrived", ( : module_received:));
-   add_hook("move", ( : artefact_moved:));
-   set_value(120);
+   add_hook("object_arrived", module_received);
+   add_hook("move", artefact_moved);
+   set_value(120.0);
 }
 
 string *query_guilds()
@@ -68,16 +70,16 @@ void module_received()
 
 void owner_killed(object ob)
 {
-   TBUG("Mob killed: " + ob);
+   TBUG(sprintf("Mob killed: %O", ob));
 }
 
 void artefact_moved()
 {
-   TBUG("Environment: " + environment());
+   TBUG(sprintf("Environment: %O", environment()));
    if (environment() && environment()->is_body())
-      environment()->add_hook("i_killed", ( : owner_killed:));
+      environment()->add_hook("i_killed", owner_killed_hook);
    else
-      environment()->remove_hook("i_killed", ( : owner_killed:));
+      environment()->remove_hook("i_killed", owner_killed_hook);
 }
 
 string add_article(string s)

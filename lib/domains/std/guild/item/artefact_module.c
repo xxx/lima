@@ -15,7 +15,7 @@ void setup(string g)
    set_id(GUILD_ARTEFACT_PLUGIN, "module");
    set_adj(guild);
    add_save(({"guild", "letter"}));
-   set_value(50);
+   set_value(50.0);
 }
 
 string long()
@@ -52,7 +52,7 @@ string query_module_name()
 }
 
 // Can be put into things.
-mixed direct_put_obj_wrd_obj(object ob1, string wrd, object ob2)
+mixed direct_put_obj_wrd_obj(object ob1, object ob2)
 {
    return 1;
 }

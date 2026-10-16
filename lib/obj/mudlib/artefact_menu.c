@@ -131,7 +131,7 @@ void guild_mission(string guild, int tier, string name)
 
    if (materials[0] && member_array(lower_case(this_body()->query_name()), mgmt) != -1)
    {
-      modal_simple(( : start_mission, tier, name, guild, materials[2] :), "Start the mission? (y/N) ", 1);
+      modal_simple(&start_mission(tier, name, guild, materials[2]), "Start the mission? (y/N) ", 1);
    }
 }
 
@@ -142,13 +142,12 @@ void guild_favour(string guild, int tier, string name)
    int favour = to_int(favour_info["favour"]);
    write("[FAVOUR INFO]   " + replace_string(favour_info["description"], "<guild>", capitalize(guild)) + "\n");
    write("[FAVOUR COST]   " + favour + "\n");
-   write("[FAVOUR LENGTH] " + time_to_string(to_int(favour_info["length"]) * 60) + "\n\n");
+   write("[FAVOUR LENGTH] " + time_to_string(to_int(favour_info["length"]) * 60, 0) + "\n\n");
 
    if (member_array(lower_case(this_body()->query_name()), mgmt) != -1)
    {
       if (GUILD_D->query_favour_score(guild) >= favour)
-         modal_simple((
-                          : start_favour, tier, name, favour, guild:),
+         modal_simple(&start_favour(tier, name, favour, guild),
                       "Buy this favour for " + favour + " favour? (y/N) ", 1);
       else
       {
@@ -171,8 +170,7 @@ class menu build_guild_mission_menu(string guild, class menu_item gmi)
    foreach (string name, mapping data in missions)
    {
       class menu_item mi = new_menu_item(sprintf("%-30s", name) + " Favour gain: " + data["favour"],
-                                         (
-                                             : guild_mission, guild, guild_tier, name:),
+                                         &guild_mission(guild, guild_tier, name),
                                          count + "");
       add_menu_item(s, mi);
       count++;
@@ -196,8 +194,7 @@ class menu build_guild_favour_menu(string guild, class menu_item gmi)
    foreach (string name, mapping data in favours)
    {
       class menu_item mi = new_menu_item(name + " Favour Cost: " + data["favour"],
-                                         (
-                                             : guild_favour, guild, guild_tier, name:),
+                                         &guild_favour(guild, guild_tier, name),
                                          count + "");
       add_menu_item(s, mi);
       count++;
@@ -248,11 +245,11 @@ void create(int level)
    // Since we'll use these things more than once, we can just
    // call new_menu_item once, and insert them wherever we want
    // to use them.
-   quit_item = new_menu_item("Quit", ( : quit_menu_application:), "q");
+   quit_item = new_menu_item("Quit", quit_menu_application, "q");
    goto_main_menu_item = new_menu_item("Return to main menu", toplevel, "m");
 
    // Add items to the toplevel (main) menu.
-   add_menu_item(other, new_menu_item("MUD Options", ( : start_player_menu:), "o"));
+   add_menu_item(other, new_menu_item("MUD Options", start_player_menu, "o"));
    add_menu_item(other, quit_item);
 }
 

@@ -38,7 +38,7 @@ void read_entry(string s)
 
 void read()
 {
-   read_entry(0);
+   read_entry(nil);
 }
 
 mixed direct_read_obj()

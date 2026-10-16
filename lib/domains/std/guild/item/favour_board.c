@@ -28,7 +28,7 @@ string *contributors()
 {
    if (!contrib)
       return ({});
-   return sort_array(keys(contrib), ( : sort_contrib:))[0..MAX_ON_BOARD];
+   return sort_array(keys(contrib), sort_contrib)[0..MAX_ON_BOARD];
 }
 
 string long()
@@ -55,7 +55,7 @@ string long()
          long_desc += "\n    %^YELLOW%^ACTIVE TIER " + tier + " BUFFS:%^RESET%^\n";
          foreach (string name, int expire in guilds[guild])
          {
-            long_desc += sprintf("%20s for %20s more.\n", name, time_to_string(expire - time()));
+            long_desc += sprintf("%20s for %20s more.\n", name, time_to_string(expire - time(), 0));
          }
          long_desc += "\n";
       }

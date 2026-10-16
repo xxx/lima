@@ -168,26 +168,31 @@ The earlier RST shutdown observation remains recorded separately without a nativ
 fix/resolution claim. Generic virtual parameter names are unnecessary for these
 buttons; PARAM_OBJ remains an explicit clone factory. Original playback/message
 policy, attic code, equipment/TCP and reserved native discussions remain separate.
-The refreshed 957/1,182 inventory above is compile-only; the recorder run retains
-its gameplay scope. The guild artefact item/menu audit has a temporary five-file
-proposal: float values, explicit object formatting, native callbacks (retaining
-one owner hook value), matching parser declaration, explicit time mode and nil
-ledger argument. Headers/CRLF/final-newline states are preserved; no dedicated LPC
-or native implementation is adopted. **17/17** complete targets compile in the
-disposable proposal. Its **72.73s / 71-input** focused run passes normal module
-installation/refusals, movement, blank/populated ledger, two sorted contributors,
-nested game menu, mission/favour details and both confirmation cancellations, plus
-30 lifecycle checkpoints, both clean 151-preload boots, saved login and normal
-exits. Separate guild data uses existing public APIs; bundled guild records remain
-unchanged. Same six fixtures/two address overrides, no new helper or grant.
+The refreshed 957/1,182 inventory above is compile-only. Guild artefact audit notes
+are committed in **a77e9a4d**; the five source files now exactly match the reviewed
+proposal. Native function values/partial application, retained owner-hook identity,
+float values/object formatting, matching parser declaration, explicit time mode and
+nil ledger argument adapt the items/menu. All headers, CRLF and final-newline states
+remain. Native API/code, shared frameworks, authorization and configuration stay
+unchanged.
+
+**17/17 complete targets compile**. The final **290.14s** full replay retains the
+prior meaningful 1429-input gameplay scope (1429 replay records; repeated polls
+may vary), adding **71 artefact inputs**, **1500 total**. Five item constructions,
+normal module installation/refusals, move-hook deduplication, blank/populated ledger,
+two sorted contributors, nested game menu, mission/favour details and both
+confirmation cancellations pass. Both clean 151-preload boots, all 30 lifecycle
+checkpoints, saved login/bank restoration and normal exits pass with all preceding
+families. Bundled guild records remain unchanged; the separate guild uses public
+APIs. Same six fixtures/two address overrides, no helper or grant. Final logs have
+no failed apply or worker panic.
 
 Activation and active-buff display remain untested pending the unported mission
-controller; cancellation does not qualify them. The pager's hidden installed
-modules, previous-owner hook policy and board slice/absent-leader behavior remain
-original source behavior. No native feature is recommended. Next adopt the five
-reviewed files with the retained full production replay, then audit that concrete
-controller dependency. Equipment/TCP, native observations and reserved discussions
-stay separate. Evidence: /tmp/lima-guild-artefact-audit-20261016.
+controller; cancellation does not qualify them. Next audit that concrete dependency.
+Hidden installed modules, previous-owner hook policy and board slice/absent-leader
+behavior remain original source behavior. No native feature is recommended. The
+whole-source count remains its measured inventory. Equipment/TCP, native observations
+and reserved discussions stay separate. Evidence: /tmp/lima-guild-artefact-20261016.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
