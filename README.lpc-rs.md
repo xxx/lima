@@ -169,11 +169,25 @@ fix/resolution claim. Generic virtual parameter names are unnecessary for these
 buttons; PARAM_OBJ remains an explicit clone factory. Original playback/message
 policy, attic code, equipment/TCP and reserved native discussions remain separate.
 The refreshed 957/1,182 inventory above is compile-only; the recorder run retains
-its gameplay scope. Next audit the four guild artefact item sources and artefact
-menu together, including their actual configuration/parser/menu consumers. Current
-first boundaries cover value types, parser signatures, time formatting and nil
-read arguments; no adapter proposal has been adopted for that family. Keep the
-completed guild/menu framework and reserved native discussions separate.
+its gameplay scope. The guild artefact item/menu audit has a temporary five-file
+proposal: float values, explicit object formatting, native callbacks (retaining
+one owner hook value), matching parser declaration, explicit time mode and nil
+ledger argument. Headers/CRLF/final-newline states are preserved; no dedicated LPC
+or native implementation is adopted. **17/17** complete targets compile in the
+disposable proposal. Its **72.73s / 71-input** focused run passes normal module
+installation/refusals, movement, blank/populated ledger, two sorted contributors,
+nested game menu, mission/favour details and both confirmation cancellations, plus
+30 lifecycle checkpoints, both clean 151-preload boots, saved login and normal
+exits. Separate guild data uses existing public APIs; bundled guild records remain
+unchanged. Same six fixtures/two address overrides, no new helper or grant.
+
+Activation and active-buff display remain untested pending the unported mission
+controller; cancellation does not qualify them. The pager's hidden installed
+modules, previous-owner hook policy and board slice/absent-leader behavior remain
+original source behavior. No native feature is recommended. Next adopt the five
+reviewed files with the retained full production replay, then audit that concrete
+controller dependency. Equipment/TCP, native observations and reserved discussions
+stay separate. Evidence: /tmp/lima-guild-artefact-audit-20261016.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
