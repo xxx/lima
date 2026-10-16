@@ -13,14 +13,16 @@ With the lpc-rs checkout beside this one and its CLI built, check a command with
 ../lpc-rs/target/debug/lpc-rs-lpcc -c lpc-rs.env --check lib/cmds/player/mudlist.c
 ```
 
-The current standalone-source inventory, on 15 October 2026 against native
-`e6822728` and this checkout at `39da199b`, compiles **924 of 1,180 .c files**:
-**256 fail, with no timeouts or crashes**. The identical target set gains **106
-successes without regressions** since the preceding 818/1,180 checkpoint: 88 school,
-11 ranged/ammunition and seven NPC/account sources. Counts include optional and
-inherited-only sources and are not a completion percentage. **58 failed fragments**
-have verified passing complete hosts. Further fragments and source/API adaptations
-remain to be reviewed.
+The current standalone-source inventory, on **16 October 2026** against native
+**2870a0b4** and this checkout at **6ca00180**, compiles **957 of 1,182 .c files**:
+**225 fail, with no timeouts or crashes**. All 924 previous successes remain;
+**31 previously failed targets now compile** (23 junk/spawner, three vehicle and
+five room/grid), plus both new virtual-room source files. This fresh sweep replaces
+the dated 924/1,180 inventory. Counts include optional and inherited-only sources
+and are not a completion percentage. **60 failed fragments** have reviewed passing
+complete hosts; the other 165 failures still include further fragments/optional
+code and are not a native-gap count. All 34 standard-room sources and 22 junk
+examples compile. No target constructor or driver gameplay rerun is included.
 
 Command compilation is player **65/67**, wizard **81/81**, guild **4/4**, verbs
 **90/90**, transitional **49/49** and transitional administrator **9/9**. The two
@@ -166,8 +168,12 @@ The earlier RST shutdown observation remains recorded separately without a nativ
 fix/resolution claim. Generic virtual parameter names are unnecessary for these
 buttons; PARAM_OBJ remains an explicit clone factory. Original playback/message
 policy, attic code, equipment/TCP and reserved native discussions remain separate.
-The whole-source **924/1,180** remains the earlier measured inventory. Next refresh
-the complete source inventory before choosing another consumer family.
+The refreshed 957/1,182 inventory above is compile-only; the recorder run retains
+its gameplay scope. Next audit the four guild artefact item sources and artefact
+menu together, including their actual configuration/parser/menu consumers. Current
+first boundaries cover value types, parser signatures, time formatting and nil
+read arguments; no adapter proposal has been adopted for that family. Keep the
+completed guild/menu framework and reserved native discussions separate.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
