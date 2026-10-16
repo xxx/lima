@@ -19,12 +19,22 @@ void do_fire_obj(object ob)
 
 void do_fire_obs(object *obs)
 {
-   handle_obs(obs, ( : do_fire_obj:));
+   handle_obs(obs, do_fire_obj);
+}
+
+mixed indirect_fire_obj_at_liv(object ob, object liv)
+{
+   return liv->direct_kill_liv(liv);
 }
 
 void do_fire_obj_at_liv(object ob, object liv)
 {
    ob->do_fire_at(liv);
+}
+
+void do_fire_obs_at_liv(object *obs, object liv)
+{
+   handle_obs(obs, do_fire_obj_at_liv, liv);
 }
 
 void do_fire_obj_obj(object ob1, object ob2)

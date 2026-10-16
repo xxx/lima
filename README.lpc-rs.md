@@ -34,15 +34,21 @@ The school/tutorial family has 88 failing examples, mostly first blocked by trai
 include semicolons, with text-block syntax and other later errors still to audit.
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
-an upstream bug or a missing efun. The ranged/ammunition audit finds nine source
-adapters that let all 11 family targets compile in a temporary copy: an explicit
-array collector, a parameterless short-description adapter, nil object sentinels
-and float values. A default fire-mode list also needs initialization; a standalone
-method control verifies it and retains flattened array calls. These changes are
-proposed, with no dedicated LPC source changes or normal-game combat qualification
-yet. Apply them next and check actual clone descriptions and matching pistol/clip
-flows. Bundled crossbow/quarrel configuration, other source families, optional
-services and broader gameplay remain separate.
+an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
+files, including explicit collector/default modes, a protected short-description
+helper, nil sentinels, float values and native callbacks. Fire has its missing plural
+action and falls back to the target's existing kill-permission check. Bounded source
+checks pass **36/36**, including all 11 family targets and 17 tracked core objects.
+The whole-source count above remains the earlier inventory.
+
+The new normal-game run retains all 482 prior first-session command records and
+adds **114 ranged inputs**. Nine real clones verify descriptions/configuration;
+matching pistol/clip flows pass loading, readiness, mode changes and refusal cases,
+15 shots, two clip depletions, removal and reload. A real quarrel callback verifies
+bound-target movement and nil weapon-link cleanup. All 30 lifecycle checkpoints,
+two 151-preload boots and saved login pass with normal exits. No new fixture source
+or master grant is used. Crossbow/quarrel configuration, continuous combat, AI,
+burst semantics, other source families and optional services retain separate scopes.
 
 The retained production-driver check passes 30 checkpoints covering account/character
 creation, menu, Grand Hall entry, look/inventory, logout and saved-account/body

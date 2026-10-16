@@ -16,6 +16,6 @@ void setup()
    set_ammo_type("13mm plasma");
    set_combat_messages("combat-bludgeon");
    set_exertion_rating(7);
-   set_value(2300);
+   set_value(2300.0);
    set_salvageable((["textile":10, "metal":90]));
 }

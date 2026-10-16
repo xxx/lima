@@ -13,11 +13,11 @@ void setup()
    set_ammo_type("13mm plasma");
    set_weapon_class(20);
    set_destruct_on_spent();
-   set_value(6 * 15);
+   set_value(6.0 * 15.0);
 }
 
 string short()
 {
-   string short = ::short(1);
+   string short = base_short();
    return "magazine of " + short;
 }

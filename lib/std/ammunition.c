@@ -67,12 +67,14 @@ void ammo_spent()
       this_object()->remove();
 }
 
-varargs string short(int base)
+protected string base_short()
 {
-   string short = ::short();
-   if (base)
-      return short;
-   return "clip of " + short;
+   return ::short();
+}
+
+string short()
+{
+   return "clip of " + base_short();
 }
 
 string get_extra_long()
@@ -90,14 +92,14 @@ void finish_discharge(object target)
    // TBUG("Charges: " + charges + "/" + max_charges);
    if (destruct_on_spent && !charges)
    {
-      object player = environment(this_object())->is_body() ? environment(this_object()) : 0;
+      object player = environment(this_object())->is_body() ? environment(this_object()) : nil;
       tell(player, "Your " + this_object()->short() + " is empty.\n");
       this_object()->remove();
    }
    else if ((!charges || charges == -1) && !destruct_on_spent)
    {
       this_object()->move(environment(target));
-      weapon = 0;
+      weapon = nil;
    }
 }
 
@@ -106,7 +108,7 @@ void finish_discharge(object target)
 // which will thus occur after the ammunition has hit/missed the target
 void discharge(object target)
 {
-   call_out(( : finish_discharge:), 0, target);
+   call_out(&finish_discharge(target), 0);
 }
 
 string alt_weapon()

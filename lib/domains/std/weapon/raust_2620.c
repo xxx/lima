@@ -14,6 +14,6 @@ void setup()
    set_skill_used("combat/melee/club");
    set_ammo_type("10mm bullets");
    set_combat_messages("combat-bludgeon");
-   set_value(450);
+   set_value(450.0);
    set_salvageable((["textile":10, "metal":70, "wood":20]));
 }

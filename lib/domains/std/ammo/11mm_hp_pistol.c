@@ -13,7 +13,7 @@ void setup()
    set_ammo_type("11mm bullets");
    set_weapon_class(14);
    set_destruct_on_spent();
-   set_value(32);
+   set_value(32.0);
 }
 
 string alt_weapon()

@@ -9,7 +9,7 @@ nosave int time_to_load = 2;
 private
 nosave object ammo_ob;
 private
-nosave string *fire_type;
+nosave string *fire_type = ({"single"});
 private
 nosave string fire_mode = "single";
 private
@@ -38,7 +38,7 @@ string *query_fire_type()
    return fire_type;
 }
 
-void set_fire_type(string ft...)
+void set_fire_type(string *ft...)
 {
    // single, pump, semi, fully
    fire_type = flatten_array(ft);

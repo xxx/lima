@@ -10,7 +10,7 @@ void setup()
    set_weapon_class(2); // It can be used to bash if it's not loaded
    set_damage_type("bludgeon");
    set_time_to_load(4);
-   set_value(500);
+   set_value(500.0);
    set_skill_used("combat/melee/club");
    set_ammo_type("11mm bullets");
    set_combat_messages("combat-torch");
