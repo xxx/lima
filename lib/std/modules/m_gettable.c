@@ -35,7 +35,7 @@ void set_getmsg(string s)
    get_response = s;
    if (!my_get_hook)
    {
-      my_get_hook = ( : prevent_get:);
+      my_get_hook = prevent_get;
       add_hook("prevent_get", my_get_hook);
    }
 }
@@ -64,7 +64,7 @@ void set_gettable(mixed g)
 
    if (!my_get_hook)
    {
-      my_get_hook = ( : prevent_get:);
+      my_get_hook = prevent_get;
       add_hook("prevent_get", my_get_hook);
    }
 }
@@ -98,7 +98,7 @@ void set_dropmsg(string s)
    drop_response = s;
    if (!my_drop_hook)
    {
-      my_drop_hook = ( : prevent_drop:);
+      my_drop_hook = prevent_drop;
       add_hook("prevent_drop", my_drop_hook);
    }
 }
@@ -127,7 +127,7 @@ void set_droppable(mixed g)
 
    if (!my_drop_hook)
    {
-      my_drop_hook = ( : prevent_drop:);
+      my_drop_hook = prevent_drop;
       add_hook("prevent_drop", my_drop_hook);
    }
 }

@@ -733,6 +733,14 @@ native API, framework, configuration, authorization or fixture change is needed.
 The full replay and source inventory retain their preceding scopes. Evidence:
 /tmp/lima-weather-20261017.
 
+The shared gettable module now registers its actual get/drop check functions.
+Nested get validation keeps a container's gettable state separate from its
+contents, recognizes the parser's individual and plural-array checks, and uses
+the existing accessibility helper. Boolean, message and function responses are
+verified through all four setters; direct moves respect drop hooks and setting
+true restores get/drop behavior. The mailbox's original 62-input sequence remains.
+
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source

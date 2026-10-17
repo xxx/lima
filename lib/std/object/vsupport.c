@@ -103,6 +103,12 @@ int do_verb_rule(string verb, string rule, mixed args...)
 mixed direct_get_obj(object ob)
 {
    object who = owner(ob);
+   mixed targets = ob;
+
+   // Plural parser rechecks supply an array through this object parameter.
+   if ((objectp(targets) && targets != this_object()) ||
+       (arrayp(targets) && member_array(this_object(), targets) == -1))
+      return nil;
 
    if (environment() == this_body())
       return "#You already have it!\n";
@@ -118,7 +124,7 @@ mixed direct_get_obj(object ob)
       if (intp(result))
          return result;
    }
-   if (environment(this_object()) != environment(this_body()))
+   if (!immediately_accessible(this_object()))
       return "#You cannot get that.";
    if (this_object()->query_drop_owner() && this_object()->query_drop_owner() != this_body())
       return "#That's not yours.";
