@@ -567,6 +567,23 @@ is not a matched native speed comparison. Earlier compile checks remain prior
 stays separate; next audit is the standard table/treasure-chest consumers. Evidence:
 /tmp/lpc-gc-sweep-20261017.
 
+The subsequent GC parallelism investigation leaves driver code, dependencies,
+storage and Lima source/configuration unchanged. The same 596-command measurement
+prefix retains 15,264 of roughly 899,000 cells. Debug construction/destruction/
+collector times are **21/735/885ms**; the optimized native driver measures
+**6/235/268ms**. Destruction dominates. These are measurement-only runs; the prior
+complete 2,159+10 replay remains qualification.
+
+Rayon iterator adapters lose in the separate optimized map fixture. An isolated
+imbl API prototype exposes owned root branches without changing map layout and
+measures **197ms serial -> 114ms with two Rayon workers** for 2.3m entries with
+Arc payloads. This unpublished API is not integrated into the driver and the result
+is not a native speedup. A bounded native prototype with dependency API support
+and transaction/GC validation is the recommended next performance investigation.
+All temporary timing code is removed and debug/release production binaries rebuilt;
+atomic GC and the existing timeout/mode contracts remain. Evidence:
+/tmp/lpc-gc-parallel-20261017.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
