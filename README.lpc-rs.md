@@ -908,22 +908,26 @@ all gameplay/exits; the prior full replay and 985/1182 inventory keep their scop
 Evidence: /tmp/lima-room-construction-20261017. Constructor notes are committed as
 Lima **46327624**, native **2ac8e2ea**; do not repeat the completed constructors.
 
-The Lava_Room audit reproduces a no-op arrival hook: its closure returns the handler.
-A temporary named-handler registration exposes `destruct: permission denied` for
-ordinary objects after the melting message; normal `remove()` succeeds. Recommend
-only a named callback and `o->remove()` followed by return, without changing policy.
-Under the control, natural five-second burns deal 5 damage/reschedule, departure
-consumes its pending timer without another burn, and a ridden Camaro survives with
-an unharmed rider. Existing vehicle cosmetic burns and quick-reentry duplicate
-timers are recorded for preservation in the initial adapter.
+The Lava Room audit is committed as Lima **4313c3b3**, native **320664db**.
+The one-file adapter now registers bare `when_person_enters` and uses `o->remove()`
+with an immediate return after the original ordinary-object melting message.
+Native/master rules, timer/vehicle policy, configuration and fixtures are unchanged.
 
-**43 audit inputs**, **151 clean preloads** and normal RST/saves/logout/shutdown
-pass in **141.43s**. Original hook, health/healing, path and props restore. No
-LPC/native/master/configuration/fixture edits or production-fix claim. Two earlier
-runs remain incomplete: uncaught object cleanup, then a health measurement taken
-before lazy limb initialization. Evidence: /tmp/lima-lava-room-audit-20261017.
-Next make the two local source adaptations and validate normal arrivals; prior
-full replay/source inventory retain scope.
+**One complete target compiles**; **42 production inputs**, **151 clean preloads**
+and normal RST/saves/logout/shutdown pass in **140.68s**. The actual production
+hook runs without replacement or expected errors. Repeated direct object arrivals
+and ordinary `drop` remove rocks without extra timers/leftovers. Natural five-second
+burns deal 5 damage and reschedule; departure consumes the pending timer without
+more damage. A ridden Camaro protects its rider; existing cosmetic vehicle burns
+and quick-reentry duplicate timers are preserved. Health/healing, path and props
+restore; the fixed callback remains installed. Evidence:
+/tmp/lima-lava-room-20261017. Prior audit, constructor/full replay and source
+inventory retain their scopes; there is no additive recount or repeated Rust gate.
+
+Next audit `std/book.c` and its concrete `domains/std/lima_guide.c` host: their
+unchanged-source inventory failures concern callback initialization and mass typing.
+Fresh target checks come before adapter selection; no native prototype change or
+room-constructor repeat is proposed.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically

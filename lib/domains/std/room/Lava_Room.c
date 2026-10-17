@@ -42,7 +42,8 @@ void when_person_enters(object o)
    {
       receive_inside_msg(capitalize(o->the_short()) + " sinks and "
                                                       "melts into the lava...\n");
-      destruct(o);
+      o->remove();
+      return;
    }
 
    // This is the initial call to the burn_player function...  The call keeps
@@ -64,5 +65,5 @@ void setup()
    ]));
 
    // Set it up so our functions get called when something enters.
-   add_hook("object_arrived", ( : when_person_enters:));
+   add_hook("object_arrived", when_person_enters);
 }
