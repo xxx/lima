@@ -783,6 +783,32 @@ run; the preceding full replay and 966/1182 inventory retain their measured scop
 The next audit is the daemon that creates these chests. Failed controls remain
 unqualified. Evidence: /tmp/lima-loot-chest-20261017.
 
+The following loot-generation audit leaves source unchanged after commit
+**ed33a625** (native notes **1e5f394a**). Of six targets, daemon/chest/coins compile;
+gem and art fail on return/value types and quoted callbacks. The standalone boss
+mixin lacks its host methods, and a tracked-source search finds no bundled host.
+Both gem/art value getters also call themselves rather than the inherited getter;
+this is source-reviewed, without executing recursion.
+
+A **25-input** production audit catches both generator compile failures, verifies
+coin creation/description and reproduces the daemon's unplaced chest. Level 17
+produces no loot in the original table, isolating placement without random
+selection or dependency substitutions. The chest is live, recipient-owned and
+scheduled for its ordinary expiry, but has no environment or room membership.
+All props and shell variables are cleaned up. **151 clean preloads**, normal
+RST completion, saved account/body and normal shutdown pass in **133.09s**.
+The two earlier harness-output failures remain unqualified.
+
+Next repair the two generators and daemon placement, retaining existing float
+value formulas, loot probabilities and boss rules. Type/callback changes are port
+adapters; self-recursive getters and missing placement are present in the pinned
+original source. The loot table only implements levels 0–16; extending it or
+changing unused boss policy is separate work. No actual boss combat, random
+distribution or loot persistence qualification is claimed. Native source/config,
+fixtures, distinct nil/preserved player/4000ms and 300-second GC are unchanged.
+The preceding full replay and 966/1182 inventory retain their measured scopes.
+Evidence: /tmp/lima-loot-generation-audit-20261017.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
