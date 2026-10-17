@@ -895,10 +895,18 @@ previous generator/beach/container/bottle/workroom/weather/gettable/chest checks
 No combat or saved-guard restoration claim; prior full replay and 985/1182 inventory
 keep their measured scopes. Evidence: /tmp/lima-guild-guard-20261017.
 
-Next review remaining standard-room constructors and their child dependencies,
-using existing evidence to separate concrete rooms, factories and qualified cases.
-This will identify actual construction blockers before choosing more source work;
-completed blocking, equipment, parser/exit and quest frameworks remain separate.
+Guild-guard source/notes are committed as Lima **686d0a4d**, native **9f1ea8b2**.
+The constructor coverage map now accounts for all **34 standard-room sources**:
+**30 concrete rooms**, plus **four templates/servers**. Nine concrete rooms and all
+four templates/servers retain source-matched prior evidence. The remaining **21
+room checks pass**, including direct stock and nested adventurer equipment/table
+shovel. Sixteen rooms load directly, two through checked dependencies; three are
+already loaded during startup. **67 focused inputs**, **151 clean preloads**, normal
+RST scanning, account/body saves and clean shutdown pass in **153.59s**.
+No LPC/native/configuration/fixture changes. Construction coverage does not qualify
+all gameplay/exits; the prior full replay and 985/1182 inventory keep their scopes.
+Evidence: /tmp/lima-room-construction-20261017. Next audit Lava_Room's arrival hook
+and timed burning/departure behavior; do not repeat the completed constructors.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
