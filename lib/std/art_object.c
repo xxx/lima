@@ -18,7 +18,7 @@ void set_value(float value);
 
 float query_value()
 {
-   return query_value();
+   return ::query_value();
 }
 
 // If sold to merchant, just remove the item, don't sell it again.
@@ -39,7 +39,7 @@ string item_name()
    if (!id)
    {
       TBUG("Bad format art object: '" + item + "'");
-      return;
+      return nil;
    }
    set_id(id);
 
@@ -74,7 +74,7 @@ void generate_item()
          item = choice(options);
          item_code = item;
          item = item_name();
-         set_value(5 + random(to_int(query_value())));
+         set_value(to_float(5 + random(to_int(query_value()))));
          set_weight(random(5) + 1 * 0.1);
          break;
       case 250..749:
@@ -85,7 +85,7 @@ void generate_item()
 
          item = choice(options);
          item_code = item;
-         set_value(50 + random(to_int(query_value())));
+         set_value(to_float(50 + random(to_int(query_value()))));
          set_weight(random(5) + 3 * 0.1);
          break;
       }
@@ -96,10 +96,10 @@ void generate_item()
 void mudlib_setup(int value)
 {
    if (value > art_value)
-      art_value = value;
+      art_value = to_float(value);
    set_id("art", "art object");
    set_value(art_value);
-   call_out("generate_item", 0);
+   call_out(generate_item, 0);
 }
 
 void internal_setup()

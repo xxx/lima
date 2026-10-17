@@ -315,10 +315,14 @@ object *loot_chest(int level, object env)
 void drop_chest(object slayer, int level)
 {
    object chest;
-   object *loot = loot_chest(level, environment(slayer));
+   object where;
+   object *loot;
    if (!slayer || !slayer->is_body())
       slayer = this_body();
+   where = environment(slayer);
+   loot = loot_chest(level, where);
    chest = clone_object("/std/loot_chest", slayer);
+   chest->move(where);
    loot->move(chest);
 }
 

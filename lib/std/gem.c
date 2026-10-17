@@ -23,7 +23,7 @@ void set_value(float value);
 
 float query_value()
 {
-   return query_value();
+   return ::query_value();
 }
 
 int randomize_gem()
@@ -45,6 +45,7 @@ int randomize_gem()
       return 4;
    if (roll < 63)
       return 5;
+   return 0;
 }
 
 // If sold to merchant, just remove the item, don't sell it again.
@@ -53,7 +54,7 @@ int destroyable()
    return 1;
 }
 
-int gem_value()
+float gem_value()
 {
    return (1 + gsize) * (1.0 + (gshape / 3.0) + (gcut / 10.0) + (gcolour / 5.0));
 }
@@ -87,7 +88,7 @@ void mudlib_setup(int vc)
    set_id("gem");
    if (vc > 0)
       value_cap = vc;
-   call_out("roll_gem", 1);
+   call_out(roll_gem, 1);
 }
 
 void internal_setup()

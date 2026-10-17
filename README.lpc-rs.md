@@ -809,6 +809,33 @@ fixtures, distinct nil/preserved player/4000ms and 300-second GC are unchanged.
 The preceding full replay and 966/1182 inventory retain their measured scopes.
 Evidence: /tmp/lima-loot-generation-audit-20261017.
 
+The audited three-file repair is applied after notes commit **0dfba629** (native
+**72802a4f**). Gem/art query their inherited value getters, adapt return/value
+types and schedule named callbacks. The missing maximum gem roll returns category
+0 explicitly; existing thresholds, formulas, text and delays remain. The daemon
+resolves its recipient first and places the chest in that recipient's room before
+moving loot inside. Loot bands, boss rules and expiry are unchanged. Headers, LF
+and original final-newline states remain; no native code/config or fixture edits.
+
+**Seven complete targets compile**. Production passes **62 new + 283 retained
+inputs**, **151 clean preloads**, normal documentation scanning, saved account/body
+and normal shutdown in **177.45s**. Natural callbacks generate four gems across
+caps 10/50/64 and four art objects across both existing tiers. Inherited value
+factors, original value/mass ranges, distinct clones, valid index samples, stable
+repeated gem values and ordinary look/get/drop work. Nil and non-player recipients
+use the existing body fallback. Level 17 retains empty generation but now places
+its chest; a supported level 16 run produces one coin pile and five gems in a
+placed, owned chest. Ordinary opening and coin collection work, and the wallet
+and all props are cleaned up. Art is checked through its public factories.
+
+The unchanged six retained helpers keep all container/bottle/workroom/gettable/
+weather/chest assertions. Real weather changes fog to sun; all three original
+chest-expiry notices arrive naturally at 15/30/45 seconds. Actual boss combat,
+random distributions and loot persistence remain outside this run. The earlier
+full replay and 966/1182 inventory retain their measured scopes. Next refresh the
+source inventory after these leaf ports to select remaining complete consumers.
+Evidence: /tmp/lima-loot-generation-20261017.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
