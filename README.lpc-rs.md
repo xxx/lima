@@ -875,9 +875,30 @@ bottle/workroom/weather/gettable/chest assertions, including natural weather and
 all three chest-expiry notices. Previous full replay and 985/1182 inventory retain
 their scopes; no additive recount. Evidence: /tmp/lima-rocky-beach-20261017.
 
-Next audit Monster_Room's guild_guard constructor and its private parent-handler
-boundary. Keep native privacy and the existing block-action interface; no native
-visibility change or general equipment/parser/quest-policy review is proposed.
+Rocky Beach support is committed as **7d47e4af** (native **684e8a1a**). The next
+guild-guard adapter changes only `std/guild_guard.c`: use the existing block-action
+callback instead of calling a private parent handler. Its explicit allow result
+matches that API's polarity. Members/allies pass; other characters receive the
+original refusal text and action. The blocking module, native privacy, master,
+configuration, fixtures, constructors and headers/LF/final newline are unchanged.
+
+**Three complete targets compile**. Production passes **63 new + 393 retained
+inputs**, **151 clean preloads**, normal documentation scanning, account/body saves
+and normal shutdown in **178.76s**. The actual Monster_Room factory creates its
+Yakitori guard. Nonmembers and zero-level memberships are blocked; members pass.
+Temporary guild records and a clone of the stock room test ally membership,
+unrelated membership and revocation without changing bundled ally relationships.
+Movement transfers the guard's hook; reset preserves one live guard and replaces
+one removed guard, with stale hooks pruned normally. Memberships, shell path,
+temporary catalog entries and props restore. Eight unchanged helpers retain all
+previous generator/beach/container/bottle/workroom/weather/gettable/chest checks.
+No combat or saved-guard restoration claim; prior full replay and 985/1182 inventory
+keep their measured scopes. Evidence: /tmp/lima-guild-guard-20261017.
+
+Next review remaining standard-room constructors and their child dependencies,
+using existing evidence to separate concrete rooms, factories and qualified cases.
+This will identify actual construction blockers before choosing more source work;
+completed blocking, equipment, parser/exit and quest frameworks remain separate.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
