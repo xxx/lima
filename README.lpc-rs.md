@@ -511,6 +511,28 @@ Prior 2082 + 10 restored-favour / 426.29s replay and 966/1182 sweep keep measure
 Next adopt with retained full replay after writing and before mission/expiry/favour.
 Evidence: /tmp/lima-mailbox-props-audit-20261016.
 
+The mailbox/leaflet source still exactly matches the audited two mass conversions;
+implementation and notes are pending commit. All **83 prior compile checks** are
+retained for unchanged source/configuration/binaries. The new full retry passed
+**all 62 mailbox inputs** and earlier helpers through normal missions, with one
+clean 151-preload boot. Full validation remains **pending**: it ended normally in
+**343.78s** during mission-expiry polling, before saved-state restart.
+
+Input callback resolution exceeded 4000ms with **zero compilation time**. GC then
+reported reclaiming **2,272,887 variables**, and a live-snapshot reply found its
+receiver cancelled. Callback snapshot acquisition shares the evaluation deadline;
+GC executes atomically in the committer. GC/snapshot waiting is suspected, not
+isolated or fixed. This differs from the earlier cold-preload failures, preserved
+under /tmp/lima-mailbox-props-20261016. Source/helpers/fixtures/limits are unchanged;
+no native change or current full-replay success is claimed.
+
+Same six fixtures/two address overrides, distinct nil/preserved player/4000ms and
+actual master/simuls/user/body/parser; no new LPC helper/body/host/grant. Prior
+2082 + 10 restored-favour / 426.29s replay and 966/1182 sweep keep measured scope.
+Next investigate the native snapshot/GC deadline before another full qualification
+or the next container-example audit. Evidence:
+/tmp/lima-mailbox-props-retry-20261016.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source

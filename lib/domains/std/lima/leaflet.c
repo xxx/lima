@@ -12,7 +12,7 @@ void setup()
    set_size(VERY_SMALL);
 #endif
 #ifdef USE_MASS
-   set_mass(VERY_SMALL);
+   set_mass(to_float(VERY_SMALL));
 #endif
    set_id("leaflet", "booklet", "mail");
    set_text("WELCOME TO ZORK!\n\nWell, ok, maybe not.  But it starts sorta similar.  Your mission, should you choose "
