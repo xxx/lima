@@ -584,6 +584,30 @@ All temporary timing code is removed and debug/release production binaries rebui
 atomic GC and the existing timeout/mode contracts remain. Evidence:
 /tmp/lpc-gc-parallel-20261017.
 
+The subsequent native worker prototype lives only in the detached checkout at
+/tmp/lpc-gc-native-20261017/checkout (native d2a2c28b). Its unpublished imbl
+owned-branch API and Rayon dependency do not change production code, storage or
+Lima source/configuration. Two lazy workers finish retired-map disposal inside
+atomic GC; small maps remain serial and worker creation failure falls back.
+
+The prototype passes **5,134 workspace tests / 2 skips**, five new lifetime and
+completion tests, **10 doctests**, warning-free Clippy/docs, formatting and the
+optimized workspace build. One paired measurement uses the same binary and
+596-command prefix, six fixtures/two address overrides and ordinary GC period,
+with distinct nil/preserved player/4000ms unchanged. Both retain **15,264 cells**
+from roughly 899k. Serial disposal/collector service measure **275.1/315.7ms**;
+two-worker disposal of 32 owned branches measures **143.8/184.0ms**, a **41.7%**
+shorter collector pause in this pair. These are prefix measurements; the prior
+complete 2,159+10 replay remains full qualification.
+
+All **362 transaction workload trials** pass. Initial large differences do not
+persist in nine longer paired repetitions of affected cases; repeated medians
+range from **8.2% faster to 2.5% slower**, with overlapping ranges. Zero overhead
+is not established. Results support the approach, but adoption needs a maintained
+dependency API strategy; the temporary path and measurement control remain isolated.
+Native timeout/mode contracts, prior 83/83 compile evidence and 966/1182 inventory
+keep their measured scope. Evidence: /tmp/lpc-gc-native-20261017.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
