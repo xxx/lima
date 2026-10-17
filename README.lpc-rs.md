@@ -759,6 +759,30 @@ no prototype extension is needed. Beek conversation and fresh-driver prop
 persistence remain outside the check; the 966/1182 inventory is not repeated.
 Evidence: /tmp/lima-workroom-20261017.
 
+The loot chest matches inherited parser signatures, schedules its named expiry
+callback and handles ownerless expiry. Explicit opening/get aliases and the
+money/material put rules preserve its ownership and take-only checks. The shared
+ordinary-item `get ... out of ...` handler delegates to the existing get-from
+check; other object behavior is unchanged. Original headers, CRLF/LF endings,
+capacities, text and timing formula remain.
+
+**Eight complete targets compile**. The focused production run passes **95 new
+loot inputs + 188 retained inputs**, **151 clean preloads** and normal shutdown
+in **172.99s**. It checks player-owned, NPC-owned and ownerless construction,
+ordinary opening, singular/plural taking through from/out-of/from-in forms,
+wrong-relation and put refusals, rescheduling and removal. All three original
+notices arrive naturally at approximately **15, 30 and 45 seconds**; the original
+formula removes the chest at the third notice despite the constant's value of 60.
+The retained real weather tick changes sun to snow and notifies the player.
+Existing rule-failure selection can choose a generic no-object message for refused
+aliases or money phrases; object states and the chest's checks are verified.
+
+No native code/configuration or fixture changes. Loot-daemon generation and
+placement, the death pipeline and fresh-driver loot persistence are outside this
+run; the preceding full replay and 966/1182 inventory retain their measured scopes.
+The next audit is the daemon that creates these chests. Failed controls remain
+unqualified. Evidence: /tmp/lima-loot-chest-20261017.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source

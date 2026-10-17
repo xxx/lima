@@ -21,11 +21,11 @@ void destroy_loot_chest()
       // Is there player next to me
       if (env && present(loot_for, env))
          tell(loot_for, msgs[dest_step] + "\n");
-      call_out("destroy_loot_chest", (CHEST_GONE_IN / (1 + sizeof(msgs))));
+      call_out(destroy_loot_chest, (CHEST_GONE_IN / (1 + sizeof(msgs))));
    }
    else
    {
-      if (present(loot_for, env))
+      if (env && present(loot_for, env))
          tell(loot_for, msgs[dest_step] + "\n");
       remove();
    }
@@ -48,14 +48,19 @@ void setup(object player)
    add_relation("in", VERY_LARGE);
    add_relation("on", VERY_LARGE);
    set_default_relation("in");
-   call_out("destroy_loot_chest", (CHEST_GONE_IN / (1 + sizeof(msgs))));
+   call_out(destroy_loot_chest, (CHEST_GONE_IN / (1 + sizeof(msgs))));
 }
 
-mixed direct_open_obj()
+mixed direct_open_obj(object ob)
 {
    if (this_body() == loot_for)
       return 1;
    return "Not your loot chest, sorry.";
+}
+
+mixed direct_open_up_obj(object ob)
+{
+   return direct_open_obj(ob);
 }
 
 mixed indirect_get_obs_from_obj()
@@ -65,16 +70,38 @@ mixed indirect_get_obs_from_obj()
    return "Not your loot chest, sorry.";
 }
 
-mixed indirect_get_obj_from_obj()
+mixed indirect_get_obj_from_obj(object ob1, string wrd, object ob2)
 {
    if (this_body() == loot_for)
       return 1;
    return "Not your loot chest, sorry.";
 }
 
-mixed indirect_put_obj_wrd_obj(object ob)
+mixed indirect_get_obj_out_of_obj(object ob1, object ob2)
+{
+   return indirect_get_obj_from_obj(ob1, nil, ob2);
+}
+
+mixed indirect_get_obj_from_wrd_obj(object ob1, string rel, object ob2)
+{
+   if (this_body() != loot_for)
+      return "Not your loot chest, sorry.";
+   return ::indirect_get_obj_from_wrd_obj(ob1, rel, ob2);
+}
+
+mixed indirect_put_obj_wrd_obj(object ob1, string wrd, object ob2)
 {
    return "You can only take from loot chests.";
+}
+
+mixed direct_put_wrd_str_in_obj(string amount, string str, object ob)
+{
+   return "You can only take from loot chests.";
+}
+
+mixed direct_put_wrd_str_into_obj(string amount, string str, object ob)
+{
+   return direct_put_wrd_str_in_obj(amount, str, ob);
 }
 
 mixed indirect_put_obs_wrd_obj()

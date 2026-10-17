@@ -147,6 +147,11 @@ mixed direct_get_obj_from_obj(object ob1, object ob2)
    return call_hooks("prevent_get", HOOK_YES_NO_ERROR);
 }
 
+mixed direct_get_obj_out_of_obj(object ob1, object ob2)
+{
+   return direct_get_obj_from_obj(ob1, ob2);
+}
+
 //: FUNCTION direct_get_obj_from_wrd_obj
 // Handle parser checks for "get OBJ from WRD OBJ"
 // Leave the relation checks to indirect_
