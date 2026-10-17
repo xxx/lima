@@ -939,13 +939,21 @@ resident callable-page reading pass without diagnostic source or hook controls.
 A real book-owned callback resolves the prior audit's invalid callback-owner probe.
 Props and path restore. Evidence: /tmp/lima-book-20261017.
 
-Two command-layer findings remain: `read about docs in guide` uses bare-topic
-lookup, and rejected turn commands show missing-object fallbacks despite correct
-class validation messages and preserved pages. Next audit these exact routing and
-error-selection cases; no shared-readable or native workaround is presumed. Two
-prior incomplete runs retain the command-message assumption and corrected alias
-bug; the second also trips source-consistency after repair during cleanup. Previous
-whole-source/full replay/constructor counts retain their scopes.
+Book source/notes are committed as Lima **a5efeef1**, native **c2895b85**. The command
+audit traces the remaining cases to registration order under the existing native
+first-success/equal-progress trial-order policy. Read places broad about STR before
+qualified forms; turn puts bare OBJ before its page forms.
+
+A temporary version reorders **only the two verb rule arrays**, retaining every rule
+and handler. **32 diagnostic inputs**, **151 clean preloads** and normal RST/saves/
+logout/shutdown complete in **133.91s**. Qualified about in/from forms and the
+original four turn errors now work. Page state, ordinary controls and valid trailing
+turns stay correct. Rejected trailing-direction forms still have the existing
+missing-noun error tie. Recommend the two source-order adaptations and document that
+remaining diagnostic edge; preserve native policy. Dedicated sources are unchanged,
+so this is not production qualification. Evidence:
+/tmp/lima-command-routing-audit-20261017. No native/shared-readable/master/config or
+fixture edit; previous book, source, full replay and constructor scopes remain.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
