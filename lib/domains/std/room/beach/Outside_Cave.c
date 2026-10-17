@@ -4,7 +4,11 @@ inherit OUTDOOR_ROOM;
 
 void obj_arrived(object ob)
 {
+#ifdef USE_SIZE
    if (ob->query_size() >= VERY_LARGE)
+#else
+   if (ob->query_mass() >= to_float(VERY_LARGE))
+#endif
    {
       if (!ob->is_living())
          receive_inside_msg(capitalize(ob->the_short()) + " makes a "
@@ -16,7 +20,7 @@ void obj_arrived(object ob)
    {
       receive_inside_msg(capitalize(ob->the_short()) +
                          " sinks into the surf, and you quickly lose track of it in the violent crashing waves.\n");
-      destruct(ob);
+      ob->remove();
    }
 }
 
@@ -56,7 +60,7 @@ void setup()
 
    set_hidden_exits("northeast", "northwest", "south", "southeast", "southwest", "in");
 
-   add_hook("object_arrived", ( : obj_arrived:));
+   add_hook("object_arrived", obj_arrived);
 }
 
 void do_enter(string s)

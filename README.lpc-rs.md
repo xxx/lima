@@ -36,10 +36,10 @@ this is a status comparison, not an isolated source/performance experiment.
 No Rust gate or gameplay rerun. Earlier full replay and the 345-input generator
 run retain their measured scopes. Evidence: /tmp/lima-source-inventory-20261017.
 
-Next audit Rocky Beach's actual debris/rock consumer and ocean/Outside_Cave
-context. Four of five sources compile; the room's debris spawn fails a numeric
-mass argument. Construction, attached get behavior, rock creation and reset need
-runtime review before an adapter. No source proposal is adopted by this inventory.
+This inventory selected Rocky Beach's actual debris/rock consumer and ocean/Outside_Cave
+context. At that checkpoint, four of five sources compiled; the debris spawn
+failed its mass argument. Construction, attached pickup, rock creation and reset
+needed runtime review. The subsequent validated repair is recorded below.
 
 Command compilation is player **65/67**, wizard **81/81**, guild **4/4**, verbs
 **90/90**, transitional **49/49** and transitional administrator **9/9**. The two
@@ -852,6 +852,32 @@ random distributions and loot persistence remain outside this run. The earlier
 full replay and 966/1182 inventory retain their measured scopes. The inventory above now measures
 these leaf ports and selects the next complete consumer.
 Evidence: /tmp/lima-loot-generation-20261017.
+
+Inventory notes are committed as **2ffc14ad** (native **f96aedc2**). The following
+Rocky Beach repair changes two LPC files: debris converts its unchanged mass 5000
+to float; Outside_Cave registers bare obj_arrived, uses the item's normal remove
+path and checks mass in the configured mass build. The original size branch is
+preserved, untested. Stock rock settings, thresholds, text, quest rules and reset
+policy remain. Headers/LF/final newlines remain; no native code/master/config or
+fixture edits. Prior failed controls distinguish a scenery-count assertion,
+inactive callback, rejected direct destruct and the unavailable legacy size getter.
+
+**Five complete targets compile**. Production passes **48 new + 345 retained
+inputs**, **151 clean preloads**, normal documentation scanning, saved account/body
+and normal shutdown in **176.75s**. Real Outside_Cave/east/Rocky_Beach construction,
+debris/ocean spawns, repeated distinct rocks, ordinary look/get/drop, direction
+refusals, stable reset and missing-debris replenishment pass. The original pile
+stays during pickup; small rocks sink at the cave entrance while the large pile
+splashes and remains. Both ocean-object and bare wade routes return correctly.
+The existing ocean hook starts the pirate quest; full quest completion/combat
+are outside this check. Seven unchanged helpers retain the generator/container/
+bottle/workroom/weather/gettable/chest assertions, including natural weather and
+all three chest-expiry notices. Previous full replay and 985/1182 inventory retain
+their scopes; no additive recount. Evidence: /tmp/lima-rocky-beach-20261017.
+
+Next audit Monster_Room's guild_guard constructor and its private parent-handler
+boundary. Keep native privacy and the existing block-action interface; no native
+visibility change or general equipment/parser/quest-policy review is proposed.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
