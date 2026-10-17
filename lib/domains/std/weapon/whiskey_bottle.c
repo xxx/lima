@@ -10,7 +10,7 @@ void setup()
    set_weapon_class(2);
    set_disarm_bonus(2);
    set_damage_bonus(2);
-   set_weight(2);
+   set_weight(2.0);
    set_skill_used("combat/melee/improv");
    set_salvageable((["metal":100]));
 }

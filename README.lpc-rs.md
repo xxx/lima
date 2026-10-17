@@ -708,6 +708,18 @@ patch. The final optimized run waits for ordinary RST completion before shutdown
 and has no Apply failure or worker panic. Evidence:
 /tmp/lima-container-consumers-20261017.
 
+The whiskey bottle spawned by Pinto's shadowy swamp now passes `2.0` to the
+float-weight API. Its value range, bonuses, skill and salvage settings are retained.
+Both the weapon and unchanged room compile. A focused production run passes
+**27 new inputs plus all 70 retained container inputs**, with **151 clean preloads**,
+ordinary RST completion and normal shutdown in **133.42s**. It checks the real room
+spawn, look/get/wield/unwield/drop, integer values in 10..19 and reset restocking
+without duplicate floor stock. The same six fixtures and two address substitutions
+are used; no native code, configuration, framework or authorization changes.
+Combat damage and fresh-driver weapon restoration are not tested. The full replay
+and whole-source inventory above retain their earlier scopes. Evidence:
+/tmp/lima-whiskey-bottle-20261017.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
