@@ -661,10 +661,26 @@ The API/tests commit is separate from the upstream release lockfile correction.
 Seven ownership contract tests run in the normal native workspace gate, and the
 fork records how to replay the feature onto reviewed upstream releases. No vendor
 copy, root patch override or preparation tool is required by Git/path consumers.
-Existing dependency versions and feature selection remain unchanged. This prepares
-the dependency API; native GC worker integration remains a separate change and
-production GC is still serial. Lima source, configuration and qualification scope
-remain unchanged. Evidence: /tmp/lpc-imbl-fork-20261017.
+Existing dependency versions and feature selection remain unchanged. That change
+prepared the dependency API without enabling workers. Lima source, configuration
+and qualification scope were unchanged. Evidence: /tmp/lpc-imbl-fork-20261017.
+
+The native collector now disposes of large rebuilt maps using a lazy two-worker
+pool through the pinned owned-branch API. Small/shared/direct cases and worker
+creation failures clean up synchronously; workers finish inside the accepted
+atomic GC operation before its reply. One world map, snapshot version, committer,
+reachability rules, protected identities and evaluation accounting remain.
+
+The integration passes 5,142 workspace tests/2 skips, including six new runtime
+checks, plus doctests, formatting, warning-free Clippy/docs and debug/release
+workspace builds. A production release run passes the same 596 inputs and 151
+clean preloads with six fixtures/two address overrides. Distinct nil, preserved
+player, 4,000 ms and normal 300-second GC stay unchanged. Collection reduces
+898,442 cells to 15,264 with 656 roots; disposal of 32 chunks on two workers takes
+154.1ms and total collector service is 201.3ms. This is one measurement, not a
+controlled comparison with earlier samples or a new full replay/inventory
+qualification. No Lima source or configuration changes are needed.
+Evidence: /tmp/lpc-gc-workers-20261017.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
