@@ -905,8 +905,25 @@ already loaded during startup. **67 focused inputs**, **151 clean preloads**, no
 RST scanning, account/body saves and clean shutdown pass in **153.59s**.
 No LPC/native/configuration/fixture changes. Construction coverage does not qualify
 all gameplay/exits; the prior full replay and 985/1182 inventory keep their scopes.
-Evidence: /tmp/lima-room-construction-20261017. Next audit Lava_Room's arrival hook
-and timed burning/departure behavior; do not repeat the completed constructors.
+Evidence: /tmp/lima-room-construction-20261017. Constructor notes are committed as
+Lima **46327624**, native **2ac8e2ea**; do not repeat the completed constructors.
+
+The Lava_Room audit reproduces a no-op arrival hook: its closure returns the handler.
+A temporary named-handler registration exposes `destruct: permission denied` for
+ordinary objects after the melting message; normal `remove()` succeeds. Recommend
+only a named callback and `o->remove()` followed by return, without changing policy.
+Under the control, natural five-second burns deal 5 damage/reschedule, departure
+consumes its pending timer without another burn, and a ridden Camaro survives with
+an unharmed rider. Existing vehicle cosmetic burns and quick-reentry duplicate
+timers are recorded for preservation in the initial adapter.
+
+**43 audit inputs**, **151 clean preloads** and normal RST/saves/logout/shutdown
+pass in **141.43s**. Original hook, health/healing, path and props restore. No
+LPC/native/master/configuration/fixture edits or production-fix claim. Two earlier
+runs remain incomplete: uncaught object cleanup, then a health measurement taken
+before lazy limb initialization. Evidence: /tmp/lima-lava-room-audit-20261017.
+Next make the two local source adaptations and validate normal arrivals; prior
+full replay/source inventory retain scope.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
