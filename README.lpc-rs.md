@@ -548,6 +548,25 @@ code is excluded from the shared change. Full replay qualification remains pendi
 all 62 mailbox inputs passed the preceding retry. Evidence:
 /tmp/lpc-gc-snapshot-audit-20261016.
 
+The subsequent native collector change selects reconstruction from traced cell
+IDs and protected identities when their conservative survivor bound is at most
+10% of the world. Other collections retain individual deletion. Snapshot metadata,
+object lookup, atomic/quiescent collection, wall-clock accounting and the normal
+GC period are preserved; no Lima source or configuration workaround is added.
+
+The ordinary full replay with that change passes **2,159 first-session inputs +
+10 restored-favour inputs**, **30 checkpoints**, two clean **151-preload boots**,
+and all retained gameplay, including the exact **62-input mailbox sequence**, in
+**474.85s**. Same six fixtures/two address overrides and distinct nil/preserved
+player/4000ms remain. Normal periodic GC reconstructs a **2,186,372-cell** world,
+reclaiming **2,157,205 cells** with a **2,775.341ms** collector pause; no transaction
+timeout or cancelled snapshot reply is reported. Account/body/bank/favour state
+restores. The separate original-collector measurement used a smaller world and
+is not a matched native speed comparison. Earlier compile checks remain prior
+83/83 evidence, not rerun for the GC-only change. Cold-compilation investigation
+stays separate; next audit is the standard table/treasure-chest consumers. Evidence:
+/tmp/lpc-gc-sweep-20261017.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
