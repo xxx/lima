@@ -924,10 +924,25 @@ restore; the fixed callback remains installed. Evidence:
 /tmp/lima-lava-room-20261017. Prior audit, constructor/full replay and source
 inventory retain their scopes; there is no additive recount or repeated Rust gate.
 
-Next audit `std/book.c` and its concrete `domains/std/lima_guide.c` host: their
-unchanged-source inventory failures concern callback initialization and mass typing.
-Fresh target checks come before adapter selection; no native prototype change or
-room-constructor repeat is proposed.
+Lava Room is committed as Lima **23bb5730**, native **bf97389b**. Fresh book/guide
+checks reproduce two complete failures: absent open/close callback implementations
+and an int mass argument. The disposable test version removes the unused hooks
+and casts mass; both controlled targets compile. Dedicated
+source remains unchanged, and no production book support is claimed.
+
+**29 audit inputs**, **151 clean preloads** and normal RST/saves/logout/shutdown
+complete in **135.50s**. Remaining callback closures cause description and page
+sort errors. Explicit page/topic reads work, while the about-topic-with-object
+form chooses bare-topic lookup in this control. Numeric append overwrites page ten,
+description loses title/author and empty reading fails. Source review also finds
+backward-boundary and page-reset logic errors. A generated-page invocation used a
+dead temporary command callback owner; retest with a resident owner before changing
+readable support. Two earlier incomplete attempts remain recorded.
+
+Recommend a class-local book repair for callbacks, mass and basic page behavior;
+recheck read forms afterward, without presuming native prototype, parser, visibility
+or shared-readable changes. Evidence: /tmp/lima-book-audit-20261017. Prior whole
+source/full replay/constructor counts retain their scopes; no new source recount.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
