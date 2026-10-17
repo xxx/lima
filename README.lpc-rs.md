@@ -720,6 +720,19 @@ Combat damage and fresh-driver weapon restoration are not tested. The full repla
 and whole-source inventory above retain their earlier scopes. Evidence:
 /tmp/lima-whiskey-bottle-20261017.
 
+The weather daemon used by the example Weather Room now retains its timer ID,
+cancels by ID and schedules the named callback. The **120-second period**, weather
+selection, descriptions and recipient filtering are unchanged. All four daemon,
+room and support targets compile. The production check retains 97 prior inputs
+and adds **23 weather inputs**, passing all **120 inputs**, **151 clean preloads**,
+ordinary RST completion and normal shutdown in **133.41s**. Repeated initialization
+cancels old schedules and leaves one timer; a natural firing after 120 seconds
+schedules one replacement. This sample remains foggy and emits no change notice;
+changing natural ticks, all states and multiple recipients remain untested. No
+native API, framework, configuration, authorization or fixture change is needed.
+The full replay and source inventory retain their preceding scopes. Evidence:
+/tmp/lima-weather-20261017.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source

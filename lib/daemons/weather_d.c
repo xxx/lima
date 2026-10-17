@@ -17,6 +17,7 @@ nosave private string *type_nouns = ({"sun", "rain", "fog", "snow"});
 ** Globals.
 */
 nosave private int weather_state;
+nosave private int weather_call_out;
 
 string show_weather_change(int last_state)
 {
@@ -61,7 +62,8 @@ void change_weather()
    string buf_me_once;
    object body;
 
-   remove_call_out(); // all call_outs
+   if (weather_call_out)
+      remove_call_out(weather_call_out);
 
    last_state = weather_state;
    weather_state = random(sizeof(types));
@@ -75,7 +77,7 @@ void change_weather()
       }
    }
 
-   call_out(( : change_weather:), WEATHER_PERIOD);
+   weather_call_out = call_out(change_weather, WEATHER_PERIOD);
 }
 
 string query_current_weather()
