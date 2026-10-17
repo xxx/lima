@@ -740,6 +740,24 @@ the existing accessibility helper. Boolean, message and function responses are
 verified through all four setters; direct moves respect drop hooks and setting
 true restores get/drop behavior. The mailbox's original 62-input sequence remains.
 
+Rust's conversation now invokes its named directory-giving callback, and the
+nested workroom matches the open-handler signatures and validates the `open up`
+alias through the same ownership check. The actual conversation gives one directory
+with its workroom, retains per-body topic progress, and both open forms reach
+Beek's room and NPC. Existing drop/put and unheld-open refusals remain.
+
+All six real compositions compile. The full production replay passes **2,367
+first-session inputs + 10 restored-favour inputs**, all **30 lifecycle checkpoints**,
+both clean **151-preload boots** and normal exits in **336.70s**. It retains every
+previous gameplay family and adds **41 workroom inputs** and **27 get/drop response
+checks**. Account/body/bank/favour restoration, normal periodic GC and the natural
+weather timer pass. Same six fixtures/two address substitutions and distinct nil/
+preserved player/4000ms/300-second GC; no native code or authorization changes.
+Earlier failed attempts and temporary diagnostics are retained as unqualified.
+The standalone gettable module still requires its composition's `add_hook`;
+no prototype extension is needed. Beek conversation and fresh-driver prop
+persistence remain outside the check; the 966/1182 inventory is not repeated.
+Evidence: /tmp/lima-workroom-20261017.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically

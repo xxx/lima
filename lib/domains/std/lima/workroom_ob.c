@@ -15,7 +15,7 @@ void setup()
    set_droppable("It doesn't seem to want to leave your directory.");
 }
 
-mixed direct_open_obj()
+mixed direct_open_obj(object ob)
 {
    object env = this_object();
 
@@ -27,7 +27,12 @@ mixed direct_open_obj()
    return "#You do not have that.\n";
 }
 
-void open_with()
+mixed direct_open_up_obj(object ob)
+{
+   return direct_open_obj(ob);
+}
+
+varargs int open_with(object with)
 {
    class move_data dest = new (class move_data);
    dest.destination = __DIR__ "beeks_workroom";
@@ -37,4 +42,5 @@ void open_with()
          "the background as the monitor dims and fuzzes out, then regains focus.  You look around, and notice you "
          "aren't quite where you thought you were going to end up.\n");
    this_body()->move_to(dest);
+   return 1;
 }

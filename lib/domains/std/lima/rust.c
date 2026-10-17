@@ -43,8 +43,7 @@ void setup()
            "zork_yes":({"!smile", "Me too!@@help@@zork_no"}),
 
                "help":({"!kewl", "Here is a directory to work in.@@forever",
-                        (
-                            : handle_help:)}),
+                        handle_help}),
 
             "forever":"Yeah, I wish I knew a better way to do this.", ]));
    set_start(({"hello"}));
