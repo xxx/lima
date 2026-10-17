@@ -533,6 +533,21 @@ Next investigate the native snapshot/GC deadline before another full qualificati
 or the next container-example audit. Evidence:
 /tmp/lima-mailbox-props-retry-20261016.
 
+Mailbox source/validation notes are committed as **4c15b53b** (native **8561a764**).
+The native timeout audit now has two passing paused-clock tests: snapshot queue
+waiting consumes the existing evaluation allowance, and cancellation releases the
+snapshot pin. Native documentation explicitly explains this behavior. No production
+GC, deadline, mode/configuration or mudlib change is made by that audit.
+
+The recommendation is a measured, selective GC reconstruction path for garbage-
+heavy sweeps while preserving the current timeout and atomic/quiescent collection
+contract. Debug scalar-world and optimized map-only fixtures favor reconstruction
+when nearly everything is garbage; unconditional reconstruction was slower for
+mostly-live maps. These are not an end-to-end Lima speedup. Temporary profiling
+code is excluded from the shared change. Full replay qualification remains pending;
+all 62 mailbox inputs passed the preceding retry. Evidence:
+/tmp/lpc-gc-snapshot-audit-20261016.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
