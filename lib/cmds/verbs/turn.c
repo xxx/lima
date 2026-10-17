@@ -30,8 +30,8 @@ void do_turn_str_wrd_obj_wrd(string str, string wrd, object ob, string wrd2)
 void create()
 {
    add_rules(({
-       "OBJ",
        "STR WRD OBJ",
        "STR WRD OBJ WRD",
+       "OBJ",
    }));
 }

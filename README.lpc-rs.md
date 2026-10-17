@@ -939,21 +939,25 @@ resident callable-page reading pass without diagnostic source or hook controls.
 A real book-owned callback resolves the prior audit's invalid callback-owner probe.
 Props and path restore. Evidence: /tmp/lima-book-20261017.
 
-Book source/notes are committed as Lima **a5efeef1**, native **c2895b85**. The command
-audit traces the remaining cases to registration order under the existing native
-first-success/equal-progress trial-order policy. Read places broad about STR before
-qualified forms; turn puts bare OBJ before its page forms.
+Book source/notes are committed as Lima **a5efeef1**, native **c2895b85**; routing
+audit notes as Lima **d0063df1**, native **1d138a6d**. Only the read/turn rule arrays
+now change: qualified about forms precede broad about STR, and page-turn forms
+precede bare OBJ. All rule texts and handlers stay. Native first-success and
+equal-progress failure ordering are unchanged.
 
-A temporary version reorders **only the two verb rule arrays**, retaining every rule
-and handler. **32 diagnostic inputs**, **151 clean preloads** and normal RST/saves/
-logout/shutdown complete in **133.91s**. Qualified about in/from forms and the
-original four turn errors now work. Page state, ordinary controls and valid trailing
-turns stay correct. Rejected trailing-direction forms still have the existing
-missing-noun error tie. Recommend the two source-order adaptations and document that
-remaining diagnostic edge; preserve native policy. Dedicated sources are unchanged,
-so this is not production qualification. Evidence:
-/tmp/lima-command-routing-audit-20261017. No native/shared-readable/master/config or
-fixture edit; previous book, source, full replay and constructor scopes remain.
+Both complete verb targets compile. **32 routing + 74 retained book inputs** pass
+in **140.45s**, with **151 clean preloads**, normal RST/saves/logout/shutdown.
+Actual registry order, qualified about in/from reads, the four ordinary turn error
+messages, valid turns, page preservation and cleanup pass. Numeric/alias/empty/
+resident-callback book coverage remains green. No runtime rule or hook control.
+Evidence: /tmp/lima-command-routing-20261017.
+
+Rejected trailing-direction turns retain the missing-noun diagnostic tie; valid
+trailing turns and refusal state preservation pass. Native/parser, shared-readable,
+book, master, configuration and fixtures are unchanged. Previous temporary audit:
+/tmp/lima-command-routing-audit-20261017. Prior inventory/full replay/constructor
+counts retain their scopes. Next audit std/pelt.c construction and its existing
+loot-daemon consumer, without reopening completed book or generator coverage.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically

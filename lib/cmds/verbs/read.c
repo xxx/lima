@@ -129,9 +129,9 @@ void create()
        "OBJ:v",
        "from OBJ:v",
        "in OBJ:v",
-       "about STR",
        "about STR in OBJ:v",
        "about STR from OBJ:v",
+       "about STR",
        "STR in OBJ:v",
        "STR from OBJ:v",
    }));
