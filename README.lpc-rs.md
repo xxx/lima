@@ -608,6 +608,64 @@ dependency API strategy; the temporary path and measurement control remain isola
 Native timeout/mode contracts, prior 83/83 compile evidence and 966/1182 inventory
 keep their measured scope. Evidence: /tmp/lpc-gc-native-20261017.
 
+The subsequent published-API research tests the unmodified registry imbl 7.0.2
+with the native allocator version. All 700 measured container trials pass, covering
+batched iteration, payload extraction, mutable pipelines, partially consumed map
+copies, two/four/eight stored maps, snapshot/read/update costs and alternate pointer
+backends. Two maps with parallel disposal reduce owned-payload collection medians
+**68.8->37.5ms** at 900k entries and **276.9->152.5ms** at 2.3m. Serial two-map controls
+are 57.1/239.3ms, so the gains include both layout and parallelism. Snapshot clone/drop
+rises from roughly 13ns to 24–25ns; sampled read/update medians improve 1–14%, with
+read ranges overlapping. These are container results, not native/Lima speedups.
+
+Recommend a bounded two-map native prototype under the existing single snapshot
+version/committer, preserving atomic/quiescent GC and deadline accounting. Workers
+must join before GC returns. Iterator pipelines regress scalar cleanup substantially;
+alternate pointers show no convincing owned-payload GC gain. The uncommitted vendor
+proposal is withdrawn and preserved in its prior evidence package. Main native
+code/Cargo settings are restored to the original registry dependency; workspace
+build passes. No native storage change or new full Lima replay is claimed.
+Evidence: /tmp/lpc-gc-public-api-20261017.
+
+A further matched container comparison uses one executable, identical 32-byte
+payloads/survivor IDs/hash seed/allocator and two workers. Seven balanced rotations
+complete **196 measured trials**. Patched branches versus two public maps measure
+**33.4/26.9ms** for owned payloads at 900k entries, and **124.0/125.7ms** at 2.3m,
+where ranges overlap substantially. Scalar results are 13.6/8.1ms and 61.5/59.1ms.
+Four maps reach 78.8ms in the larger owned case, with more handle-copy overhead.
+The partition algorithm calls unchanged public methods; both cases link the local
+API extension solely to control the dependency build. Main native source and
+registry configuration remain unchanged; native validation is recorded below.
+Evidence: /tmp/lpc-gc-matched-20261017.
+
+The native follow-up supports **two maps without a fork/vendor**. With the same
+596-command prefix and normal 300-second GC interval, optimized total pauses are
+**263.9ms unchanged**, **169.4ms patched imbl**, **178.2ms two public maps**, and
+**193.1ms four public maps**; every parallel variant uses two workers. All runs
+pass, collecting about 899k cells to 15.3k with 656 roots. These are single GC
+samples, not identical heaps: the control retains 15,268 cells versus 15,264 for
+the other variants. The observed two-map pause is 32.5% shorter than the control.
+
+Both partition variants pass 5,138 tests/2 skips, including nine new ownership,
+routing and completion tests, plus the workspace quality checks and release build.
+All 560 transaction trials and 96 longer repeats pass. Larger initial slowdowns
+do not persist; two-map recheck medians range from 2.0% faster to 2.5% slower,
+with overlapping ranges. Two maps remain a viable alternative under one snapshot,
+version and committer, with synchronous worker completion. That prototype remains
+isolated and original public executables were restored after the comparison. This does not add a full replay or inventory
+qualification. Evidence: /tmp/lpc-gc-world-native-20261017.
+
+The selected delivery uses the existing single world map and a direct Git pin to
+[the imbl fork](https://github.com/xxx/imbl/commit/5fa322d043faee90d32c63430b51a52be3ad121d).
+The API/tests commit is separate from the upstream release lockfile correction.
+Seven ownership contract tests run in the normal native workspace gate, and the
+fork records how to replay the feature onto reviewed upstream releases. No vendor
+copy, root patch override or preparation tool is required by Git/path consumers.
+Existing dependency versions and feature selection remain unchanged. This prepares
+the dependency API; native GC worker integration remains a separate change and
+production GC is still serial. Lima source, configuration and qualification scope
+remain unchanged. Evidence: /tmp/lpc-imbl-fork-20261017.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
