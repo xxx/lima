@@ -13,16 +13,33 @@ With the lpc-rs checkout beside this one and its CLI built, check a command with
 ../lpc-rs/target/debug/lpc-rs-lpcc -c lpc-rs.env --check lib/cmds/player/mudlist.c
 ```
 
-The current standalone-source inventory, on **16 October 2026** against native
-**2870a0b4** and this checkout at **6ca00180**, compiles **957 of 1,182 .c files**:
-**225 fail, with no timeouts or crashes**. All 924 previous successes remain;
-**31 previously failed targets now compile** (23 junk/spawner, three vehicle and
-five room/grid), plus both new virtual-room source files. This fresh sweep replaces
-the dated 924/1,180 inventory. Counts include optional and inherited-only sources
-and are not a completion percentage. **60 failed fragments** have reviewed passing
-complete hosts; the other 165 failures still include further fragments/optional
-code and are not a native-gap count. All 34 standard-room sources and 22 junk
-examples compile. No target constructor or driver gameplay rerun is included.
+The current standalone-source inventory, reviewed **17 October 2026** against
+native **1ffebc70** and this checkout at **6f755146**, compiles **985 of 1,182 .c
+files**: **197 fail, zero timeouts/crashes, 241.316s**. All **966** previous
+successes remain; **19 previous failures now compile**. The target set and all
+1,549 library files remain unchanged by the sweep. Gains cover consumables and
+slowheal, camera/paper, mailbox/workroom/container examples, weather and loot.
+These counts include optional and inherited-only sources, not port completion.
+
+**62 failed fragments** have reviewed passing complete hosts: all 61 carried
+reviews plus writing-surface/paper. Changed gettable callback registrations are
+reviewed with actual button/panel providers and fresh host passes. The other
+135 failures include further host parts, optional/legacy sources and adapters,
+not 135 established native gaps. Remaining first diagnostic messages/sources
+match the prior inventory. All 34 standard-room and 22 junk sources, all 25 guild
+sources and all 18 consumable examples compile; target constructors do not run.
+
+Maximum two CLI processes, two Tokio workers each, 4 GiB/40s per target, distinct
+nil/preserved player/4000ms remain. Source/configuration/binaries stay unchanged
+during this run; current binary hashes differ from the preceding inventory, so
+this is a status comparison, not an isolated source/performance experiment.
+No Rust gate or gameplay rerun. Earlier full replay and the 345-input generator
+run retain their measured scopes. Evidence: /tmp/lima-source-inventory-20261017.
+
+Next audit Rocky Beach's actual debris/rock consumer and ocean/Outside_Cave
+context. Four of five sources compile; the room's debris spawn fails a numeric
+mass argument. Construction, attached get behavior, rock creation and reset need
+runtime review before an adapter. No source proposal is adopted by this inventory.
 
 Command compilation is player **65/67**, wizard **81/81**, guild **4/4**, verbs
 **90/90**, transitional **49/49** and transitional administrator **9/9**. The two
@@ -832,8 +849,8 @@ The unchanged six retained helpers keep all container/bottle/workroom/gettable/
 weather/chest assertions. Real weather changes fog to sun; all three original
 chest-expiry notices arrive naturally at 15/30/45 seconds. Actual boss combat,
 random distributions and loot persistence remain outside this run. The earlier
-full replay and 966/1182 inventory retain their measured scopes. Next refresh the
-source inventory after these leaf ports to select remaining complete consumers.
+full replay and 966/1182 inventory retain their measured scopes. The inventory above now measures
+these leaf ports and selects the next complete consumer.
 Evidence: /tmp/lima-loot-generation-20261017.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
