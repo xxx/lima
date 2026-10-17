@@ -13,12 +13,14 @@ void setup()
                       "hole.");
    set_long("The treasure chest is still a bit sandy, but otherwise has weathered well.  There is some writing on the "
             "outside of it.");
+   add_relation("in");
+   set_default_relation("in");
    set_objects(([]));
 #ifdef USE_SIZE
    set_size(LARGE);
 #endif
 #ifdef USE_MASS
-   set_mass(LARGE);
+   set_mass(to_float(LARGE));
 #endif
    set_max_capacity(LARGE);
    set_text("Written on the treasure chest is a poem:\n"

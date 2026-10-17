@@ -682,6 +682,32 @@ controlled comparison with earlier samples or a new full replay/inventory
 qualification. No Lima source or configuration changes are needed.
 Evidence: /tmp/lpc-gc-workers-20261017.
 
+The integrated driver subsequently passes the unchanged full retained gameplay
+run: **2,160 gameplay inputs + 10 restored-favour inputs**, all **30 lifecycle
+checkpoints**, both clean **151-preload boots** and normal exits in **487.60s**.
+The exact mailbox sequence and account/body/bank/favour restoration checks pass.
+Normal periodic GC runs during gameplay. Configuration, six fixture sources and
+two address-only overrides stay unchanged. This replay precedes the container
+source changes below; the whole-source inventory remains the earlier 966/1182.
+
+The standard table and treasure chest now pass explicit float mass values while
+preserving 64.0. The chest also initializes its default `in` relation before its
+empty reset mapping. Both files compile. A focused production-driver run passes
+**70 command inputs**, including both table relations and independent capacities,
+full and closed refusals, normal put/get, open/close, visibility, poem reading,
+empty reset and cleanup. All **151 preloads** pass and the process exits normally.
+It uses stock leaflets as tokens, public weight controls and the existing six
+fixtures, with no native code, configuration or authorization change. Fresh-driver
+prop persistence and a combined full replay with these new inputs are not tested.
+
+Two failed debug runs are retained separately: immediate shutdown during RST
+scanning caused a background-task failure and committer-closed worker panic; a
+repeat passed all object checks but hit two cold-compilation preload timeouts at
+the unchanged 4,000ms limit. These driver findings are not fixed by the container
+patch. The final optimized run waits for ordinary RST completion before shutdown
+and has no Apply failure or worker panic. Evidence:
+/tmp/lima-container-consumers-20261017.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source

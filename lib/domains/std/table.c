@@ -11,7 +11,7 @@ void setup()
    set_size(LARGE);
 #endif
 #ifdef USE_MASS
-   set_mass(LARGE);
+   set_mass(to_float(LARGE));
 #endif
    set_relations("on", "under");
    set_default_relation("on");
