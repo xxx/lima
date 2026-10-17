@@ -924,25 +924,28 @@ restore; the fixed callback remains installed. Evidence:
 /tmp/lima-lava-room-20261017. Prior audit, constructor/full replay and source
 inventory retain their scopes; there is no additive recount or repeated Rust gate.
 
-Lava Room is committed as Lima **23bb5730**, native **bf97389b**. Fresh book/guide
-checks reproduce two complete failures: absent open/close callback implementations
-and an int mass argument. The disposable test version removes the unused hooks
-and casts mass; both controlled targets compile. Dedicated
-source remains unchanged, and no production book support is claimed.
+Book audit notes are committed as Lima **f61c59cd**, native **e9d53ae7**.
+Only `std/book.c` changes: remove dangling unused open/close hooks, use named
+callbacks/int page arrays/float mass, preserve selected pages, resolve aliases to
+canonical page names, fix backward/numeric-append behavior, retain title/author,
+and handle empty/untitled books. The trailing backwards form follows validation.
+Public page/readable signatures and trivial open/close responses stay unchanged.
+No native/shared-readable/guide/parser/master/configuration/fixture edit.
 
-**29 audit inputs**, **151 clean preloads** and normal RST/saves/logout/shutdown
-complete in **135.50s**. Remaining callback closures cause description and page
-sort errors. Explicit page/topic reads work, while the about-topic-with-object
-form chooses bare-topic lookup in this control. Numeric append overwrites page ten,
-description loses title/author and empty reading fails. Source review also finds
-backward-boundary and page-reset logic errors. A generated-page invocation used a
-dead temporary command callback owner; retest with a resident owner before changing
-readable support. Two earlier incomplete attempts remain recorded.
+**Two complete targets compile**. **74 production inputs**, **151 clean preloads**
+and normal RST/saves/logout/shutdown complete in **133.69s**. Core book commands,
+contents/page removal and fallback, append beyond page ten, empty-book append and
+resident callable-page reading pass without diagnostic source or hook controls.
+A real book-owned callback resolves the prior audit's invalid callback-owner probe.
+Props and path restore. Evidence: /tmp/lima-book-20261017.
 
-Recommend a class-local book repair for callbacks, mass and basic page behavior;
-recheck read forms afterward, without presuming native prototype, parser, visibility
-or shared-readable changes. Evidence: /tmp/lima-book-audit-20261017. Prior whole
-source/full replay/constructor counts retain their scopes; no new source recount.
+Two command-layer findings remain: `read about docs in guide` uses bare-topic
+lookup, and rejected turn commands show missing-object fallbacks despite correct
+class validation messages and preserved pages. Next audit these exact routing and
+error-selection cases; no shared-readable or native workaround is presumed. Two
+prior incomplete runs retain the command-message assumption and corrected alias
+bug; the second also trips source-consistency after repair during cleanup. Previous
+whole-source/full replay/constructor counts retain their scopes.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically

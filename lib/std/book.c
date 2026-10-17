@@ -11,34 +11,38 @@ inherit OBJ;
 inherit M_READABLE;
 inherit M_GETTABLE;
 
-void close_hook_func();
-void open_hook_func();
 string extra_long_hook_func();
 string synonym_index();
 
 string current_page;
 string title;
 string author;
-nosave function open_hook = ( : open_hook_func:);
-nosave function close_hook = ( : close_hook_func:);
-nosave function extra_long_hook = ( : extra_long_hook_func:);
+
+private
+nomask string page_name(string page)
+{
+   if (member_array(page, list_entries()) != -1)
+      return page;
+   return query_synonym(page);
+}
 
 private
 nomask mixed page_first()
 {
-   string *pages = sort_array(map(list_entries(), ( : to_int:)), 1);
+   int *pages = sort_array(map(list_entries(), to_int), 1);
+   if (!sizeof(pages))
+      return nil;
    return sprintf("%i", pages[0]);
 }
 
 private
 nomask mixed page_before(string first)
 {
-   string *pages = sort_array(map(list_entries(), ( : to_int:)), 1);
-   if (!query_entry(first))
-      first = query_synonym(first);
+   int *pages = sort_array(map(list_entries(), to_int), 1);
+   first = page_name(first);
    if (!query_entry(first))
       return 0;
-   if (member_array(to_int(first), pages) - 1 <= 0)
+   if (member_array(to_int(first), pages) <= 0)
       return -1;
    return sprintf("%i", pages[member_array(to_int(first), pages) - 1]);
 }
@@ -46,9 +50,8 @@ nomask mixed page_before(string first)
 private
 nomask mixed page_after(string first)
 {
-   string *pages = sort_array(map(list_entries(), ( : to_int:)), 1);
-   if (!query_entry(first))
-      first = query_synonym(first);
+   int *pages = sort_array(map(list_entries(), to_int), 1);
+   first = page_name(first);
    if (!query_entry(first))
       return 0;
    if (member_array(to_int(first), pages) + 1 >= sizeof(pages))
@@ -66,6 +69,10 @@ mixed direct_turn_str_wrd_obj(string str, string wrd, object ob)
    default:
       return sprintf("#You cannot turn the %s '%s' %s.", str, wrd, this_object()->short());
    }
+   if (!query_entry(current_page))
+      current_page = page_first();
+   if (!current_page)
+      return "#It appears to be blank.\n";
    switch (str)
    {
       /* The easy stuff first */
@@ -86,8 +93,7 @@ mixed direct_turn_str_wrd_obj(string str, string wrd, object ob)
       string page;
       if (sscanf(str, "to page %s", page) != 1)
          return 0;
-      if (!query_entry(page))
-         page = query_synonym(page);
+      page = page_name(page);
       if (!query_entry(page))
          return "#That page does not exist.";
    }
@@ -111,16 +117,23 @@ mixed direct_read_obj(object ob)
 
    if (o && o != this_body())
       return sprintf("#Try asking %s nicely if you can read it.\n", o->query_name());
-   current_page = page_first();
+   if (!query_entry(current_page))
+      current_page = page_first();
+   if (!current_page)
+      return "It appears to be blank.\n";
    return 1;
 }
 
 varargs void do_turn(mixed str, mixed wrd, string wrd2)
 {
+   if (!stringp(str))
+      return;
    if (wrd2)
-      wrd = sprintf("%s %s", wrd, wrd2);
+      str = sprintf("%s %s", str, wrd2);
    if (!wrd)
       wrd = "in";
+   if (direct_turn_str_wrd_obj(str, wrd, this_object()) != 1)
+      return;
    switch (str)
    {
    case "page forward":
@@ -139,8 +152,7 @@ varargs void do_turn(mixed str, mixed wrd, string wrd2)
    default: {
       string page;
       sscanf(str, "to page %s", page);
-      if (!query_entry(page))
-         page = query_synonym(page);
+      page = page_name(page);
       current_page = page;
       this_body()->targetted_action("$N $vturns to a page in $td.", this_object());
    }
@@ -151,7 +163,10 @@ varargs void do_turn(mixed str, mixed wrd, string wrd2)
 private
 nomask string query_last_page()
 {
-   return sort_array(list_entries(), 1)[ < 1];
+   int *pages = sort_array(map(list_entries(), to_int), 1);
+   if (!sizeof(pages))
+      return nil;
+   return sprintf("%i", pages[ < 1]);
 }
 
 //: FUNCTION set_pages
@@ -174,7 +189,8 @@ void set_pages(mixed *page_data...)
 // See set_pages()
 void add_pages(string *page_data...)
 {
-   int counter = to_int(query_last_page());
+   string last = query_last_page();
+   int counter = last ? to_int(last) : 0;
    foreach (string page in flatten_array(page_data))
    {
       counter++;
@@ -293,7 +309,7 @@ string extra_long_hook_func()
    string ret = "";
    string auth = query_author();
    string tit = query_title();
-   if (!current_page)
+   if (!query_entry(current_page))
       current_page = page_first();
    if (title)
    {
@@ -302,7 +318,8 @@ string extra_long_hook_func()
       else
          ret = sprintf("The title of the book is '%s'. ", tit);
    }
-   ret = sprintf("It is turned to a page marked '%s'.  ", current_page);
+   if (current_page)
+      ret += sprintf("It is turned to a page marked '%s'.  ", current_page);
    if (synonym_index())
       ret += "\n" + synonym_index();
 
@@ -321,25 +338,30 @@ mixed direct_close_obj()
 
 string a_short()
 {
+   if (!query_title())
+      return ::a_short();
    return sprintf("%s titled '%s'", ::a_short(), query_title());
 }
 
 string read()
 {
+   if (!query_entry(current_page))
+      current_page = page_first();
+   if (!current_page)
+      return "It appears to be blank.\n";
    return read_entry(current_page);
 }
 
 void mudlib_setup()
 {
    ::mudlib_setup();
+   clear_entries();
    set_id("book");
 #ifdef USE_SIZE
    set_size(SMALL);
 #endif
 #ifdef USE_MASS
-   set_mass(SMALL);
+   set_mass(to_float(SMALL));
 #endif
-   add_hook("open", open_hook);
-   add_hook("close", close_hook);
-   add_hook("extra_long", extra_long_hook);
+   add_hook("extra_long", extra_long_hook_func);
 }
