@@ -21,14 +21,12 @@ Gains cover debris, guild guard/example, book/Lima guide, ladder, meat, pelt and
 climb challenge. Eleven library sources changed since the preceding inventory;
 configuration and compiler/driver binary hashes match.
 
-**82 failed fragments** have reviewed passing complete hosts: **62** carried
-proofs plus **20** newly reviewed object/container/room/body, light/food/drink,
-decay/salvage/complex-exit and digging compositions. The other **106 failures**
-include further host parts, optional/legacy sources and source adapters, not
-106 established native gaps. Remaining first diagnostic messages and sources
-match the preceding inventory. These counts include inherited-only and optional
-files, not a port-completion percentage. All 34 standard-room, 22 junk, 25 guild
-and 18 consumable sources compile; target constructors do not run.
+The full inventory established **82 failed fragments** with passing complete hosts.
+The focused classification below adds **28** source/host proofs, giving **110**
+confirmed compositions against the same 188-file failure set and **78** remaining
+review items. This is not a new whole-source count or a native-gap count. All 34
+standard-room, 22 junk, 25 guild and 18 consumable compile successes retain their
+measured scope; target constructors did not run in that sweep.
 
 Maximum two CLI processes, two Tokio workers each, 4 GiB/40s per target and the
 normal 4000ms/distinct-nil/preserved-player profile remain. All 1,549 library files,
@@ -1143,6 +1141,27 @@ and its cached restart watermark are preserved; no scan-cleanup fixture is added
 Evidence: /tmp/lima-quest-restoration-20261017. Pirate passage/quest work is closed;
 return to the classified source backlog and actual consumers. No new Rust gate,
 full inventory, chest implementation or native/configuration/binary change.
+
+Quest restoration notes are committed as Lima **0caed83c**, native **cae150fa**.
+The remaining-source review adds 28 confirmed compositions: 13 selected adversary,
+seven behaviour-tree and eight object-module fragments. **43 scoped checks** show
+11 complete hosts passing, 30 expected isolated rejections and two failing tools
+with source callers. No unexpected outcome, timeout or crash remains.
+
+Against the preceding 188-file failure set, **110 now have reviewed passing hosts**
+and **78 remain for review**: 14 unselected combat/statistics alternatives, 32
+WWW/contrib/attic files grouped only by location, two deferred/disabled commands,
+two tools with confirmed callers and 28 further source/host cases. Directory
+location does not establish activation, and this is not a count of native gaps.
+No new whole-source measurement or runtime qualification is claimed.
+
+The next audit is obj/mudlib/aliasmenu.c. Both configured shells inherit SHELL;
+the normal alias command loads this file for bare alias and alias-name display.
+Its inline function syntax still fails compilation. The secure/cgi/webed wrapper
+also reaches failing obj/secure/webed, without a new HTTP execution claim.
+Evidence: /tmp/lima-compile-classification-20261017. No source, native API, binary,
+profile or fixture changes; completed pirate/quest/equipment/framework work stays
+closed. Audit the alias menu through its existing shell/API/persistence path next.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
