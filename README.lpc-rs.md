@@ -1264,6 +1264,23 @@ The original control also retains a later, corrected harness pwd assertion; its
 source-failure observations are not relabelled as a clean run. No native/profile/
 binary/privilege change, new fixture, full inventory or broad gameplay claim.
 
+The ownership adapter is committed as Lima **f9bde8b2**, native **f00de4cd**. The
+four remaining item construction cases above are now resolved by four source-file
+adapters: float setter arguments, native special-weapon callbacks/class access/save
+registration and a float conditional, and a red colour for the typed stick fixture.
+Test framework, equipment APIs, master policy and special-item selection remain.
+
+The real item command passes **26/26** with no suite residue. A separate special
+longsword's actual scheduled roll, five saved fields and four canonical event cases
+pass; a blue stick retains its constructor data. Both controls remove themselves.
+**14/14** scoped real-source checks and one temporary event fixture compile.
+**63 inputs / 134.21s** pass with 49 positive individual loads (21 crafting recipes),
+151 clean preloads, normal saves/logout/shutdown and no runtime error. The actual
+dedicated-source copy uses the prior six fixtures/two loopback substitutions plus
+one temporary event helper, with no proposal source override. This prepared-runtime
+result adds no cold-performance, full-source or other-suite/all/all quiet claim.
+Evidence: /tmp/lima-item-construction-20261017. Native/profile/binaries stay unchanged.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source

@@ -1,5 +1,7 @@
 /* Do not remove the headers from this file! see /USAGE for more info. */
 
+#include <move.h>
+
 inherit M_TEST_SUITE;
 
 object troll;
@@ -20,6 +22,20 @@ int clone_actors()
 
 int clone_items(mixed i)
 {
+   if (i == "weapon/stick.c")
+   {
+      object stick;
+      string err = catch(stick = clone_object("/domains/std/weapon/stick", "red"));
+      if (err || !stick)
+      {
+         debug("Failed to clone " + i);
+         return 0;
+      }
+      if (stick->move(troll) == MOVE_OK)
+         return 1;
+      stick->remove();
+      return 0;
+   }
    return std_clone_move(troll, i);
 }
 

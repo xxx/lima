@@ -20,7 +20,7 @@ void setup()
    set_weapon_class(8);
    set_id("rapier");
    set_weight(1.0);
-   set_value(25);
+   set_value(25.0);
    set_skill_used("combat/melee/blade");
    set_skill_restriction("combat/melee/blade", 2);
    set_skill_restriction_message("The rapier feels foreign in $p hand. $N $vwield it like $n would wield a stick.");

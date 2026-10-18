@@ -138,7 +138,7 @@ private
 float calc_value_factor()
 {
    return 1 + ((1.0 * MAT_SUM) / (binary_level()) / 50) +
-          (special_damage_type ? ((1.0 * ATTK_SUM) / (binary_attack_level()) / 50) : 0);
+          (special_damage_type ? ((1.0 * ATTK_SUM) / (binary_attack_level()) / 50) : 0.0);
 }
 
 void setup_damage_types()
@@ -223,7 +223,7 @@ int query_special_att_level()
 // and loads again.
 void roll_item()
 {
-   call_out("internal_roll_item", 0);
+   call_out(internal_roll_item, 0);
 }
 
 //: FUNCTION upgrade_weapon_material
@@ -282,18 +282,18 @@ class event_info source_modify_event(class event_info evt)
    int excess;
    string *system_limbs;
 
-   if (evt->data == "miss" || evt->data == "disarm")
+   if (evt.data == "miss" || evt.data == "disarm")
       return evt;
 
-   damage = evt->data[sizeof(evt->data) - 1];
+   damage = evt.data[sizeof(evt.data) - 1];
 
    /*
    if (special_damage_type)
-       evt->data[0] += ({special_damage_type});
+       evt.data[0] += ({special_damage_type});
        */
-   evt->data[1] += 1 + random(special_attk_level);
-   if (evt->data[1] <= 0)
-      evt->data[1] = 1;
+   evt.data[1] += 1 + random(special_attk_level);
+   if (evt.data[1] <= 0)
+      evt.data[1] = 1;
    // do_effect_info();
 
    return evt;
@@ -307,6 +307,6 @@ int is_special_weapon()
 void internal_setup()
 {
    rn = SKILL_D->titles()[1..];
-   this_object()->add_save(
+   add_save(
        ({"material", "special_damage_type", "special_damage_level", "special_mat_level", "special_attk_level"}));
 }
