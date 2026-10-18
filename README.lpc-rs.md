@@ -976,23 +976,27 @@ Evidence: /tmp/lima-pelt-20261017. Prior diagnostic audit and incomplete attempt
 Previous inventory/full replay counts retain scope. Pelt source and notes are
 committed as Lima **fd952bd6**, native **c047e1a0**.
 
-Meat audit: three of four complete targets compile; the unchanged meat source fails
-its constructor override. A one-file diagnostic control uses variadic arguments,
-M_HEALING for the edible host contract, qualified junk setup and a function callback.
-That control compiles. **51 audit inputs**, **151 clean preloads** and normal
-RST/saves/logout/shutdown complete in **133.91s**. Ordinary commands, final
-bite removal, actual state-daemon decay through removal and stock badger meat
-placement/collection/eating pass. No forced loot selection or probability claim.
+Meat audit notes are committed as Lima **6a0aa954**, native **1ab3938c**. Only
+std/meat.c now changes: compatible variadic construction, the existing healing host
+contract, explicit junk/edible/decay setup, direct type/level/mass save registration,
+and separate initial rolls from derived identity/actions. Public setup_meat retains
+its reset behavior. Load rebuilds derived state without resetting saved counts;
+five-minute configuration precedes deferred state registration.
 
-Only decay fields are saved: type/level registration cannot reach protected
-add_save, and edible setup is omitted. A no-argument restore clone loses type/level/
-bites/mass, and deferred setup resets the restored decay count from two to three.
-Recommend a one-file adapter with explicit parent/save composition and initialization
-separate from derived appearance/actions, preserving loaded state and recursive
-restoration. Dedicated source remains unchanged; no production fix is claimed.
-Evidence: /tmp/lima-meat-audit-20261017. One incomplete cleanup-observation typo is
-retained; final cleanup passes. Shared/native/config/fixtures and completed framework
-coverage remain unchanged. No full replay/source inventory or upstream runtime test.
+**Four complete targets compile**. **66 production inputs**, **151 clean preloads**
+and normal RST/saves/logout/shutdown pass in **133.50s**, without diagnostic
+source/hook controls or expected failure. Real partial eating leaves six of seven;
+direct/no-argument/recursive inventory restoration retains those counts, type/level,
+poison data, mass 0.375, remaining decays and begun state after callbacks complete.
+Type IDs/descriptions restore without a manual child hook. Ordinary commands,
+explicit public setup reset, actual state-daemon decay through removal and stock
+badger meat collection/eating pass. No forced loot selection or probability claim.
+Poison is only checked as saved data and cleared before eating. Shared/native/
+configuration and six fixtures are unchanged. CRLF/no-final-newline format remains.
+Evidence: /tmp/lima-meat-20261017; previous audit /tmp/lima-meat-audit-20261017.
+No fresh-driver meat restoration or alternate build claim; previous inventory/full
+replay counts retain scope. Next audit exported std/ladder.c's constructor contract
+against its compiled stairs parent, without reopening completed frameworks.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
