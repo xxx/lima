@@ -37,11 +37,10 @@ performance benchmark, Rust gate or gameplay rerun. Prior 2367+10 full replay an
 later focused runtime checks retain their scopes. Evidence:
 /tmp/lima-source-inventory-refresh-20261017; prior /tmp/lima-source-inventory-20261017.
 
-Next audit the existing dig verb, Navigation Room's shovel and Sandy Beach's
-sand/hole interaction. Room construction/stock are already checked; inferred and
-explicit tool/target paths, modal selection, hole growth and quest dispatch need
-interaction review. HOLE resolves to `/std/hole`, not the failing duplicate in
-`domains/std/object/`. No mudlib source changes accompany this inventory.
+The digging audit below now records an input-handler lifecycle failure and a
+validated two-module proposal. HOLE resolves to `/std/hole`, not the failing
+duplicate in `domains/std/object/`. Dedicated sources remain unchanged pending
+adoption of the proposal; source enumeration and room construction are retained.
 
 Command compilation is player **65/67**, wizard **81/81**, guild **4/4**, verbs
 **90/90**, transitional **49/49** and transitional administrator **9/9**. The two
@@ -1031,9 +1030,31 @@ Parsed go up/down object forms retain the outer go verb's refusal. The class's g
 alias is separately tested through direct calls and follows the same reflex policy;
 no parsed-go travel is claimed. Shared/native/configuration behavior is unchanged.
 Evidence: /tmp/lima-climb-challenge-20261017; prior diagnostic audit:
-/tmp/lima-climb-challenge-audit-20261017. Next refresh whole-source compile coverage
-and existing classifications to select a concrete remaining blocker, preserving
-closed functional scopes and avoiding automatic ports of legacy/WIP sources.
+/tmp/lima-climb-challenge-audit-20261017. The refreshed source inventory is recorded
+above, preserving earlier functional scopes and host classifications.
+
+The digging audit at native **ad86b192** and Lima **01bc51ad** reproduces a nested
+prompt failure in M_DIGGER/M_DIGGABLE: pop-after-forward removes a newly created
+prompt, leaving the old callback with a cleared user binding. Source remains
+unchanged pending adoption. A two-module temporary proposal uses existing
+modal_simple() and this_user()->modal_pass(input), requiring no driver change.
+
+**84 proposal inputs**, **151 clean preloads** and normal scan/saves/logout/
+shutdown pass in **134.03s**. Real stock pickup, explicit/inferred/reversed
+forms, hole growth/exhaustion, castle refusal, both selection prompts, ordinary
+pass-through, both nested handoffs and same-object repeated prompts pass. Light,
+props, path, stock, inventory and unchanged quest/XP/score restore. No handler
+recovery is needed; same six fixtures and two loopback-address overrides.
+
+The sand's chest message has no chest-construction implementation. The missing
+quest prerequisite prevents reward; positive reward/full quest remain separate.
+The existing omitted tool argument is unused by both targets and is not the
+observed lifecycle failure. Prior setup/capture/ID mistakes and a discarded
+modal_remove proposal are retained as harness history, not final qualification.
+Evidence and proposed patch: /tmp/lima-digging-audit-20261017. Recommend adopting
+these two callers with retained replay, then the button/secret-door/quest chain.
+Eight unchanged complete compile passes are retained from the matched inventory;
+no fresh source recount, Rust gate, native API or dedicated-source change is claimed.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
