@@ -1392,6 +1392,28 @@ scope. Evidence: /tmp/lima-source-inventory-20261018. The next concrete optional
 consumer is the on-demand stone/sword example, whose relative child retains its
 integer-mass blocker; constructor/get/release behavior needs its own audit.
 
+The inventory notes are committed as Lima **4910e637**, native **33ca97b6**. The
+on-demand stone/sword sample now adapts only its child: explicit float mass and
+set_id("sword"), matching the parent's acceptance check. Original construction
+reproduces the type rejection; mass-only compiles but the child advertises only
+weapon and placement fails. The stone/king-choice/container implementations stay.
+
+Eight complete proposal/control targets and two mass-only targets compile. Two
+connected real players verify selection, nonking refusal, king extraction, return
+and re-extraction of the same sword, non-sword rejection and forced child cleanup.
+Mass remains MEDIUM=16.0 and weapon class 25. Global/per-relation hide behavior is
+preserved, including the global flag remaining set after return. Guest permissions
+stay unchanged; observations use the administrator session and guest actions are
+ordinary commands. Two earlier partial harness runs remain separately recorded.
+
+**36 shell inputs plus 15 guest-creation inputs / 132.78s**, 151 clean
+preloads, both account/body saves and normal logout/shutdown pass without unexpected
+errors. Tracked player/inventory/pouch/lab/clone state restores. Tested child bytes
+are adopted exactly afterward; no new helper or native/profile/binary change.
+This sample is on-demand, with no selected stock/preload root established. No new
+full-source total or king-logout reselection claim. Evidence:
+/tmp/lima-stone-sword-20261018.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
