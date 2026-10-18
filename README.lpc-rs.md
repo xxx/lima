@@ -1226,6 +1226,23 @@ do not establish inactivity; relative inheritance and object-stock review are ne
 Evidence: /tmp/lima-web-editor-audit-20261017. Source/config/binaries remain unchanged;
 no runtime/HTTP test, service activation or new whole-source count is made.
 
+Optional-editor notes are committed as Lima **a22e3aed**, native **5343469c**.
+The 28 further source/host entries now have consumer decisions. **47 scoped checks**
+give 19 selected/reference passes and 28 retained target failures, with no timeout
+or crash. Four entries are discovered by unittest items (three weapon leaves plus
+M_SPECIAL_WEAPON); one belongs to the relative stone/sword sample, one to legacy
+service/inspection, one to unselected MONEY, five to sample/attic chains, and 16
+have no configured caller identified. The last group is not declared unreachable.
+
+The item suite glob discovers baseball_bat, rapier and special_longsword; its
+registered clone helpers prefix /domains/std/. The last weapon inherits the
+special-weapon mixin. Parent providers and the suite/daemon/command compile, but
+this source review does not execute or qualify the suite's callbacks. Next audit
+that invocation/clone boundary and those leaf adapters, preserving established
+equipment APIs and previous gameplay coverage. Evidence:
+/tmp/lima-consumer-classification-20261017. Sources/config/binaries stay unchanged;
+no new full-source count, gameplay result or native requirement is established.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
