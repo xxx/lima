@@ -1210,6 +1210,22 @@ the filter, and no caught cancellation error occurs. This closes the known alias
 quit leak. Evidence: /tmp/lima-quit-input-20261017. No native/profile/binary/format
 change, new fixture, broad handler qualification or whole-source recount is made.
 
+Quit source/notes are committed as Lima **55deab9c**, native **e4a6c18c**.
+The next consumer review finds webed behind the optional HTTP daemon, commented
+out in the configured preload. Its first compile failure comes from audit.h's
+error->throw macro expanding the display_error parameter named error; a minimal
+declaration confirms the collision and passes when renamed. Existing mappingp and
+optional CGI-header adaptations are retained. The complete editor remains deferred.
+
+Nine source checks show eight passes and that expected editor rejection. Wrapper,
+HTTP, M_ACCESS, master, drop, COINS, netstat and full simuls compile. Three small
+compile examples verify macro causality and the unselected USE_MONEY branch.
+An initial reference scan of 28 remaining source/host cases finds MONEY unselected
+and netstat inspecting already-loaded legacy sockets. Negative reference matches
+do not establish inactivity; relative inheritance and object-stock review are next.
+Evidence: /tmp/lima-web-editor-audit-20261017. Source/config/binaries remain unchanged;
+no runtime/HTTP test, service activation or new whole-source count is made.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
