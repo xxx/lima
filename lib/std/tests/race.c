@@ -118,20 +118,10 @@ int check_duplicate_races()
 
 int clean_up()
 {
-   int result = 1;
-   mapping dup = ([]);
-
-   foreach (string file, object ob in races)
-   {
-      string err;
-      err = catch (destruct(ob));
-      if (err)
-      {
-         debug("Error cleainng up " + file);
-         result = 0;
-      }
-   }
-   return result;
+   // Race blueprints are shared with character creation.
+   races = ([]);
+   example_race = nil;
+   return 1;
 }
 
 void init_tests()

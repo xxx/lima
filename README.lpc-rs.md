@@ -1296,6 +1296,22 @@ Player/lab/clone state returns to baseline; no unexpected error or residue remai
 Other suites/all/all quiet and cold-suite performance retain their prior scope.
 Evidence: /tmp/lima-liquids-suite-20261017. Native/profile/binaries stay unchanged.
 
+The liquids-suite fix is committed as Lima **23f6497e**, native **5e62be06**.
+The race suite loads shared blueprints; its original cleanup is refused for all
+seven, yielding **4/5**. Its one-file adapter clears the suite's race references
+and example selection while leaving the shared objects loaded. The real command
+now passes **5/5**, and repeated cleanup succeeds. All seven blueprint identities,
+the active human character and existing race clone groups remain unchanged.
+
+Thirteen scoped proposal/control checks and the original-suite compile pass.
+**21 inputs / 133.28s**, 151 clean preloads, normal saves/logout/shutdown
+and no unexpected errors pass. The tested source bytes are adopted exactly after
+the disposable run. The prior six fixtures/two loopback substitutions remain;
+its temporary shell identity marker is removed. Master, race content, assertions,
+framework and native/profile/binaries remain unchanged. Limbs, salvage, all/all quiet
+and cold-suite performance retain their prior scope. Evidence:
+/tmp/lima-race-suite-20261018.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
