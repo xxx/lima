@@ -3,6 +3,9 @@
 inherit M_TEST_SUITE;
 object troll;
 
+// The troll fixture has no material pouch.
+private object *salvaged_materials = ({});
+
 int clone_actors()
 {
    troll = lab_clone("/domains/std/monster/troll");
@@ -21,12 +24,27 @@ int check_unwield(string w)
 
 int check_salvage(string w)
 {
-   return inv_do(troll, "salvage", w, "gone", 0);
+   object prototype = load_object(MATERIAL);
+   object *previous = object_clones(prototype);
+   mixed problem = catch(cmd(troll, "salvage " + w));
+   salvaged_materials += object_clones(prototype) - previous;
+   if (problem)
+      error(problem);
+   return !present(w, troll);
 }
 
 int clean_up()
 {
-   destruct(troll);
+   foreach (object material in salvaged_materials)
+      if (material)
+         material->remove();
+   salvaged_materials = ({});
+   if (troll)
+   {
+      foreach (object item in deep_inventory(troll))
+         item->remove();
+      troll->remove();
+   }
    return 1;
 }
 

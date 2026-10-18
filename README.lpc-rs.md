@@ -1333,6 +1333,29 @@ substitutions remain; no new helper or native/profile/binary change is introduce
 Salvage, all/all quiet and cold-suite performance retain their prior scope. Evidence:
 /tmp/lima-limbs-suite-20261018.
 
+The limbs-suite fix is committed as Lima **c325475f**, native **f87b40af**. The
+salvage suite now checks actual sword removal, tracks only base-material clones
+created by its own command, and asks outputs/inventory/actor to remove themselves.
+Its troll has no material pouch. The shared material prototype and existing clones
+are excluded; command errors propagate after capturing outputs. The five cases and
+expected outcomes, framework/master and crafting/material implementations remain.
+
+The original reaches 3 passes/1 failure before teardown is refused; ownership-only
+completes 4/5 but leaves three material objects in this run. The final real suite
+passes **5/5**. A fixed-yield control proves refusal leaves the wielded sword intact
+with no yield, then unwielded salvage removes it and creates two steel scraps.
+Natural/repeated cleanup removes both while preserving an unrelated wood scrap;
+the player's pouch and tracked player/lab/clone state return to baseline.
+
+Eleven scoped source targets compile, with the final suite recompiled; original and
+ownership-only suite checks also pass. **34 inputs / 133.83s**, 151 clean
+preloads and normal saves/logout/shutdown pass without unexpected errors. Tested
+bytes are adopted exactly afterward. The prior six fixtures/two loopback substitutions
+remain; no new helper or native/profile/binary change is introduced. All five shipped
+suites have individual results; all/all quiet still needs combined qualification.
+Material probabilities, arbitrary recipe yields, player-pouch credit and cold-suite
+performance retain their prior scope. Evidence: /tmp/lima-salvage-suite-20261018.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
