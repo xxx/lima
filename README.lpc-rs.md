@@ -956,8 +956,27 @@ Rejected trailing-direction turns retain the missing-noun diagnostic tie; valid
 trailing turns and refusal state preservation pass. Native/parser, shared-readable,
 book, master, configuration and fixtures are unchanged. Previous temporary audit:
 /tmp/lima-command-routing-audit-20261017. Prior inventory/full replay/constructor
-counts retain their scopes. Next audit std/pelt.c construction and its existing
-loot-daemon consumer, without reopening completed book or generator coverage.
+counts retain their scopes. Read/turn source and notes are committed as Lima
+**d234149d**, native **b47b39ed**.
+
+The pelt audit checks four complete targets: three pass; std/pelt.c fails int-to-
+float set_mass. A temporary float conversion alone compiles. **41 audit inputs**,
+**151 clean preloads** and normal RST/saves/logout/shutdown pass in **139.32s**.
+Ordinary look/get/drop, generic IDs, real loot corpse placement and collection work.
+Constructor size/salvage level remains zero, so ordinary salvage yields nothing;
+its setter updates size/level and uses the existing half-size mass scale. The missing
+constructor field assignment is in unchanged original source.
+
+Save registration also fails through the protected add_save self-call: no pelt
+fields are saved, and loading into a different clone leaves its values unchanged.
+The no-argument clone needed by M_SAVE restoration fails in nil-type ID grammar;
+that caught failure is intentional audit evidence. Recommend a one-file pelt
+adapter for explicit mass conversion, size initialization, direct save registration,
+no-argument construction and mass/type-ID restoration. Preserve constructor mass=s,
+setter mass=0.5*s and shared/native policy. Dedicated sources are unchanged; no
+production fix is claimed. Evidence: /tmp/lima-pelt-audit-20261017. Two incomplete
+attempts retain a save assumption and early corpse cleanup; the final run waits for
+its real registration callback. No new fixture/config/native or full replay change.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
