@@ -5,16 +5,16 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **18 October 2026** at Lima **a1984c30** and native **0e87ead9**.
-The configured fresh-account path has passed clean boot, character creation,
-Grand Hall entry, ordinary commands, native saves, fresh-process restart and
-saved login. The recorded lifecycle runs have 151 clean preloads per boot.
-Runtime evidence retains its recorded revisions; the new release-build
-qualification covers source compilation.
+Reviewed **18 October 2026** at Lima **b5580f53** and native **cae3c8cd**.
+The rebuilt release driver passes the configured fresh-account path: clean
+boot, character creation, Grand Hall entry, ordinary commands, native saves,
+fresh-process restart and saved login. Both boots have 151 clean preloads
+and exit normally. Source inventory and runtime results retain distinct scope.
 
 | Qualification | Result | Scope |
 |---|---|---|
-| Shipped tests | 59/59 in both `unittest all` and `unittest all quiet` | Per-suite commands first; no manual program loads. Direct cold combined execution remains sensitive to the deadline. |
+| Release lifecycle | 30 checks across two clean driver processes | First administrator; actual saved-password authentication and character identity/state verified after restart. |
+| Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Direct cold combined execution remains sensitive to the deadline. |
 | Whole-source inventory | 999/1182 compile; 183 standalone failures | Rebuilt release compiler; target constructors were not run. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
 
@@ -99,9 +99,10 @@ The five suites should report 26, 16, 7, 5 and 5 successes respectively. Both
 combined commands should then report 59 successes and zero failures. Normal
 mode prints case results; quiet mode prints aggregate totals. This sequence
 passed from a fresh driver after normal startup under the unchanged 4000ms
-limit, with no manual program loads or added LPC fixtures. The recorded harness
-also checked existing prototype identities, player/inventory state, cleanup,
-saves, logout and shutdown; manual totals alone do not repeat those observations.
+limit, with no manual program loads or added LPC fixtures. The current release
+qualification also checks existing prototype identities, player/inventory state
+and cleanup, then saves, logs out and verifies the account and character after
+a fresh-process restart. Manual totals alone do not repeat those observations.
 
 Direct `unittest all` without manually loading test programs produced one timeout
 and one 59/59 pass in separate fresh drivers. Two shell observation commands
@@ -134,6 +135,27 @@ paths are evidence locations on the development machine, not installed tooling.
 
 These records describe their dated revisions. Earlier totals and statements of
 pending work are superseded by the current summary above and later results.
+
+### Release lifecycle qualification
+
+Reviewed 18 October 2026 at native **cae3c8cd**, Lima **b5580f53**. Two fresh
+release-driver processes pass all **30 lifecycle checks** in **136.6s**, with
+**151 clean preloads per boot** and exit status zero for both processes. The five
+suite commands pass **26/16/7/5/5**, then normal and quiet combined modes each pass
+**59/59**.
+Existing prototypes and player/world state are preserved; the observation
+marker is removed. The first documentation scan completes before shutdown. Real
+saved password authentication and character name/program/race/room/inventory/material
+pouch restoration pass after restart.
+
+No source changes, manual target loads or added LPC fixtures are required.
+The distinct-nil, preserved-player, 4000ms profile and all source/binary hashes
+remain unchanged. Existing channel compiler and autodoc header warnings remain;
+there are no runtime errors or preload failures. The two existing loopback
+IMUD substitutions and fixed local router frames retain their limited scope.
+This first-administrator/native-save result does not qualify original-driver
+save import, live services, cold combined reliability or mortal-only behavior.
+Evidence: /tmp/lima-release-lifecycle-20261018.
 
 ### Release inventory after trailing-default validation
 
