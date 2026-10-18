@@ -1155,13 +1155,32 @@ two tools with confirmed callers and 28 further source/host cases. Directory
 location does not establish activation, and this is not a count of native gaps.
 No new whole-source measurement or runtime qualification is claimed.
 
-The next audit is obj/mudlib/aliasmenu.c. Both configured shells inherit SHELL;
+That review selected obj/mudlib/aliasmenu.c. Both configured shells inherit SHELL;
 the normal alias command loads this file for bare alias and alias-name display.
 Its inline function syntax still fails compilation. The secure/cgi/webed wrapper
 also reaches failing obj/secure/webed, without a new HTTP execution claim.
 Evidence: /tmp/lima-compile-classification-20261017. No source, native API, binary,
 profile or fixture changes; completed pirate/quest/equipment/framework work stays
-closed. Audit the alias menu through its existing shell/API/persistence path next.
+closed. The audit below now covers the selected shell/API/persistence path.
+
+The alias-menu audit uses a temporary one-file proposal: named native callbacks,
+nil/string defaults and a retained menu handler, plus corrections to shortcut
+commands, numbered completions and editing space-omission flags. Five of seven
+compile targets pass; the other two are expected isolated M_ALIAS/SHELL host parts.
+Both complete shells and the user compile.
+
+**83 first-session inputs + 13 restored inputs / 142.92s** complete over two driver
+processes, each with 151 clean preloads and normal saves/logout/shutdown. Custom class records,
+defaults and xverb flags survive authentic save/login/restart and are cleaned up.
+Two unresolved findings are explicitly asserted: body.quit's blind modal_pop on
+!quit leaves an editor clone, and M_ALIAS's obsolete sizeof(class) != 4 migration
+resets global defaults to personal aliases in saves. This is not a clean lifecycle
+pass. Evidence: /tmp/lima-alias-menu-audit-20261017.
+
+Next adopt the menu adapter and remove that obsolete migration, then correct quit
+notification in a focused follow-up. This audit changes no persistent mudlib/native
+source, profile, binary, save format, shell API or access policy. No class-size
+reflection is required. The old whole-source count is not recomputed.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
