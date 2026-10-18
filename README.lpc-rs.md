@@ -998,20 +998,20 @@ No fresh-driver meat restoration or alternate build claim; previous inventory/fu
 replay counts retain scope. Meat source/notes are committed as Lima **b24a3d7a**,
 native **59fb3ec6**.
 
-Ladder audit: five of six complete targets compile; std/ladder.c's unused third
-more_create parameter disagrees with its two-argument parent. A signature-only
-temporary control compiles. **58 inputs**, **151 clean preloads** and normal
-RST/saves/logout/shutdown complete in **133.81s**. Singular/attached identity,
-relative and object destinations, live environment base and actual ascend/descend/
-climb up/down movement pass. Missing directions and an unconfigured ladder refuse;
-get retains the climb suggestion. Parent stairs remain, and props/path/variables
-clean up. No bundled ladder consumer is claimed; it is an exported template.
+Ladder audit notes are committed as Lima **78e849ee**, native **32a7e9f9**. Only
+std/ladder.c changes: remove the unused third more_create formal to match its parent.
+Function body, parent attachment, destination forwarding and base callback stay.
 
-Recommend removing only the unused formal. Parent constructor/attachment, shared
-exit/registry/native policy, configuration and fixtures stay. Dedicated sources
-remain unchanged, so this audit does not qualify a production fix. Evidence:
-/tmp/lima-ladder-audit-20261017. Bundled destination cleanup, separate climb_challenge
-behavior and whole inventory/full replay remain outside scope.
+**All six complete targets compile**. **58 production inputs**, **151 clean preloads**
+and normal scan/saves/logout/shutdown pass in **136.43s**, without diagnostic
+source/hook controls or expected failures. Actual climb/ascend/descend movement,
+two-way relative and one-way object/string destinations, singular identity,
+attachment, relocation base, get refusal and unconfigured defaults pass. Props,
+path and variables restore; stock stairs remain. No shared/native/config/fixture
+change. Evidence: /tmp/lima-ladder-20261017; prior audit:
+/tmp/lima-ladder-audit-20261017. Prior room/navigation, inventory and full replay
+scopes remain. Next audit the separate exported std/climb_challenge.c template,
+preserving injury/skill policy and keeping native method design separate.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically

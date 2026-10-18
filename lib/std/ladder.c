@@ -2,7 +2,7 @@
 
 inherit STAIRS;
 
-void more_create(mixed up_dest, mixed down_dest, int attached)
+void more_create(mixed up_dest, mixed down_dest)
 {
    setup_messages("ladder", up_dest, down_dest);
 }
