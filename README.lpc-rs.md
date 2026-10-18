@@ -1013,23 +1013,25 @@ change. Evidence: /tmp/lima-ladder-20261017; prior audit:
 scopes remain. Ladder source/notes are committed as Lima **fb1de80e**, native
 **860a3950**.
 
-Climb-challenge audit: four of five complete targets compile; its bare integer
-return fails. A return-only control compiles but hits nil direction text in sprintf.
-Adding only direction initialization exposes runtime behavior. **84 audit inputs**,
-**151 clean preloads** and normal RST/saves/logout/shutdown complete in **133.81s**.
-Real skill, movement and bounded injury run; actual body getters verify all controlled
-player data restored. Low-reflex ascend/climb up and descend/climb down differ;
-handler arguments also disagree with the parent's generic parser contract. Empty
-failure messages raise. Constructor/message errors are expected caught cases.
+Climb-challenge audit notes are committed as Lima **3f3b929e**, native **b589f1cb**.
+Only std/climb_challenge.c changes: integer refusal, direction descriptions,
+variadic forwarding, direction-based reflex checks and default/validated failure
+messages. Existing injury/skill/reflex cost and traversal policy are preserved.
 
-Recommend a class-only adapter for integer refusal, description initialization,
-variadic argument forwarding, direction-based reflex checks and usable/validated
-failure messages. Preserve failed-skill injury plus traversal, existing cost/threshold
-and random policy. Dedicated source unchanged; no production fix is claimed.
-Evidence: /tmp/lima-climb-challenge-audit-20261017. One incomplete fixture baseline
-attempt is retained; final setup warms the real limb selector before snapshots.
-One temporary constructor probe joins the six prior fixtures. No shared/native/
-configuration change or completed framework, inventory/full replay repeat.
+**Six complete targets compile**. **144 production inputs**, **151 clean preloads**
+and normal RST/saves/logout/shutdown pass in **133.77s**. Accepted parser command
+forms now share reflex rules; actual success/failure movement and bounded existing
+injury, default/custom messages, configuration rejection and no-route cases pass.
+Health/skills/ranks/stat/reflex/rate/path/props restore through actual getters.
+No source controls or constructor-failure fixture; the six prior fixtures suffice.
+
+Parsed go up/down object forms retain the outer go verb's refusal. The class's go
+alias is separately tested through direct calls and follows the same reflex policy;
+no parsed-go travel is claimed. Shared/native/configuration behavior is unchanged.
+Evidence: /tmp/lima-climb-challenge-20261017; prior diagnostic audit:
+/tmp/lima-climb-challenge-audit-20261017. Next refresh whole-source compile coverage
+and existing classifications to select a concrete remaining blocker, preserving
+closed functional scopes and avoiding automatic ports of legacy/WIP sources.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically

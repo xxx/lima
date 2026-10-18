@@ -9,7 +9,10 @@ string challenge_name = "";
 private
 int challenge_rating = 100;
 private
-string *fail_messages = ({});
+string *fail_messages = ({
+   "$N $vslip while climbing.",
+   "$N $vlose $p footing while climbing."
+});
 private
 string direction;
 
@@ -25,6 +28,8 @@ mixed direct_climb_obj()
 
 void set_fail_climb_message(string *m)
 {
+   if (!arrayp(m) || sizeof(m) < 2)
+      error("Climb failure messages require at least two strings.\n");
    fail_messages = m;
 }
 
@@ -33,7 +38,7 @@ int reflex_use()
    return to_int(challenge_rating / REFLEX_USE_FACTOR) || 1;
 }
 
-int handle_fail(string action, string rule, string prep, object ob)
+int handle_fail(string action, string rule, mixed args...)
 {
    int max_dam = this_body()->query_health("torso") - 2;
    // Fail climb
@@ -41,39 +46,39 @@ int handle_fail(string action, string rule, string prep, object ob)
    {
       this_body()->simple_action(fail_messages[1]);
       this_body()->hurt_us(max_dam);
-      return ::do_verb_rule(action, rule, prep, ob);
+      return ::do_verb_rule(action, rule, args...);
    }
    else
    {
       this_body()->simple_action(fail_messages[0]);
       this_body()->hurt_us((max_dam / 2));
-      return ::do_verb_rule(action, rule, prep, ob);
+      return ::do_verb_rule(action, rule, args...);
    }
 }
 
-int do_verb_rule(string action, string rule, string prep, object ob)
+int do_verb_rule(string action, string rule, mixed args...)
 {
    // You can always climb if you just have 5 point of mana.
-   if (action == "ascend" && this_body()->query_reflex() < 5)
+   if (direction == "up" && this_body()->query_reflex() < 5)
    {
       write("You cannot concentrate enough to climb this.\n");
-      return;
+      return 0;
    }
 
-   if (action == "descend" && this_body()->query_reflex() < 5)
+   if (direction == "down" && this_body()->query_reflex() < 5)
    {
-      return handle_fail(action, rule, prep, ob);
+      return handle_fail(action, rule, args...);
    }
 
    this_body()->spend_reflex(reflex_use());
 
    if (this_body()->test_skill("misc/life/climbing", challenge_rating))
    {
-      return ::do_verb_rule(action, rule, prep, ob);
+      return ::do_verb_rule(action, rule, args...);
    }
    else
    {
-      return handle_fail(action, rule, prep, ob);
+      return handle_fail(action, rule, args...);
    }
 }
 
@@ -91,6 +96,7 @@ varargs protected void setup_messages(string name, string dir, mixed dest, int c
 {
    string dirs;
    direction = dir;
+   dirs = direction == "up" ? "upwards" : direction == "down" ? "downwards" : "nowhere";
    if (dest && direction == "up")
       add_method("ascend", dest, 0, ({sprintf("$N $vclimb up the $o.")}),
                  ({sprintf("$N $vclimb up the $o from below.")}));
