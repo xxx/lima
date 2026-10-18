@@ -1372,6 +1372,26 @@ adds no cold-suite performance or full-source inventory claim. Evidence:
 /tmp/lima-bundled-tests-20261018. The next check is a fresh bounded source inventory
 with existing host/optional/legacy classifications carried forward.
 
+The combined-test notes are committed as Lima **fb3ad0a9**, native **45648cfb**.
+A fresh full inventory measures **998/1182 compiling, 184 failing, zero regressions,
+timeouts or crashes in 245.587s**. All 994 previous passes remain and the target set
+is unchanged. Four gains are baseball_bat, rapier, special_longsword and aliasmenu.
+Fifteen .c files changed since the previous full sweep; headers/profile/binaries match.
+
+**111** failed standalone fragments have freshly passing real hosts, including the
+newly confirmed special-weapon composition. Changed alias/user/body inputs retain
+the reviewed inheritance/provider contracts. The other **73** retain their source/
+profile/consumer contexts; they are not 73 native feature requests. All 17 core
+objects and the previous command success groups remain green. The digging fragments'
+first errors now name their already-reviewed modal_simple provider; actual hosts pass.
+
+Two bounded CLI processes compile without target constructors or driver/Cargo
+overlap. Source/configuration/binary guards pass; no implementation changes or new
+runtime claim are added. Combined normal/quiet 59/59 results retain their preceding
+scope. Evidence: /tmp/lima-source-inventory-20261018. The next concrete optional
+consumer is the on-demand stone/sword example, whose relative child retains its
+integer-mass blocker; constructor/get/release behavior needs its own audit.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
