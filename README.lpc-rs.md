@@ -5,14 +5,14 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **18 October 2026**, after Lima **6a99ff86** and native **962cd832**.
+Reviewed **18 October 2026**, after Lima **47e16fce** and native **8784d200**.
 The configured fresh-account path has passed clean boot, character creation,
 Grand Hall entry, ordinary commands, native saves, fresh-process restart and
 saved login. The recorded lifecycle runs have 151 clean preloads per boot.
 
 | Qualification | Result | Scope |
 |---|---|---|
-| Shipped tests | 59/59 in both `unittest all` and `unittest all quiet` | Prepared runtime; 42 programs loaded individually first. |
+| Shipped tests | 59/59 in both `unittest all` and `unittest all quiet` | Per-suite commands first; no manual program loads. Direct cold combined execution remains sensitive to the deadline. |
 | Whole-source inventory | 998/1182 compile; 184 standalone failures | Measured before the subsequent sword-sample fix; constructors were not run. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | Later on-demand sample, including refusal, extraction/return and cleanup. |
 
@@ -74,81 +74,43 @@ rather than replacing or repeatedly copying the persistent port source.
 
 ## Run the shipped tests
 
-Use the administrator wizard shell. `unittest list` should show exactly items,
-limbs, liquids, race and salvage. The observed counts are 26, 16, 7, 5 and 5.
-
-The passing combined run loaded the following 42 programs individually, in order,
-before testing. Send each line separately and wait for the shell prompt; each
-should print 1. This preparation keeps cold compilation in separate tasks under
-the unchanged 4000ms budget. Loading programs through the CLI beforehand does
-not warm a running driver's object space.
-
-<details>
-<summary>Individual preparation commands</summary>
-
-```text
-print `!!load_object("/domains/std/room/Laboratory")`
-print `!!load_object("/domains/std/armour/bracelet")`
-print `!!load_object("/domains/std/armour/chainmail")`
-print `!!load_object("/domains/std/armour/cs_grunt_helm")`
-print `!!load_object("/domains/std/armour/fullplate")`
-print `!!load_object("/domains/std/armour/gloves")`
-print `!!load_object("/domains/std/armour/kevlar_vest")`
-print `!!load_object("/domains/std/armour/leather_jacket")`
-print `!!load_object("/domains/std/armour/scarf")`
-print `!!load_object("/domains/std/weapon/baseball_bat")`
-print `!!load_object("/domains/std/weapon/club")`
-print `!!load_object("/domains/std/weapon/crossbow")`
-print `!!load_object("/domains/std/weapon/greataxe")`
-print `!!load_object("/domains/std/weapon/longsword")`
-print `!!load_object("/domains/std/weapon/mantis_eagle_m25")`
-print `!!load_object("/domains/std/weapon/pac_sword")`
-print `!!load_object("/domains/std/weapon/plas_tech_5_0")`
-print `!!load_object("/domains/std/weapon/rapier")`
-print `!!load_object("/domains/std/weapon/raust_2620")`
-print `!!load_object("/domains/std/weapon/special_longsword")`
-print `!!load_object("/domains/std/weapon/stick")`
-print `!!load_object("/domains/std/weapon/sword")`
-print `!!load_object("/domains/std/weapon/whiskey_bottle")`
-print `!!load_object("/domains/std/monster/troll")`
-print `!!load_object("/domains/std/ale")`
-print `!!load_object("/domains/std/bottle")`
-print `!!load_object("/domains/std/keg")`
-print `!!load_object("/std/material")`
-print `!!load_object("/std/race/documentation")`
-print `!!load_object("/std/race/dragon")`
-print `!!load_object("/std/race/elf")`
-print `!!load_object("/std/race/human")`
-print `!!load_object("/std/race/orc")`
-print `!!load_object("/std/race/restricted/coder")`
-print `!!load_object("/std/race/troll")`
-print `!!load_object("/std/tests/items")`
-print `!!load_object("/std/tests/limbs")`
-print `!!load_object("/std/tests/liquids")`
-print `!!load_object("/std/tests/race")`
-print `!!load_object("/std/tests/salvage")`
-print `!!load_object("/daemons/test_d")`
-print `!!load_object("/cmds/wiz/unittest")`
-```
-
-</details>
-
-Then run these commands separately:
+Use the administrator wizard shell. Send each command separately and wait for
+the shell prompt:
 
 ```text
 unittest list
+unittest items
+unittest limbs
+unittest liquids
+unittest race
+unittest salvage
 unittest all
 unittest all quiet
 look
 pwd
 ```
 
-Both combined commands should report 59 successes and zero failures. Normal
-mode prints case results; quiet mode prints aggregate totals. This is the
-prepared test recipe. Cold whole-suite execution immediately after boot remains
-unqualified. The recorded harness also checked suite replacement, shared race
-blueprints, player/inventory state, cleanup and saves; manual totals alone do
-not repeat those observations.
+The five suites should report 26, 16, 7, 5 and 5 successes respectively. Both
+combined commands should then report 59 successes and zero failures. Normal
+mode prints case results; quiet mode prints aggregate totals. This sequence
+passed from a fresh driver after normal startup under the unchanged 4000ms
+limit, with no manual program loads or added LPC fixtures. The recorded harness
+also checked existing prototype identities, player/inventory state, cleanup,
+saves, logout and shutdown; manual totals alone do not repeat those observations.
+
+Direct `unittest all` without manually loading test programs produced one timeout
+and one 59/59 pass in separate fresh drivers. Two shell observation commands
+recorded initially loaded objects before testing; those commands compile normal
+evaluation code but do not load test targets. The timeout spent about 3802ms
+compiling and 200ms evaluating, without a transaction conflict. Its rolled-back
+output included the shell prompt; a following ordinary command restored input.
+The per-suite sequence separates compilation across tasks, but the cold item
+suite still had limited headroom in this audit. These observations do not
+establish reliable cold combined execution; cold-first quiet mode was not tested.
+
+The earlier 42-program manual-load recipe belongs to the historical prepared
+run. The current sequence uses the existing test commands instead. CLI compilation
+does not warm a running driver's object space.
 
 ## Remaining scope
 
