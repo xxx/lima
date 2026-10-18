@@ -1193,9 +1193,22 @@ personal overrides are preserved. This does not repair earlier accidental overri
 Runtime uses the dedicated sources without alias proposal overrides; the same six
 fixtures and two existing loopback address substitutions remain. Normal command
 lines match the audit, with stronger save/metadata assertions. The known !quit editor
-leak is the sole remaining finding and will receive a separate notification fix.
+leak was the sole remaining finding; the focused cleanup below resolves it.
 Evidence: /tmp/lima-alias-menu-20261017. No native/config/binary/format/API change,
 new full-source count, stock data rewrite or clean-cancellation claim is made.
+
+Alias source/notes are committed as Lima **bcd959bf**, native **0ad959a1**.
+The focused quit fix changes only secure/user.c and std/body.c: the body now invokes
+a current-body-only entry point that reuses the existing clear_input_stack loop,
+removing handlers before sending cancellation. Ordinary modal completion is unchanged.
+
+**8/8 compile targets and 92+13 runtime inputs / 154.16s** pass across two
+clean 151-preload boots and authentic save/login/restart. Pending and nested editors
+are destroyed; repeated quit/re-entry returns to one shell handler. Existing alias
+classes/defaults/xverbs/global flags remain intact, six save checkpoints preserve
+the filter, and no caught cancellation error occurs. This closes the known alias
+quit leak. Evidence: /tmp/lima-quit-input-20261017. No native/profile/binary/format
+change, new fixture, broad handler qualification or whole-source recount is made.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically

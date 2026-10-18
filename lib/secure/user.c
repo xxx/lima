@@ -72,6 +72,14 @@ void remove()
    destruct();
 }
 
+nomask void cancel_body_input()
+{
+   object body = query_body();
+   if (!body || previous_object() != body)
+      error("cancel_body_input: not the current body");
+   clear_input_stack();
+}
+
 void quit()
 {
    object body = query_body();

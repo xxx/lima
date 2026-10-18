@@ -305,7 +305,7 @@ void quit()
    if (link)
    {
       link->update_body(this_object());
-      link->modal_pop();
+      link->cancel_body_input();
    }
 
    if (is_visible())
