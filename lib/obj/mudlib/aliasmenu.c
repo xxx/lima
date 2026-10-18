@@ -27,6 +27,8 @@ private
 nosave int num_defaults;
 private
 nosave int default_index;
+private nosave function input_handler;
+private nosave function input_callback;
 
 /*
 **  From here on lies a menu interface to aliases.
@@ -43,22 +45,43 @@ void init_alias_editor();
 nomask void begin_menu(object for_shell_ob)
 {
    shell_ob = for_shell_ob;
-   modal_push(( : input_from_main_menu:), ( : main_menu_prompt:));
+   input_handler = receive_input;
+   input_callback = input_from_main_menu;
+   modal_push(input_handler, main_menu_prompt);
    display_main_menu();
+}
+
+private void receive_input(mixed input)
+{
+   // Cancellation can arrive after the user has removed this handler.
+   if (!stringp(input))
+   {
+      quit_alias_editor();
+      return;
+   }
+   evaluate(input_callback, input);
+}
+
+private void set_handler(function callback, mixed prompt)
+{
+   input_callback = callback;
+   modal_func(input_handler, prompt);
 }
 
 private
 void goto_main_menu()
 {
    display_main_menu();
-   modal_func(( : input_from_main_menu:), ( : main_menu_prompt:));
+   set_handler(input_from_main_menu, main_menu_prompt);
 }
 
 private
 void quit_alias_editor()
 {
    write("Exiting alias editor.\n");
-   modal_pop();
+   function handler = input_handler;
+   input_handler = input_callback = nil;
+   modal_remove(handler);
    destruct(this_object());
 }
 
@@ -160,7 +183,7 @@ void process_display_alias_menu_choice(string input)
       return;
    }
    display_one_alias(display_menu_options[index - 1]);
-   display_menu_options = 0;
+   display_menu_options = nil;
    goto_main_menu();
 }
 
@@ -178,7 +201,7 @@ void display_alias_menu()
          write("\n");
    }
    write("\n");
-   modal_func(( : process_display_alias_menu_choice:), "[#q] ");
+   set_handler(process_display_alias_menu_choice, "[#q] ");
 }
 
 private
@@ -205,9 +228,9 @@ void display_alias(string s)
       write("Possible completions are:\n");
       matches = sort_array(matches, 1);
       for (i = 0; i < sizeof(matches); i++)
-         printf("  %-4d%s\n", i, matches[i]);
+         printf("  %-4d%s\n", i + 1, matches[i]);
       display_menu_options = matches;
-      modal_func(( : process_display_alias_menu_choice:), "Select one by number, or q to quit: ");
+      set_handler(process_display_alias_menu_choice, "Select one by number, or q to quit: ");
       return;
    }
 }
@@ -221,6 +244,7 @@ string get_arg_default_prompt()
 private
 void get_xverb_status(string s)
 {
+   int xverb;
    if (s == "")
       return;
 
@@ -233,7 +257,7 @@ void get_xverb_status(string s)
             "between the ' and the foo??\n");
       return;
    case 'y':
-      shell_ob->add_xalias(new_alias_name);
+      xverb = 1;
       break;
    case 'n':
       break;
@@ -241,6 +265,10 @@ void get_xverb_status(string s)
       write("Invalid response.\n");
       return;
    }
+   if (shell_ob->query_one_alias(new_alias_name))
+      shell_ob->remove_alias(new_alias_name);
+   if (xverb)
+      shell_ob->add_xalias(new_alias_name);
    shell_ob->add_alias_simple(new_alias_name, new_alias_in_progress);
 
    printf("Alias %s defined.\n", new_alias_name);
@@ -250,7 +278,7 @@ void get_xverb_status(string s)
 private
 void ask_for_xverb_status()
 {
-   modal_func(( : get_xverb_status:), "Allow space ommision? [yn?] ");
+   set_handler(get_xverb_status, "Allow space ommision? [yn?] ");
 }
 
 private
@@ -276,7 +304,14 @@ void set_star_default(string s)
       return;
    }
 
-   modal_func(( : set_arg_default:), ( : get_arg_default_prompt:));
+   set_handler(set_arg_default, get_arg_default_prompt);
+}
+
+private int alias_argument_number(string s)
+{
+   int d;
+   sscanf(s, "%d%s", d, s);
+   return d;
 }
 
 private
@@ -322,15 +357,11 @@ void new_template(string s)
    new_alias_in_progress.template = s;
 
    new_alias_in_progress.num_args = max(map(
-       explode(s[strsrch(s, "$")..], "$"), function(string s) {
-          int d;
-          sscanf(s, "%d%s", d, s);
-          return d;
-       }));
+       explode(s[strsrch(s, "$")..], "$"), alias_argument_number));
 
-   new_alias_in_progress.defaults = allocate(new_alias_in_progress.num_args + 1);
+   new_alias_in_progress.defaults = allocate(new_alias_in_progress.num_args + 1, "");
 
-   modal_func(( : set_star_default:), "What's the default for $* (enter for none)? ");
+   set_handler(set_star_default, "What's the default for $* (enter for none)? ");
 }
 
 private
@@ -347,7 +378,7 @@ void rcv_new_alias_name(string s)
    new_alias_in_progress = new (class alias);
    new_alias_name = s;
    write("Type in the expansion for this alias.\n");
-   modal_func(( : new_template:), "Expansion (? for help): ");
+   set_handler(new_template, "Expansion (? for help): ");
 }
 
 private
@@ -356,12 +387,12 @@ void cmd_adjust_alias(string s)
    if (strsrch(s, " ") != -1)
    {
       write("Aliases may not have spaces.  Try again.\n");
-      modal_func(( : rcv_new_alias_name:), "Name of alias: ");
+      set_handler(rcv_new_alias_name, "Name of alias: ");
       return;
    }
    if (s == "")
    {
-      modal_func(( : rcv_new_alias_name:), "Name of alias: ");
+      set_handler(rcv_new_alias_name, "Name of alias: ");
       return;
    }
    rcv_new_alias_name(s);
@@ -393,10 +424,10 @@ void input_from_main_menu(string arg)
       quit_alias_editor();
       return;
    }
+   cmd = arg[0];
    if (strlen(arg) == 1)
    {
-      cmd = arg[0];
-      arg = 0;
+      arg = nil;
    }
    else
    {
@@ -409,7 +440,7 @@ void input_from_main_menu(string arg)
       if (strlen(trim(arg)) > 1)
          arg = arg[2..];
       else
-         arg = 0;
+         arg = nil;
    }
    switch (cmd)
    {
@@ -439,7 +470,7 @@ void input_from_main_menu(string arg)
       return;
    case 'a':
       if (!arg)
-         modal_func(( : cmd_adjust_alias:), "Alias name? ");
+         set_handler(cmd_adjust_alias, "Alias name? ");
       else
          cmd_adjust_alias(arg);
       return;
@@ -451,7 +482,7 @@ void input_from_main_menu(string arg)
          return;
       }
       if (!arg)
-         modal_func(( : process_remove_alias:), "Alias name? ");
+         set_handler(process_remove_alias, "Alias name? ");
       else
          process_remove_alias(arg);
       return;

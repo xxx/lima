@@ -1177,10 +1177,25 @@ Two unresolved findings are explicitly asserted: body.quit's blind modal_pop on
 resets global defaults to personal aliases in saves. This is not a clean lifecycle
 pass. Evidence: /tmp/lima-alias-menu-audit-20261017.
 
-Next adopt the menu adapter and remove that obsolete migration, then correct quit
-notification in a focused follow-up. This audit changes no persistent mudlib/native
-source, profile, binary, save format, shell API or access policy. No class-size
-reflection is required. The old whole-source count is not recomputed.
+The adoption below covers the menu adapter and obsolete migration; quit notification
+remains separate. That audit changed no persistent mudlib/native source, profile,
+binary, save format, shell API or access policy. No class-size reflection is required.
+The old whole-source count is not recomputed.
+
+The dedicated source now contains that exact menu adapter and removes the obsolete
+class-size migration from M_ALIAS. Five complete/definition targets pass; two
+isolated host-part failures remain expected. **83 first-session + 13 restored inputs
+/ 142.96s** pass the adapter checks across two clean 151-preload driver boots.
+Custom aliases/defaults/xverbs restore exactly. Six save checkpoints exclude globals
+colors/p and restored flags remain 1/2; supplied zero-status defaults and existing
+personal overrides are preserved. This does not repair earlier accidental overrides.
+
+Runtime uses the dedicated sources without alias proposal overrides; the same six
+fixtures and two existing loopback address substitutions remain. Normal command
+lines match the audit, with stronger save/metadata assertions. The known !quit editor
+leak is the sole remaining finding and will receive a separate notification fix.
+Evidence: /tmp/lima-alias-menu-20261017. No native/config/binary/format/API change,
+new full-source count, stock data rewrite or clean-cancellation claim is made.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically

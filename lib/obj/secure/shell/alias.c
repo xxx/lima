@@ -178,17 +178,6 @@ string *prep_aliases_for_save(string state)
    if (state == "saving")
       foreach (a, expansion in aliases)
       {
-         // TMP HACK =(
-         if (sizeof(expansion) != 4)
-         {
-            class alias new_expansion;
-            new_expansion = new (class alias);
-            new_expansion.template = expansion.template;
-            new_expansion.defaults = expansion.defaults;
-            new_expansion.num_args = expansion.num_args;
-            new_expansion.global_alias_status = 0;
-            expansion = new_expansion;
-         }
          if (!(expansion.global_alias_status))
          {
             alias_save[a] = expansion;
