@@ -11,7 +11,9 @@ int clone_actors()
       debug("Failed to clone troll");
       return 0;
    }
-   destruct(present("sword", troll));
+   object starting_weapon = present("sword", troll);
+   if (starting_weapon)
+      starting_weapon->remove();
    return 1;
 }
 
@@ -23,7 +25,10 @@ int clone_items()
 
 int check_wield(string w)
 {
-   return inv_do(troll, "wield", w, "query_wielding", 0);
+   object ob;
+   cmd(troll, "wield " + w);
+   ob = present(w, troll);
+   return ob ? sizeof(ob->query_wielding()) == 1 : 0;
 }
 
 int check_wear(string w)
@@ -82,7 +87,12 @@ int check_unwield_all()
 
 int clean_up()
 {
-   destruct(troll);
+   if (troll)
+   {
+      foreach (object item in deep_inventory(troll))
+         item->remove();
+      troll->remove();
+   }
    return 1;
 }
 
@@ -92,9 +102,9 @@ void init_tests()
    add_test_true("Clone 5 pieces of equipment", clone_items);
    add_test_true("Wield longsword", &check_wield("longsword"));
    add_test_fail("Wield greataxe", &check_wield("axe"));
-   add_test_true("Unwield longsword", &check_unwield("sword"));
+   add_test_true("Unwield longsword", &check_unwield("longsword"));
    add_test_true("Dualwield longsword", &check_dualwield("longsword"));
-   add_test_true("Unwield longsword", &check_unwield("sword"));
+   add_test_true("Unwield longsword", &check_unwield("longsword"));
    add_test_true("Dualwield greataxe", &check_dualwield("axe"));
    add_test_fail("Wield longsword", &check_wield("longsword"));
    add_test_true("Dualwield greataxe", &check_dualwield("axe"));

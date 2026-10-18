@@ -1312,6 +1312,27 @@ framework and native/profile/binaries remain unchanged. Limbs, salvage, all/all 
 and cold-suite performance retain their prior scope. Evidence:
 /tmp/lima-race-suite-20261018.
 
+The race-suite fix is committed as Lima **d39f288c**, native **66bd5b52**. The limbs
+suite needs three local adaptations: test objects remove themselves, the wield
+check requires exactly one occupied limb instead of comparing a nullable array
+with zero, and both unwield callbacks select the cloned longsword's actual ID.
+Its sixteen cases and expected outcomes, equipment implementations, framework and master remain.
+
+The original setup is refused before counting a case. Ownership-only reaches 9/16;
+the wield check reaches 10/16, exposing the selector mismatch and cascading failures.
+The corrected real suite passes **16/16**, including both expected refusals. Explicit
+item-state controls confirm one/two-hand wielding, unwielding, occupied-hand refusal,
+cleanup and repeated cleanup; player/lab/clone state returns to baseline.
+
+Sixteen scoped source targets compile, with the corrected final suite recompiled;
+original and ownership-only suite checks also pass. **22 inputs / 139.25s**,
+151 clean preloads and normal saves/logout/shutdown pass without unexpected errors.
+The diagnostic run and its non-green results remain separately recorded. Tested
+final bytes are adopted exactly afterward. The prior six fixtures/two loopback
+substitutions remain; no new helper or native/profile/binary change is introduced.
+Salvage, all/all quiet and cold-suite performance retain their prior scope. Evidence:
+/tmp/lima-limbs-suite-20261018.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
