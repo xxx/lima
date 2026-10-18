@@ -1010,8 +1010,26 @@ attachment, relocation base, get refusal and unconfigured defaults pass. Props,
 path and variables restore; stock stairs remain. No shared/native/config/fixture
 change. Evidence: /tmp/lima-ladder-20261017; prior audit:
 /tmp/lima-ladder-audit-20261017. Prior room/navigation, inventory and full replay
-scopes remain. Next audit the separate exported std/climb_challenge.c template,
-preserving injury/skill policy and keeping native method design separate.
+scopes remain. Ladder source/notes are committed as Lima **fb1de80e**, native
+**860a3950**.
+
+Climb-challenge audit: four of five complete targets compile; its bare integer
+return fails. A return-only control compiles but hits nil direction text in sprintf.
+Adding only direction initialization exposes runtime behavior. **84 audit inputs**,
+**151 clean preloads** and normal RST/saves/logout/shutdown complete in **133.81s**.
+Real skill, movement and bounded injury run; actual body getters verify all controlled
+player data restored. Low-reflex ascend/climb up and descend/climb down differ;
+handler arguments also disagree with the parent's generic parser contract. Empty
+failure messages raise. Constructor/message errors are expected caught cases.
+
+Recommend a class-only adapter for integer refusal, description initialization,
+variadic argument forwarding, direction-based reflex checks and usable/validated
+failure messages. Preserve failed-skill injury plus traversal, existing cost/threshold
+and random policy. Dedicated source unchanged; no production fix is claimed.
+Evidence: /tmp/lima-climb-challenge-audit-20261017. One incomplete fixture baseline
+attempt is retained; final setup warms the real limb selector before snapshots.
+One temporary constructor probe joins the six prior fixtures. No shared/native/
+configuration change or completed framework, inventory/full replay repeat.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
