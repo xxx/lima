@@ -1281,6 +1281,21 @@ one temporary event helper, with no proposal source override. This prepared-runt
 result adds no cold-performance, full-source or other-suite/all/all quiet claim.
 Evidence: /tmp/lima-item-construction-20261017. Native/profile/binaries stay unchanged.
 
+The item construction changes are committed as Lima **f3a16824**, native **dc40cf01**.
+The bundled liquids suite passes its first six assertions, then direct actor
+destruction is refused by the existing master policy. Its one-file teardown adapter
+asks captured deep inventory, actor and keg to remove themselves, with nil guards.
+The real command now passes **7/7**; cleanup also removes ale still inside a filled
+bottle and safely repeats. No fluid implementation or assertion changes are needed.
+
+**24 inputs / 139.21s**, 151 clean preloads and normal saves/logout/shutdown
+pass. Twelve scoped proposal/control checks and the original-suite compile check
+pass. The temporary runtime switches only the suite source, then those tested bytes
+are adopted exactly. The prior six fixtures/two loopback substitutions remain.
+Player/lab/clone state returns to baseline; no unexpected error or residue remains.
+Other suites/all/all quiet and cold-suite performance retain their prior scope.
+Evidence: /tmp/lima-liquids-suite-20261017. Native/profile/binaries stay unchanged.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source

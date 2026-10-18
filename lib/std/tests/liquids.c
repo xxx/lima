@@ -49,8 +49,14 @@ int check_drink_fluid()
 
 int clean_up()
 {
-   destruct(troll);
-   destruct(keg);
+   if (troll)
+   {
+      foreach (object item in deep_inventory(troll))
+         item->remove();
+      troll->remove();
+   }
+   if (keg)
+      keg->remove();
    return 1;
 }
 
