@@ -39,13 +39,15 @@ void mudlib_setup(string t, int s)
    ::mudlib_setup();
    set_salvageable((["textile":100]));
    set_id("textile", "pelt","skin");
+   pelt_size = s;
 #ifdef USE_SIZE
    set_size(s);
 #endif
 #ifdef USE_MASS
-   set_mass(s);
+   set_mass(to_float(s));
 #endif
-   set_pelt_type(t);
+   if (t)
+      set_pelt_type(t);
 }
 
 int is_pelt()
@@ -55,5 +57,19 @@ int is_pelt()
 
 void internal_setup()
 {
-   this_object()->add_save(({"pelt_size", "pelt_type"}));
+#ifdef EVERYTHING_SAVES
+   add_save(({"pelt_size", "pelt_type"}));
+#ifdef USE_MASS
+   add_save(({"mass"}));
+#endif
+#endif
 }
+
+#ifdef EVERYTHING_SAVES
+void load_from_string(mixed value, int recurse)
+{
+   ::load_from_string(value, recurse);
+   if (pelt_type)
+      set_pelt_type(pelt_type);
+}
+#endif

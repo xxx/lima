@@ -959,24 +959,22 @@ book, master, configuration and fixtures are unchanged. Previous temporary audit
 counts retain their scopes. Read/turn source and notes are committed as Lima
 **d234149d**, native **b47b39ed**.
 
-The pelt audit checks four complete targets: three pass; std/pelt.c fails int-to-
-float set_mass. A temporary float conversion alone compiles. **41 audit inputs**,
-**151 clean preloads** and normal RST/saves/logout/shutdown pass in **139.32s**.
-Ordinary look/get/drop, generic IDs, real loot corpse placement and collection work.
-Constructor size/salvage level remains zero, so ordinary salvage yields nothing;
-its setter updates size/level and uses the existing half-size mass scale. The missing
-constructor field assignment is in unchanged original source.
+Pelt audit notes are committed as Lima **a99a39c1**, native **2023c7af**. Only
+std/pelt.c now changes: float constructor mass, initialized size/salvage level,
+direct save registration, safe no-argument construction, saved current mass and
+restored type IDs. Constructor mass=s and setter mass=0.5*s remain unchanged.
 
-Save registration also fails through the protected add_save self-call: no pelt
-fields are saved, and loading into a different clone leaves its values unchanged.
-The no-argument clone needed by M_SAVE restoration fails in nil-type ID grammar;
-that caught failure is intentional audit evidence. Recommend a one-file pelt
-adapter for explicit mass conversion, size initialization, direct save registration,
-no-argument construction and mass/type-ID restoration. Preserve constructor mass=s,
-setter mass=0.5*s and shared/native policy. Dedicated sources are unchanged; no
-production fix is claimed. Evidence: /tmp/lima-pelt-audit-20261017. Two incomplete
-attempts retain a save assumption and early corpse cleanup; the final run waits for
-its real registration callback. No new fixture/config/native or full replay change.
+**Four complete targets compile**. **55 production inputs**, **151 clean preloads**
+and normal RST/saves/logout/shutdown pass in **139.90s**, with no diagnostic
+source/hook control or expected error. Ordinary look/get/drop, generic IDs, exact
+size/type/custom-mass restoration through no-argument and recursive inventory loads,
+zero/positive salvage paths, real loot/corpse placement and collection pass. Positive
+yield is bounded rather than fixed; no probability claim. Shared save/object/loot/
+crafting/corpse, native/configuration and six existing fixtures are unchanged.
+Evidence: /tmp/lima-pelt-20261017. Prior diagnostic audit and incomplete attempts:
+/tmp/lima-pelt-audit-20261017. No fresh-driver pelt restore or alternate-size claim.
+Previous inventory/full replay counts retain scope. Next audit std/meat.c and its
+existing loot consumer without reopening completed pelt or death frameworks.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
