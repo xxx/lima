@@ -12,7 +12,9 @@ int clone_actors()
       debug("Failed to clone troll");
       return 0;
    }
-   destruct(present("sword", troll));
+   object starting_weapon = present("sword", troll);
+   if (starting_weapon)
+      starting_weapon->remove();
    return 1;
 }
 
@@ -140,7 +142,12 @@ int check_armours()
 
 int clean_up()
 {
-   destruct(troll);
+   if (troll)
+   {
+      foreach (object item in all_inventory(troll))
+         item->remove();
+      troll->remove();
+   }
    return 1;
 }
 

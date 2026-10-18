@@ -1243,6 +1243,27 @@ equipment APIs and previous gameplay coverage. Evidence:
 /tmp/lima-consumer-classification-20261017. Sources/config/binaries stay unchanged;
 no new full-source count, gameplay result or native requirement is established.
 
+Consumer-classification notes are committed as Lima **54555bda**, native **b831bdfb**.
+The item suite first aborts on direct destruction of its troll's starting sword;
+its teardown has the same ownership-policy rejection. Only std/tests/items.c now
+changes to use the objects' existing remove methods and remove test inventory
+before its actor. The tested one-file proposal was adopted byte for byte afterward.
+Master, framework API, callback array payload and weapon sources are unchanged.
+
+The real command completes **26 cases: 22 pass, four fail**. Setup, weapon/armour
+checks and cleanup pass, with no suite actor or inventory residue. Array and scalar
+clone controls both pass. **37 inputs / 146.26s**, 151 clean preloads and normal
+saves/logout/shutdown verify the proposal; 11 compile targets retain seven passes
+and four known rejections before/after. This is not a complete item-suite pass.
+
+Remaining clones are baseball_bat, rapier and special_longsword (compile failures),
+plus stick, whose typed colour constructor is called without fixture data and logs
+an expected init-program error. Next adapt the three weapon sources/mixin and give
+the stick fixture a valid colour. Evidence: /tmp/lima-item-suite-audit-20261017.
+The original control also retains a later, corrected harness pwd assertion; its
+source-failure observations are not relabelled as a clean run. No native/profile/
+binary/privilege change, new fixture, full inventory or broad gameplay claim.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
