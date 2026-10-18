@@ -1,17 +1,172 @@
 # Lima for lpc-rs
 
-This is the working lpc-rs port of Lima, based on upstream revision
-`eefaff66adcae9b01e16059574c925b0d63e70a1`. The mudlib sources are in `lib/`.
+This is the working port of Lima based on upstream
+`eefaff66adcae9b01e16059574c925b0d63e70a1`, with mudlib sources in `lib/`.
+Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
+checkout on `lima-support`.
 
-Use `lpc-rs.env` from this checkout's root. It selects distinct nil, preserved
-call-out player context, and a 4,000 ms task limit. Its library path is relative
-to this directory.
+Reviewed **18 October 2026**, after Lima **6a99ff86** and native **962cd832**.
+The configured fresh-account path has passed clean boot, character creation,
+Grand Hall entry, ordinary commands, native saves, fresh-process restart and
+saved login. The recorded lifecycle runs have 151 clean preloads per boot.
 
-With the lpc-rs checkout beside this one and its CLI built, check a command with:
+| Qualification | Result | Scope |
+|---|---|---|
+| Shipped tests | 59/59 in both `unittest all` and `unittest all quiet` | Prepared runtime; 42 programs loaded individually first. |
+| Whole-source inventory | 998/1182 compile; 184 standalone failures | Measured before the subsequent sword-sample fix; constructors were not run. |
+| Stone/sword sample | Eight scoped targets compile; two-player behavior passes | Later on-demand sample, including refusal, extraction/return and cleanup. |
+
+Of the inventory's failures, 111 fragments have passing complete hosts. The
+other 73 retain reviewed optional, unselected, deferred or unresolved-consumer
+contexts. They are not a count of missing driver features or proof that code is
+unreachable. Command compilation is player 65/67 (random2 deferred; suicide
+disabled upstream), wizard 81/81, guild 4/4 and verbs 90/90.
+
+## Build, check and start
+
+From the sibling native checkout, build the workspace:
 
 ```sh
-../lpc-rs/target/debug/lpc-rs-lpcc -c lpc-rs.env --check lib/cmds/player/mudlist.c
+cd ../lpc-rs
+cargo build --workspace --locked --release
+cd ../lima-lpc-rs
 ```
+
+Use the profile from this checkout's root: `LPC_LIB_DIR=lib` is relative to
+the working directory. It selects distinct nil, preserved call-out player
+context and a 4000ms execution limit. `lpc-config.json` is editor metadata.
+Exported environment values override values in `lpc-rs.env`.
+
+Compile a complete command without running its constructor:
+
+```sh
+../lpc-rs/target/release/lpc-rs-lpcc -c lpc-rs.env --check lib/cmds/player/mudlist.c
+```
+
+Startup uses `-e` for the profile. For the administrator test commands below,
+prepare a wizard directory matching the account you will create; this example
+uses `portadmin`. On fresh data, the first wizard becomes administrator when
+no administrator exists. Subsequent AUTO_WIZ accounts are guest wizards; that
+alone does not grant the evaluation command's file-write permissions.
+
+The committed preload includes IMUD. Its router is configured in
+`lib/daemons/imud_d.c`, and its OOB listener uses the game port plus one.
+Choose those service settings before starting. Runtime qualifications used
+disposable copies with a loopback router and an explicit loopback OOB bind;
+the game bind below alone does not select those settings. HTTP, FTP and RCP
+remain commented out in `lib/data/config/preload`.
+
+```sh
+mkdir -p lib/wiz/portadmin
+LPC_BIND_ADDRESS=127.0.0.1 LPC_PORT=4000 \
+  ../lpc-rs/target/release/lpc-rs-driver -e lpc-rs.env
+```
+
+Connect a Telnet-capable MUD client to `127.0.0.1:4000`. Follow the account and
+character menus, create/select a human character, and enter the game. Try
+`look`, `inventory` and `pwd`. `quit` returns to the account menu, where `q`
+disconnects; reconnect to check saved account/body restoration. The administrator
+command `shutdown <reason>` stops the driver normally.
+
+Startup writes saves, generated help and logs below `lib/`. Keep those runtime
+files with the instance; use a disposable `/tmp/` copy for throwaway checks
+rather than replacing or repeatedly copying the persistent port source.
+
+## Run the shipped tests
+
+Use the administrator wizard shell. `unittest list` should show exactly items,
+limbs, liquids, race and salvage. The observed counts are 26, 16, 7, 5 and 5.
+
+The passing combined run loaded the following 42 programs individually, in order,
+before testing. Send each line separately and wait for the shell prompt; each
+should print 1. This preparation keeps cold compilation in separate tasks under
+the unchanged 4000ms budget. Loading programs through the CLI beforehand does
+not warm a running driver's object space.
+
+<details>
+<summary>Individual preparation commands</summary>
+
+```text
+print `!!load_object("/domains/std/room/Laboratory")`
+print `!!load_object("/domains/std/armour/bracelet")`
+print `!!load_object("/domains/std/armour/chainmail")`
+print `!!load_object("/domains/std/armour/cs_grunt_helm")`
+print `!!load_object("/domains/std/armour/fullplate")`
+print `!!load_object("/domains/std/armour/gloves")`
+print `!!load_object("/domains/std/armour/kevlar_vest")`
+print `!!load_object("/domains/std/armour/leather_jacket")`
+print `!!load_object("/domains/std/armour/scarf")`
+print `!!load_object("/domains/std/weapon/baseball_bat")`
+print `!!load_object("/domains/std/weapon/club")`
+print `!!load_object("/domains/std/weapon/crossbow")`
+print `!!load_object("/domains/std/weapon/greataxe")`
+print `!!load_object("/domains/std/weapon/longsword")`
+print `!!load_object("/domains/std/weapon/mantis_eagle_m25")`
+print `!!load_object("/domains/std/weapon/pac_sword")`
+print `!!load_object("/domains/std/weapon/plas_tech_5_0")`
+print `!!load_object("/domains/std/weapon/rapier")`
+print `!!load_object("/domains/std/weapon/raust_2620")`
+print `!!load_object("/domains/std/weapon/special_longsword")`
+print `!!load_object("/domains/std/weapon/stick")`
+print `!!load_object("/domains/std/weapon/sword")`
+print `!!load_object("/domains/std/weapon/whiskey_bottle")`
+print `!!load_object("/domains/std/monster/troll")`
+print `!!load_object("/domains/std/ale")`
+print `!!load_object("/domains/std/bottle")`
+print `!!load_object("/domains/std/keg")`
+print `!!load_object("/std/material")`
+print `!!load_object("/std/race/documentation")`
+print `!!load_object("/std/race/dragon")`
+print `!!load_object("/std/race/elf")`
+print `!!load_object("/std/race/human")`
+print `!!load_object("/std/race/orc")`
+print `!!load_object("/std/race/restricted/coder")`
+print `!!load_object("/std/race/troll")`
+print `!!load_object("/std/tests/items")`
+print `!!load_object("/std/tests/limbs")`
+print `!!load_object("/std/tests/liquids")`
+print `!!load_object("/std/tests/race")`
+print `!!load_object("/std/tests/salvage")`
+print `!!load_object("/daemons/test_d")`
+print `!!load_object("/cmds/wiz/unittest")`
+```
+
+</details>
+
+Then run these commands separately:
+
+```text
+unittest list
+unittest all
+unittest all quiet
+look
+pwd
+```
+
+Both combined commands should report 59 successes and zero failures. Normal
+mode prints case results; quiet mode prints aggregate totals. This is the
+prepared test recipe. Cold whole-suite execution immediately after boot remains
+unqualified. The recorded harness also checked suite replacement, shared race
+blueprints, player/inventory state, cleanup and saves; manual totals alone do
+not repeat those observations.
+
+## Remaining scope
+
+Original-FluffOS saved-data/password import, alternate build options, live I3
+and other optional service operation require their own decisions and checks.
+Some optional/unselected sources and documented original Lima defects remain;
+the inventory is not a port-completion percentage. The inherited-method
+signature/cache design discussion also remains separate.
+
+The current native [driver comparison](../lpc-rs/doc/driver-comparison.md#lima-port-readiness)
+centralizes driver differences and qualification scope. The records below retain
+the detailed local evidence, including nonpassing controls; temporary `/tmp/`
+paths are evidence locations on the development machine, not installed tooling.
+
+## Historical qualification notes
+
+These records describe their dated revisions. Earlier totals and statements of
+pending work are superseded by the current summary above and later results.
 
 The standalone-source inventory, refreshed **17 October 2026** at native
 **14d766dc** and this checkout **9cddebfc**, compiles **994 of 1,182 .c files**:
