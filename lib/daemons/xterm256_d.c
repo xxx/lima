@@ -184,7 +184,7 @@ void load_all_colours()
 
 //: FUNCTION substitute_ansi
 public
-varargs string substitute_ansi(string text = "", string mode)
+varargs string substitute_ansi(string text = "", string mode = "")
 {
    mixed *assoc;
    string *parts, sub, part;
@@ -281,7 +281,7 @@ varargs string substitute_ansi(string text = "", string mode)
 //   xterm - replace all tokens with xterm256 colour codes
 //   ansi  - fall back to ansi colour codes
 public
-varargs string substitute_colour(string text = "", string mode)
+varargs string substitute_colour(string text = "", string mode = "")
 {
    mixed *assoc;
    string *parts, sub;

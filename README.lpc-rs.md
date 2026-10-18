@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **18 October 2026**, after Lima **47e16fce** and native **8784d200**.
+Reviewed **18 October 2026**, after Lima **c0ae3baf** and native **9f1fc65e**.
 The configured fresh-account path has passed clean boot, character creation,
 Grand Hall entry, ordinary commands, native saves, fresh-process restart and
 saved login. The recorded lifecycle runs have 151 clean preloads per boot.
@@ -129,6 +129,27 @@ paths are evidence locations on the development machine, not installed tooling.
 
 These records describe their dated revisions. Earlier totals and statements of
 pending work are superseded by the current summary above and later results.
+
+### Colour-helper parameter defaults
+
+Reviewed 18 October 2026 at Lima **c0ae3baf**, native **9f1fc65e**, with the
+following source/notes edits pending. The earlier port gave substitute_ansi and
+substitute_colour a default text before a non-default mode parameter. The
+native default-position defect then replaced supplied text with an empty string
+when mode was omitted. Both declarations now explicitly default mode to an
+empty string, retaining their existing plain fallback and explicit-mode behavior.
+
+Two real administrator sessions exercise 58 cases each: the original has six
+lost-text cases, and the tested adapter fixes all six. Explicit plain/ANSI/VT100/
+Xterm, empty/nil mode, no arguments and empty text retain their results. Six real
+source targets compile. Both sessions preserve player/colour/daemon state and
+finish normal saves/logout/shutdown with 151 clean preloads. Only those two
+parameter defaults change; native code and the 4000ms profile are unchanged.
+The compiler's non-trailing-default issue remains separate. The observer's first
+unescaped-colour JSON run and policy-blocked CLI attempts remain failed controls.
+Evidence: /tmp/lima-parameter-defaults-20261018; the source inventory is not rerun.
+
+### Earlier qualification records
 
 The standalone-source inventory, refreshed **17 October 2026** at native
 **14d766dc** and this checkout **9cddebfc**, compiles **994 of 1,182 .c files**:
