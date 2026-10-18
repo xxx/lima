@@ -1122,6 +1122,28 @@ change, Rust gate, full source sweep or continuous cave route rerun. Evidence:
 /tmp/lima-pirate-passage-20261017. Commit this repair, then verify saved quest state
 and points/XP after restart. Chest construction remains outside this fix.
 
+The passage repair is committed as Lima **a4ef8318**, native **62a4b21e**.
+Completed quest restoration is now verified without source changes: **27 earning/
+save inputs plus eight restored inputs in 137.36s**, across **two separate
+driver processes**, both with 151 clean preloads and normal saved login/logout/
+shutdown. The same six fixtures and two address substitutions remain.
+
+Explicit save at secretPsg contains 15 points/150 XP; completed saves contain end,
+25 points and 250 XP. Nine archived body-save checkpoints verify quests/points/experience.
+The completed file stays byte-identical through restart authentication until play;
+the restored body's mapping, finished status, identity/link, points/XP, inventory,
+light and location match. Quests, score and re-saving preserve that state.
+
+The quest module's update calls add_experience, which saves a linked body. Thus
+completion is already written before logout; the earlier inference that it relied
+only on explicit save/logout was incomplete. Existing policy is unchanged. No save
+file or quest progress is injected. The prior continuous route and timer results
+retain their scopes, with earning used only as restoration setup. First RST scan
+and its cached restart watermark are preserved; no scan-cleanup fixture is added.
+Evidence: /tmp/lima-quest-restoration-20261017. Pirate passage/quest work is closed;
+return to the classified source backlog and actual consumers. No new Rust gate,
+full inventory, chest implementation or native/configuration/binary change.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
