@@ -13,33 +13,35 @@ With the lpc-rs checkout beside this one and its CLI built, check a command with
 ../lpc-rs/target/debug/lpc-rs-lpcc -c lpc-rs.env --check lib/cmds/player/mudlist.c
 ```
 
-The current standalone-source inventory, reviewed **17 October 2026** against
-native **1ffebc70** and this checkout at **6f755146**, compiles **985 of 1,182 .c
-files**: **197 fail, zero timeouts/crashes, 241.316s**. All **966** previous
-successes remain; **19 previous failures now compile**. The target set and all
-1,549 library files remain unchanged by the sweep. Gains cover consumables and
-slowheal, camera/paper, mailbox/workroom/container examples, weather and loot.
-These counts include optional and inherited-only sources, not port completion.
+The standalone-source inventory, refreshed **17 October 2026** at native
+**14d766dc** and this checkout **9cddebfc**, compiles **994 of 1,182 .c files**:
+**188 fail, zero timeouts/crashes, 603.911s**. All **985** preceding successes
+remain; **9 previous failures now compile**. No sources were added or removed.
+Gains cover debris, guild guard/example, book/Lima guide, ladder, meat, pelt and
+climb challenge. Eleven library sources changed since the preceding inventory;
+configuration and compiler/driver binary hashes match.
 
-**62 failed fragments** have reviewed passing complete hosts: all 61 carried
-reviews plus writing-surface/paper. Changed gettable callback registrations are
-reviewed with actual button/panel providers and fresh host passes. The other
-135 failures include further host parts, optional/legacy sources and adapters,
-not 135 established native gaps. Remaining first diagnostic messages/sources
-match the prior inventory. All 34 standard-room and 22 junk sources, all 25 guild
-sources and all 18 consumable examples compile; target constructors do not run.
+**82 failed fragments** have reviewed passing complete hosts: **62** carried
+proofs plus **20** newly reviewed object/container/room/body, light/food/drink,
+decay/salvage/complex-exit and digging compositions. The other **106 failures**
+include further host parts, optional/legacy sources and source adapters, not
+106 established native gaps. Remaining first diagnostic messages and sources
+match the preceding inventory. These counts include inherited-only and optional
+files, not a port-completion percentage. All 34 standard-room, 22 junk, 25 guild
+and 18 consumable sources compile; target constructors do not run.
 
-Maximum two CLI processes, two Tokio workers each, 4 GiB/40s per target, distinct
-nil/preserved player/4000ms remain. Source/configuration/binaries stay unchanged
-during this run; current binary hashes differ from the preceding inventory, so
-this is a status comparison, not an isolated source/performance experiment.
-No Rust gate or gameplay rerun. Earlier full replay and the 345-input generator
-run retain their measured scopes. Evidence: /tmp/lima-source-inventory-20261017.
+Maximum two CLI processes, two Tokio workers each, 4 GiB/40s per target and the
+normal 4000ms/distinct-nil/preserved-player profile remain. All 1,549 library files,
+configuration and compiler binary stay unchanged during the run. This is not a
+performance benchmark, Rust gate or gameplay rerun. Prior 2367+10 full replay and
+later focused runtime checks retain their scopes. Evidence:
+/tmp/lima-source-inventory-refresh-20261017; prior /tmp/lima-source-inventory-20261017.
 
-This inventory selected Rocky Beach's actual debris/rock consumer and ocean/Outside_Cave
-context. At that checkpoint, four of five sources compiled; the debris spawn
-failed its mass argument. Construction, attached pickup, rock creation and reset
-needed runtime review. The subsequent validated repair is recorded below.
+Next audit the existing dig verb, Navigation Room's shovel and Sandy Beach's
+sand/hole interaction. Room construction/stock are already checked; inferred and
+explicit tool/target paths, modal selection, hole growth and quest dispatch need
+interaction review. HOLE resolves to `/std/hole`, not the failing duplicate in
+`domains/std/object/`. No mudlib source changes accompany this inventory.
 
 Command compilation is player **65/67**, wizard **81/81**, guild **4/4**, verbs
 **90/90**, transitional **49/49** and transitional administrator **9/9**. The two
