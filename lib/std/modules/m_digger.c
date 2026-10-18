@@ -1,9 +1,7 @@
 /* Do not remove the headers from this file! see /USAGE for more info. */
 
 // You must inherit M_INPUT for this stuff to work.
-void modal_push(function, mixed);
-void modal_pop();
-void modal_pass(string);
+void modal_simple(function, mixed);
 void do_digging(object);
 
 private
@@ -12,15 +10,11 @@ void answer_question(string input)
    object o;
 
    if (!stringp(input))
-   {
-      modal_pop();
       return;
-   }
    if (o = present(input, environment(this_body())))
       do_digging(o);
    else
-      modal_pass(input);
-   modal_pop();
+      this_user()->modal_pass(input);
 }
 
 void do_digging(object arg)
@@ -40,7 +34,7 @@ void do_digging(object arg)
          arg = o[0];
          break;
       default:
-         modal_push(answer_question, "What do you want to dig in? ");
+         modal_simple(answer_question, "What do you want to dig in? ");
          return;
       }
    }

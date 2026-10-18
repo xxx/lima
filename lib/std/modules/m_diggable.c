@@ -2,9 +2,7 @@
 
 // Define a function called dig(obj)  for when obj tries to dig you.
 // This module requires that M_INPUT also be inherited.
-void modal_push(function, mixed);
-void modal_pop();
-void modal_pass(string);
+void modal_simple(function, mixed);
 
 int is_diggable()
 {
@@ -77,15 +75,11 @@ void answer_question(string input)
    object o;
 
    if (!stringp(input))
-   {
-      modal_pop();
       return;
-   }
    if ((o = present(input, environment(this_body()))) || (o = present(input, this_body())))
       o->do_digging(this_object());
    else
-      modal_pass(input);
-   modal_pop();
+      this_user()->modal_pass(input);
 }
 
 void complete_dig()
@@ -104,7 +98,7 @@ void complete_dig()
       obs[0]->do_digging(this_object());
       return;
    default:
-      modal_push(answer_question, "What do you want to dig with? ");
+      modal_simple(answer_question, "What do you want to dig with? ");
       return;
    }
 }

@@ -37,10 +37,10 @@ performance benchmark, Rust gate or gameplay rerun. Prior 2367+10 full replay an
 later focused runtime checks retain their scopes. Evidence:
 /tmp/lima-source-inventory-refresh-20261017; prior /tmp/lima-source-inventory-20261017.
 
-The digging audit below now records an input-handler lifecycle failure and a
-validated two-module proposal. HOLE resolves to `/std/hole`, not the failing
-duplicate in `domains/std/object/`. Dedicated sources remain unchanged pending
-adoption of the proposal; source enumeration and room construction are retained.
+The digging audit and source adoption below record the nested prompt repair and
+its production replay. HOLE resolves to `/std/hole`, not the failing duplicate in
+`domains/std/object/`. The source inventory and room-construction results retain
+their original scopes.
 
 Command compilation is player **65/67**, wizard **81/81**, guild **4/4**, verbs
 **90/90**, transitional **49/49** and transitional administrator **9/9**. The two
@@ -1055,6 +1055,26 @@ Evidence and proposed patch: /tmp/lima-digging-audit-20261017. Recommend adoptin
 these two callers with retained replay, then the button/secret-door/quest chain.
 Eight unchanged complete compile passes are retained from the matched inventory;
 no fresh source recount, Rust gate, native API or dedicated-source change is claimed.
+
+The digging prompt repair adopts only std/modules/m_digger.c and m_diggable.c,
+matching the reviewed proposal. Existing modal_simple() handles the one-shot
+selection; this_user()->modal_pass(input) forwards other commands without popping
+a replacement prompt. Audit notes are committed as Lima **1ef5c2bb**, native
+**842fd5ed**; source adoption and these notes are pending commit.
+
+**Eight complete targets compile**. **84 retained production inputs** pass in
+**136.42s**, with **151 clean preloads** and normal scan/saves/logout/shutdown.
+Input lines and observed states match the proposal run; there are no proposal source
+overrides or handler-recovery commands. Both nested handoffs and same-object repeated
+prompts, ordinary selections/pass-through, digging forms, hole stages and refusals
+pass. Light, stock, props, inventory, path and unchanged quest/XP/score restore.
+Same six fixtures and two loopback-address substitutions; no native/config/binary
+change, new Rust gate, whole-source inventory or room-construction rerun.
+
+Chest construction and positive pirate-quest reward remain separate; the unused
+tool argument stays. Evidence: /tmp/lima-digging-20261017. After committing this
+adoption, audit the Navigation Room button, linked secret doors and remaining
+pirate milestone integration.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
