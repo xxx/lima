@@ -1104,6 +1104,24 @@ Evidence and one-line patch: /tmp/lima-pirate-passage-audit-20261017. Adopt and 
 that callback change, then verify completed quest restoration. Chest creation stays
 outside the repair.
 
+Passage audit notes are committed as Lima **8eacce39**, native **d8f2b752**.
+The one-line rock_wall.c repair is now adopted: its eight-second callback uses
+bare do_close. Source and updated notes are pending commit; the implementation
+matches the reviewed proposal exactly.
+
+**Ten complete compile targets and 67 retained production inputs pass**, the latter
+in **135.85s**, with **151 clean preloads** and normal scan/saves/logout/shutdown.
+Input lines and observed states match the proposal run. Press/push naturally close
+both walls without proposal overrides, manual callback advancement or close resets.
+Door state/visibility/movement, refusal paths and ordinary quest milestones work;
+the character finishes with 25 points/250 XP and normal saving completes. A fresh-
+process quest restore is not yet checked. Cleanup retains the preceding audit scope.
+
+Same six fixtures, two address substitutions and configuration; no native/binary
+change, Rust gate, full source sweep or continuous cave route rerun. Evidence:
+/tmp/lima-pirate-passage-20261017. Commit this repair, then verify saved quest state
+and points/XP after restart. Chest construction remains outside this fix.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source

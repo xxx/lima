@@ -21,7 +21,7 @@ mixed direct_close_obj(object ob)
 void trigger()
 {
    call_out(open_with, 0);
-   call_out((: this_object()->close() :), 8);
+   call_out(do_close, 8);
 }
 
 void setup()
