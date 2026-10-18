@@ -995,8 +995,23 @@ Poison is only checked as saved data and cleared before eating. Shared/native/
 configuration and six fixtures are unchanged. CRLF/no-final-newline format remains.
 Evidence: /tmp/lima-meat-20261017; previous audit /tmp/lima-meat-audit-20261017.
 No fresh-driver meat restoration or alternate build claim; previous inventory/full
-replay counts retain scope. Next audit exported std/ladder.c's constructor contract
-against its compiled stairs parent, without reopening completed frameworks.
+replay counts retain scope. Meat source/notes are committed as Lima **b24a3d7a**,
+native **59fb3ec6**.
+
+Ladder audit: five of six complete targets compile; std/ladder.c's unused third
+more_create parameter disagrees with its two-argument parent. A signature-only
+temporary control compiles. **58 inputs**, **151 clean preloads** and normal
+RST/saves/logout/shutdown complete in **133.81s**. Singular/attached identity,
+relative and object destinations, live environment base and actual ascend/descend/
+climb up/down movement pass. Missing directions and an unconfigured ladder refuse;
+get retains the climb suggestion. Parent stairs remain, and props/path/variables
+clean up. No bundled ladder consumer is claimed; it is an exported template.
+
+Recommend removing only the unused formal. Parent constructor/attachment, shared
+exit/registry/native policy, configuration and fixtures stay. Dedicated sources
+remain unchanged, so this audit does not qualify a production fix. Evidence:
+/tmp/lima-ladder-audit-20261017. Bundled destination cleanup, separate climb_challenge
+behavior and whole inventory/full replay remain outside scope.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
