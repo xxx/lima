@@ -1356,6 +1356,22 @@ suites have individual results; all/all quiet still needs combined qualification
 Material probabilities, arbitrary recipe yields, player-pouch credit and cold-suite
 performance retain their prior scope. Evidence: /tmp/lima-salvage-suite-20261018.
 
+The salvage-suite fix is committed as Lima **52271b44**, native **70f1812e**. Both
+combined commands now pass **59/59** through the real command/daemon: `unittest all`
+and `unittest all quiet`. Only the five shipped suites are discovered, with observed
+counts 26/16/7/5/5 and matching aggregate fields/output. Normal mode prints 59 case
+results and five summaries; quiet prints only final totals. Each run replaces all
+five suite objects, while seven shared race blueprints and tracked player/lab/clone
+state remain unchanged. Identity markers are removed; following look/pwd work.
+
+**55 inputs / 138.44s**, 42 individual program loads, 151 clean preloads and normal
+saves/logout/shutdown pass without unexpected errors. No extra LPC fixture or gameplay
+replacement is installed; the two existing loopback substitutions remain. No further
+implementation/configuration/binary change is needed. This prepared-runtime result
+adds no cold-suite performance or full-source inventory claim. Evidence:
+/tmp/lima-bundled-tests-20261018. The next check is a fresh bounded source inventory
+with existing host/optional/legacy classifications carried forward.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
