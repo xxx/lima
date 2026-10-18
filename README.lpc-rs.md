@@ -1076,6 +1076,34 @@ tool argument stays. Evidence: /tmp/lima-digging-20261017. After committing this
 adoption, audit the Navigation Room button, linked secret doors and remaining
 pirate milestone integration.
 
+Digging source/notes are committed as Lima **133993b7**, native **76052e17**.
+The subsequent passage audit finds one existing example error: rock_wall schedules
+close(), which does not exist. Button press/push open both walls but leave them
+open after eight seconds. The dock/river counterpart's do_close callback closes
+both normally; native timer and shared door behavior need no change.
+
+Ten complete targets compile. A one-line temporary proposal uses bare do_close
+at the same eight-second delay. **67 proposal inputs / 134.05s**, **151
+clean preloads** and normal scan/saves/logout/shutdown pass. Real callback timing,
+both movement directions, reciprocal visibility/state, already-open behavior and
+cleanup work without a manual close reset. Original timing failures are recorded
+separately, not presented as passing timer checks.
+
+Focused ordinary inputs earn begin10/100XP, secretPsg15/150 and end25/250, with
+no injected progress; repeated actions do not add rewards. The character finishes
+with earned progress and normal saves complete. Props/light/path/inventory restore;
+the table reset is requested.
+The older six-test continuous cave route is retained as historical evidence; it is
+not rerun. Saved quest restoration after restart remains separate.
+
+Dedicated source is unchanged pending adoption. Six fixtures and two loopback
+address substitutions remain; the only proposal source replacement is rock_wall.c.
+The stale constructor destination in Small_Dock is unused; actual door destinations
+are reciprocal, so it is not changed. No Rust/full-inventory/room/framework rerun.
+Evidence and one-line patch: /tmp/lima-pirate-passage-audit-20261017. Adopt and replay
+that callback change, then verify completed quest restoration. Chest creation stays
+outside the repair.
+
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
 an upstream bug or a missing efun. The ranged/ammunition batch adapts ten source
