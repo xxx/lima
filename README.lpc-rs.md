@@ -5,22 +5,27 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **18 October 2026**, after Lima **c0ae3baf** and native **9f1fc65e**.
+Reviewed **18 October 2026** at Lima **a1984c30** and native **0e87ead9**.
 The configured fresh-account path has passed clean boot, character creation,
 Grand Hall entry, ordinary commands, native saves, fresh-process restart and
 saved login. The recorded lifecycle runs have 151 clean preloads per boot.
+Runtime evidence retains its recorded revisions; the new release-build
+qualification covers source compilation.
 
 | Qualification | Result | Scope |
 |---|---|---|
 | Shipped tests | 59/59 in both `unittest all` and `unittest all quiet` | Per-suite commands first; no manual program loads. Direct cold combined execution remains sensitive to the deadline. |
-| Whole-source inventory | 998/1182 compile; 184 standalone failures | Measured before the subsequent sword-sample fix; constructors were not run. |
-| Stone/sword sample | Eight scoped targets compile; two-player behavior passes | Later on-demand sample, including refusal, extraction/return and cleanup. |
+| Whole-source inventory | 999/1182 compile; 183 standalone failures | Rebuilt release compiler; target constructors were not run. |
+| Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
 
 Of the inventory's failures, 111 fragments have passing complete hosts. The
-other 73 retain reviewed optional, unselected, deferred or unresolved-consumer
+other 72 retain reviewed optional, unselected, deferred or unresolved-consumer
 contexts. They are not a count of missing driver features or proof that code is
 unreachable. Command compilation is player 65/67 (random2 deferred; suicide
 disabled upstream), wizard 81/81, guild 4/4 and verbs 90/90.
+
+Fixed parameter defaults follow the native
+[trailing-default rule](../lpc-rs/doc/lpc/anatomy_of_a_program.md#parameter-defaults).
 
 ## Build, check and start
 
@@ -129,6 +134,27 @@ paths are evidence locations on the development machine, not installed tooling.
 
 These records describe their dated revisions. Earlier totals and statements of
 pending work are superseded by the current summary above and later results.
+
+### Release inventory after trailing-default validation
+
+Reviewed 18 October 2026 at native **0e87ead9**, Lima **a1984c30**. The release
+workspace is rebuilt, and invalid function/closure probes verify the new compiler
+rule. The bounded source sweep measures **999/1182 compile, 183 fail, zero
+regressions/timeouts/crashes in 45.643s**. All 998 previous successes
+remain, with sword_in_stone as the one new success and no target-set changes.
+
+All 111 reviewed fragment proofs retain passing complete hosts (45 distinct hosts);
+the other 72 failed standalone files retain prior contexts. The resolved sword
+child leaves 23 carried consumer decisions; all remaining first diagnostics match.
+Core and command groups remain green within their recorded scope. Only xterm256_d
+and sword_in_stone changed since the prior inventory; headers/profile match.
+
+Two CLI workers, two Tokio workers each, 4GiB/40s per target and the normal distinct-
+nil/preserved-player/4000ms profile remain. All 1549 library files and binaries
+stay unchanged during the run. Target constructors do not run. The baseline used
+target/debug and this sweep uses target/release; timing is not a performance
+comparison. Earlier gameplay and suite results retain their separate scope.
+Evidence: /tmp/lima-source-inventory-defaults-20261018.
 
 ### Colour-helper parameter defaults
 
