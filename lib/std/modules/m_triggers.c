@@ -18,7 +18,8 @@ private int counter = 1;
 private
 mapping patterns = ([0:({})]);
 
-varargs void add_pattern(string pattern, mixed action, mixed left, mixed right, int type)
+varargs void add_pattern(string pattern, mixed action, mixed left = nil,
+                        mixed right = nil, int type = 0)
 {
    class pattern pat = new (class pattern);
 
@@ -41,7 +42,8 @@ mapping query_patterns()
    return deep_copy(patterns);
 }
 
-varargs void add_sub_pattern(mixed rule, string pattern, mixed action, mixed left, mixed right)
+varargs void add_sub_pattern(mixed rule, string pattern, mixed action,
+                            mixed left = nil, mixed right = nil)
 {
    class pattern pat = new (class pattern);
 

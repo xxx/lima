@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **19 October 2026** at Lima **bdb3a1fd** and native **194fc4f0**.
+Reviewed **19 October 2026** at Lima **faeb3896** and native **99cd1e45**.
 The rebuilt release driver passes the configured fresh-account path: clean
 boot, character creation, Grand Hall entry, ordinary commands, native saves,
 fresh-process restart and saved login. Both boots have 151 clean preloads
@@ -235,6 +235,15 @@ now passes an explicit float mass to the existing API. Four compile checks and
 descriptions, independent state and cleanup. The isolated fixture uses the shipped
 providers/simuls and a temporary master; configured gameplay remains unqualified.
 The profile and native binaries are unchanged. Evidence: /tmp/lima-navigation-passage-20261019.
+
+The optional [Logical Genius adapter](../lpc-rs/doc/driver-comparison.md#lima-logical-genius-and-trigger-defaults)
+uses native typed closures and nil rule references. The trigger APIs now default
+omitted rule references to nil while retaining the numeric listen mask and strict
+checks on explicit zero. Eight complete-consumer/fixture compiles and 40 runtime
+checks pass, including predicates, captures, message matching and real clone setup.
+Response commands are captured in the fixture; delayed speech/player gameplay is
+not newly qualified. The profile and native binaries are unchanged.
+Evidence: /tmp/lima-logical-genius-20261019.
 
 The current native [driver comparison](../lpc-rs/doc/driver-comparison.md#lima-port-readiness)
 centralizes driver differences and qualification scope. The records below retain
