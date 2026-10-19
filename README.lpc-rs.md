@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **19 October 2026** at Lima **0c84eecd** and native **22181810**.
+Reviewed **19 October 2026** at Lima **f1251a6c** and native **f7522564**.
 The rebuilt release driver passes the configured fresh-account path: clean
 boot, character creation, Grand Hall entry, ordinary commands, native saves,
 fresh-process restart and saved login. Both boots have 151 clean preloads
@@ -268,6 +268,14 @@ Repeated configuration, conditional flow, inventories and delayed captures/guard
 are covered. Delayed callbacks are invoked directly and cancelled; elapsed timer
 delivery is not tested. No configured caller is enabled; the profile and native
 binaries are unchanged. Evidence: /tmp/lima-flow-room-20261019.
+
+The unchanged [boss module](../lpc-rs/doc/driver-comparison.md#lima-boss-module-host-contract)
+passes five compile checks and 17 runtime checks in temporary ADVERSARY hosts,
+with fixture actors and a recording loot daemon. Host methods, eligibility/history
+and handoff arguments work without a port fix. Its existing unused loot flag and
+unrefreshed expiry timestamp remain documented policy gaps. Controlled dead-state
+and timestamp fixtures do not qualify actual boss combat or generation; no caller
+is enabled. Evidence: /tmp/lima-boss-integration-20261019.
 
 The current native [driver comparison](../lpc-rs/doc/driver-comparison.md#lima-port-readiness)
 centralizes driver differences and qualification scope. The records below retain
