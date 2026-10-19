@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **19 October 2026** at Lima **4727f889** and native **f170d3a3**.
+Reviewed **19 October 2026** at Lima **5214351c** and native **4763637c**.
 The rebuilt release driver passes the configured fresh-account path: clean
 boot, character creation, Grand Hall entry, ordinary commands, native saves,
 fresh-process restart and saved login. Both boots have 151 clean preloads
@@ -212,6 +212,15 @@ Evidence: /tmp/lima-trainer-stats-adoption-20261019.
 The attic reaction examples retain their upstream placeholder; their missing
 script API stays deferred. The dated 999/1182 inventory is not rerun. Alternate
 stat models and configuration flags retain their separate scope.
+
+The [remaining-source triage](../lpc-rs/doc/driver-comparison.md#lima-remaining-source-implementation-triage)
+reviews the 16 files with no identified configured caller as one batch. Temporary
+adapters compile three optional examples; other entries need hosts, integration,
+dependencies or unfinished feature work. No source change or new efun is added.
+The audit also reproduces a [compiler input difference](../lpc-rs/doc/lpc/inheritance.md):
+host-path CLI input uses a filename as the relative-inherit base, while an
+independent in-game load uses its directory. That consistency issue is the
+recommended next driver audit. Evidence: /tmp/lima-remaining-sources-20261019.
 
 The current native [driver comparison](../lpc-rs/doc/driver-comparison.md#lima-port-readiness)
 centralizes driver differences and qualification scope. The records below retain
