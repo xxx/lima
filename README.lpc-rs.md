@@ -5,15 +5,16 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **19 October 2026** at Lima **d6534f6f** and native **bc642b2a**.
-The rebuilt release driver passes the configured fresh-account path: clean
-boot, character creation, Grand Hall entry, ordinary commands, native saves,
-fresh-process restart and saved login. Both boots have 151 clean preloads
-and exit normally. Source inventory and runtime results retain distinct scope.
+Reviewed **19 October 2026** at Lima **03e1f72f** and native **c027d047**.
+The current checkout passes the configured fresh-account acceptance run:
+30 lifecycle checkpoints in 136.54 seconds, including character creation, ordinary
+commands, native saves and saved login after restart. Both boots have 151 clean
+preloads and exit normally. The five shipped suites pass 26/16/7/5/5, then both
+combined modes pass 59/59. Source inventory and runtime results retain distinct scope.
 
 | Qualification | Result | Scope |
 |---|---|---|
-| Release lifecycle | 30 checks across two clean driver processes | First administrator; actual saved-password authentication and character identity/state verified after restart. |
+| Current port acceptance | 30 checks across two clean driver processes | First administrator; actual saved-password authentication and character identity/state verified after restart. |
 | Ordinary-player lifecycle | 57 checks across two clean driver processes | AUTO_WIZ disabled in the disposable runtime; real player shell, commands, saved-password login, quit location and alias restoration. |
 | NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default stat-menu qualification follows. |
 | Trainer stat menu | Four source targets compile; 43 runtime checks pass | Adopted source with default strength/agility options; prices, payments, point exhaustion and cleanup verified. |
@@ -182,6 +183,13 @@ The [native qualification](../lpc-rs/doc/driver-comparison.md#lima-ordinary-play
 records scope; local evidence is /tmp/lima-mortal-entry-20261019. It does not
 repeat the shipped suites, full gameplay coverage, foreign saves or live services.
 
+The [current acceptance record](../lpc-rs/doc/driver-comparison.md#lima-port-acceptance)
+reuses the documented per-suite-first recipe on this checkout, with preserved
+player/world state, zero manual target loads, completed documentation scanning
+and real saved-password authentication. Sources, profile and release binaries
+are unchanged. Existing channel/header warnings remain; no runtime errors or
+preload failures occur. Evidence: /tmp/lima-port-acceptance-20261019.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
@@ -189,6 +197,20 @@ and other optional service operation require their own decisions and checks.
 Some optional/unselected sources and documented original Lima defects remain;
 the inventory is not a port-completion percentage. The inherited-method
 signature/cache design discussion also remains separate.
+
+The 16-entry optional-source review has six adapted entries and one unchanged
+boss host qualification. The other nine retain these decisions:
+
+| Source | Current decision |
+|---|---|
+| `m_exit_obj.c`, `std/room/exits.c` | Keep the selected simple/complex exit providers; restore these older APIs only for a concrete consumer. |
+| `state_of_mind.c` | Keep the selected condition module and its two-argument stun API. |
+| Duplicate `domains/std/object/hole.c`, WIP `std/paper.c` | Keep selected `std/hole` and `domains/std/paper`. |
+| `secure/error_handler.c` | Keep the configured master's active error handler. |
+| `portable_board.c` | Select a compatible board provider before adaptation. |
+| `clan_d.c`, `secure/modules/m_file.c` | Incomplete subsystems/contracts remain deferred. |
+
+These are recorded scope decisions, not a queue of missing driver features.
 
 The [NPC sample-chain audit](../lpc-rs/doc/driver-comparison.md#lima-npc-sample-chain-audit)
 now has [aggression/trainer adapters](../lpc-rs/doc/driver-comparison.md#lima-aggression-and-trainer-adapters)
