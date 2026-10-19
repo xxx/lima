@@ -19,7 +19,7 @@ void setup()
    set_adj("test");
    set_in_room_desc("A test dummy is standing here.");
    set_level(10);
-   add_hook("object_arrived", ( : ob_arrived:));
+   add_hook("object_arrived", ob_arrived);
 }
 
 string query_name()
@@ -37,10 +37,10 @@ void tell_target(string s)
 
 int do_damage_event(class event_info evt)
 {
-   if (arrayp(evt->data))
+   if (arrayp(evt.data))
    {
-      tell_target("Incoming %^YELLOW%^" + format_list(evt->data[0]) + "%^RESET%^ dmg (" + evt->data[1] + " hp) on " +
-                  evt->target_extra + " limb");
+      tell_target("Incoming %^YELLOW%^" + format_list(evt.data[0], nil) + "%^RESET%^ dmg (" + evt.data[1] + " hp) on " +
+                  evt.target_extra + " limb");
    }
    return ::do_damage_event(evt);
 }
@@ -51,18 +51,18 @@ class event_info armours_modify_event(class event_info evt)
    int dmg;
    string dtype;
 
-   if (arrayp(evt->data))
+   if (arrayp(evt.data))
    {
-      dtype = evt->data[0], dmg = evt->data[1];
+      dtype = evt.data[0], dmg = evt.data[1];
    }
 
    evt = ::armours_modify_event(evt);
 
-   if (arrayp(evt->data))
+   if (arrayp(evt.data))
    {
-      if (evt->data[1] != dmg)
-         tell_target("Armor reduced %^YELLOW%^" + format_list(evt->data[0]) + "%^RESET%^ dmg on " + evt->target_extra +
-                     " to by " + (dmg - evt->data[1]));
+      if (evt.data[1] != dmg)
+         tell_target("Armor reduced %^YELLOW%^" + format_list(evt.data[0], nil) + "%^RESET%^ dmg on " + evt.target_extra +
+                     " to by " + (dmg - evt.data[1]));
    }
 
    return evt;
@@ -91,7 +91,7 @@ void stand_up()
 void stun(string limb, int period)
 {
    ::stun(limb, 2);
-   call_out("stand_up", 3);
+   call_out(stand_up, 3);
 }
 
 void take_a_swing(object t)
@@ -101,7 +101,7 @@ void take_a_swing(object t)
    this_object()->heal_all();
 }
 
-mixed indirect_give_obj_to_liv()
+mixed indirect_give_obj_to_liv(object ob, object liv)
 {
    return 1;
 }

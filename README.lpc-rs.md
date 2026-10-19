@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **19 October 2026** at Lima **faeb3896** and native **99cd1e45**.
+Reviewed **19 October 2026** at Lima **2ca1509c** and native **9dc7b25c**.
 The rebuilt release driver passes the configured fresh-account path: clean
 boot, character creation, Grand Hall entry, ordinary commands, native saves,
 fresh-process restart and saved login. Both boots have 151 clean preloads
@@ -244,6 +244,14 @@ checks pass, including predicates, captures, message matching and real clone set
 Response commands are captured in the fixture; delayed speech/player gameplay is
 not newly qualified. The profile and native binaries are unchanged.
 Evidence: /tmp/lima-logical-genius-20261019.
+
+The optional [test dummy adapter](../lpc-rs/doc/driver-comparison.md#lima-test-dummy-example)
+uses native event fields/callbacks, nil formatter separators and the inherited
+give-checker signature. Six compile checks and 25 runtime checks pass with real
+dummy/equipment clones, arrival hooks, damage diagnostics, armour reduction and
+cleanup. The registered stand-up callback is invoked directly and cancelled;
+elapsed timer delivery and player gameplay are not tested. The profile and native
+binaries are unchanged. Evidence: /tmp/lima-test-dummy-20261019.
 
 The current native [driver comparison](../lpc-rs/doc/driver-comparison.md#lima-port-readiness)
 centralizes driver differences and qualification scope. The records below retain
