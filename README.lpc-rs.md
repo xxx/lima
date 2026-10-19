@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **19 October 2026** at Lima **3b048a06** and native **3efa1fa0**.
+Reviewed **19 October 2026** at Lima **bdb3a1fd** and native **194fc4f0**.
 The rebuilt release driver passes the configured fresh-account path: clean
 boot, character creation, Grand Hall entry, ordinary commands, native saves,
 fresh-process restart and saved login. Both boots have 151 clean preloads
@@ -228,6 +228,13 @@ The class provider and profile are unchanged. This is an optional example's
 inheritance check, without gameplay or a new whole-library inventory. Contrib's
 drunk effect retains its parent's heartbeat adaptation gap.
 Evidence: /tmp/lima-behaviour-example-20261019.
+
+The optional [navigation passage example](../lpc-rs/doc/driver-comparison.md#lima-navigation-passage-example)
+now passes an explicit float mass to the existing API. Four compile checks and
+12 checks with real clone construction pass, covering mass, IDs, attachment,
+descriptions, independent state and cleanup. The isolated fixture uses the shipped
+providers/simuls and a temporary master; configured gameplay remains unqualified.
+The profile and native binaries are unchanged. Evidence: /tmp/lima-navigation-passage-20261019.
 
 The current native [driver comparison](../lpc-rs/doc/driver-comparison.md#lima-port-readiness)
 centralizes driver differences and qualification scope. The records below retain
