@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **19 October 2026** at Lima **260e20b0** and native **301c90e0**.
+Reviewed **19 October 2026** at Lima **3b048a06** and native **3efa1fa0**.
 The rebuilt release driver passes the configured fresh-account path: clean
 boot, character creation, Grand Hall entry, ordinary commands, native saves,
 fresh-process restart and saved login. Both boots have 151 clean preloads
@@ -220,10 +220,14 @@ dependencies or unfinished feature work. No source change or new efun is added.
 The audit also reproduced a compiler input difference, corrected in the
 [relative-inherit follow-up](../lpc-rs/doc/driver-comparison.md#lima-relative-inherit-inputs):
 host-file and in-game inputs now use the source directory. All 12 CLI cases and
-both reordered behavior-example forms pass. The original behavior example still
-needs its inherit before its global declaration; contrib's drunk effect now
-finds its parent but retains that parent's heartbeat adaptation gap. These
-optional sources are unchanged. Evidence: /tmp/lima-relative-inherits-20261019.
+both reordered behavior-example forms pass. Evidence: /tmp/lima-relative-inherits-20261019.
+The behavior example now places its inherit before its global declaration and
+retains the relative sibling path. Both actual sources and a child consumer
+compile; four constructor checks cover the inherited global and class fields.
+The class provider and profile are unchanged. This is an optional example's
+inheritance check, without gameplay or a new whole-library inventory. Contrib's
+drunk effect retains its parent's heartbeat adaptation gap.
+Evidence: /tmp/lima-behaviour-example-20261019.
 
 The current native [driver comparison](../lpc-rs/doc/driver-comparison.md#lima-port-readiness)
 centralizes driver differences and qualification scope. The records below retain
