@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **19 October 2026** at Lima **44399be5** and native **433082f7**.
+Reviewed **19 October 2026** at Lima **3d294c46** and native **2117116a**.
 The rebuilt release driver passes the configured fresh-account path: clean
 boot, character creation, Grand Hall entry, ordinary commands, native saves,
 fresh-process restart and saved login. Both boots have 151 clean preloads
@@ -205,6 +205,16 @@ uses the existing `trainer->set_train_stat(({}))` runtime setting. The committed
 sample configuration is unchanged. Audit the stat/body contract separately.
 The attic reaction examples retain their upstream placeholder; their missing
 script API is deferred. Evidence: /tmp/lima-npc-adapters-20261019.
+
+A subsequent [stat-menu audit](../lpc-rs/doc/driver-comparison.md#lima-trainer-stat-menu-audit)
+finds that the existing body APIs are sufficient. A four-line temporary trainer
+adapter uses `stat_abrev()`, `query_stat()` and `inc_mod_stat()`, and binds the
+selected stat in its menu callback. With Tara's default stat options enabled,
+43 runtime checks pass: prices, refusals, exact payments, repeated purchases,
+both stat increases, point exhaustion, restoration and normal logout. The boot
+has 151 clean preloads. This proposal is not adopted yet; the current default
+menu gap above remains. No new body/driver API or payment conversion is needed.
+Evidence: /tmp/lima-trainer-stats-audit-20261019.
 
 The current native [driver comparison](../lpc-rs/doc/driver-comparison.md#lima-port-readiness)
 centralizes driver differences and qualification scope. The records below retain
