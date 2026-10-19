@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **19 October 2026** at Lima **ac3f5f47** and native **1edee923**.
+Reviewed **19 October 2026** at Lima **5845303c** and native **fb668dfd**.
 The rebuilt release driver passes the configured fresh-account path: clean
 boot, character creation, Grand Hall entry, ordinary commands, native saves,
 fresh-process restart and saved login. Both boots have 151 clean preloads
@@ -141,8 +141,16 @@ The subsequent
 finds that at least 94% of observed metadata checks cannot change the selected
 header path. A small resolver short-circuit preserves the tested search and
 callback behavior and substantially reduces isolated resolution time. It is
-recommended for native adoption, with full compilation/runtime measurement;
-production code and the port profile are unchanged by this audit.
+now adopted in the native
+[resolver](../lpc-rs/doc/driver-comparison.md#lima-include-resolution-short-circuit):
+actual preprocessing metadata calls fall from 13,088 to 785, with unchanged
+header reads and callback order. Eight fresh driver sessions pass; sampled cold
+command and CLI medians improve 2.5% and 14.6%, respectively. The samples do not
+establish cold-timeout reliability. The locked release workspace build, 5,167
+workspace tests/doctests (two ignored), warning-free all-targets Clippy and format
+check pass. After rebuilding the ordinary release workspace, the final driver
+also passes two fresh sessions with both combined modes at 59/59, clean preloads,
+preserved state, native saves and logout. The mudlib and profile are unchanged.
 
 The earlier 42-program manual-load recipe belongs to the historical prepared
 run. The current sequence uses the existing test commands instead. CLI compilation
