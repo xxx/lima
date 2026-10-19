@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **18 October 2026** at Lima **05d0590c** and native **4dac077e**.
+Reviewed **18 October 2026** at Lima **b8cec2d6** and native **cefe9e35**.
 The rebuilt release driver passes the configured fresh-account path: clean
 boot, character creation, Grand Hall entry, ordinary commands, native saves,
 fresh-process restart and saved login. Both boots have 151 clean preloads
@@ -121,6 +121,9 @@ code generation; its ordinary disabled/enabled controls pass both modes at
 passes do not establish cold reliability or a speedup. The deadline, source
 and cache policies are unchanged. Details are in the native
 [compiler profile](../lpc-rs/doc/driver-comparison.md#lima-cold-compilation-profile).
+The [cached-macro copy audit](../lpc-rs/doc/driver-comparison.md#lima-cached-macro-copy-audit)
+keeps the current storage: its isolated replay does not establish a worthwhile
+whole-compiler gain. No optimization or profile change is adopted.
 
 The earlier 42-program manual-load recipe belongs to the historical prepared
 run. The current sequence uses the existing test commands instead. CLI compilation
