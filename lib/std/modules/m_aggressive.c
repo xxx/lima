@@ -32,7 +32,7 @@ void aggressively_attack(object who)
       if (wizardp(who) && environment(this_object()) && environment(this_object())->contains(who))
          who->targetted_action("$N $vwould have been attacked by $t, but $n1 reconsidered.", this_object());
       else
-         call_out("start_fight", (1 + random(attack_delay)), who);
+         call_out(&start_fight(who), (1 + random(attack_delay)));
 }
 
 //: FUNCTION handle_attack
@@ -45,7 +45,7 @@ void handle_attack(object who)
 {
    if (random(100) < aggression_chance && who->is_visible() && who->is_body() && environment() &&
        !environment()->query_combat_forbidden())
-      call_out("aggressively_attack", (1 + random(attack_delay)), who);
+      call_out(&aggressively_attack(who), (1 + random(attack_delay)));
 }
 
 // It checks to see which objects in the room are players and attacks them.
@@ -67,7 +67,7 @@ void i_met(object who)
 // range 0 (never aggressive) to 100 (completely aggressive).
 void set_aggressive(int a)
 {
-   call_out("behavior_hooks", 1);
+   call_out(behavior_hooks, 1);
    aggression_chance = a;
 }
 

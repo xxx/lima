@@ -67,7 +67,9 @@ int is_trainer()
    return 1;
 }
 
-void set_train_restrict(mixed *restrictions)
+//: FUNCTION set_train_restrict
+// Restriction entries map skill paths to strings; any listed skill is refused.
+void set_train_restrict(mapping restrictions)
 {
    string *valid_skills = SKILL_D->query_skills();
 
@@ -87,18 +89,18 @@ void do_training(object trainee, string skill)
       return;
    else
    {
-      int trainee_skillpts = trainee_skill->skill_points;
+      int trainee_skillpts = trainee_skill.skill_points;
       int trainer_skill = this_object()->query_skill_pts(skill);
       string msg;
 
-      if (trainee_skill->training_points == 0)
+      if (trainee_skill.training_points == 0)
          msg = trainer_msgs["no_pts_msg"];
       else if (member_array(skill, keys(skill_restrictions)) != -1 ||
                member_array(skill, keys(this_object()->query_skills())) == -1)
          msg = trainer_msgs["unable_msg"];
       else if (trainee_skillpts < trainer_skill)
       {
-         for (int i = 0; i < trainee_skill->training_points; i++)
+         for (int i = 0; i < trainee_skill.training_points; i++)
          {
             trainee->test_skill(skill, trainee_skillpts + 1);
          }

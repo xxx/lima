@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **19 October 2026** at Lima **e6a538a5** and native **8157cfac**.
+Reviewed **19 October 2026** at Lima **44399be5** and native **433082f7**.
 The rebuilt release driver passes the configured fresh-account path: clean
 boot, character creation, Grand Hall entry, ordinary commands, native saves,
 fresh-process restart and saved login. Both boots have 151 clean preloads
@@ -15,6 +15,7 @@ and exit normally. Source inventory and runtime results retain distinct scope.
 |---|---|---|
 | Release lifecycle | 30 checks across two clean driver processes | First administrator; actual saved-password authentication and character identity/state verified after restart. |
 | Ordinary-player lifecycle | 57 checks across two clean driver processes | AUTO_WIZ disabled in the disposable runtime; real player shell, commands, saved-password login, quit location and alias restoration. |
+| NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default Tara stat menu retains the separate gap below. |
 | Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Direct cold combined execution remains sensitive to the deadline. |
 | Whole-source inventory | 999/1182 compile; 183 standalone failures | Rebuilt release compiler; target constructors were not run. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
@@ -188,14 +189,22 @@ Some optional/unselected sources and documented original Lima defects remain;
 the inventory is not a port-completion percentage. The inherited-method
 signature/cache design discussion also remains separate.
 
-A bounded [NPC sample-chain audit](../lpc-rs/doc/driver-comparison.md#lima-npc-sample-chain-audit)
-reproduces seven remaining failures and retains five passing references. Temporary
-source controls compile the aggressive-monster and trainer hosts using small
-callback/type adapters; those changes are not adopted or runtime-qualified.
-The trainer restriction setter needs an explicit mapping contract. The attic
-reaction examples depend on an upstream placeholder, so completing their script
-API remains outside ordinary port adaptation. No configured stock/preload root
-was identified for these chains. The 999/1182 inventory is unchanged.
+The [NPC sample-chain audit](../lpc-rs/doc/driver-comparison.md#lima-npc-sample-chain-audit)
+now has [aggression/trainer adapters](../lpc-rs/doc/driver-comparison.md#lima-aggression-and-trainer-adapters)
+and focused runtime qualification. Aggression binds targets into function values;
+the trainer uses native class fields and `set_train_restrict(mapping)`, whose
+entries mark skill paths unavailable for training. Both complete hosts compile.
+All 48 runtime checks pass, with 151 clean preloads, state restoration, cleanup,
+native saves and normal logout/shutdown. The timer fixture records attempts;
+combat damage is outside this check. The dated 999/1182 inventory is not rerun.
+
+Tara's default stat menu still fails: it calls the missing body method
+`stat_abrevs()` and then indexes nil. The method is absent from the pinned
+original source too; no upstream driver was run. The passing skill-only test
+uses the existing `trainer->set_train_stat(({}))` runtime setting. The committed
+sample configuration is unchanged. Audit the stat/body contract separately.
+The attic reaction examples retain their upstream placeholder; their missing
+script API is deferred. Evidence: /tmp/lima-npc-adapters-20261019.
 
 The current native [driver comparison](../lpc-rs/doc/driver-comparison.md#lima-port-readiness)
 centralizes driver differences and qualification scope. The records below retain
