@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **19 October 2026** at Lima **5214351c** and native **4763637c**.
+Reviewed **19 October 2026** at Lima **260e20b0** and native **301c90e0**.
 The rebuilt release driver passes the configured fresh-account path: clean
 boot, character creation, Grand Hall entry, ordinary commands, native saves,
 fresh-process restart and saved login. Both boots have 151 clean preloads
@@ -217,10 +217,13 @@ The [remaining-source triage](../lpc-rs/doc/driver-comparison.md#lima-remaining-
 reviews the 16 files with no identified configured caller as one batch. Temporary
 adapters compile three optional examples; other entries need hosts, integration,
 dependencies or unfinished feature work. No source change or new efun is added.
-The audit also reproduces a [compiler input difference](../lpc-rs/doc/lpc/inheritance.md):
-host-path CLI input uses a filename as the relative-inherit base, while an
-independent in-game load uses its directory. That consistency issue is the
-recommended next driver audit. Evidence: /tmp/lima-remaining-sources-20261019.
+The audit also reproduced a compiler input difference, corrected in the
+[relative-inherit follow-up](../lpc-rs/doc/driver-comparison.md#lima-relative-inherit-inputs):
+host-file and in-game inputs now use the source directory. All 12 CLI cases and
+both reordered behavior-example forms pass. The original behavior example still
+needs its inherit before its global declaration; contrib's drunk effect now
+finds its parent but retains that parent's heartbeat adaptation gap. These
+optional sources are unchanged. Evidence: /tmp/lima-relative-inherits-20261019.
 
 The current native [driver comparison](../lpc-rs/doc/driver-comparison.md#lima-port-readiness)
 centralizes driver differences and qualification scope. The records below retain
