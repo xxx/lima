@@ -27,7 +27,8 @@ nomask void handle_one_char(int);
 
 nomask void handle_input(string s)
 {
-   map(s, ( : handle_one_char:));
+   foreach (int c in s)
+      handle_one_char(c);
 }
 
 private
@@ -98,7 +99,7 @@ nomask void init_charmode(mapping new_bindings, function d)
    // of course, you can bind over this.
    bindings = (["<":d]) + new_bindings;
    default_func = d;
-   modal_push_char(( : handle_input:));
+   modal_push_char(handle_input);
 }
 
 //: FUNCTION bind

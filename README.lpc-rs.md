@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **19 October 2026** at Lima **2ca1509c** and native **9dc7b25c**.
+Reviewed **19 October 2026** at Lima **a18182fe** and native **8b1e997a**.
 The rebuilt release driver passes the configured fresh-account path: clean
 boot, character creation, Grand Hall entry, ordinary commands, native saves,
 fresh-process restart and saved login. Both boots have 151 clean preloads
@@ -252,6 +252,14 @@ dummy/equipment clones, arrival hooks, damage diagnostics, armour reduction and
 cleanup. The registered stand-up callback is invoked directly and cancelled;
 elapsed timer delivery and player gameplay are not tested. The profile and native
 binaries are unchanged. Evidence: /tmp/lima-test-dummy-20261019.
+
+The optional [character-mode key-binding helper](../lpc-rs/doc/driver-comparison.md#lima-character-mode-key-bindings)
+now iterates characters directly and registers a bare input callback. Four compile
+checks and 31 runtime checks pass through a temporary wizard-shell composition
+and the real input provider, with a recording user at the modal boundary. Matching,
+Escape/control tokens, dynamic bindings and Unicode are covered; owned-shell
+startup, the real user stack and network input are outside this check. No configured
+caller is identified or enabled. Evidence: /tmp/lima-key-bindings-20261019.
 
 The current native [driver comparison](../lpc-rs/doc/driver-comparison.md#lima-port-readiness)
 centralizes driver differences and qualification scope. The records below retain
