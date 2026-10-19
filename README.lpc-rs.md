@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **19 October 2026** at Lima **5845303c** and native **fb668dfd**.
+Reviewed **19 October 2026** at Lima **2fb9a921** and native **ae128006**.
 The rebuilt release driver passes the configured fresh-account path: clean
 boot, character creation, Grand Hall entry, ordinary commands, native saves,
 fresh-process restart and saved login. Both boots have 151 clean preloads
@@ -14,6 +14,7 @@ and exit normally. Source inventory and runtime results retain distinct scope.
 | Qualification | Result | Scope |
 |---|---|---|
 | Release lifecycle | 30 checks across two clean driver processes | First administrator; actual saved-password authentication and character identity/state verified after restart. |
+| Ordinary-player lifecycle | 57 checks across two clean driver processes | AUTO_WIZ disabled in the disposable runtime; real player shell, commands, saved-password login, quit location and alias restoration. |
 | Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Direct cold combined execution remains sensitive to the deadline. |
 | Whole-source inventory | 999/1182 compile; 183 standalone failures | Rebuilt release compiler; target constructors were not run. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
@@ -53,6 +54,12 @@ prepare a wizard directory matching the account you will create; this example
 uses `portadmin`. On fresh data, the first wizard becomes administrator when
 no administrator exists. Subsequent AUTO_WIZ accounts are guest wizards; that
 alone does not grant the evaluation command's file-write permissions.
+
+The checkout enables `AUTO_WIZ` for development. For ordinary new players,
+remove that definition in `lib/include/config.h` before starting the instance.
+The existing no-administrator bootstrap still makes the first account an
+administrator; later accounts use the Player Shell. A separate disposable-runtime
+audit qualifies this setting with the same distinct-nil/preserved-player profile.
 
 The committed preload includes IMUD. Its router is configured in
 `lib/daemons/imud_d.c`, and its OOB listener uses the game port plus one.
@@ -155,6 +162,23 @@ preserved state, native saves and logout. The mudlib and profile are unchanged.
 The earlier 42-program manual-load recipe belongs to the historical prepared
 run. The current sequence uses the existing test commands instead. CLI compilation
 does not warm a running driver's object space.
+
+## Ordinary-player lifecycle
+
+With stock `AUTO_WIZ` disabled only in a disposable runtime copy, **57 checks
+across two fresh driver processes pass in 9.26s**. Both boots load 151 preloads
+cleanly and exit zero. The ordinary account stays non-wizard/non-admin and uses
+`/obj/mudlib/pshell` (`Player Shell`). Real menus, human creation, look/inventory/
+score, aliases, movement and normal menu logout pass.
+
+Native account, character and player-shell saves survive restart. Real password
+login restores identity, role, race, capacity, empty inventory, command path,
+alias and the saved Example Room quit location. Existing channel compiler
+warnings remain; there are no runtime errors or failed preloads. This requires
+no port source fix and does not change this checkout's development setting.
+The [native qualification](../lpc-rs/doc/driver-comparison.md#lima-ordinary-player-lifecycle)
+records scope; local evidence is /tmp/lima-mortal-entry-20261019. It does not
+repeat the shipped suites, full gameplay coverage, foreign saves or live services.
 
 ## Remaining scope
 
