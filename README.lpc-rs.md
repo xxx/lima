@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **18 October 2026** at Lima **6278c194** and native **f9a0999b**.
+Reviewed **18 October 2026** at Lima **05d0590c** and native **4dac077e**.
 The rebuilt release driver passes the configured fresh-account path: clean
 boot, character creation, Grand Hall entry, ordinary commands, native saves,
 fresh-process restart and saved login. Both boots have 151 clean preloads
@@ -105,7 +105,7 @@ and cleanup, then saves, logs out and verifies the account and character after
 a fresh-process restart. Manual totals alone do not repeat those observations.
 
 Direct cold combined execution remains unreliable under this profile. An earlier
-normal-mode run passed 59/59, while current fresh-driver trials time out in both
+normal-mode run passed 59/59, while two further fresh-driver trials time out in
 normal-first and quiet-first modes. They spend about 3847/3867ms compiling and
 155/152ms evaluating, with zero conflicts. The command and prompt roll back; a
 following ordinary look restores input. Observed player/test state rolls back
@@ -114,9 +114,13 @@ cleanly, and saves/logout complete, but the failed tests remain failed.
 Two shell observations inspect initially loaded objects before testing; they
 compile evaluation code without loading test targets. The per-suite sequence
 separates compilation across tasks and remains the qualified recipe. These
-measurements identify compilation pressure without identifying the dominant
-compiler stage. The deadline, source and cache policies are unchanged. Current
-cold evidence: /tmp/lima-cold-combined-release-20261018.
+cold observations identify compilation pressure. A later compiler-stage profile
+attributes 61.5–62.8% of measured compilation to preprocessing and 16.0–16.5% to
+code generation; its ordinary disabled/enabled controls pass both modes at
+59/59. The restored uninstrumented driver also passes a fresh cold run. These
+passes do not establish cold reliability or a speedup. The deadline, source
+and cache policies are unchanged. Details are in the native
+[compiler profile](../lpc-rs/doc/driver-comparison.md#lima-cold-compilation-profile).
 
 The earlier 42-program manual-load recipe belongs to the historical prepared
 run. The current sequence uses the existing test commands instead. CLI compilation
