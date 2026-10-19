@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **19 October 2026** at Lima **2fb9a921** and native **ae128006**.
+Reviewed **19 October 2026** at Lima **e6a538a5** and native **8157cfac**.
 The rebuilt release driver passes the configured fresh-account path: clean
 boot, character creation, Grand Hall entry, ordinary commands, native saves,
 fresh-process restart and saved login. Both boots have 151 clean preloads
@@ -187,6 +187,15 @@ and other optional service operation require their own decisions and checks.
 Some optional/unselected sources and documented original Lima defects remain;
 the inventory is not a port-completion percentage. The inherited-method
 signature/cache design discussion also remains separate.
+
+A bounded [NPC sample-chain audit](../lpc-rs/doc/driver-comparison.md#lima-npc-sample-chain-audit)
+reproduces seven remaining failures and retains five passing references. Temporary
+source controls compile the aggressive-monster and trainer hosts using small
+callback/type adapters; those changes are not adopted or runtime-qualified.
+The trainer restriction setter needs an explicit mapping contract. The attic
+reaction examples depend on an upstream placeholder, so completing their script
+API remains outside ordinary port adaptation. No configured stock/preload root
+was identified for these chains. The 999/1182 inventory is unchanged.
 
 The current native [driver comparison](../lpc-rs/doc/driver-comparison.md#lima-port-readiness)
 centralizes driver differences and qualification scope. The records below retain
