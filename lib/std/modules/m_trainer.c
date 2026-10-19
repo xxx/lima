@@ -142,7 +142,7 @@ varargs int stat_train_cost(string statstr)
 #endif
 #ifdef STAT_TRAIN_SCALES_WITH_STAT
    if (statstr && strlen(statstr))
-      stat = call_other(this_body(), "query_" + stat_abrevs[statstr]);
+      stat = this_body()->query_stat(stat_abrevs[statstr]);
    else
       stat = this_body()->max_stat();
    cost = cost * (stat + 1);
@@ -178,7 +178,7 @@ void train_stat(string s)
    b->targetted_action("$N $vgive $t $o.", this_object(), cost + " " + currency);
    targetted_action(trainer_msgs["stat_train"], b, s);
 
-   call_other(b, "inc_mod_" + abr);
+   b->inc_mod_stat(abr);
    b->refresh_stats();
 
    // Need this one again to update potential price hike. Must be done after stat increase.
@@ -187,7 +187,7 @@ void train_stat(string s)
 
 void begin_conversation()
 {
-   stat_abrevs = this_body()->stat_abrevs();
+   stat_abrevs = this_body()->stat_abrev();
    if (sizeof(stats_we_train))
    {
       int train_cost;
@@ -198,7 +198,7 @@ void begin_conversation()
       foreach (string s in stats_we_train)
       {
          add_option("stat_" + s, "Train my " + s + ", please. [" + stat_train_cost(s) + " " + currency + "]");
-         add_response("stat_" + s, ({"Okay! @@stat_" + s, ( : train_stat, s:)}));
+         add_response("stat_" + s, ({"Okay! @@stat_" + s, &train_stat(s)}));
          add_to_start("stat_" + s);
       }
    }

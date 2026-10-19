@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **19 October 2026** at Lima **3d294c46** and native **2117116a**.
+Reviewed **19 October 2026** at Lima **4727f889** and native **f170d3a3**.
 The rebuilt release driver passes the configured fresh-account path: clean
 boot, character creation, Grand Hall entry, ordinary commands, native saves,
 fresh-process restart and saved login. Both boots have 151 clean preloads
@@ -15,7 +15,8 @@ and exit normally. Source inventory and runtime results retain distinct scope.
 |---|---|---|
 | Release lifecycle | 30 checks across two clean driver processes | First administrator; actual saved-password authentication and character identity/state verified after restart. |
 | Ordinary-player lifecycle | 57 checks across two clean driver processes | AUTO_WIZ disabled in the disposable runtime; real player shell, commands, saved-password login, quit location and alias restoration. |
-| NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default Tara stat menu retains the separate gap below. |
+| NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default stat-menu qualification follows. |
+| Trainer stat menu | Four source targets compile; 43 runtime checks pass | Adopted source with default strength/agility options; prices, payments, point exhaustion and cleanup verified. |
 | Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Direct cold combined execution remains sensitive to the deadline. |
 | Whole-source inventory | 999/1182 compile; 183 standalone failures | Rebuilt release compiler; target constructors were not run. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
@@ -192,29 +193,25 @@ signature/cache design discussion also remains separate.
 The [NPC sample-chain audit](../lpc-rs/doc/driver-comparison.md#lima-npc-sample-chain-audit)
 now has [aggression/trainer adapters](../lpc-rs/doc/driver-comparison.md#lima-aggression-and-trainer-adapters)
 and focused runtime qualification. Aggression binds targets into function values;
-the trainer uses native class fields and `set_train_restrict(mapping)`, whose
-entries mark skill paths unavailable for training. Both complete hosts compile.
-All 48 runtime checks pass, with 151 clean preloads, state restoration, cleanup,
-native saves and normal logout/shutdown. The timer fixture records attempts;
-combat damage is outside this check. The dated 999/1182 inventory is not rerun.
+the trainer uses native class fields and a mapping restriction contract. Both
+complete hosts compile. All 48 earlier runtime checks pass for inherited timers
+and skill conversations, with state restoration, cleanup and normal saves/logout.
+The timer fixture records attempts; combat damage is outside that check.
 
-Tara's default stat menu still fails: it calls the missing body method
-`stat_abrevs()` and then indexes nil. The method is absent from the pinned
-original source too; no upstream driver was run. The passing skill-only test
-uses the existing `trainer->set_train_stat(({}))` runtime setting. The committed
-sample configuration is unchanged. Audit the stat/body contract separately.
+Tara's default stat-menu gap is now resolved by the four-line
+[trainer adaptation](../lpc-rs/doc/driver-comparison.md#lima-trainer-stat-menu-adoption).
+It uses the body's existing `stat_abrev()`, `query_stat()` and `inc_mod_stat()`,
+and binds the selected stat in its menu callback. Four source targets compile;
+the adopted checkout's source passes the same 43 runtime checks as the audit,
+with default stat options enabled and no module substitution. Prices, refusals,
+exact payments, repeated strength/agility gains, point exhaustion, reopened menus,
+state restoration and normal saves/logout/shutdown pass with 151 clean preloads.
+No new body/driver API, payment cast or sample configuration change is needed.
+Evidence: /tmp/lima-trainer-stats-adoption-20261019.
+
 The attic reaction examples retain their upstream placeholder; their missing
-script API is deferred. Evidence: /tmp/lima-npc-adapters-20261019.
-
-A subsequent [stat-menu audit](../lpc-rs/doc/driver-comparison.md#lima-trainer-stat-menu-audit)
-finds that the existing body APIs are sufficient. A four-line temporary trainer
-adapter uses `stat_abrev()`, `query_stat()` and `inc_mod_stat()`, and binds the
-selected stat in its menu callback. With Tara's default stat options enabled,
-43 runtime checks pass: prices, refusals, exact payments, repeated purchases,
-both stat increases, point exhaustion, restoration and normal logout. The boot
-has 151 clean preloads. This proposal is not adopted yet; the current default
-menu gap above remains. No new body/driver API or payment conversion is needed.
-Evidence: /tmp/lima-trainer-stats-audit-20261019.
+script API stays deferred. The dated 999/1182 inventory is not rerun. Alternate
+stat models and configuration flags retain their separate scope.
 
 The current native [driver comparison](../lpc-rs/doc/driver-comparison.md#lima-port-readiness)
 centralizes driver differences and qualification scope. The records below retain
