@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **18 October 2026** at Lima **45c04287** and native **40b2acae**.
+Reviewed **19 October 2026** at Lima **e7713798** and native **fbe898da**.
 The rebuilt release driver passes the configured fresh-account path: clean
 boot, character creation, Grand Hall entry, ordinary commands, native saves,
 fresh-process restart and saved login. Both boots have 151 clean preloads
@@ -33,7 +33,7 @@ From the sibling native checkout, build the workspace:
 
 ```sh
 cd ../lpc-rs
-cargo build --workspace --locked --release
+CARGO_BUILD_JOBS=2 CARGO_INCREMENTAL=0 cargo build --workspace --locked --release
 cd ../lima-lpc-rs
 ```
 
@@ -126,10 +126,15 @@ keeps the current storage: its isolated replay does not establish a worthwhile
 whole-compiler gain. A subsequent
 [lexer token-text audit](../lpc-rs/doc/driver-comparison.md#lima-lexer-token-text-copy-audit)
 finds 8.7–10.6% lower raw-lexer time after removing a redundant text buffer, with
-3,984 matching token/error/span comparisons. That small native change is
-recommended but remains unapplied; whole-compiler gains and cold reliability
-still need measurement. Production source, profile and release driver are
-unchanged.
+3,984 matching token/error/span comparisons. The small native
+[buffer removal](../lpc-rs/doc/driver-comparison.md#lima-lexer-buffer-removal)
+is now applied. Eight fresh driver sessions pass the combined or per-suite test
+sequences with state/cleanup checks, real saves and logout. Actual compiler and
+cold-command timings remain noisy; no whole-compiler gain or cold-timeout fix is
+established. The mudlib and profile are unchanged. The locked release workspace
+build, 5,161 workspace tests/doctests (two ignored), warning-free all-targets
+Clippy and format check pass. The ordinary release workspace rebuilds after
+testing, and its driver/CLI hashes match the measured executables exactly.
 
 The earlier 42-program manual-load recipe belongs to the historical prepared
 run. The current sequence uses the existing test commands instead. CLI compilation
