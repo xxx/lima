@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **19 October 2026** at Lima **a18182fe** and native **8b1e997a**.
+Reviewed **19 October 2026** at Lima **0c84eecd** and native **22181810**.
 The rebuilt release driver passes the configured fresh-account path: clean
 boot, character creation, Grand Hall entry, ordinary commands, native saves,
 fresh-process restart and saved login. Both boots have 151 clean preloads
@@ -260,6 +260,14 @@ and the real input provider, with a recording user at the modal boundary. Matchi
 Escape/control tokens, dynamic bindings and Unicode are covered; owned-shell
 startup, the real user stack and network input are outside this check. No configured
 caller is identified or enabled. Evidence: /tmp/lima-key-bindings-20261019.
+
+The optional [flow room module](../lpc-rs/doc/driver-comparison.md#lima-flow-room-module)
+now retains one named arrival callback. Five compile checks and 27 runtime checks
+pass with temporary room compositions, real movement and message providers.
+Repeated configuration, conditional flow, inventories and delayed captures/guards
+are covered. Delayed callbacks are invoked directly and cancelled; elapsed timer
+delivery is not tested. No configured caller is enabled; the profile and native
+binaries are unchanged. Evidence: /tmp/lima-flow-room-20261019.
 
 The current native [driver comparison](../lpc-rs/doc/driver-comparison.md#lima-port-readiness)
 centralizes driver differences and qualification scope. The records below retain

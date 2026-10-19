@@ -11,6 +11,9 @@ class flow_set
 
 class flow_set *flow_arr = ({});
 
+private
+nosave function flow_hook;
+
 void add_hook(string tag, function hook);
 
 void object_action(object obj, string msg, object where)
@@ -69,5 +72,7 @@ void set_flow(mapping *flows)
       fl.delay = has_key(fs, "delay") ? fs["delay"] : 0;
       flow_arr += ({fl});
    }
-   add_hook("object_arrived", ( : fall_through:));
+   if (!flow_hook)
+      flow_hook = fall_through;
+   add_hook("object_arrived", flow_hook);
 }
