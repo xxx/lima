@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **19 October 2026** at Lima **f1251a6c** and native **f7522564**.
+Reviewed **19 October 2026** at Lima **d6534f6f** and native **bc642b2a**.
 The rebuilt release driver passes the configured fresh-account path: clean
 boot, character creation, Grand Hall entry, ordinary commands, native saves,
 fresh-process restart and saved login. Both boots have 151 clean preloads
@@ -276,6 +276,14 @@ and handoff arguments work without a port fix. Its existing unused loot flag and
 unrefreshed expiry timestamp remain documented policy gaps. Controlled dead-state
 and timestamp fixtures do not qualify actual boss combat or generation; no caller
 is enabled. Evidence: /tmp/lima-boss-integration-20261019.
+
+The [legacy exit integration review](../lpc-rs/doc/driver-comparison.md#lima-legacy-exit-integration-decision)
+retains BASE_ROOM/M_EXIT and EXIT_OBJ/M_COMPLEX_EXIT. Six compiler passes, four
+expected rejections and ten runtime checks show that the unselected older helpers
+need more than argument-count edits: destination lookup, callbacks and movement
+records have different contracts. The fixture records movement arguments; it
+does not move a body. No diagnostic adapter or library change is adopted.
+Evidence: /tmp/lima-exit-integration-20261019.
 
 The current native [driver comparison](../lpc-rs/doc/driver-comparison.md#lima-port-readiness)
 centralizes driver differences and qualification scope. The records below retain
