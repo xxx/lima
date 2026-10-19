@@ -5,7 +5,7 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **19 October 2026** at Lima **03e1f72f** and native **c027d047**.
+Reviewed **19 October 2026** at Lima **8a26d8c7** and native **ded2bc3a**.
 The current checkout passes the configured fresh-account acceptance run:
 30 lifecycle checkpoints in 136.54 seconds, including character creation, ordinary
 commands, native saves and saved login after restart. Both boots have 151 clean
@@ -18,7 +18,7 @@ combined modes pass 59/59. Source inventory and runtime results retain distinct 
 | Ordinary-player lifecycle | 57 checks across two clean driver processes | AUTO_WIZ disabled in the disposable runtime; real player shell, commands, saved-password login, quit location and alias restoration. |
 | NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default stat-menu qualification follows. |
 | Trainer stat menu | Four source targets compile; 43 runtime checks pass | Adopted source with default strength/agility options; prices, payments, point exhaustion and cleanup verified. |
-| Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Direct cold combined execution remains sensitive to the deadline. |
+| Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Per-suite-first is the operator recipe; the current direct-cold recheck is below. |
 | Whole-source inventory | 999/1182 compile; 183 standalone failures | Rebuilt release compiler; target constructors were not run. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
 
@@ -114,12 +114,22 @@ qualification also checks existing prototype identities, player/inventory state
 and cleanup, then saves, logs out and verifies the account and character after
 a fresh-process restart. Manual totals alone do not repeat those observations.
 
-Direct cold combined execution remains unreliable under this profile. An earlier
-normal-mode run passed 59/59, while two further fresh-driver trials time out in
-normal-first and quiet-first modes. They spend about 3847/3867ms compiling and
-155/152ms evaluating, with zero conflicts. The command and prompt roll back; a
-following ordinary look restores input. Observed player/test state rolls back
-cleanly, and saves/logout complete, but the failed tests remain failed.
+The [current direct-cold recheck](../lpc-rs/doc/driver-comparison.md#lima-current-cold-combined-checks)
+passes both modes from fresh drivers without per-suite warmup or manual loads.
+Normal-first returns the prompt in 2.330s and quiet-first in 2.542s; each following
+other mode also passes 59/59, at 0.185s/0.189s. Both boots have 151 clean preloads,
+preserved player/world/prototype state, normal saves/logout and exit-zero shutdown.
+The 4000ms budget and source/profile/binaries are unchanged.
+Evidence: /tmp/lima-cold-current-20261019.
+
+The earlier timeouts predate the lexer/include optimizations. Those attempts spend
+about 3847/3867ms compiling and 155/152ms evaluating, with zero conflicts. Their
+command/prompt output rolls back; ordinary look recovers input and state is
+preserved. They remain recorded failures, while the current recheck does not
+reproduce them. Two passing trials do not guarantee reliability under load;
+response timings include scheduling/network, exclude the separate drain and do
+not measure compiler phases. OS caches are not flushed. Keep the per-suite-first
+recipe; this recheck alone does not justify another compiler change.
 
 Two shell observations inspect initially loaded objects before testing; they
 compile evaluation code without loading test targets. The per-suite sequence
