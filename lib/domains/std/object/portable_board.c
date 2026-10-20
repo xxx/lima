@@ -5,15 +5,15 @@
 // figured I would save you the trouble.
 // Vette  April 16, 1997
 
-inherit BOARD_OB;
+inherit "/contrib/board";
 inherit M_GETTABLE;
 
 void mudlib_setup()
 {
-   ::mudlib_setup("Portable Bulletin Board", "lima.bugs", 1);
+   ::mudlib_setup("Portable Bulletin Board", BUG_NEWSGROUP, 1);
 }
 
 string a_short()
 {
-   return evaluate(( : do_desc:));
+   return query_in_room_desc();
 }

@@ -19,11 +19,11 @@ combined modes pass 59/59. Source inventory and runtime results retain distinct 
 | NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default stat-menu qualification follows. |
 | Trainer stat menu | Four source targets compile; 43 runtime checks pass | Adopted source with default strength/agility options; prices, payments, point exhaustion and cleanup verified. |
 | Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Per-suite-first is the operator recipe; the current direct-cold recheck is below. |
-| Whole-source inventory | 1017/1182 compile; 165 standalone failures | Fresh sweep after the web-editor backend adapter; no regressions/timeouts/crashes, target constructors omitted. |
+| Whole-source inventory | 1019/1182 compile; 163 standalone failures | Fresh sweep after the portable-board adapter; no regressions/timeouts/crashes, target constructors omitted. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
 
 Of the inventory's failures, 113 documented fragments have currently compiling
-shipped hosts. **The other 52 standalone consumers remain open for porting or explicit
+shipped hosts. **The other 50 standalone consumers remain open for porting or explicit
 review.** Optional or unselected code is not finished merely because it is absent
 from the configured boot. These are not counts of missing driver features.
 The contributed drunkenness example also retains its older body-API integration
@@ -475,13 +475,57 @@ Production source/profile/binaries stay unchanged. The last inventory remains
 **1017/1182**, without a new sweep or inferred source gain. The port remains in
 progress; provider selection and incomplete-feature decisions retain their scope.
 
+## Portable-board adaptation
+
+The portable sample now explicitly inherits `contrib/board.c`, uses configured
+`BUG_NEWSGROUP` and shares current user article read sets with the newsreader.
+No global `BOARD_OB` alias or alternate news daemon is installed. Descriptions
+return text through the public API, and the board has explicit mass from SMALL.
+Reads skip removed articles and preserve earlier unread entries after reading
+out of order. Editor callbacks capture the starting group/thread, so switching
+the board during editing cannot redirect posts or followups. Failed completion
+retains the text for manual recovery; cancellation creates no post.
+
+Replies use the user's selected mailer through `begin_news_reply(group, id)`.
+It captures the article subject/poster before opening the normal reply editor,
+saved draft and **Cc confirmation**. Both standard/Mh support this entry; the
+existing NEWSREADER-only `send_news_reply` guard is unchanged. Successful local
+mail clears the draft, cancellation preserves an older draft and an invalid
+local destination retains the new draft. Other board packages stay unselected.
+
+Run the maintained regression test after building lpc-rs:
+
+```sh
+python3 tests/boards/test_boards.py
+```
+
+Eight compiler checks and **54 LPC runtime assertions** pass in 3.043s. Real
+news/editor/mail/mailbox components and user news/mail modules run with a
+recording user at the modal/body boundary. Tests cover reading, prompting,
+empty posts, cancellation, group changes, quoted/plain followups, removal,
+recovery and replies through both mailers, including actual native mail saves.
+Python independently checks the retained draft and mail-save files. This does
+not qualify parser dispatch, live login, concurrent players, real-master path
+policy, remote mail or account save/restart; news save calls are counted.
+See [test details](tests/boards/README.md) and the
+[native adaptation notes](../lpc-rs/doc/driver-comparison.md#lima-portable-board-adaptation).
+
+The fresh source sweep measures **1019/1182 compiling, 163 failures** in 46.217s,
+with **zero regressions/timeouts/crashes** and exactly the two board-file gains.
+All 113 existing fragment proofs retain compiling hosts; the other 50 standalone
+consumers keep their integration/provider/host/incomplete-feature dispositions.
+The port remains in progress. Native Rust, profile and release binaries are unchanged.
+
 ## Contributed board-provider interface audit
+
+The following is the earlier audit snapshot; the adaptation above now adopts
+its recommended provider.
 
 The 20 October audit recommends `contrib/board.c` for the portable sample:
 it alone matches `mudlib_setup(name, group, switchable)` and the switching API.
 `contrib/boards/board.c` uses a different constructor and missing body boarddata;
 `contrib/bboard/bboard.c` uses separate setters and its example names an absent
-personal path. **No board provider is selected or source adapter adopted yet.**
+personal path. **The audit selected no provider or source adapter.**
 
 The matching provider's old body counters are absent from current body and user.
 Current user news state stores sets of read article IDs; moving the old calls to
@@ -514,8 +558,9 @@ Some optional/unselected sources and documented original Lima defects remain;
 the inventory is not a port-completion percentage. The inherited-method
 signature/cache design discussion also remains separate.
 
-The 16-entry optional-source review has six adapted entries and one unchanged
-boss host qualification. The other nine retain these decisions:
+The 16-entry optional-source review now has seven adapted entries, including
+the portable board, and one unchanged boss host qualification. The other eight
+retain these decisions:
 
 | Source | Current decision |
 |---|---|
@@ -523,7 +568,6 @@ boss host qualification. The other nine retain these decisions:
 | `state_of_mind.c` | Keep the selected condition module and its two-argument stun API. |
 | Duplicate `domains/std/object/hole.c`, WIP `std/paper.c` | Keep selected `std/hole` and `domains/std/paper`. |
 | `secure/error_handler.c` | Keep the configured master's active error handler. |
-| `portable_board.c` | `contrib/board.c` is the matching recommendation; selection and a complete tested adapter remain pending. |
 | `clan_d.c`, `secure/modules/m_file.c` | Incomplete subsystems/contracts remain deferred. |
 
 These are recorded scope decisions, not a queue of missing driver features.

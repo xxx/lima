@@ -12,19 +12,15 @@
 //  Boards are simply set up from rooms by using
 //
 //   set_objects( ([
-//      BOARD_OB : ({ "name", "linked newsgroup", int switchable })
+//      "/contrib/board" : ({ "name", "linked newsgroup", switchable })
 //    ]) );
-
-// TODO
-// Something to show more than the MAX_HEADERS amount of posts
-// The query_message_lines() returns an array which is then imploded,
-//   would it not be faster to send a string and not have to implode?
 
 #include <edit.h>
 
 inherit OBJ;
 inherit M_READABLE;
 inherit M_INPUT;
+inherit M_SET;
 inherit CLASS_NEWSMSG;
 
 // The maximum nr of headers to show.
@@ -34,7 +30,7 @@ inherit CLASS_NEWSMSG;
 #define DEFAULT_SWITCHABLE 0
 
 // The default mud newsgroup
-#define DEFAULT_GROUP NEWS_D->get_groups()[1]
+#define DEFAULT_GROUP BUG_NEWSGROUP
 
 // The default Name of the Board Object
 #define DEFAULT_NAME "Bulletin Board"
@@ -52,25 +48,19 @@ private
 int can_switch;
 
 // Function prototypes.
-varargs private nomask int get_current_id(string group_name);
-int set_group(string new_group);
+private nomask int set_group(string new_group);
 private
 nomask string list_headers();
-string do_desc();
-int get_group_last_id(string group);
+private nomask string do_desc();
 private
 nomask string switch_to_next_unread_group();
 
-// Filter removed messages from ids array.
-private
-nomask int filter_removed(int elem)
+private nomask int *message_ids(string group)
 {
-   class news_msg msg = NEWS_D->get_message(linked_group, elem);
-
-   if (!msg || !msg.body)
-      return 0;
-
-   return 1;
+   if (!check_group(group))
+      return ({});
+   int *ids = NEWS_D->get_messages(group, 1);
+   return arrayp(ids) ? sort_array(ids, 1) : ({});
 }
 
 // Create a new board.
@@ -85,13 +75,13 @@ varargs void mudlib_setup(string name, string group, int switchable)
 
    can_switch = switchable;
 
-   set_group(group);
+   if (!set_group(group))
+      error("Invalid board newsgroup: " + group + "\n");
 
    board_name = name;
    set_id("board", "bulletin board");
-   set_in_room_desc(( : do_desc:));
-   set_long(( : list_headers:));
-   set_size(SMALL);
+   set_long(list_headers);
+   set_mass(to_float(SMALL));
 }
 
 // A check to test whether the current user is allowed to read
@@ -122,8 +112,6 @@ nomask int set_group(string new_group)
 // Added Valid group check
 nomask string query_group()
 {
-   if (!check_group(linked_group))
-      return DEFAULT_GROUP;
    return linked_group;
 }
 
@@ -148,7 +136,7 @@ nomask varargs string format_message_line(int id)
    msg = NEWS_D->get_message(linked_group, id);
 
    if (!msg || !msg.body)
-      return 0; // Do not display removed messages.
+      return nil; // Do not display removed messages.
    else
       subject = msg.subject;
 
@@ -163,24 +151,14 @@ nomask varargs string format_message_line(int id)
 private
 nomask string *query_message_lines()
 {
-   int *ids = sort_array(filter(NEWS_D->get_messages(linked_group), filter_removed), 1);
-   int i, k, j = sizeof(ids) - MAX_HEADERS;
-   string *tmp;
-
-   if (j < 0)
-      j = 0;
-   // ### This can probably be removed, but will wait for now  --Vette--
-   // ###    ids = ids[<MAX_HEADERS..];
-   ids = ids[j..];
-   tmp = map(ids, ( : format_message_line($1) :));
-   if (sizeof(ids) == 0)
-      return ({"The board is bereft of posts.  Feel free to change this!\n"});
-   k = ids[ < 1] - this_body()->get_news_group_id(linked_group);
-   for (i = 1; i < sizeof(tmp) + 1; i++)
-   {
-      tmp[i - 1] = sprintf("%4d%s ", i + j, k > (sizeof(tmp) - i - 1) ? "*" : " ") + tmp[i - 1];
-   }
-   return tmp;
+   int *ids = message_ids(linked_group);
+   int start = sizeof(ids) > MAX_HEADERS ? sizeof(ids) - MAX_HEADERS : 0;
+   string read_ids = this_user() ? this_user()->get_news_id_read(linked_group) : "";
+   string *lines = ({});
+   for (int index = start; index < sizeof(ids); index++)
+      lines += ({sprintf("%4d%s %s", index + 1, set_member(read_ids, ids[index]) ? " " : "*",
+                         format_message_line(ids[index]))});
+   return sizeof(lines) ? lines : ({"The board is bereft of posts.  Feel free to change this!\n"});
 }
 
 // Make the long description.
@@ -206,40 +184,33 @@ nomask int has_entries()
 // Vette  April 14, 1997
 nomask mixed read_entry(string str)
 {
-   class news_msg msg;
-   int id;
-   int *ids;
-
-   // Before we do anything, need to make sure this user can read the group
-   if (!check_group(linked_group))
+   if (!this_user() || !check_group(linked_group))
       return "You do not have access.\n";
-
-   ids = sort_array(filter(NEWS_D->get_messages(linked_group), filter_removed), 1);
-
+   int *ids = message_ids(linked_group);
+   int id;
    if (str == "next")
    {
-      id = this_body()->get_news_group_id(linked_group) + 0;
-      while (member_array(id, ids) == -1 && id < ids[sizeof(ids) - 1])
-         id++;
-      /* This ID already a NEWS_D ID, no translation needed */
-      if (id > ids[sizeof(ids) - 1])
+      string read_ids = this_user() ? this_user()->get_news_id_read(linked_group) : "";
+      foreach (int candidate in ids)
+         if (!set_member(read_ids, candidate))
+         {
+            id = candidate;
+            break;
+         }
+      if (!id)
          return "No more messages.\n";
-      if (id < ids[0] || id > ids[sizeof(ids) - 1])
-         return "You can only read posts that are on the bulletin board!\n";
    }
    else
    {
-      if (sscanf(str, "%d", id) != 1)
+      int number;
+      if (sscanf(str, "%d", number) != 1)
          return "Specify the post number you want to read.";
-      if (id < 0 || id > sizeof(ids))
+      if (number <= 0 || number > sizeof(ids))
          return "You can only read posts that are on the bulletin board!\n";
-      id = ids[id - 1]; // Translate to NEWS_D id
+      id = ids[number - 1];
    }
-
-   if (this_body()->get_news_group_id(linked_group) < (id + 1))
-      this_body()->set_news_group_id(linked_group, id + 1);
-   msg = NEWS_D->get_message(linked_group, id);
-
+   class news_msg msg = NEWS_D->get_message(linked_group, id);
+   this_user()->add_news_id_read(linked_group, id);
    return format_message_line(id) + "\n\n" + msg.body;
 }
 
@@ -258,32 +229,13 @@ mixed direct_read_about_str_from_obj(string str, object ob)
 private
 nomask string do_desc()
 {
-   int new_id;
-   int *ids;
-   int curr_id = this_body()->get_news_group_id(linked_group);
-
-   if (!NEWS_D->get_messages(linked_group))
-      ids = ({});
-   else
-      ids = sort_array(filter(NEWS_D->get_messages(linked_group), filter_removed), 1);
-
-   /* Slight fix here, lest see if this solves our problems. */
-   if (curr_id < 0)
-      curr_id = 1;
-   /*
-       if (curr_id <= 0)
-           this_body()->set_news_group_id(linked_group, curr_id = 1);
-       if (curr_id > sizeof(ids))
-           this_body()->set_news_group_id(linked_group, curr_id = sizeof(ids));
-   */
-
-   new_id = member_array(curr_id, ids);
-   if (curr_id > 0 && new_id < 0)
-      new_id = sizeof(ids);
-   else if (new_id < 0)
-      new_id = 1;
-   return "A " + board_name + (can_switch ? " set to " + linked_group : "") + " [at " + new_id + ", max " +
-          sizeof(ids) + "].";
+   int *ids = message_ids(linked_group);
+   string read_ids = this_user() ? this_user()->get_news_id_read(linked_group) : "";
+   int unread;
+   foreach (int id in ids)
+      if (!set_member(read_ids, id)) unread++;
+   return sprintf("A %s%s [%d unread, %d total].", board_name,
+                  can_switch ? " set to " + linked_group : "", unread, sizeof(ids));
 }
 
 // For board verbs like post etc.
@@ -295,7 +247,7 @@ nomask int is_bulletin_board()
 // Check if id is in range, for board verbs can_* functions.
 nomask int valid_id(int id)
 {
-   int *ids = sort_array(filter(NEWS_D->get_messages(linked_group), filter_removed), 1);
+   int *ids = message_ids(linked_group);
    if (id <= 0 || id > sizeof(ids))
       return 0;
 
@@ -305,7 +257,7 @@ nomask int valid_id(int id)
 // Check if this_body() can post.
 nomask int valid_post()
 {
-   return !NEWS_D->is_write_restricted(linked_group);
+   return this_user() && check_group(linked_group) && !NEWS_D->is_write_restricted(linked_group);
 }
 
 // Verb interface. These get called by their respective verbs.
@@ -313,21 +265,20 @@ nomask int valid_post()
 // Remove a note.
 nomask void do_remove(int id)
 {
-   int *ids;
-   class news_msg msg;
-
-   ids = sort_array(filter(NEWS_D->get_messages(linked_group), filter_removed), 1);
-   msg = NEWS_D->get_message(linked_group, ids[id - 1]);
-
-   if (msg.poster != this_body()->query_name() && !check_privilege(1))
+   int *ids = message_ids(linked_group);
+   if (id <= 0 || id > sizeof(ids))
+   {
+      write("No such note.\n");
+      return;
+   }
+   class news_msg msg = NEWS_D->get_message(linked_group, ids[id - 1]);
+   if (msg.userid != this_user()->query_userid() && !check_privilege(1))
    {
       write("You can only delete your own posts.\n");
       return;
    }
-
-   NEWS_D->remove_post(linked_group, ids[id - 1]);
-   write("Post number " + id + " removed.\n");
-   return;
+   mixed problem = catch(NEWS_D->remove_post(linked_group, ids[id - 1]));
+   write(problem ? "Could not remove that post.\n" : "Post number " + id + " removed.\n");
 }
 
 mixed direct_remove_wrd_from_obj(string wrd, object ob)
@@ -348,47 +299,56 @@ mixed direct_remove_wrd_from_obj(string wrd, object ob)
 
 // Post a note.
 private
-void receive_post(string subj, string *body)
+void receive_post(string group, string subj, string *body)
 {
-   if (!body)
+   if (nilp(body))
    {
       write("Post aborted.\n");
       return;
    }
-
-   NEWS_D->post(linked_group, subj, implode(body, "\n"));
+   int posted;
+   mixed problem = catch(posted = NEWS_D->post(group, subj, implode(body, "\n")));
+   if (problem || !posted)
+   {
+      write("Post not completed; check before resending. Text retained in the editor.\n");
+      clone_object(EDIT_OB, EDIT_TEXT, body, &receive_post(group, subj));
+      return;
+   }
    write("Posted.\n");
 }
 
 private
-void receive_subject(mixed subj)
+void receive_subject(string group, mixed subj)
 {
    if (subj == -1)
       return;
-
-   if (!subj || subj == "")
+   if (!stringp(subj) || subj == "")
    {
       write("No subject, post aborted.\n");
-      modal_pop();
       return;
    }
-
    if (sizeof(subj) > 50)
    {
       write("Subject too long. Please try again.\n");
+      modal_simple(&receive_subject(group), "Subject: ");
       return;
    }
-
-   modal_pop();
-   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : receive_post, subj:));
+   clone_object(EDIT_OB, EDIT_TEXT, nil, &receive_post(group, subj));
 }
 
 nomask void do_post(string subj)
 {
-   if (subj == "" || !subj)
-      modal_push(( : receive_subject:), "Subject: ");
+   if (!valid_post())
+   {
+      write("You aren't permitted to post on this board.\n");
+      return;
+   }
+   if (!subj || subj == "")
+      modal_simple(&receive_subject(linked_group), "Subject: ");
+   else if (sizeof(subj) <= 50)
+      clone_object(EDIT_OB, EDIT_TEXT, nil, &receive_post(linked_group, subj));
    else
-      clone_object (EDIT_OB, EDIT_TEXT, 0, ( : receive_post, subj:));
+      write("Subject too long.\n");
 }
 
 mixed direct_post_on_obj_about_str(string str, object ob)
@@ -406,25 +366,33 @@ mixed direct_post_on_obj_about_str(string str, object ob)
 
 // Followup a note.
 private
-void receive_followup(int followup_id, string *body)
+void receive_followup(string group, int followup_id, string *body)
 {
-   if (!body)
+   if (nilp(body))
    {
       write("Followup aborted.\n");
       return;
    }
-
-   NEWS_D->followup(linked_group, followup_id, implode(body, "\n"));
+   int posted;
+   mixed problem = catch(posted = NEWS_D->followup(group, followup_id, implode(body, "\n")));
+   if (problem || !posted)
+   {
+      write("Followup not completed; check before resending. Text retained in the editor.\n");
+      clone_object(EDIT_OB, EDIT_TEXT, body, &receive_followup(group, followup_id));
+      return;
+   }
    write("Posted.\n");
 }
 
 nomask void do_followup(int id)
 {
-   int *ids;
-
-   ids = sort_array(filter(NEWS_D->get_messages(linked_group), filter_removed), 1);
-
-   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : receive_followup, ids[id - 1] :));
+   int *ids = message_ids(linked_group);
+   if (!valid_post() || id <= 0 || id > sizeof(ids))
+   {
+      write("No such note, or posting is not permitted.\n");
+      return;
+   }
+   clone_object(EDIT_OB, EDIT_TEXT, nil, &receive_followup(linked_group, ids[id - 1]));
 }
 
 nomask void do_followup_with_message(int id)
@@ -433,21 +401,26 @@ nomask void do_followup_with_message(int id)
    class news_msg msg;
    string *lines;
 
-   ids = sort_array(filter(NEWS_D->get_messages(linked_group), filter_removed), 1);
+   ids = message_ids(linked_group);
 
+   if (!valid_post() || id <= 0 || id > sizeof(ids))
+   {
+      write("No such note, or posting is not permitted.\n");
+      return;
+   }
    msg = NEWS_D->get_message(linked_group, ids[id - 1]);
-   if (!msg)
+   if (!msg || !msg.body)
    {
       write("You may not followup to that message -- it was removed.\n");
       return;
    }
 
    lines = ({sprintf("On %s %s wrote post #%d:", intp(msg.time) ? ctime(msg.time) : msg.time, msg.poster,
-                     get_current_id())});
+                     ids[id - 1])});
 
    lines += map(explode(msg.body, "\n"), ( : "> " + $1:));
 
-   clone_object (EDIT_OB, EDIT_TEXT, lines, ( : receive_followup, ids[id - 1] :));
+   clone_object(EDIT_OB, EDIT_TEXT, lines, &receive_followup(linked_group, ids[id - 1]));
 }
 
 mixed direct_post_wrd_to_wrd_on_obj(string wrd1, string wrd2, object ob)
@@ -472,33 +445,16 @@ mixed direct_post_wrd_with_wrd_on_obj(string wrd1, string wrd2, object ob)
    return direct_post_wrd_to_wrd_on_obj(wrd1, wrd2, ob);
 }
 
-// Reply to a user about a note.
-private
-void receive_reply(int reply_id, string *body)
-{
-   class news_msg msg = NEWS_D->get_message(linked_group, reply_id);
-
-   if (!body)
-   {
-      write("Reply aborted.\n");
-      return;
-   }
-
-   // This line required a change in the mailer
-   //  (/obj/secure/mailers/mailer.c) because it checked whether the
-   //  previous object was the newsreader.
-   this_body()->query_mailer()->send_news_reply("Re: " + msg.subject, body, lower_case(msg.poster));
-
-   write("Replied to " + lower_case(msg.poster) + ".\n");
-}
-
+// Reply through the user-owned mail composer.
 nomask void do_reply(int id)
 {
-   int *ids;
-
-   ids = sort_array(filter(NEWS_D->get_messages(linked_group), filter_removed), 1);
-
-   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : receive_reply, ids[id - 1] :));
+   int *ids = message_ids(linked_group);
+   if (id <= 0 || id > sizeof(ids))
+   {
+      write("No such note.\n");
+      return;
+   }
+   this_user()->query_mailer()->begin_news_reply(linked_group, ids[id - 1]);
 }
 
 mixed direct_answer_to_wrd_on_obj(string wrd, object ob)
@@ -519,6 +475,11 @@ mixed direct_answer_to_wrd_on_obj(string wrd, object ob)
 // Switch board newsgroup.
 nomask void do_switch(string group)
 {
+   if (!can_switch || !this_user() || NEWS_D->is_write_restricted(linked_group))
+   {
+      write("You aren't permitted to switch this board.\n");
+      return;
+   }
    if (group == "next")
       if ((group = switch_to_next_unread_group()) == "" || !group)
       {
@@ -539,10 +500,10 @@ mixed direct_switch_obj_to_str(object ob, string str)
    if (!can_switch)
       return 0;
 
-   if (!valid_post())
+   if (!this_user() || NEWS_D->is_write_restricted(linked_group))
       return "You aren't permitted to switch this board.\n";
 
-   if ((member_array(str, NEWS_D->get_groups(str)) == -1) && (str != "next"))
+   if ((member_array(str, NEWS_D->get_groups()) == -1) && (str != "next"))
       return "That is not a valid newsgroup name.\n";
 
    return 1;
@@ -554,42 +515,16 @@ mixed direct_switch_obj_to_str(object ob, string str)
 /* Functions to Support Switching to Next Unread and Listing Unread Groups */
 
 /* Lifted from newsreader.c */
-varargs private nomask int get_current_id(string group_name)
-{
-   if (!group_name)
-      group_name = linked_group;
-
-   /*
-   ** -1 to get the "current" message.  The body records the _next_
-   ** message to read.
-   */
-   return this_body()->get_news_group_id(group_name) - 1;
-}
-
-/* Lifted from newsreader.c */
 private
 int count_unread_messages(string group, int all_messages)
 {
-   int *ids = NEWS_D->get_messages(group);
-   int id;
-   class news_msg msg;
-   int count = 0;
-   int read_thru_id;
-
-   read_thru_id = get_current_id(group);
-
-   if (!all_messages)
-   {
-      ids = filter(ids, ( : $1 > $(read_thru_id) :));
-   }
-   foreach (id in ids)
-   {
-      msg = NEWS_D->get_message(group, id);
-      if (msg.body)
-      {
-         count++;
-      }
-   }
+   int *ids = message_ids(group);
+   if (all_messages)
+      return sizeof(ids);
+   string read_ids = this_user() ? this_user()->get_news_id_read(group) : "";
+   int count;
+   foreach (int id in ids)
+      if (!set_member(read_ids, id)) count++;
    return count;
 }
 
@@ -606,10 +541,7 @@ nomask int test_for_new(string group)
 private
 nomask string format_group_line(string group)
 {
-   int last_id;
    int unread = count_unread_messages(group, 1);
-
-   last_id = NEWS_D->get_group_last_id(group);
    return sprintf("  %-40s (%d %s, %d unread)", group, unread, unread == 1 ? "message" : "messages",
                   count_unread_messages(group, 0));
 }
@@ -620,7 +552,7 @@ nomask void display_groups_with_new()
 {
    string *groups;
 
-   groups = filter(this_body()->subscribed_groups(), test_for_new);
+   groups = filter(this_user()->subscribed_groups(), test_for_new);
 
    if (!sizeof(groups))
    {
@@ -639,7 +571,7 @@ nomask string switch_to_next_unread_group()
 {
    string *groups;
 
-   groups = filter(this_body()->subscribed_groups(), test_for_new);
+   groups = filter(this_user()->subscribed_groups(), test_for_new);
    if (!sizeof(groups))
    {
       return "";
@@ -648,4 +580,14 @@ nomask string switch_to_next_unread_group()
    {
       return groups[0];
    }
+}
+
+string query_in_room_desc()
+{
+   return is_visible() ? do_desc() : "";
+}
+
+mixed indirect_post_on_obj_about_str(string str, object ob)
+{
+   return direct_post_on_obj_about_str(str, ob);
 }

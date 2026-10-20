@@ -22,6 +22,7 @@ inherit M_ACCESS;
 inherit M_INPUT;
 
 inherit CLASS_MAILMSG;
+inherit CLASS_NEWSMSG;
 
 // ### make it private so it can't be changed?
 nosave object mailbox_ob;
@@ -591,6 +592,20 @@ protected nomask void cmd_forward(int user_num, string newto)
 
    send_mail_message("FWD: " + msg.subject, body, newto, ({}), /* cc_list */
                      0);
+}
+
+//: FUNCTION begin_news_reply
+// Compose a reply using the normal editor and Cc confirmation flow.
+void begin_news_reply(string group, int id)
+{
+   class news_msg msg = NEWS_D->get_message(group, id);
+   if (!msg || !msg.body)
+   {
+      write("You may not reply to that message -- it was removed.\n");
+      return;
+   }
+   clone_object(EDIT_OB, EDIT_TEXT, nil,
+                &mailer_done_reply(({lower_case(msg.poster)}), "Re: " + msg.subject));
 }
 
 int send_news_reply(string subject, string *text, string *to)
