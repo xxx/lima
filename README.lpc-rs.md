@@ -251,35 +251,49 @@ The following full sweep measures **1010/1182 compile, 172 fail**, with zero
 regressions/timeouts/crashes. The two gains are these helpers; 113 hosted fragments
 and 59 other consumers remain. The port is still in progress.
 
-## Tar writer audit
+## Tar writer
 
-`contrib/tar.c` remains unported. Its mutable header can be represented by an
-integer array and converted with `to_bytes`; no mutable-byte API is needed.
-A small native control archive preserves binary bytes and an empty file when
-read by Python and GNU tar, but that control does not execute this utility.
+`/contrib/tar` now supports asynchronous `tar(source, archive)` using native
+integer-array headers and immutable byte payloads. It creates/truncates the
+output explicitly, includes empty files/directories, skips its own output and
+writes two final zero records. Each job has independent state and bound one-shot
+callbacks; continuations queue at most ten entries or 1 MiB of payload and resume
+after one second. Completion prints `DONE.`.
 
-The audit exposed a native driver issue: `write_bytes` used physical metadata,
-ignoring pending creation, growth and truncation. The native correction now
-shares the calling transaction's kind/byte-size view with `file_size`, so bounds
-and negative offsets follow staged changes. An ordinary missing file still
-returns zero. Ten new byte-write regressions and additional file-size coverage
-verify pending changes, permission-apply creation and write-only files. The native
-workspace passes 5188 tests, two ignored; Clippy, formatting and an ordinary
-optimized workspace build pass too.
+Paths normalize relative to the tar object's directory. Member names are
+relative to the mudlib root, without a leading slash. The existing basic GNU
+header and fixed mode/UID/GID/owner names remain; links, prefix/long-name records
+and other archive extensions are unsupported. Names must fit 100 UTF-8 bytes,
+including a directory's trailing slash; overlong names fail rather than clip.
+The size field fits 11 octal digits (8 GiB minus one), which is a format limit,
+not a qualified operating size. Keep inputs stable until completion and coordinate
+calls that would write the same archive. An asynchronous error can leave a partial
+archive; a new call truncates its output.
 
-Seven controls with the rebuilt release CLI and unchanged Lima profile pass,
-including a five-write archive created within one task. Python and GNU tar retain
-its exact binary payload and empty member. The control uses real simuls/includes
-and a temporary permissive master; it does not execute `contrib/tar.c` or qualify
-a gameplay/service run. This fixes the driver prerequisite, with the tar adaptation
-still open. See the [native correction](../lpc-rs/doc/driver-comparison.md#lima-transactional-byte-writes).
+Run the permanent regression test after building the sibling native workspace:
 
-The tar source also needs native callback binding, explicit archive creation,
-empty-file/directory handling, terminating zero records, corrected large-file
-record arithmetic and bounded continuations. Its filename-field limits remain
-part of the format decision. See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-contributed-tar-audit).
-The source inventory remains 1010/1182 compiling with 59 open consumers; no tar
-adapter is adopted by this audit.
+```sh
+python3 tests/tar/test_tar.py
+```
+
+The actual helper passes 21 LPC assertions and six externally read archives,
+including 100-byte ASCII/UTF-8 names, empty-directory-only work, a nested tree
+containing its output and a 16 MiB + 513 byte binary payload. The large output
+shows 17 elapsed callback growths. Python tarfile and GNU tar verify names,
+metadata and binary contents; padding and both footer blocks are checked. The
+runner keeps the distinct-nil/preserved-player/4000ms profile and uses real
+simuls/includes with a temporary permissive master, rather than a player command
+or full gameplay run. See [test scope](tests/tar/README.md).
+
+The native byte-write visibility fix is committed as **29f120c2**. One driver
+performance follow-up remains: `read_bytes` currently reads the entire source
+before slicing each requested chunk. The payload budget therefore does not bound
+physical read memory/I/O yet; directory listings are also collected in full.
+See the [native port notes](../lpc-rs/doc/driver-comparison.md#lima-contributed-tar-writer).
+
+The full standalone source sweep now measures **1011/1182 compiling, 171 fail**,
+with zero regressions/timeouts/crashes. Its only gain is this helper; 113 hosted
+fragments and 58 other consumers remain. The port remains in progress.
 
 ## Remaining scope
 
