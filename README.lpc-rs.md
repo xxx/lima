@@ -383,6 +383,27 @@ other standalone consumers** remaining. The contributed drunkenness body contrac
 remains an extra runtime integration limit. No native Rust, binary or profile
 change is required. The port remains in progress.
 
+## Attic table and town-room audit
+
+The 20 October audit checks the still-unadapted coffee-table and town-room
+examples. Float mass alone compiles the table but leaves its constructor failing:
+`set_preposition` is a diagnostic placeholder, so it lacks a real relation/default.
+The town helper needs the format separator and uses an unassigned string as its
+exit-count selector, preventing its dead-end/two-way-road branches.
+
+A small temporary two-file adapter passes **60 assertions** covering table
+construction, movement/capacity/refusals and all 16 town direction combinations
+with exact titles, descriptions and exit paths. **13 compiler controls** give
+11 passes and two expected rejections; three baseline runtime controls reproduce
+the hidden defects. Recommend adopting it with permanent tests. No production
+source or native framework change is adopted by this audit.
+
+The attic supplies no town destination directory, so these are helper/path
+checks rather than traversal qualification. Existing zero-exit wording remains;
+real player/parser commands and alternate configurations are unchecked. See the
+[native audit notes](../lpc-rs/doc/driver-comparison.md#lima-attic-table-and-town-room-audit).
+The measured source inventory remains **1014/1182**; no inferred source gain.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
