@@ -475,6 +475,37 @@ Production source/profile/binaries stay unchanged. The last inventory remains
 **1017/1182**, without a new sweep or inferred source gain. The port remains in
 progress; provider selection and incomplete-feature decisions retain their scope.
 
+## Contributed board-provider interface audit
+
+The 20 October audit recommends `contrib/board.c` for the portable sample:
+it alone matches `mudlib_setup(name, group, switchable)` and the switching API.
+`contrib/boards/board.c` uses a different constructor and missing body boarddata;
+`contrib/bboard/bboard.c` uses separate setters and its example names an absent
+personal path. **No board provider is selected or source adapter adopted yet.**
+
+The matching provider's old body counters are absent from current body and user.
+Current user news state stores sets of read article IDs; moving the old calls to
+the user would not fix them. The portable sample also names absent `lima.bugs`,
+and its legacy short-description expression returns a function rather than text.
+A temporary read adapter uses configured `BUG_NEWSGROUP`, current user read sets
+and public `query_in_room_desc`, preserving the helper's private visibility.
+
+**Sixteen compiler controls give ten passes/six expected rejections. Eight
+legacy contract checks and nineteen read-prototype checks pass** through actual
+NEWS_D, portable/gettable/readable code and the actual user news module in a
+fixture user. Empty/removed/out-of-order reads, numeric bounds, dynamic headers,
+descriptions and shared read state pass. Save calls are counted; real account
+save/reload, parser dispatch and upstream execution are outside this check.
+
+The read prototype is deliberately partial. Adoption must finish editor
+callbacks, unread/group switching, post/followup result handling and reply
+integration; the existing user-mailer ownership and NEWSREADER-only sender
+restriction still apply. Keep selected NEWS_D/current user state and other board
+packages unselected. See the
+[native audit notes](../lpc-rs/doc/driver-comparison.md#lima-contributed-board-provider-interface-audit).
+The last measured inventory stays **1017/1182**, with no new sweep or inferred
+gain. The port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
@@ -492,7 +523,7 @@ boss host qualification. The other nine retain these decisions:
 | `state_of_mind.c` | Keep the selected condition module and its two-argument stun API. |
 | Duplicate `domains/std/object/hole.c`, WIP `std/paper.c` | Keep selected `std/hole` and `domains/std/paper`. |
 | `secure/error_handler.c` | Keep the configured master's active error handler. |
-| `portable_board.c` | Select a compatible board provider before adaptation. |
+| `portable_board.c` | `contrib/board.c` is the matching recommendation; selection and a complete tested adapter remain pending. |
 | `clan_d.c`, `secure/modules/m_file.c` | Incomplete subsystems/contracts remain deferred. |
 
 These are recorded scope decisions, not a queue of missing driver features.
