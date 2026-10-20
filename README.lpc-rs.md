@@ -583,6 +583,39 @@ No library/profile/binary change or new inventory sweep is made; the last
 measured inventory remains **1019/1182**, and synthetic hosts do not increase
 the documented shipped-fragment tally. The port remains in progress.
 
+## Legacy money and selected coin interface audit
+
+The 20 October audit keeps COINS and current body wallets selected; USE_MONEY
+remains unselected. Legacy `std/money` stores integer denomination counts, while
+`std/coins` renders base-currency balances. A temporary argument collector and
+bare long callback make the legacy pile compile and transfer denomination values
+into the current wallet without changing native method contracts. Alternate
+USE_MONEY operation is not qualified or adopted.
+
+The audit also finds a selected get/drop unit mismatch. A fractional-denomination
+drop creates a pile with a denomination key where the renderer expects a currency
+key; rendering throws. Merging into an existing currency pile raises a missing-
+entry nil-addition error, and denomination pickup misses an existing currency
+balance. Ordinary base-currency get/drop and fractional whole-pile pickup work.
+The fixture catches the merge exception and retains its earlier wallet debit;
+this is not evidence of an uncaught transaction losing funds or a live-shell test.
+
+Thirteen compiler controls give **twelve passes/one expected legacy rejection**;
+**23 final diagnostic assertions** pass in 0.918s. Actual pile/wallet/daemon/verb
+components run with an OBJ actor and permissive fixture master. These checks
+reproduce the failures; they do not qualify the affected denomination workflows
+as correct. No parser dispatch, real login, concurrent players or account
+save/restart is established. See the
+[native audit notes](../lpc-rs/doc/driver-comparison.md#lima-legacy-money-and-selected-coin-interfaces).
+
+The recommended next fix is the bounded selected coin/get/drop unit boundary:
+store base-currency values, initialize missing balances and translate denomination
+pickup, with maintained value-conservation tests. Keep current wallets, selected
+COINS and native nil/number/override policy; no legacy-provider activation or
+replacement of previously qualified payment/report behavior is proposed.
+Production library/profile/binaries stay unchanged. The last measured inventory
+remains **1019/1182**; no fresh sweep or inferred gain. The port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
