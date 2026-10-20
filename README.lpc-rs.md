@@ -19,7 +19,7 @@ combined modes pass 59/59. Source inventory and runtime results retain distinct 
 | NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default stat-menu qualification follows. |
 | Trainer stat menu | Four source targets compile; 43 runtime checks pass | Adopted source with default strength/agility options; prices, payments, point exhaustion and cleanup verified. |
 | Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Per-suite-first is the operator recipe; the current direct-cold recheck is below. |
-| Whole-source inventory | 1019/1182 compile; 163 standalone failures | Fresh sweep after the portable-board adapter; no regressions/timeouts/crashes, target constructors omitted. |
+| Whole-source inventory | 1019/1182 compile; 163 standalone failures | Fresh sweep after the coin denomination fix; no gains/regressions/timeouts/crashes, target constructors omitted. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
 
 Of the inventory's failures, 113 documented fragments have currently compiling
@@ -583,7 +583,46 @@ No library/profile/binary change or new inventory sweep is made; the last
 measured inventory remains **1019/1182**, and synthetic hosts do not increase
 the documented shipped-fragment tally. The port remains in progress.
 
+## Selected coin denomination adaptation
+
+Coin piles retain float balances keyed by base currency. The drop verb now
+converts denomination counts to those units before creating or merging a pile,
+and pickup converts a denomination request against its stored currency balance.
+A missing balance starts at 0.0. Current wallets, money daemon, COINS constructor/
+merge contract and get dispatch remain; USE_MONEY stays unselected.
+
+`all` drop transfers the wallet's entire balance for that currency, including
+fractions. Named `all` pickup transfers that currency's balance in the addressed
+pile, leaving other currencies intact. Generic numeric `coin`/`coins` keeps its
+base-unit meaning and requires a single currency. Whole pickup retains float
+values, and the existing money tolerance removes rounding-only residue after
+repeated decimal transfers. Drop debits the wallet only after successful pile
+creation/placement or merge; refused placement removes the new unplaced pile.
+
+Run the maintained regression test after building lpc-rs:
+
+```sh
+python3 tests/coins/test_coins.py
+```
+
+**Ten compiler checks and 55 runtime assertions pass in 1.150s.** The original
+source fails the new denomination-storage regression. Actual get/drop/pile/
+wallet/daemon components with a fixture actor check fixed totals and recovery
+of seeded piles: new/existing and mixed currencies, aliases, partial/whole/all,
+fractions, decimal repetition, refusals and a caught pre-mutation merge error.
+Parser dispatch, real login, concurrency, account restart and callbacks that
+mutate before failing are outside this suite. See [test details](tests/coins/README.md)
+and the [native adaptation notes](../lpc-rs/doc/driver-comparison.md#lima-selected-coin-denomination-adaptation).
+
+The fresh sweep remains **1019/1182 compiling, 163 failures**, with no gains,
+regressions, timeouts or crashes in 43.474s. This fixes runtime behavior in already
+compiling files. All 113 existing fragment proofs retain compiling hosts. The
+port remains in progress; native Rust, profile and release binaries are unchanged.
+
 ## Legacy money and selected coin interface audit
+
+The following is the earlier audit snapshot; the selected-path fixes above are
+now adopted. The optional legacy money provider remains unchanged.
 
 The 20 October audit keeps COINS and current body wallets selected; USE_MONEY
 remains unselected. Legacy `std/money` stores integer denomination counts, while

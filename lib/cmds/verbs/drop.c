@@ -97,6 +97,7 @@ void do_drop_wrd_str(string amount_str, string type)
 
    sscanf(type, "%s %s", type, s);
    type = MONEY_D->singular_name(type);
+#ifdef USE_MONEY
    if (amount_str == "all")
       amount = this_body()->query_amt_money(type);
    else
@@ -111,21 +112,50 @@ void do_drop_wrd_str(string amount_str, string type)
       write("You don't have " + MONEY_D->denomination_to_string(amount, type) + ".\n");
       return;
    }
+   this_body()->subtract_money(type, amount);
+   if (ob = present("money", environment(this_body())))
+      ob->merge_money(amount, type);
+   else
+      clone_object(MONEY, amount, type)->move(environment(this_body()));
+   this_body()->simple_action("$N $vdrop " + MONEY_D->denomination_to_string(amount, type) + ".");
+#else
+   string currency = MONEY_D->query_currency(type);
+   float balance = this_body()->query_amt_currency(currency);
+   amount = to_int(amount_str);
+   if (amount_str != "all" && amount < 0)
+   {
+      write("Nice try.\n");
+      return;
+   }
+   float value = amount_str == "all" ? balance : to_float(amount) * MONEY_D->query_factor(type);
+   if (value <= 0.0)
+   {
+      write("There is no money to drop.\n");
+      return;
+   }
+   if (!MONEY_D->sufficient_money(balance, value))
+   {
+      write("You don't have " + MONEY_D->denomination_to_string(amount, type) + ".\n");
+      return;
+   }
+   string description = amount_str == "all" ? MONEY_D->currency_to_string(value, currency) :
+                                             MONEY_D->denomination_to_string(amount, type);
+   if (ob = present("money", environment(this_body())))
+      ob->merge_coins(value, currency);
    else
    {
-      this_body()->subtract_money(type, amount);
-      if (ob = present("money", environment(this_body())))
-#ifdef USE_MONEY
-         ob->merge_money(amount, type);
-      else
-         clone_object (MONEY, amount, type)->move(environment(this_body()));
-#else
-         ob->merge_coins(amount, type);
-      else
-         clone_object (COINS, amount, type)->move(environment(this_body()));
-#endif
-      this_body()->simple_action("$N $vdrop " + MONEY_D->denomination_to_string(amount, type) + ".");
+      ob = clone_object(COINS, value, currency);
+      mixed moved = ob->move(environment(this_body()));
+      if (moved != MOVE_OK)
+      {
+         destruct(ob);
+         write(stringp(moved) ? moved : "You can't drop money here.\n");
+         return;
+      }
    }
+   this_body()->subtract_money(currency, value);
+   this_body()->simple_action("$N $vdrop " + description + ".");
+#endif
 }
 
 void create()

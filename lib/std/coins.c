@@ -8,6 +8,7 @@ inherit OBJ;
 inherit M_GETTABLE;
 inherit M_MESSAGES;
 
+// Pile balances are stored in base-currency units.
 private
 mapping coins = ([]);
 
@@ -29,7 +30,7 @@ string long_descr()
 private
 float query_amt_coins(string type)
 {
-   return coins[type];
+   return coins[type] || 0.0;
 }
 
 string *query_coins()
@@ -39,69 +40,78 @@ string *query_coins()
 
 void split_coins(float amount, string type)
 {
-   if (coins[type] >= amount)
+   float balance = query_amt_coins(type);
+   if (amount <= 0.0)
    {
-      this_body()->add_money(type, amount);
-      coins[type] -= amount;
-      this_body()->simple_action("$N $vtake some coins.");
-      if (coins[type] <= 0)
-      {
-         m_delete(coins, type);
-         if (!sizeof(query_coins()))
-            remove();
-      }
+      write("Please specify a positive amount.\n");
+      return;
    }
-   else
+   if (!MONEY_D->sufficient_money(balance, amount))
+   {
       write("There aren't that many coins of that type here.\n");
+      return;
+   }
+   this_body()->add_money(type, amount);
+   if (MONEY_D->sufficient_money(amount, balance))
+      m_delete(coins, type);
+   else
+      coins[type] = balance - amount;
+   this_body()->simple_action("$N $vtake some coins.");
+   if (!sizeof(coins))
+      remove();
 }
 
 mixed get(mixed args...)
 {
    string amount_str = sizeof(args) > 0 ? args[0] : nil;
    string type = sizeof(args) > 1 ? args[1] : nil;
-   string denomination;
-   int amount;
-   string *types;
 
    if (!amount_str)
    {
-      foreach (denomination, amount in coins)
-      {
-         this_body()->add_money(denomination, amount);
-      }
+      foreach (string currency, float value in coins)
+         this_body()->add_money(currency, value);
       this_body()->simple_action("$N $vtake the pile of coins.");
       remove();
       return "";
    }
+
+   string currency;
+   float factor = 1.0;
+   if (type == "coin" || type == "coins")
+   {
+      string *types = query_coins();
+      if (sizeof(types) != 1)
+      {
+         write("Which type of coins do you want to get?\n");
+         return;
+      }
+      currency = types[0];
+   }
    else
    {
-      if (type == "coins" || type == "coin")
+      type = MONEY_D->singular_name(type);
+      if (!MONEY_D->is_denomination(type))
       {
-         types = query_coins();
-         if (sizeof(types) == 1)
-         {
-            amount = to_int(amount_str);
-            split_coins(to_float(amount), types[0]);
-         }
-         else
-            write("Which type of coins do you want to get?\n");
-      }
-      else if (!coins[type])
          write("There are no coins of that type here.\n");
-      else
-      {
-         if (amount_str == "all")
-            split_coins(coins[type], type);
-         else
-            split_coins(to_float(to_int(amount_str)), type);
+         return;
       }
+      currency = MONEY_D->query_currency(type);
+      factor = MONEY_D->query_factor(type);
    }
+   float balance = query_amt_coins(currency);
+   if (balance <= 0.0)
+   {
+      write("There are no coins of that type here.\n");
+      return;
+   }
+   float amount = amount_str == "all" ? balance : to_float(to_int(amount_str)) * factor;
+   split_coins(amount, currency);
 }
 
 void merge_coins(float amount, string type)
 {
    this_object()->add_id(type);
-   coins[type] = coins[type] + amount;
+   coins[type] = query_amt_coins(type) + amount;
 }
 
 void setup(float amount, string type)
