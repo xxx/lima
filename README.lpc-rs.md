@@ -693,6 +693,44 @@ fragment proofs retain compiling hosts; 49 other consumers retain their recorded
 dispositions. This is source support without activation; the port remains in
 progress. Native Rust, profile and release binaries stay unchanged.
 
+## Remaining-source disposition reconciliation
+
+The 20 October reconciliation accounts for all **49** failures outside the 113
+existing shipped-host fragment proofs. The last measured total remains
+**1020/1182 compiling, 162 failures**; this review reruns no full sweep and claims
+no new compilation gain. All 1549 library hashes, the 49 source/log records and
+release binary/profile inputs match the measured inventory.
+
+| Residual disposition | Files |
+|---|---:|
+| Previously qualified optional host compositions | 3 |
+| Retained provider/configuration alternatives | 20 |
+| Unselected board packages/backend | 10 |
+| Body/schema or shared-state integration required | 6 |
+| Unfinished subsystems and dependent examples | 5 |
+| Deferred or upstream-disabled commands | 2 |
+| Incomplete legacy service/backend ports | 3 |
+
+The three host compositions are bindings, boss and flow room; their existing
+bounded qualifications remain separate from shipped-host proofs. The other 46
+are limitations or unselected work, not completed implementations or proven
+native-feature gaps. One compiler-only selector confirms the current statistics/
+combat providers, USE_MASS and unselected USE_MONEY; no alternate build is run.
+
+The incomplete service group is contrib/http_connection, contrib/nntp and
+obj/secure/old_socket. Keep the HTTP/master replacement unselected and the
+deprecated backend retired. NNTP still depends on that backend and has no
+completed focused port. The next bounded work is a source-only NNTP interface
+audit against the already ported SOCKET, without endpoint contact, service
+activation or transport reimplementation. Default local news/mail and previous
+TCP/service qualifications retain their scopes. See the
+[native reconciliation](../lpc-rs/doc/driver-comparison.md#lima-remaining-source-disposition-reconciliation).
+
+This is a disposition inventory, not whole-port completion or proof that
+arbitrary user-selected paths cannot load a file. No production library/profile/
+binary changes or driver session occur in this reconciliation. The port remains
+in progress; existing integration/incomplete-feature decisions remain visible.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
