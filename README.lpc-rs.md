@@ -258,11 +258,21 @@ integer array and converted with `to_bytes`; no mutable-byte API is needed.
 A small native control archive preserves binary bytes and an empty file when
 read by Python and GNU tar, but that control does not execute this utility.
 
-A driver issue must be fixed first: `write_bytes` checks physical metadata,
-ignoring the calling transaction's pending creation, growth and truncation.
-The audit reproduces failed writes after creation/append and incorrect negative
-offsets or bounds after staged changes. Keep the usual missing-file zero result,
-but use the current transaction's file view for existing pending files.
+The audit exposed a native driver issue: `write_bytes` used physical metadata,
+ignoring pending creation, growth and truncation. The native correction now
+shares the calling transaction's kind/byte-size view with `file_size`, so bounds
+and negative offsets follow staged changes. An ordinary missing file still
+returns zero. Ten new byte-write regressions and additional file-size coverage
+verify pending changes, permission-apply creation and write-only files. The native
+workspace passes 5188 tests, two ignored; Clippy, formatting and an ordinary
+optimized workspace build pass too.
+
+Seven controls with the rebuilt release CLI and unchanged Lima profile pass,
+including a five-write archive created within one task. Python and GNU tar retain
+its exact binary payload and empty member. The control uses real simuls/includes
+and a temporary permissive master; it does not execute `contrib/tar.c` or qualify
+a gameplay/service run. This fixes the driver prerequisite, with the tar adaptation
+still open. See the [native correction](../lpc-rs/doc/driver-comparison.md#lima-transactional-byte-writes).
 
 The tar source also needs native callback binding, explicit archive creation,
 empty-file/directory handling, terminating zero records, corrected large-file
