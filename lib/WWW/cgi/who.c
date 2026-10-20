@@ -9,7 +9,7 @@ inherit CLASS_FINGER;
 // Strip colour codes
 string stripped(string info)
 {
-   return terminal_colour(info, ANSI_D->query_translations()[1]);
+   return terminal_colour(info, ANSI_D->query_translations()[1], 0, 0);
 }
 
 private
@@ -23,18 +23,18 @@ nomask string get_idle(int i)
    return "";
 }
 
-string main(mixed data)
+string main(mixed data = nil)
 {
    class finger info;
    string s;
    string mailstring;
    string idle;
    string first_line;
-   string userid;
+   string userid = "";
 
    if (stringp(data))
       userid = data;
-   if (mappingp(data))
+   if (mappingp(data) && stringp(data["name"]))
       userid = data["name"];
    if (strlen(userid) && userid[0] == '=')
       userid = userid[1..];

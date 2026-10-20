@@ -5,8 +5,8 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-Reviewed **19 October 2026** at Lima **8a26d8c7** and native **ded2bc3a**.
-The current checkout passes the configured fresh-account acceptance run:
+**The port remains in progress.** The configured fresh-account lifecycle was
+qualified on **19 October 2026** at Lima **8a26d8c7** and native **ded2bc3a**:
 30 lifecycle checkpoints in 136.54 seconds, including character creation, ordinary
 commands, native saves and saved login after restart. Both boots have 151 clean
 preloads and exit normally. The five shipped suites pass 26/16/7/5/5, then both
@@ -19,14 +19,15 @@ combined modes pass 59/59. Source inventory and runtime results retain distinct 
 | NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default stat-menu qualification follows. |
 | Trainer stat menu | Four source targets compile; 43 runtime checks pass | Adopted source with default strength/agility options; prices, payments, point exhaustion and cleanup verified. |
 | Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Per-suite-first is the operator recipe; the current direct-cold recheck is below. |
-| Whole-source inventory | 999/1182 compile; 183 standalone failures | Rebuilt release compiler; target constructors were not run. |
+| Whole-source inventory | 1008/1182 compile; 174 standalone failures | Fresh sweep after the CGI adaptations; no regressions/timeouts/crashes, target constructors omitted. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
 
-Of the inventory's failures, 111 fragments have passing complete hosts. The
-other 72 retain reviewed optional, unselected, deferred or unresolved-consumer
-contexts. They are not a count of missing driver features or proof that code is
-unreachable. Command compilation is player 65/67 (random2 deferred; suicide
-disabled upstream), wizard 81/81, guild 4/4 and verbs 90/90.
+Of the inventory's failures, 113 documented fragments have currently compiling
+shipped hosts. **The other 61 consumers remain open for porting or explicit
+review.** Optional or unselected code is not finished merely because it is absent
+from the configured boot. These are not counts of missing driver features.
+Command compilation remains player 65/67 (random2 deferred; suicide disabled
+upstream), wizard 81/81, guild 4/4 and verbs 90/90.
 
 Fixed parameter defaults follow the native
 [trailing-default rule](../lpc-rs/doc/lpc/anatomy_of_a_program.md#parameter-defaults).
@@ -199,6 +200,34 @@ player/world state, zero manual target loads, completed documentation scanning
 and real saved-password authentication. Sources, profile and release binaries
 are unchanged. Existing channel/header warnings remain; no runtime errors or
 preload failures occur. Evidence: /tmp/lima-port-acceptance-20261019.
+
+## CGI helper regression tests
+
+The three `WWW/cgi` helpers now compile and pass 55 isolated runtime assertions.
+`autodoc.c` uses ordinary HTML string literals, distinct nil routing and bare
+callbacks for its indexes and inheritance tree. `mudinfo.c` uses native array,
+mapping-filter and regex-result forms. `who.c` supplies the four required colour
+wrapper arguments and handles omitted query/form names. Empty queries are
+handled before indexing.
+
+Run the permanent regression test from this checkout:
+
+```sh
+python3 tests/cgi/test_cgi.py
+```
+
+The [test guide](tests/cgi/README.md) explains compiler selection and fixture
+scope. The runner copies current sources into a temporary library, uses the
+existing profile, and exercises generated documentation, mud filtering, colour
+stripping, finger fields and the HTTP form's data-plus-headers call. The real
+class definitions, grammar, glob and ANSI providers remain in use; IMUD and
+finger records are controlled fixtures. This qualifies helper output without
+starting an HTTP service or contacting a router.
+
+The following full source sweep measures **1008/1182 compile, 174 fail**, with
+zero regressions/timeouts/crashes. All three gains are these CGI helpers; 113
+hosted fragments and 61 other consumers remain. This is compilation coverage,
+not another full lifecycle or live-service qualification.
 
 ## Remaining scope
 

@@ -40,16 +40,16 @@ string mail_link(string s)
    return sprintf("<a href=mailto:%s>%s</a>", s, s);
 }
 
-string main(string pattern)
+string main(string pattern = nil)
 {
    string ret = "";
    mapping mudlist = IMUD_D->query_mudlist();
    mapping upmuds;
    int nummuds = sizeof(mudlist);
    string mudname;
-   mixed array data;
+   mixed *data;
 
-   if (!pattern)
+   if (!pattern || pattern == "")
       pattern = "*";
 
    pattern = replace_string(pattern, "+", " ");
@@ -58,7 +58,7 @@ string main(string pattern)
       pattern = pattern[1..];
 
    pattern = "^" + M_GLOB->translate(pattern, 1);
-   mudlist = filter_mapping(mudlist, ( : regexp(lobotomize($1), $(pattern)) :));
+   mudlist = filter(mudlist, ( : sizeof(regexp(({lobotomize($1)}), $(pattern))) :));
    if (!sizeof(mudlist))
    {
       return sprintf("<h3>No muds out of %d match your pattern.<h3>", nummuds);

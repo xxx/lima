@@ -23,12 +23,12 @@ string handle_command(string part)
 {
    string ret;
 
-   if (part == 0)
+   if (part == nil)
    {
       string *commands = get_dir("/help/autodoc/command/");
 
-      return @END<title> Automatic Command Documentation</ title><H1> Automatic Command Documentation</ H1><HR>
-             <UL> END +
+      return "<title>Automatic Command Documentation</title>\n"
+             "<H1>Automatic Command Documentation</H1><HR><UL>\n" +
              implode(map(commands, (
                                        : "<LI> <A HREF=\"autodoc.c?=command-" + $1 + "\"> " + $1 + " </A>"
                                        :)),
@@ -48,12 +48,12 @@ string handle_function(string part)
    string ret, func, tmp;
    int i;
 
-   if (part == 0)
+   if (part == nil)
    {
       string *functions = get_dir("/help/autodoc/functions/");
 
-      return @END<title> Automatic Function Documentation</ title><H1> Automatic Function Documentation</ H1><HR>
-             <UL> END +
+      return "<title>Automatic Function Documentation</title>\n"
+             "<H1>Automatic Function Documentation</H1><HR><UL>\n" +
              implode(map(functions, (
                                         : "<LI> <A HREF=\"autodoc.c?=functions-" + $1 + "\"> " + $1 + " </A>"
                                         :)),
@@ -61,12 +61,12 @@ string handle_function(string part)
              "</UL>\n";
    }
    sscanf(part, "%s-%s", part, func);
-   if (func == 0)
+   if (func == nil)
    {
       string *functions = get_dir("/help/autodoc/functions/" + part + "/");
 
-      return @END<title> Automatic Function Documentation</ title><H1> Automatic Function Documentation</ H1><HR>
-             <UL> END +
+      return "<title>Automatic Function Documentation</title>\n"
+             "<H1>Automatic Function Documentation</H1><HR><UL>\n" +
              implode(map(functions,
                          (
                              : "<LI> <A HREF=\"autodoc.c?=functions-" + $(part) + "-" + $1 + "\"> " + $1 + " </A>"
@@ -91,11 +91,12 @@ string handle_hook(string part)
    string ret, tmp;
    int i;
 
-   if (part == 0)
+   if (part == nil)
    {
       string *hooks = get_dir("/help/autodoc/hook/");
 
-      return @END<title> Automatic Hook Documentation</ title><H1> Automatic Hook Documentation</ H1><HR><UL> END +
+      return "<title>Automatic Hook Documentation</title>\n"
+             "<H1>Automatic Hook Documentation</H1><HR><UL>\n" +
              implode(map(hooks, (
                                     : "<LI> <A HREF=\"autodoc.c?=hook-" + $1 + "\"> " + $1 + " </A>"
                                     :)),
@@ -118,11 +119,12 @@ string handle_module(string part)
 {
    string ret;
 
-   if (part == 0)
+   if (part == nil)
    {
       string *modules = get_dir("/help/autodoc/modules/");
 
-      return @END<title> Automatic Module Documentation</ title><H1> Automatic Module Documentation</ H1><HR><UL> END +
+      return "<title>Automatic Module Documentation</title>\n"
+             "<H1>Automatic Module Documentation</H1><HR><UL>\n" +
              implode(map(modules, (
                                       : "<LI> <A HREF=\"autodoc.c?=modules-" + $1 + "\"> " + $1 + " </A>"
                                       :)),
@@ -182,7 +184,7 @@ string tree_form(string part)
       line = part;
    }
 
-   return "<LI> " + line + "<UL>\n" + implode(map(inherit_list(ob), ( : tree_form:)), "\n") + "</UL>\n";
+   return "<LI> " + line + "<UL>\n" + implode(map(inherit_list(ob), tree_form), "\n") + "</UL>\n";
 }
 
 varargs string handle_tree(string part)
@@ -205,42 +207,46 @@ string handle_overview(string part)
 {
    mixed *tmp;
 
-   string ret = @END<title> Mudlib Overview</ title><h1> Mudlib Overview</ h1><hr>
-
-       <h3> Base Objects</ h3><UL> END;
+   string ret = "<title>Mudlib Overview</title>\n<h1>Mudlib Overview</h1><hr>\n"
+       "<h3>Base Objects</h3><UL>\n";
    tmp = get_dir("/std/");
    tmp = filter(tmp, ( : $1[ < 2..] == ".c" :));
-   tmp = map(tmp, ( : object_summary_line:));
+   tmp = map(tmp, object_summary_line);
    ret += implode(tmp, "\n") + "</UL>\n";
 
    ret += "<h3>Modules</h3>\n<UL>\n";
 
    tmp = get_dir("/std/modules/");
    tmp = filter(tmp, ( : $1[ < 2..] == ".c" :));
-   tmp = map(tmp, ( : module_summary_line:));
+   tmp = map(tmp, module_summary_line);
    ret += implode(tmp, "\n") + "</UL>\n";
 
    return ret;
 }
 
-string main(string arg)
+string main(string arg = nil)
 {
    string part;
 
-   if (arg && arg[0] == '=')
+   if (arg && sizeof(arg) && arg[0] == '=')
       arg = arg[1..];
+
+   if (arg == "")
+      arg = nil;
 
    if (arg)
       sscanf(arg, "%s-%s", arg, part);
 
    switch (arg)
    {
-   case 0:
-      return @END<title> Automatic Documentation Interface</ title><H1> Automatic Documentation Interface</ H1><HR><UL>
-          <LI><A HREF = "autodoc.c?=command"> Commands</ A><LI><A HREF = "autodoc.c?=functions"> Functions</ A><LI>
-          <A HREF = "autodoc.c?=hook"> Hooks</ A><LI><A HREF = "autodoc.c?=modules"> Modules</ A></ UL>
-
-          <A HREF = "autodoc.c?=overview"> Mudlib Overview</ A> END;
+   case nil:
+      return "<title>Automatic Documentation Interface</title>\n"
+             "<H1>Automatic Documentation Interface</H1><HR><UL>\n"
+             "<LI><A HREF=\"autodoc.c?=command\">Commands</A>"
+             "<LI><A HREF=\"autodoc.c?=functions\">Functions</A>"
+             "<LI><A HREF=\"autodoc.c?=hook\">Hooks</A>"
+             "<LI><A HREF=\"autodoc.c?=modules\">Modules</A></UL>\n"
+             "<A HREF=\"autodoc.c?=overview\">Mudlib Overview</A>\n";
    case "command":
       return handle_command(part);
    case "functions":
