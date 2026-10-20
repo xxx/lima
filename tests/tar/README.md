@@ -26,8 +26,10 @@ crosses the old record-mask boundary. The output inside the archived tree is
 excluded. Invalid root inputs preserve the existing output and source.
 
 The writer queues at most ten entries or 1 MiB of payload per callback, with a
-one-second continuation delay. The native `read_bytes` implementation currently
-materializes the entire source before slicing; this test proves continuation
-and archive correctness, not bounded physical read memory or I/O. Directory
-listings are also collected in full. The test uses a permissive master rather
-than qualifying a player command or live service.
+one-second continuation delay. The native range-read correction reads only the
+requested range of an unchanged regular source; pending source changes can still
+require the full content view. Directory listings are collected in full. This
+test verifies continuation/archive correctness; native memory and timing controls
+are recorded in the [driver notes](../../../lpc-rs/doc/driver-comparison.md#lima-byte-range-reads).
+The test uses a permissive master rather than qualifying a player command or live
+service.

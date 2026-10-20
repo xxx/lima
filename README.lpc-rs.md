@@ -285,11 +285,18 @@ runner keeps the distinct-nil/preserved-player/4000ms profile and uses real
 simuls/includes with a temporary permissive master, rather than a player command
 or full gameplay run. See [test scope](tests/tar/README.md).
 
-The native byte-write visibility fix is committed as **29f120c2**. One driver
-performance follow-up remains: `read_bytes` currently reads the entire source
-before slicing each requested chunk. The payload budget therefore does not bound
-physical read memory/I/O yet; directory listings are also collected in full.
-See the [native port notes](../lpc-rs/doc/driver-comparison.md#lima-contributed-tar-writer).
+The native byte-write visibility fix is committed as **29f120c2**. The subsequent
+native range-read correction reads only the requested range of unchanged regular
+sources, so tar's positive payload reads no longer load the whole source per
+chunk. Pending target changes and negative/zero-length reads retain the full
+content view; directory listings are still collected in full.
+
+A controlled native 64 MiB workload of 32 small reads drops from 0.970s/87.1 MiB
+peak RSS to 0.011s/22.8 MiB. Full-file and tail controls improve too; a separate
+1 GiB sparse-input range read passes under a 512 MiB address-space cap. These
+figures describe native API controls, not whole-mudlib speedups. The actual tar
+runner is requalified on the rebuilt release driver with all 21 assertions and
+six archives passing. See the [native range-read notes](../lpc-rs/doc/driver-comparison.md#lima-byte-range-reads).
 
 The full standalone source sweep now measures **1011/1182 compiling, 171 fail**,
 with zero regressions/timeouts/crashes. Its only gain is this helper; 113 hosted
