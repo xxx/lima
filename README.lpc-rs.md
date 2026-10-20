@@ -19,11 +19,11 @@ combined modes pass 59/59. Source inventory and runtime results retain distinct 
 | NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default stat-menu qualification follows. |
 | Trainer stat menu | Four source targets compile; 43 runtime checks pass | Adopted source with default strength/agility options; prices, payments, point exhaustion and cleanup verified. |
 | Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Per-suite-first is the operator recipe; the current direct-cold recheck is below. |
-| Whole-source inventory | 1014/1182 compile; 168 standalone failures | Fresh sweep after the room-maker adapter; no regressions/timeouts/crashes, target constructors omitted. |
+| Whole-source inventory | 1016/1182 compile; 166 standalone failures | Fresh sweep after the attic-example adapters; no regressions/timeouts/crashes, target constructors omitted. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
 
 Of the inventory's failures, 113 documented fragments have currently compiling
-shipped hosts. **The other 55 standalone consumers remain open for porting or explicit
+shipped hosts. **The other 53 standalone consumers remain open for porting or explicit
 review.** Optional or unselected code is not finished merely because it is absent
 from the configured boot. These are not counts of missing driver features.
 The contributed drunkenness example also retains its older body-API integration
@@ -340,7 +340,7 @@ permissive master and loopback driver. See the
 [test scope](tests/transient_effects/README.md) and
 [native adapter notes](../lpc-rs/doc/driver-comparison.md#lima-contributed-transient-effect-adapter).
 
-The fresh whole-source sweep measures **1013/1182 compiling, 169 failures** in
+At contributed-effect adoption, the whole-source sweep measured **1013/1182 compiling, 169 failures** in
 **39.723s**, with zero regressions/timeouts/crashes. Only the two contributed files
 gain. All **113 hosted fragments** retain compiling shipped hosts; **56 other
 standalone consumers** remain. The missing body contract above remains an extra
@@ -376,33 +376,46 @@ arbitrary input validation remain outside this focused test. See the
 [test guide](tests/roommaker/README.md) and
 [native adapter notes](../lpc-rs/doc/driver-comparison.md#lima-contributed-room-maker-adapter).
 
-The fresh full sweep measures **1014/1182 compiling, 168 failures** in **43.180s**,
+At room-maker adoption, the full sweep measured **1014/1182 compiling, 168 failures** in **43.180s**,
 with zero regressions/timeouts/crashes. Only the command gains; the menu already
 compiled. All **113 hosted fragments** retain compiling shipped hosts, with **55
 other standalone consumers** remaining. The contributed drunkenness body contract
 remains an extra runtime integration limit. No native Rust, binary or profile
 change is required. The port remains in progress.
 
-## Attic table and town-room audit
+## Attic table and town-room examples
 
-The 20 October audit checks the still-unadapted coffee-table and town-room
-examples. Float mass alone compiles the table but leaves its constructor failing:
-`set_preposition` is a diagnostic placeholder, so it lacks a real relation/default.
-The town helper needs the format separator and uses an unassigned string as its
-exit-count selector, preventing its dead-end/two-way-road branches.
+The attic coffee table now has float mass, an explicit `on` relation/default and
+LARGE surface capacity, so it constructs and accepts ordinary item placement.
+The town-room helper uses its actual exit count for dead-end/road/intersection
+descriptions and passes the default format separator explicitly. Existing sample
+identity, attachment, direction ordering, outdoor provider and path prefix remain.
+Zero directions retain the existing intersection wording.
 
-A small temporary two-file adapter passes **60 assertions** covering table
-construction, movement/capacity/refusals and all 16 town direction combinations
-with exact titles, descriptions and exit paths. **13 compiler controls** give
-11 passes and two expected rejections; three baseline runtime controls reproduce
-the hidden defects. Recommend adopting it with permanent tests. No production
-source or native framework change is adopted by this audit.
+After building the sibling native workspace, run:
 
-The attic supplies no town destination directory, so these are helper/path
-checks rather than traversal qualification. Existing zero-exit wording remains;
-real player/parser commands and alternate configurations are unchecked. See the
-[native audit notes](../lpc-rs/doc/driver-comparison.md#lima-attic-table-and-town-room-audit).
-The measured source inventory remains **1014/1182**; no inferred source gain.
+```sh
+python3 tests/attic_examples/test_attic_examples.py
+```
+
+The permanent runner passes **60 LPC assertions and eight compiler checks in
+1.198s** against actual source. It exercises table construction, default placement,
+capacity accounting/refusal/release and unsupported placement, all 16 town
+subsets with exact titles/descriptions/exit paths, and clone cleanup. The runner
+retains distinct nil, preserved player, USE_MASS and 4000ms, real simuls/includes,
+a permissive temporary master and a typed weighted fixture item. See the
+[test guide](tests/attic_examples/README.md) and
+[native adapter notes](../lpc-rs/doc/driver-comparison.md#lima-attic-table-and-town-room-adapter).
+
+The attic supplies no town destination directory and town.c is TODO; helper/path
+checks do not qualify traversal or add world content. Real parser/player get/put/go
+and alternate builds remain unchecked. No native/shared-framework change is needed.
+
+The fresh full sweep measures **1016/1182 compiling, 166 failures** in **52.687s**,
+with zero regressions/timeouts/crashes. Only these two examples gain. All **113
+hosted fragments** retain compiling shipped hosts, with **53 other standalone
+consumers** remaining. The contributed drunkenness body requirement stays an
+additional runtime limit. The port remains in progress.
 
 ## Remaining scope
 

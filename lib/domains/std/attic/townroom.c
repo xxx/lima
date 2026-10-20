@@ -5,7 +5,6 @@ inherit OUTDOOR_ROOM;
 void setup(string n, string e, string s, string w)
 {
    string *d = ({});
-   string i;
 
    if (n)
    {
@@ -27,7 +26,7 @@ void setup(string n, string e, string s, string w)
       add_exit("west", __DIR__ + "town/" + w);
       d += ({"west"});
    }
-   switch (i)
+   switch (sizeof(d))
    {
    case 1:
       set_brief("Dead end");
@@ -39,7 +38,7 @@ void setup(string n, string e, string s, string w)
       break;
    default:
       set_brief("Intersection");
-      set_long("The road leads " + format_list(d) + ".\n");
+      set_long("The road leads " + format_list(d, nil) + ".\n");
       break;
    }
 }
