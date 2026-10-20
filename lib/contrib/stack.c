@@ -25,5 +25,5 @@ mixed stack_pop(class stack s)
 {
    if (s.which == 0)
       error("Stack underflow.\n");
-   return s->elems[--(s.which)];
+   return s.elems[--(s.which)];
 }

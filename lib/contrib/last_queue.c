@@ -27,7 +27,7 @@ void lqueue_add(class lqueue q, mixed elem)
 }
 
 // 1 = last, 2 = before that, etc
-void lqueue_member(class lqueue q, int ind)
+mixed lqueue_member(class lqueue q, int ind)
 {
    int which = q.index - ind;
    if (which < 0)
@@ -37,5 +37,7 @@ void lqueue_member(class lqueue q, int ind)
 
 mixed *lqueue_list(class lqueue q)
 {
+   if (q.index == 0)
+      return q.elems + ({});
    return q.elems[q.index..] + q.elems[0..q.index - 1];
 }

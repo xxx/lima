@@ -19,11 +19,11 @@ combined modes pass 59/59. Source inventory and runtime results retain distinct 
 | NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default stat-menu qualification follows. |
 | Trainer stat menu | Four source targets compile; 43 runtime checks pass | Adopted source with default strength/agility options; prices, payments, point exhaustion and cleanup verified. |
 | Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Per-suite-first is the operator recipe; the current direct-cold recheck is below. |
-| Whole-source inventory | 1008/1182 compile; 174 standalone failures | Fresh sweep after the CGI adaptations; no regressions/timeouts/crashes, target constructors omitted. |
+| Whole-source inventory | 1010/1182 compile; 172 standalone failures | Fresh sweep after the collection helpers; no regressions/timeouts/crashes, target constructors omitted. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
 
 Of the inventory's failures, 113 documented fragments have currently compiling
-shipped hosts. **The other 61 consumers remain open for porting or explicit
+shipped hosts. **The other 59 consumers remain open for porting or explicit
 review.** Optional or unselected code is not finished merely because it is absent
 from the configured boot. These are not counts of missing driver features.
 Command compilation remains player 65/67 (random2 deferred; suicide disabled
@@ -224,10 +224,32 @@ class definitions, grammar, glob and ANSI providers remain in use; IMUD and
 finger records are controlled fixtures. This qualifies helper output without
 starting an HTTP service or contacting a router.
 
-The following full source sweep measures **1008/1182 compile, 174 fail**, with
+The full sweep immediately after the CGI adaptations measured **1008/1182 compile, 174 fail**, with
 zero regressions/timeouts/crashes. All three gains are these CGI helpers; 113
 hosted fragments and 61 other consumers remain. This is compilation coverage,
 not another full lifecycle or live-service qualification.
+
+## Queue and stack regression tests
+
+The contributed collection helpers now compile and pass 37 isolated LPC runtime
+assertions. `last_queue.c` returns a `mixed` element from `lqueue_member` and
+returns one fresh capacity-sized window at index zero, including after wrapping.
+`stack.c` uses native dot access for the class field in `stack_pop`.
+
+```sh
+python3 tests/collections/test_collections.py
+```
+
+The [test guide](tests/collections/README.md) describes the fixed-window, alias,
+mixed-value and overflow/underflow cases. The fixture inherits the two actual
+helper programs. It uses the existing profile in a temporary library without
+starting a service. The accessor declaration is already `void` in the pinned
+upstream source; a return-type-only control exposes the doubled zero-index window
+under native slicing. No upstream driver was executed.
+
+The following full sweep measures **1010/1182 compile, 172 fail**, with zero
+regressions/timeouts/crashes. The two gains are these helpers; 113 hosted fragments
+and 59 other consumers remain. The port is still in progress.
 
 ## Remaining scope
 
