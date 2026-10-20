@@ -9,7 +9,7 @@ int alcohol_strength = 1;
 // and loss of stamina it provides.
 void set_alcohol_strength(int i)
 {
-   alcohol_strength = i;
+   alcohol_strength = max(0, i);
 }
 int query_alcohol_strength()
 {
@@ -19,7 +19,8 @@ void add_alcohol_strength(int i)
 {
    if ((alcohol_strength + i) <= 0)
       alcohol_strength = 0;
-   alcohol_strength += i;
+   else
+      alcohol_strength += i;
 }
 
 void setup()
@@ -41,25 +42,25 @@ void do_effect(object ob)
       switch (action)
       {
       case 0:
-         ob->force_game_command("trip", 1);
+         ob->force_game_command("trip");
          break;
       case 1:
-         ob->force_game_command("stumble", 1);
+         ob->force_game_command("stumble");
          break;
       case 2:
          ob->simple_action("$N $vdrool.");
          break;
       case 3:
-         ob->force_game_command("appear dizzy", 1);
+         ob->force_game_command("appear dizzy");
          break;
       case 4:
-         ob->force_game_command("burp", 1);
+         ob->force_game_command("burp");
          break;
       case 5:
-         ob->force_game_command("hiccup", 1);
+         ob->force_game_command("hiccup");
          break;
       case 6:
-         ob->force_game_command("puke", 1);
+         ob->force_game_command("puke");
          break;
       default:
          break;
@@ -69,10 +70,6 @@ void do_effect(object ob)
 
 void another_effect_exists(object existing_effect)
 {
-   // Add alcohol strength to existing alcohol effect, then...
-   existing_drunkeness->add_alcohol_strength(alcohol_strength);
-   // Remove us, as the existing effect will now carry on with our
-   // strength added to it (duration is added by the transient_effect.c
-   // inheritable).
-   this_object()->remove();
+   existing_effect->add_alcohol_strength(alcohol_strength);
+   ::another_effect_exists(existing_effect);
 }

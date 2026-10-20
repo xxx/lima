@@ -8,22 +8,39 @@
  *
  */
 
-#include <hooks.h>
-
 inherit OBJ;
 inherit M_GETTABLE;
 
-int effect_duration, effect_type;
+int effect_duration;
+string effect_type;
 string effect_name;
+private nosave int effect_timer;
+
+private void stop_effect_timer()
+{
+   remove_call_out(effect_timer);
+   effect_timer = 0;
+}
+
+private void start_effect_timer()
+{
+   if (!query_call_out(effect_timer))
+      effect_timer = call_out(heart_beat, 2, 2);
+}
+
+int remove()
+{
+   stop_effect_timer();
+   return ::remove();
+}
 
 int is_transient_effect()
 {
    return 1;
 }
 
-//: HOOK another_effect_exists
-// Passed the object of the existing effect, used to perform extra
-// functionality if another effect with the same type/name exists.
+//: FUNCTION another_effect_exists
+// Override to extend a matching resident effect before removing this object.
 void another_effect_exists(object ob)
 {
    ob->add_effect_duration(effect_duration);
@@ -31,7 +48,7 @@ void another_effect_exists(object ob)
 }
 
 //: FUNCTION set_effect_duration
-// Set the duration of the effect in number of heart_beats
+// Effects run every two seconds, before checking expiry and decrementing.
 void set_effect_duration(int d)
 {
    effect_duration = d;
@@ -48,11 +65,11 @@ void add_effect_duration(int d)
 //: FUNCTION set_effect_type
 // Set the string type of effect this is, used to make sure only
 // one object of each type is in one inventory.
-void set_effect_type(int t)
+void set_effect_type(string t)
 {
    effect_type = t;
 }
-int query_effect_type()
+string query_effect_type()
 {
    return effect_type;
 }
@@ -78,13 +95,20 @@ void do_effect(object affected)
 
 void heart_beat()
 {
-   if (!environment()->is_living())
-      set_heart_beat(0);
-   else
-      set_heart_beat(1);
-   do_effect(environment());
+   object affected = environment();
+   if (!affected || !affected->is_living())
+   {
+      stop_effect_timer();
+      return;
+   }
+   do_effect(affected);
+   if (!objectp(this_object()))
+      return;
    if (effect_duration <= 0)
+   {
       this_object()->remove();
+      return;
+   }
    effect_duration--;
 }
 
@@ -92,22 +116,23 @@ void mudlib_setup()
 {
    set_attached(1);
    add_save(({"effect_duration"}));
-   set_heart_beat(1);
+   start_effect_timer();
 }
 
 varargs mixed move(object dest, string where)
 {
+   if (!dest)
+      return 0;
    foreach (object ob in all_inventory(dest))
    {
-      if (!ob->is_transient_effect())
+      if (ob == this_object() || !ob->is_transient_effect())
          continue;
       if (ob->query_effect_type() == effect_type && ob->query_effect_name() == effect_name)
       {
-         call_hooks("another_effect_exists", HOOK_IGNORE, ob);
+         another_effect_exists(ob);
          return;
       }
-      continue;
    }
-   set_heart_beat(1);
+   start_effect_timer();
    return ::move(dest, where);
 }

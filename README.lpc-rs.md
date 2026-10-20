@@ -19,13 +19,15 @@ combined modes pass 59/59. Source inventory and runtime results retain distinct 
 | NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default stat-menu qualification follows. |
 | Trainer stat menu | Four source targets compile; 43 runtime checks pass | Adopted source with default strength/agility options; prices, payments, point exhaustion and cleanup verified. |
 | Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Per-suite-first is the operator recipe; the current direct-cold recheck is below. |
-| Whole-source inventory | 1011/1182 compile; 171 standalone failures | Fresh sweep after tar adoption; no regressions/timeouts/crashes, target constructors omitted. |
+| Whole-source inventory | 1013/1182 compile; 169 standalone failures | Fresh sweep after the contributed-effect adapter; no regressions/timeouts/crashes, target constructors omitted. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
 
 Of the inventory's failures, 113 documented fragments have currently compiling
-shipped hosts. **The other 58 consumers remain open for porting or explicit
+shipped hosts. **The other 56 standalone consumers remain open for porting or explicit
 review.** Optional or unselected code is not finished merely because it is absent
 from the configured boot. These are not counts of missing driver features.
+The contributed drunkenness example also retains its older body-API integration
+requirement despite compiling; see below.
 Command compilation remains player 65/67 (random2 deferred; suicide disabled
 upstream), wizard 81/81, guild 4/4 and verbs 90/90.
 
@@ -298,28 +300,52 @@ figures describe native API controls, not whole-mudlib speedups. The actual tar
 runner is requalified on the rebuilt release driver with all 21 assertions and
 six archives passing. See the [native range-read notes](../lpc-rs/doc/driver-comparison.md#lima-byte-range-reads).
 
-The full standalone source sweep now measures **1011/1182 compiling, 171 fail**,
-with zero regressions/timeouts/crashes. Its only gain is this helper; 113 hosted
-fragments and 58 other consumers remain. The port remains in progress.
+At tar adoption, the full standalone sweep measured **1011/1182 compiling,
+171 fail**, with zero regressions/timeouts/crashes. Its only gain was this helper;
+113 hosted fragments and 58 other consumers remained. The newer inventory follows.
 
 ## Contributed transient effects
 
-The older `/contrib/transient_effect/transient_effect` and `drunk` remain
-unadapted, separate from the selected `/std/transient` framework. The 20 October
-audit reproduces their heartbeat, type and identifier compiler failures, then
-confirms inert merging and a negative-strength clamp defect. The selected body
-supplies `heal_us` but no `stun_us`; its `stun(limb, period)` performs different
-clamping/skill logic. The example also passes an obsolete second command argument.
+The older `/contrib/transient_effect/transient_effect` now uses a private nosave
+native two-second repeating timer, cancels it on removal and pauses while detached
+or in a nonliving host. A later living move restarts it. Matching identities merge
+through the virtual callback; self moves do not merge the object into itself.
+The existing apply-before-expiry rule remains: duration two permits three updates.
+The string effect type matches its documented interface and concrete example.
 
-A temporary native two-second call-out adapter passes 18 assertions, including
-real repeating callbacks, expiry, pause/restart, merge and cancellation. Nine
-additional controls confirm the original defects and selected body metadata;
-13 compiler checks give nine passes and four expected rejections. This is audit
-and feasibility evidence, not an adopted source fix or actual drunkenness test.
-The generic adapter needs adoption and permanent tests; the example's older body
-contract remains explicit. No new heartbeat efun is required. Existing selected
-poison/speed/spell integration is separate. See the
-[native audit notes](../lpc-rs/doc/driver-comparison.md#lima-contributed-transient-effect-audit).
+`drunk` corrects its merge variable, composes strength with inherited duration
+merging, clamps negative strength and uses one-argument commands. It retains an
+older **`stun_us` receiver requirement that the selected player body does not
+supply**. Its different `stun(limb, period)` is not substituted. Compile success
+therefore does not mean this contributed example is integrated with the selected
+player combat/intoxication system. The already qualified `/std/transient` effects
+remain separate. Existing effect save registration retains duration only; full
+identity/strength restoration is not established.
+
+After building the sibling native workspace, run:
+
+```sh
+python3 tests/transient_effects/test_transient_effects.py
+```
+
+The permanent runner passes **36 LPC assertions and eight compiler checks in
+6.961s** against the actual adapted source. It uses real elapsed repeating timers,
+expiry, pause/restart, merge, self-removal, cancellation and a captured fixture
+player identity. A receiver fixture supplies the older stun/heal/command contract;
+actual drunkenness callbacks dispatch bounded amounts and valid random actions
+to those sinks. No particular random sequence is required. These are not real
+player healing/stun or command-execution checks. The runner retains the distinct-
+nil/preserved-player/4000ms profile and real simuls/includes, with a temporary
+permissive master and loopback driver. See the
+[test scope](tests/transient_effects/README.md) and
+[native adapter notes](../lpc-rs/doc/driver-comparison.md#lima-contributed-transient-effect-adapter).
+
+The fresh whole-source sweep measures **1013/1182 compiling, 169 failures** in
+**39.723s**, with zero regressions/timeouts/crashes. Only the two contributed files
+gain. All **113 hosted fragments** retain compiling shipped hosts; **56 other
+standalone consumers** remain. The missing body contract above remains an extra
+runtime integration limit. No native Rust, binary or profile change is required.
+The port remains in progress.
 
 ## Remaining scope
 
