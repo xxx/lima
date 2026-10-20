@@ -731,6 +731,40 @@ arbitrary user-selected paths cannot load a file. No production library/profile/
 binary changes or driver session occur in this reconciliation. The port remains
 in progress; existing integration/incomplete-feature decisions remain visible.
 
+## NNTP source-interface audit
+
+The 20 October source audit finds that the selected SOCKET text interface can
+replace OLD_SOCKET for this optional client's constructor/read/send/remove calls.
+Keep existing ownership and outgoing privilege policy. No UDP, process-launch
+or new native transport API is needed for that use; previous TCP qualifications
+are not rerun.
+
+**Seven compiler-only controls give six passes/one expected rejection.** Changing
+the numeric response-code declaration to int * alone makes the complete client
+compile. Selected backend/news references, numeric GROUP conversions and the
+SOCKET/bare-callback control compile too. **These are temporary controls; no
+production client adapter is adopted or executed.**
+
+The client still needs retained line framing, consistent request/body queues,
+bounded body output, terminal cleanup and UTC dates. SOCKET delivers UTF-8 pieces,
+not complete protocol lines. POST queues filenames while IHAVE consumes line
+arrays from the same queue. Preserve current raw ARTICLE replies: the header
+explicitly notes removal of the older special ARTICLE handling. XHDR remains
+explicitly not implemented.
+
+The included FluffOS time header expects GMT offset at index 8, but native
+localtime has the DST flag there. strftime formats local time and offers no UTC
+selector. The client needs an explicit library UTC formatter with fixed date/zone
+vectors, rather than another assumed header layout or invented native argument.
+See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-nntp-source-interface-audit).
+
+Next qualify a temporary adapter offline with a recording transport before
+adoption or any NNTP_OB path change. This audit invokes no client constructor,
+socket call, driver session or endpoint, activates no service and makes no RFC
+conformance claim. Default local NEWS_D/reader remain selected. Production library,
+profile and binaries stay unchanged; last measured inventory remains **1020/1182**,
+without a new sweep or inferred gain. The port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
