@@ -23,8 +23,9 @@ combined modes pass 59/59. Source inventory and runtime results retain distinct 
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
 
 Of the inventory's failures, 113 documented fragments have currently compiling
-shipped hosts. **The other 50 standalone consumers remain open for porting or explicit
-review.** Optional or unselected code is not finished merely because it is absent
+shipped hosts. **The other 50 standalone failures comprise remaining porting work
+and recorded integration/provider/incomplete-feature decisions.** Optional or
+unselected code is not finished merely because it is absent
 from the configured boot. These are not counts of missing driver features.
 The contributed drunkenness example also retains its older body-API integration
 requirement despite compiling; see below.
@@ -549,6 +550,38 @@ packages unselected. See the
 [native audit notes](../lpc-rs/doc/driver-comparison.md#lima-contributed-board-provider-interface-audit).
 The last measured inventory stays **1017/1182**, with no new sweep or inferred
 gain. The port remains in progress.
+
+## Attic openable and lockable wrapper audit
+
+The 20 October audit keeps the selected chest/door and standard modules. The
+attic wrappers exactly match pinned upstream, but their shared blueprint state
+is not a complete alternative integration. They need object host flags/hooks/
+descriptions to compile, and the lock wrapper also needs M_OPENABLE.
+
+Complete hosts compile with unchanged wrappers. Their one-argument `set_locked`
+override is accepted, while a direct two-argument call rejects; forwarding both
+arguments retains an explicit key type but does not fix shared state. Clone
+queries share blueprint values while local descriptions, keys and open hooks
+fall out of sync. A clone can report locked yet open, or report unlocked while
+its old hook refuses opening. Creating another openable clone closes existing
+shared objects through ordinary initialization.
+
+Twelve compiler controls give **nine passes/three expected rejections**, and
+**23 runtime assertions** reproduce these inconsistencies and verify consistent
+selected-module controls in 0.203s. They use actual object/modules in temporary
+hosts and a recording actor. These are diagnostic checks, not qualification of
+the old wrappers as correct. No shipped wrapper host, parser routing, real room/
+sibling lifecycle, concurrent clients or persistence/restart is established.
+
+Mark these wrappers **shared-state integration-required**. A usable integration
+needs an explicit host/lifecycle contract plus consistent storage, keys, hooks
+and descriptions. Do not replace the selected providers or relax method checks
+to silence the files. The existing door/sibling implementation retains its
+previous qualification. See the
+[native audit notes](../lpc-rs/doc/driver-comparison.md#lima-attic-openable-and-lockable-wrappers).
+No library/profile/binary change or new inventory sweep is made; the last
+measured inventory remains **1019/1182**, and synthetic hosts do not increase
+the documented shipped-fragment tally. The port remains in progress.
 
 ## Remaining scope
 
