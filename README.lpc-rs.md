@@ -765,6 +765,33 @@ conformance claim. Default local NEWS_D/reader remain selected. Production libra
 profile and binaries stay unchanged; last measured inventory remains **1020/1182**,
 without a new sweep or inferred gain. The port remains in progress.
 
+## Offline NNTP prototype
+
+The temporary adapter passes **six compile controls and 463 runtime assertions
+in seven standalone CLI executions**. It retains partial CRLF lines, orders
+commands through greeting/continuation/final replies, streams article pieces
+through the existing bounded output callback and clears terminal state.
+A UTF-8 article spans more than 64 frames. Final replies can precede the last
+drain notification once all body data is queued. No new driver API is needed.
+
+The UTC helper passes **53 fixed dates in each of UTC, America/Los_Angeles and
+Asia/Kathmandu** without using driver-specific calendar indexes. The legacy
+two-digit date format and its century ambiguity remain. Raw ARTICLE arrays and
+POST/IHAVE continuation/final status callbacks remain. XHDR still reports not
+implemented, now in request order without sending the unsupported command.
+
+**This proposal is not adopted yet.** Runtime tests substitute only the SOCKET
+constructor path with a recording transport; the unsubstituted proposal is also
+compiled. They exercise no real socket/listener, driver session, endpoint or
+service activation, and do not newly qualify the provider's privilege, ownership
+or native event behavior. See the
+[native qualification](../lpc-rs/doc/driver-comparison.md#lima-offline-nntp-prototype).
+
+Next adopt optional contrib/nntp with maintained offline tests, then measure
+actual-source compilation. NNTP_OB, local NEWS_D/newsreader, production library,
+profile and release binaries remain unchanged. Last measured inventory stays
+**1020/1182**, without a new sweep or inferred gain. The port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
