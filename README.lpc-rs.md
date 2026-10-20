@@ -251,6 +251,26 @@ The following full sweep measures **1010/1182 compile, 172 fail**, with zero
 regressions/timeouts/crashes. The two gains are these helpers; 113 hosted fragments
 and 59 other consumers remain. The port is still in progress.
 
+## Tar writer audit
+
+`contrib/tar.c` remains unported. Its mutable header can be represented by an
+integer array and converted with `to_bytes`; no mutable-byte API is needed.
+A small native control archive preserves binary bytes and an empty file when
+read by Python and GNU tar, but that control does not execute this utility.
+
+A driver issue must be fixed first: `write_bytes` checks physical metadata,
+ignoring the calling transaction's pending creation, growth and truncation.
+The audit reproduces failed writes after creation/append and incorrect negative
+offsets or bounds after staged changes. Keep the usual missing-file zero result,
+but use the current transaction's file view for existing pending files.
+
+The tar source also needs native callback binding, explicit archive creation,
+empty-file/directory handling, terminating zero records, corrected large-file
+record arithmetic and bounded continuations. Its filename-field limits remain
+part of the format decision. See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-contributed-tar-audit).
+The source inventory remains 1010/1182 compiling with 59 open consumers; no tar
+adapter is adopted by this audit.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
