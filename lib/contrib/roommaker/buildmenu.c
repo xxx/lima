@@ -22,7 +22,7 @@ string fname = "RoomMaker.c";
 private
 string shrt = "RoomMaker Room";
 private
-string wethr = "ROOM";
+string wethr = "INDOOR_ROOM";
 private
 int lite = 1;
 private
@@ -71,7 +71,7 @@ void get_include(string str)
 
 void prompt_get_include()
 {
-   get_input_then_call(( : get_include:), "What file would you like to include? ");
+   get_input_then_call(get_include, "What file would you like to include? ");
 }
 
 void set_fname(string str)
@@ -82,7 +82,7 @@ void set_fname(string str)
 
 void prompt_set_fname()
 {
-   get_input_then_call(( : set_fname:), "Change file name to what?  ");
+   get_input_then_call(set_fname, "Change file name to what?  ");
 }
 
 void set_fpath(string str)
@@ -95,7 +95,7 @@ void set_fpath(string str)
 
 void prompt_set_fpath()
 {
-   get_input_then_call(( : set_fpath:), "Change path name to what?  ");
+   get_input_then_call(set_fpath, "Change path name to what?  ");
 }
 
 void change_light(string str)
@@ -106,20 +106,19 @@ void change_light(string str)
 
 void prompt_change_light()
 {
-   get_input_then_call(( : change_light:), "Change light level to what?  ");
+   get_input_then_call(change_light, "Change light level to what?  ");
 }
 void change_weather(string str)
 {
    sscanf(str, "%d", wthr);
-   if (wthr)
-      wethr = "OUTDOOR_ROOM";
+   wethr = wthr ? "OUTDOOR_ROOM" : "INDOOR_ROOM";
    write("New weather is " + wthr + ".\n\n");
 }
 
 void prompt_change_weather()
 {
    write("Change weather to what?\n");
-   get_input_then_call(( : change_weather:), "(0 for indoors, positive number for outdoors)  ");
+   get_input_then_call(change_weather, "(0 for indoors, positive number for outdoors)  ");
 }
 
 void change_short(string str)
@@ -130,34 +129,36 @@ void change_short(string str)
 
 void prompt_change_short()
 {
-   get_input_then_call(( : change_short:), "Change short desc to what?  ");
+   get_input_then_call(change_short, "Change short desc to what?  ");
 }
 
 void make_long(string *long)
 {
+   if (!arrayp(long))
+      return;
    write("Long description has been set .\n");
    lng = implode(long, "\n");
-   lng = replace_string(lng, "\"", "\\\"");
 }
 
 void change_long()
 {
    write("** Enter long description now **\n");
-   clone_object (EDIT_OB, EDIT_TEXT, 0, ( : make_long:));
+   clone_object (EDIT_OB, EDIT_TEXT, nil, make_long);
 }
 
 void idesc(string key, string *item)
 {
+   if (!arrayp(item))
+      return;
    write("Item description has been set .\n");
    tems[key] = implode(item, "\n");
-   tems[key] = replace_string(tems[key], "\"", "\\\"");
    write("Item " + key + " set to " + tems[key] + "\n\n");
 }
 
 void change_idesc(string key)
 {
    write("** Enter item description now **\n");
-   clone_object (EDIT_OB, EDIT_TEXT, tems[key], ( : idesc, key:));
+   clone_object (EDIT_OB, EDIT_TEXT, tems[key] == "" ? nil : tems[key], &idesc(key));
 }
 
 int is_in_ikey(string check, string key)
@@ -180,7 +181,7 @@ void new_ikey(string str)
 
 void prompt_new_ikey()
 {
-   get_input_then_call(( : new_ikey:), "What would you like the new key to be? ");
+   get_input_then_call(new_ikey, "What would you like the new key to be? ");
 }
 
 void list_keys()
@@ -203,7 +204,7 @@ void new_idesc(string str)
 
 void prompt_new_idesc()
 {
-   get_input_then_call(( : new_idesc:), "Change which keys desc?  ");
+   get_input_then_call(new_idesc, "Change which keys desc?  ");
 }
 
 void desc_summary()
@@ -228,26 +229,27 @@ void del_exit(string str)
 
 void prompt_del_exit()
 {
-   get_input_then_call(( : del_exit:), "What is the direction of the exit you would like to delete? ");
+   get_input_then_call(del_exit, "What is the direction of the exit you would like to delete? ");
 }
 
 void xdesc(string key, string *item)
 {
+   if (!arrayp(item))
+      return;
    write("Exit has been set .\n");
    xits[key] = implode(item, "\n");
-   xits[key] = replace_string(xits[key], "\"", "\\\"");
    write("Item " + key + " set to " + xits[key] + "\n\n");
 }
 
 void change_exit(string key)
 {
    write("** Edit path to room now **\n");
-   clone_object (EDIT_OB, EDIT_TEXT, xits[key], ( : xdesc, key:));
+   clone_object (EDIT_OB, EDIT_TEXT, xits[key] == "" ? nil : xits[key], &xdesc(key));
 }
 
 void prompt_change_exit()
 {
-   get_input_then_call(( : change_exit:), "Which exit should be changed? ");
+   get_input_then_call(change_exit, "Which exit should be changed? ");
 }
 
 void new_exit(string str)
@@ -259,7 +261,7 @@ void new_exit(string str)
 
 void prompt_new_exit()
 {
-   get_input_then_call(( : new_exit:), "Which direction should the new exit be? ");
+   get_input_then_call(new_exit, "Which direction should the new exit be? ");
 }
 
 void del_obj(string str)
@@ -270,7 +272,7 @@ void del_obj(string str)
 
 void prompt_del_obj()
 {
-   get_input_then_call(( : del_obj:), "What is the filename of the object you would like to delete? ");
+   get_input_then_call(del_obj, "What is the filename of the object you would like to delete? ");
 }
 
 void odesc(string key, string num)
@@ -282,12 +284,12 @@ void odesc(string key, string num)
 
 void change_obj(string key)
 {
-   get_input_then_call(( : odesc, key:), "How many times should " + key + " appear?");
+   get_input_then_call(&odesc(key), "How many times should " + key + " appear?");
 }
 
 void prompt_change_obj()
 {
-   get_input_then_call(( : change_obj:), "Which object should be changed? (please enter the object's file name) ");
+   get_input_then_call(change_obj, "Which object should be changed? (please enter the object's file name) ");
 }
 
 void new_obj(string str)
@@ -298,7 +300,7 @@ void new_obj(string str)
 
 void prompt_new_obj()
 {
-   get_input_then_call(( : new_obj:), "What is the path to the new object's file? ");
+   get_input_then_call(new_obj, "What is the path to the new object's file? ");
 }
 void view_objects()
 {
@@ -318,24 +320,11 @@ void view_exits()
 
 string write_mapping(mapping mmap)
 {
-   string retval = "";
-   mixed *keylist;
-
-   if (!sizeof(mmap))
-      return "";
-
-   keylist = keys(mmap);
-
-   foreach (mixed key in keylist)
-   {
-      retval = sprintf("%s\"%s\" : ", retval, key);
-      if (intp(mmap[key]))
-         retval = sprintf("%s %d,\n", retval, mmap[key]);
-      if (stringp(mmap[key]))
-         retval = sprintf("%s \"%s\",\n", retval, mmap[key]);
-   }
-
-   return retval[0.. < 3] + "\n";
+   string *entries = ({});
+   foreach (mixed key, mixed value in mmap)
+      if (intp(value) || stringp(value))
+         entries += ({save_value(key) + " : " + save_value(value)});
+   return sizeof(entries) ? implode(entries, ",\n") + "\n" : "";
 }
 
 void save_this_room()
@@ -357,12 +346,14 @@ void save_this_room()
    header += "\ninherit " + wethr + ";\n\n";
    header += "void setup(){\n";
    header += "    set_light(" + lite + ");\n";
-   header += "    set_brief(\"" + shrt + "\");\n";
+   if (wthr)
+      header += "    set_weather(" + wthr + ");\n";
+   header += "    set_brief(" + save_value(shrt) + ");\n";
    header += "    set_long(\n";
-   header += "\"" + lng + "\"";
+   header += save_value(lng);
    header += "\n);\n";
    foreach (key, value in tems)
-      header += "    add_item(\"" + key + "\" , \"" + value + "\");\n";
+      header += "    add_item(" + save_value(key) + ", " + save_value(value) + ");\n";
    header += "    set_exits( ([\n";
    header += write_mapping(xits);
    header += "    ]) );\n";
@@ -371,7 +362,9 @@ void save_this_room()
    header += "    ]) );\n";
    header += "}";
 
-   if (!write_file(afname, header, 1))
+   int written;
+   mixed failure = catch(written = write_file(afname, header, 1));
+   if (failure || !written)
    {
       printf("Error in writing to file %s (in header)\n", afname);
       write("File not saved.\n");
@@ -399,7 +392,7 @@ void create()
    filemenu = new_menu("File Menu");
    descmenu = new_menu("Description Menu");
 
-   N_QUIT = new_menu_item("Quit", ( : quit_menu_application:), "q");
+   N_QUIT = new_menu_item("Quit", quit_menu_application, "q");
    goto_main_menu_item = new_menu_item("Return to main menu", toplevel, "m");
    goto_room_menu_item = new_menu_item("Return to room menu", roommenu, "m");
    main_seperator = new_seperator("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
@@ -416,56 +409,56 @@ void create()
    add_menu_item(roommenu, new_menu_item("Edit objects", objectmenu, "o"));
    add_menu_item(roommenu, new_menu_item("Edit exits", exitmenu, "x"));
    add_menu_item(roommenu, new_menu_item("Edit file info", filemenu, "f"));
-   add_menu_item(roommenu, new_menu_item("View room", ( : view_room:), "v"));
+   add_menu_item(roommenu, new_menu_item("View room", view_room, "v"));
    add_menu_item(roommenu, N_QUIT);
    add_menu_item(roommenu, goto_main_menu_item);
 
    // Add menu items to the itemmenu item
 
    add_menu_item(itemmenu, main_seperator);
-   add_menu_item(itemmenu, new_menu_item("Add a new item", ( : prompt_new_ikey:), "a"));
-   add_menu_item(itemmenu, new_menu_item("View current items", ( : list_keys:), "v"));
-   add_menu_item(itemmenu, new_menu_item("Edit current descs", ( : prompt_new_idesc:), "e"));
+   add_menu_item(itemmenu, new_menu_item("Add a new item", prompt_new_ikey, "a"));
+   add_menu_item(itemmenu, new_menu_item("View current items", list_keys, "v"));
+   add_menu_item(itemmenu, new_menu_item("Edit current descs", prompt_new_idesc, "e"));
    add_menu_item(itemmenu, N_QUIT);
    add_menu_item(itemmenu, goto_room_menu_item);
 
    // Add menu items to object menu
    add_menu_item(objectmenu, main_seperator);
-   add_menu_item(objectmenu, new_menu_item("Add new object", ( : prompt_new_obj:), "a"));
-   add_menu_item(objectmenu, new_menu_item("Edit current object", ( : prompt_change_obj:), "e"));
-   add_menu_item(objectmenu, new_menu_item("Remove object", ( : prompt_del_obj:), "r"));
+   add_menu_item(objectmenu, new_menu_item("Add new object", prompt_new_obj, "a"));
+   add_menu_item(objectmenu, new_menu_item("Edit current object", prompt_change_obj, "e"));
+   add_menu_item(objectmenu, new_menu_item("Remove object", prompt_del_obj, "r"));
 
-   add_menu_item(objectmenu, new_menu_item("View objects", ( : view_objects:), "v"));
+   add_menu_item(objectmenu, new_menu_item("View objects", view_objects, "v"));
    add_menu_item(objectmenu, N_QUIT);
    add_menu_item(objectmenu, goto_room_menu_item);
 
    // Add menu items to exitmenu;
    add_menu_item(exitmenu, main_seperator);
-   add_menu_item(exitmenu, new_menu_item("Add new exit", ( : prompt_new_exit:), "a"));
-   add_menu_item(exitmenu, new_menu_item("Edit current exits", ( : prompt_change_exit:), "e"));
-   add_menu_item(exitmenu, new_menu_item("Remove exit", ( : prompt_del_exit:), "r"));
+   add_menu_item(exitmenu, new_menu_item("Add new exit", prompt_new_exit, "a"));
+   add_menu_item(exitmenu, new_menu_item("Edit current exits", prompt_change_exit, "e"));
+   add_menu_item(exitmenu, new_menu_item("Remove exit", prompt_del_exit, "r"));
 
-   add_menu_item(exitmenu, new_menu_item("List exits", ( : view_exits:), "v"));
+   add_menu_item(exitmenu, new_menu_item("List exits", view_exits, "v"));
    add_menu_item(exitmenu, N_QUIT);
    add_menu_item(exitmenu, goto_room_menu_item);
 
    // Add items to filemenu
    add_menu_item(filemenu, main_seperator);
-   add_menu_item(filemenu, new_menu_item("Change file name", ( : prompt_set_fname:), "n"));
-   add_menu_item(filemenu, new_menu_item("Change file path", ( : prompt_set_fpath:), "p"));
-   add_menu_item(filemenu, new_menu_item("Write room to file", ( : save_this_room:), "f"));
+   add_menu_item(filemenu, new_menu_item("Change file name", prompt_set_fname, "n"));
+   add_menu_item(filemenu, new_menu_item("Change file path", prompt_set_fpath, "p"));
+   add_menu_item(filemenu, new_menu_item("Write room to file", save_this_room, "f"));
    add_menu_item(filemenu, N_QUIT);
    add_menu_item(filemenu, goto_room_menu_item);
 
    /// Add items to descmenu
 
    add_menu_item(descmenu, main_seperator);
-   add_menu_item(descmenu, new_menu_item("Change light level", ( : prompt_change_light:), "h"));
-   add_menu_item(descmenu, new_menu_item("Change weather", ( : prompt_change_weather:), "w"));
-   add_menu_item(descmenu, new_menu_item("Change short description", ( : prompt_change_short:), "s"));
-   add_menu_item(descmenu, new_menu_item("Change long description", ( : change_long:), "l"));
-   add_menu_item(descmenu, new_menu_item("Add an include file", ( : prompt_get_include:), "a"));
-   add_menu_item(descmenu, new_menu_item("View description summary", ( : desc_summary:), "v"));
+   add_menu_item(descmenu, new_menu_item("Change light level", prompt_change_light, "h"));
+   add_menu_item(descmenu, new_menu_item("Change weather", prompt_change_weather, "w"));
+   add_menu_item(descmenu, new_menu_item("Change short description", prompt_change_short, "s"));
+   add_menu_item(descmenu, new_menu_item("Change long description", change_long, "l"));
+   add_menu_item(descmenu, new_menu_item("Add an include file", prompt_get_include, "a"));
+   add_menu_item(descmenu, new_menu_item("View description summary", desc_summary, "v"));
 
    add_menu_item(descmenu, N_QUIT);
    add_menu_item(descmenu, goto_room_menu_item);

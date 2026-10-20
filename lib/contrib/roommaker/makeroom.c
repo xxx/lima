@@ -6,10 +6,15 @@
 
 inherit CMD;
 
-#define MAKER "/trans/obj/buildmenu"
+#define MAKER __DIR__ "buildmenu"
 
 private
 void main()
 {
    clone_object (MAKER)->start_menu();
+}
+
+protected varargs void dispatch_main(mixed arg, mixed flags, mixed input, mixed implode_info)
+{
+   main();
 }

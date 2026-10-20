@@ -19,11 +19,11 @@ combined modes pass 59/59. Source inventory and runtime results retain distinct 
 | NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default stat-menu qualification follows. |
 | Trainer stat menu | Four source targets compile; 43 runtime checks pass | Adopted source with default strength/agility options; prices, payments, point exhaustion and cleanup verified. |
 | Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Per-suite-first is the operator recipe; the current direct-cold recheck is below. |
-| Whole-source inventory | 1013/1182 compile; 169 standalone failures | Fresh sweep after the contributed-effect adapter; no regressions/timeouts/crashes, target constructors omitted. |
+| Whole-source inventory | 1014/1182 compile; 168 standalone failures | Fresh sweep after the room-maker adapter; no regressions/timeouts/crashes, target constructors omitted. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
 
 Of the inventory's failures, 113 documented fragments have currently compiling
-shipped hosts. **The other 56 standalone consumers remain open for porting or explicit
+shipped hosts. **The other 55 standalone consumers remain open for porting or explicit
 review.** Optional or unselected code is not finished merely because it is absent
 from the configured boot. These are not counts of missing driver features.
 The contributed drunkenness example also retains its older body-API integration
@@ -347,26 +347,41 @@ standalone consumers** remain. The missing body contract above remains an extra
 runtime integration limit. No native Rust, binary or profile change is required.
 The port remains in progress.
 
-## Contributed room-maker audit
+## Contributed room maker
 
-The contributed `makeroom` command remains unadapted beyond earlier mechanical
-helpers. The 20 October audit finds a missing command dispatch adapter and stale
-`/trans/obj/buildmenu` target; the supplied menu is its contributed sibling.
-That menu already compiles, but its legacy edit/quit callbacks are inert here.
-The generator also emits undefined `ROOM`, does not reset/apply weather correctly
-and can emit invalid source for quoted descriptions.
+The contributed `/contrib/roommaker/makeroom` now dispatches to its bundled build
+menu. It retains the shipped menu and text editor, uses native callback values,
+and generates indoor/outdoor rooms with light, weather, descriptions, items,
+exits and object quantities. Integer/string source fields are quoted at emission
+so descriptions and item keys retain quotes/backslashes. Aborted editors preserve
+previous values; new item/exit editors start empty. Failed writes display the
+existing failure message and keep the menu usable. Saves overwrite their target.
+This adapts the contributed consumer without changing shared menu/editor code.
 
-A temporary two-file correction passes **19 compiler controls** (16 passes and
-three expected rejections) and **31 runtime assertions**. It exercises actual
-command dispatch, menu callbacks, text editing and file writes with fixture
-user/modal identities, then compiles and constructs four generated rooms in a
-separate process. Indoor/outdoor/reset behavior, quoted/backslashed descriptions
-and item text, an exit, one simple item and two configured objects verify.
-This is a proposal awaiting adoption/permanent tests, not real player/inputsys,
-permission-policy, every-action or weather-output qualification. No new native
-efun or menu/editor rewrite is needed. See the
-[native audit notes](../lpc-rs/doc/driver-comparison.md#lima-contributed-room-maker-audit).
-The last whole-source count stays **1013/1182**; this audit adds no source gain.
+After building the sibling native workspace, run:
+
+```sh
+python3 tests/roommaker/test_roommaker.py
+```
+
+The permanent test passes **63 LPC assertions and 15 compiler checks in 1.870s**.
+It drives actual command/menu/editor callbacks, all normal edit/view/delete and
+file-prompt routes, overwrite/failure handling, independent owners and cleanup.
+Six generated rooms compile and construct in a fresh driver, checking providers,
+light/weather, exact text/item identifiers, exits and object counts. The runner
+retains distinct nil, preserved player, 4000ms and actual simuls/includes; user/
+body/shell roles and modal input are fixtures. Logged-in inputsys/full-shell
+routing, permission policy, pager/completion, live weather output, logout and
+arbitrary input validation remain outside this focused test. See the
+[test guide](tests/roommaker/README.md) and
+[native adapter notes](../lpc-rs/doc/driver-comparison.md#lima-contributed-room-maker-adapter).
+
+The fresh full sweep measures **1014/1182 compiling, 168 failures** in **43.180s**,
+with zero regressions/timeouts/crashes. Only the command gains; the menu already
+compiled. All **113 hosted fragments** retain compiling shipped hosts, with **55
+other standalone consumers** remaining. The contributed drunkenness body contract
+remains an extra runtime integration limit. No native Rust, binary or profile
+change is required. The port remains in progress.
 
 ## Remaining scope
 
