@@ -417,6 +417,31 @@ hosted fragments** retain compiling shipped hosts, with **53 other standalone
 consumers** remaining. The contributed drunkenness body requirement stays an
 additional runtime limit. The port remains in progress.
 
+## Optional web-editor backend audit
+
+The 20 October continuation goes beyond the earlier first compiler error in
+`/obj/secure/webed`. A renamed macro-colliding parameter and nil reference
+arguments make the complete backend compile. A temporary catch around its write
+call routes native write errors to the existing failed-save page and retains the
+draft. Existing CGI, account/crypt helpers, rendering and empty-file handling
+remain; empty strings are truthy here, so empty/new editors already work.
+
+The proposal passes **20 functional assertions** through the actual CGI/backend
+and current role/account helpers with a synthetic offline wizard account.
+**10 source/reference compiler controls** give eight passes/two expected
+rejections; eight baseline controls and seven physical file checks retain the
+before/after evidence. Ordinary load/reload/new/empty/directory and save/overwrite/
+CRLF/error-recovery flows pass, along with normal login refusal and UTF-8 text.
+The master is a permissive fixture; this is not HTTP/browser/live-login,
+real path-policy, admin-specific or arbitrary malformed-form qualification.
+
+No production proposal is adopted yet. Recommend the small backend-only adapter
+with permanent tests. HTTP remains disabled in the configured preload; no HTTP
+request or external connection was used. See the
+[native continuation notes](../lpc-rs/doc/driver-comparison.md#lima-web-editor-backend-continuation-audit).
+The measured source inventory remains **1016/1182**, without a new sweep or
+inferred gain. The port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
