@@ -19,11 +19,11 @@ combined modes pass 59/59. Source inventory and runtime results retain distinct 
 | NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default stat-menu qualification follows. |
 | Trainer stat menu | Four source targets compile; 43 runtime checks pass | Adopted source with default strength/agility options; prices, payments, point exhaustion and cleanup verified. |
 | Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Per-suite-first is the operator recipe; the current direct-cold recheck is below. |
-| Whole-source inventory | 1016/1182 compile; 166 standalone failures | Fresh sweep after the attic-example adapters; no regressions/timeouts/crashes, target constructors omitted. |
+| Whole-source inventory | 1017/1182 compile; 165 standalone failures | Fresh sweep after the web-editor backend adapter; no regressions/timeouts/crashes, target constructors omitted. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
 
 Of the inventory's failures, 113 documented fragments have currently compiling
-shipped hosts. **The other 53 standalone consumers remain open for porting or explicit
+shipped hosts. **The other 52 standalone consumers remain open for porting or explicit
 review.** Optional or unselected code is not finished merely because it is absent
 from the configured boot. These are not counts of missing driver features.
 The contributed drunkenness example also retains its older body-API integration
@@ -411,36 +411,45 @@ The attic supplies no town destination directory and town.c is TODO; helper/path
 checks do not qualify traversal or add world content. Real parser/player get/put/go
 and alternate builds remain unchecked. No native/shared-framework change is needed.
 
-The fresh full sweep measures **1016/1182 compiling, 166 failures** in **52.687s**,
+At attic-example adoption, the full sweep measured **1016/1182 compiling, 166 failures** in **52.687s**,
 with zero regressions/timeouts/crashes. Only these two examples gain. All **113
 hosted fragments** retain compiling shipped hosts, with **53 other standalone
 consumers** remaining. The contributed drunkenness body requirement stays an
 additional runtime limit. The port remains in progress.
 
-## Optional web-editor backend audit
+## Optional web-editor backend
 
-The 20 October continuation goes beyond the earlier first compiler error in
-`/obj/secure/webed`. A renamed macro-colliding parameter and nil reference
-arguments make the complete backend compile. A temporary catch around its write
-call routes native write errors to the existing failed-save page and retains the
-draft. Existing CGI, account/crypt helpers, rendering and empty-file handling
-remain; empty strings are truthy here, so empty/new editors already work.
+`/obj/secure/webed` now compiles with the renamed macro-colliding parameter and
+nil reference arguments. Native write errors reach its existing failed-save page,
+retaining the draft and earlier files. Existing CGI, account/role/crypt helpers,
+rendering, empty/new-file behavior and credential policy remain unchanged.
 
-The proposal passes **20 functional assertions** through the actual CGI/backend
-and current role/account helpers with a synthetic offline wizard account.
-**10 source/reference compiler controls** give eight passes/two expected
-rejections; eight baseline controls and seven physical file checks retain the
-before/after evidence. Ordinary load/reload/new/empty/directory and save/overwrite/
-CRLF/error-recovery flows pass, along with normal login refusal and UTF-8 text.
-The master is a permissive fixture; this is not HTTP/browser/live-login,
-real path-policy, admin-specific or arbitrary malformed-form qualification.
+After building the sibling native workspace, run:
 
-No production proposal is adopted yet. Recommend the small backend-only adapter
-with permanent tests. HTTP remains disabled in the configured preload; no HTTP
-request or external connection was used. See the
-[native continuation notes](../lpc-rs/doc/driver-comparison.md#lima-web-editor-backend-continuation-audit).
-The measured source inventory remains **1016/1182**, without a new sweep or
-inferred gain. The port remains in progress.
+```sh
+python3 tests/web_editor/test_web_editor.py
+```
+
+The permanent runner passes **20 LPC assertions, seven compiler checks and seven
+physical-file checks in 0.494s** against actual source. It covers ordinary CGI
+load/reload/new/empty/directory and save/overwrite/CRLF/error-recovery forms,
+normal login refusal and UTF-8/entity text. A synthetic offline wizard uses the
+actual helpers under a permissive temporary master. Four exact committed byte
+sequences and three absent unsaved/refused targets verify after shutdown.
+
+These are direct form/file checks; browser/HTTP transport, live login, real path
+policy, admin-specific and malformed-form flows remain unqualified. HTTP stays
+disabled in the configured preload, and no HTTP request or external connection
+is used by the runner. The profile stays distinct nil/preserved player/4000ms.
+See the [test guide](tests/web_editor/README.md) and
+[native adapter notes](../lpc-rs/doc/driver-comparison.md#lima-web-editor-backend-adapter).
+
+The fresh full sweep measures **1017/1182 compiling, 165 failures** in **42.281s**,
+with zero regressions/timeouts/crashes. Only this backend gains. All **113 hosted
+fragments** retain compiling shipped hosts, with **52 other standalone consumers**
+remaining. The original drunk body and absent attic town requirements remain
+separate runtime limits. No native Rust, profile or binary change is needed.
+The port remains in progress.
 
 ## Remaining scope
 

@@ -109,11 +109,11 @@ string format_editor(string user, string password, string filename, string conte
    return output;
 }
 
-string display_error(string error, mapping form)
+string display_error(string message, mapping form)
 {
    return sprintf("<table border=1><tr><td><font size=+2>%s</font></td></tr>"
                   "</table><p>%s\n",
-                  error, format_editor(form["user"], form["password"], form["saveas"], form["contents"]));
+                  message, format_editor(form["user"], form["password"], form["saveas"], form["contents"]));
 }
 
 int validate_user(mapping form)
@@ -165,9 +165,9 @@ string save_text_to_file(mapping form)
       return display_error("Login info is incorrect", form);
    }
 
-   result = unguarded(get_priv(form), ( : write_file($(filename), $(contents), 1) :));
+   mixed failure = catch(result = unguarded(get_priv(form), ( : write_file($(filename), $(contents), 1) :)));
 
-   if (!result)
+   if (failure || !result)
    {
       return display_error(sprintf("%s: COULD NOT SAVE FILE.\n", filename), form);
    }
@@ -220,7 +220,7 @@ string main(mapping form)
    set_privilege(0); /* Just in case */
    if (!mappingp(form))
    {
-      return format_editor(0, 0, 0, 0);
+      return format_editor(nil, nil, nil, nil);
    }
    if (form["save"])
    {
@@ -247,7 +247,7 @@ string main(mapping form)
                return load_file(form);
             }
             else
-               return format_editor(0, 0, 0, 0);
+               return format_editor(nil, nil, nil, nil);
          }
       }
    }
