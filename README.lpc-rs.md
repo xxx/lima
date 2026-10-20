@@ -451,6 +451,30 @@ remaining. The original drunk body and absent attic town requirements remain
 separate runtime limits. No native Rust, profile or binary change is needed.
 The port remains in progress.
 
+## Contributed marriage integration audit
+
+The marriage contribution is a core-file replacement kit. `SPOUSE_CHANGES` names
+five files, including a body patch that is absent from the bundle. Its class,
+finger command and daemons still use selected global provider macros; the selected
+body has no spouse field/accessors and the user-data API does not register it.
+The contributed class has spouse instead of the current character mapping, so
+copying it over the selected class would lose current multi-character support.
+Importing that class locally instead cannot consume selected nominal records.
+
+The 20 October audit passes **21 compiler controls** (13 passes/eight expected
+rejections) and **eight runtime contract assertions**. Source/dispatch/type fixes
+expose later errors; direct selected-body/data/class controls confirm the missing
+integration. No ceremony or spouse persistence is qualified. Keep the selected
+providers and mark the kit **integration-required**: working support needs its
+omitted body/accessor/save work and a merge preserving current account/finger
+behavior. No core replacement, new native alias, class relaxation or spouse
+feature activation is adopted by this audit. See the
+[native audit notes](../lpc-rs/doc/driver-comparison.md#lima-contributed-marriage-integration-audit).
+
+Production source/profile/binaries stay unchanged. The last inventory remains
+**1017/1182**, without a new sweep or inferred source gain. The port remains in
+progress; provider selection and incomplete-feature decisions retain their scope.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
