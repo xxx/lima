@@ -19,11 +19,11 @@ combined modes pass 59/59. Source inventory and runtime results retain distinct 
 | NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default stat-menu qualification follows. |
 | Trainer stat menu | Four source targets compile; 43 runtime checks pass | Adopted source with default strength/agility options; prices, payments, point exhaustion and cleanup verified. |
 | Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Per-suite-first is the operator recipe; the current direct-cold recheck is below. |
-| Whole-source inventory | 1010/1182 compile; 172 standalone failures | Fresh sweep after the collection helpers; no regressions/timeouts/crashes, target constructors omitted. |
+| Whole-source inventory | 1011/1182 compile; 171 standalone failures | Fresh sweep after tar adoption; no regressions/timeouts/crashes, target constructors omitted. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
 
 Of the inventory's failures, 113 documented fragments have currently compiling
-shipped hosts. **The other 59 consumers remain open for porting or explicit
+shipped hosts. **The other 58 consumers remain open for porting or explicit
 review.** Optional or unselected code is not finished merely because it is absent
 from the configured boot. These are not counts of missing driver features.
 Command compilation remains player 65/67 (random2 deferred; suicide disabled
@@ -301,6 +301,25 @@ six archives passing. See the [native range-read notes](../lpc-rs/doc/driver-com
 The full standalone source sweep now measures **1011/1182 compiling, 171 fail**,
 with zero regressions/timeouts/crashes. Its only gain is this helper; 113 hosted
 fragments and 58 other consumers remain. The port remains in progress.
+
+## Contributed transient effects
+
+The older `/contrib/transient_effect/transient_effect` and `drunk` remain
+unadapted, separate from the selected `/std/transient` framework. The 20 October
+audit reproduces their heartbeat, type and identifier compiler failures, then
+confirms inert merging and a negative-strength clamp defect. The selected body
+supplies `heal_us` but no `stun_us`; its `stun(limb, period)` performs different
+clamping/skill logic. The example also passes an obsolete second command argument.
+
+A temporary native two-second call-out adapter passes 18 assertions, including
+real repeating callbacks, expiry, pause/restart, merge and cancellation. Nine
+additional controls confirm the original defects and selected body metadata;
+13 compiler checks give nine passes and four expected rejections. This is audit
+and feasibility evidence, not an adopted source fix or actual drunkenness test.
+The generic adapter needs adoption and permanent tests; the example's older body
+contract remains explicit. No new heartbeat efun is required. Existing selected
+poison/speed/spell integration is separate. See the
+[native audit notes](../lpc-rs/doc/driver-comparison.md#lima-contributed-transient-effect-audit).
 
 ## Remaining scope
 
