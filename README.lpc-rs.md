@@ -347,6 +347,27 @@ standalone consumers** remain. The missing body contract above remains an extra
 runtime integration limit. No native Rust, binary or profile change is required.
 The port remains in progress.
 
+## Contributed room-maker audit
+
+The contributed `makeroom` command remains unadapted beyond earlier mechanical
+helpers. The 20 October audit finds a missing command dispatch adapter and stale
+`/trans/obj/buildmenu` target; the supplied menu is its contributed sibling.
+That menu already compiles, but its legacy edit/quit callbacks are inert here.
+The generator also emits undefined `ROOM`, does not reset/apply weather correctly
+and can emit invalid source for quoted descriptions.
+
+A temporary two-file correction passes **19 compiler controls** (16 passes and
+three expected rejections) and **31 runtime assertions**. It exercises actual
+command dispatch, menu callbacks, text editing and file writes with fixture
+user/modal identities, then compiles and constructs four generated rooms in a
+separate process. Indoor/outdoor/reset behavior, quoted/backslashed descriptions
+and item text, an exit, one simple item and two configured objects verify.
+This is a proposal awaiting adoption/permanent tests, not real player/inputsys,
+permission-policy, every-action or weather-output qualification. No new native
+efun or menu/editor rewrite is needed. See the
+[native audit notes](../lpc-rs/doc/driver-comparison.md#lima-contributed-room-maker-audit).
+The last whole-source count stays **1013/1182**; this audit adds no source gain.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
