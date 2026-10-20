@@ -19,11 +19,11 @@ combined modes pass 59/59. Source inventory and runtime results retain distinct 
 | NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default stat-menu qualification follows. |
 | Trainer stat menu | Four source targets compile; 43 runtime checks pass | Adopted source with default strength/agility options; prices, payments, point exhaustion and cleanup verified. |
 | Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Per-suite-first is the operator recipe; the current direct-cold recheck is below. |
-| Whole-source inventory | 1019/1182 compile; 163 standalone failures | Fresh sweep after the coin denomination fix; no gains/regressions/timeouts/crashes, target constructors omitted. |
+| Whole-source inventory | 1020/1182 compile; 162 standalone failures | Fresh sweep after the optional legacy money adapter; one gain, no regressions/timeouts/crashes, target constructors omitted. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
 
 Of the inventory's failures, 113 documented fragments have currently compiling
-shipped hosts. **The other 50 standalone failures comprise remaining porting work
+shipped hosts. **The other 49 standalone failures comprise remaining porting work
 and recorded integration/provider/incomplete-feature decisions.** Optional or
 unselected code is not finished merely because it is absent
 from the configured boot. These are not counts of missing driver features.
@@ -622,7 +622,8 @@ port remains in progress; native Rust, profile and release binaries are unchange
 ## Legacy money and selected coin interface audit
 
 The following is the earlier audit snapshot; the selected-path fixes above are
-now adopted. The optional legacy money provider remains unchanged.
+now adopted. The optional legacy source adapter is qualified below; the default
+provider remains COINS.
 
 The 20 October audit keeps COINS and current body wallets selected; USE_MONEY
 remains unselected. Legacy `std/money` stores integer denomination counts, while
@@ -654,6 +655,43 @@ COINS and native nil/number/override policy; no legacy-provider activation or
 replacement of previously qualified payment/report behavior is proposed.
 Production library/profile/binaries stay unchanged. The last measured inventory
 remains **1019/1182**; no fresh sweep or inferred gain. The port remains in progress.
+
+## Optional legacy money adaptation
+
+`std/money` now compiles and passes its denomination-count tests. It remains
+optional: USE_MONEY stays unselected and default drop/loot use COINS. Its stored
+values are integer counts per denomination, with canonical aliases and explicit
+zero for a missing entry. A collector supports zero/two-argument get, a bare
+callback returns long-description text, and pickup converts counts to floats
+when crediting the current wallet. Selected coin/wallet/daemon code is unchanged.
+
+Named `all` takes only the requested denomination; generic numeric `coin`/`coins`
+counts the sole stored denomination. Multiple denominations require a choice
+even within the same currency. Generic `all` takes the sole count, while whole-
+object get recovers all denominations. This preserves the legacy count model
+rather than replacing it with COINS' currency balances.
+
+Run after building lpc-rs:
+
+```sh
+python3 tests/legacy_money/test_legacy_money.py
+```
+
+**Eight compiler checks and 39 runtime assertions pass in 1.136s.** Actual MONEY,
+get verb, money daemon and wallet module with a fixture actor cover construction,
+callbacks, merges, aliases, partial/all/whole pickup, ambiguous/refused requests,
+decimal credits and recovered totals across denominations/currencies. Original
+source rejects the fixed get override. The fixture rejects USE_MONEY, so these
+results do not qualify alternate-profile drop or mixed-provider drop/merge
+integration. Parser routing, login, concurrency and account restart are outside
+this suite. See [test details](tests/legacy_money/README.md) and the
+[native notes](../lpc-rs/doc/driver-comparison.md#lima-optional-legacy-money-adaptation).
+
+The fresh sweep measures **1020/1182 compiling, 162 failures** in 41.625s, with
+std/money as the sole gain and no regressions/timeouts/crashes. All 113 existing
+fragment proofs retain compiling hosts; 49 other consumers retain their recorded
+dispositions. This is source support without activation; the port remains in
+progress. Native Rust, profile and release binaries stay unchanged.
 
 ## Remaining scope
 

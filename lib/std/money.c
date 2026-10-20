@@ -6,6 +6,7 @@ inherit OBJ;
 inherit M_GETTABLE;
 inherit M_MESSAGES;
 
+// Balances are integer counts keyed by denomination.
 private
 mapping money = ([]);
 
@@ -29,7 +30,7 @@ string long_descr()
 private
 int query_amt_money(string type)
 {
-   return money[type];
+   return money[type] || 0;
 }
 
 string *query_money()
@@ -39,78 +40,81 @@ string *query_money()
 
 void split_money(int amount, string type)
 {
-   if (money[type] >= amount)
+   type = MONEY_D->singular_name(type);
+   int available = query_amt_money(type);
+   if (amount <= 0)
    {
-      this_body()->add_money(type, amount);
-      money[type] -= amount;
-      this_body()->simple_action("$N $vtake " + MONEY_D->denomination_to_string(amount, type) + ".");
-      if (money[type] <= 0)
-      {
-         m_delete(money, type);
-         if (!sizeof(query_money()))
-            remove();
-      }
+      write("Please specify a positive amount.\n");
+      return;
    }
-   else
+   if (amount > available)
+   {
       write("There aren't that many money of that type here.\n");
+      return;
+   }
+   this_body()->add_money(type, to_float(amount));
+   money[type] = available - amount;
+   this_body()->simple_action("$N $vtake " + MONEY_D->denomination_to_string(amount, type) + ".");
+   if (!money[type])
+   {
+      m_delete(money, type);
+      if (!sizeof(money))
+         remove();
+   }
 }
 
-mixed get(string amount_str, string type)
+mixed get(mixed args...)
 {
-   string denomination;
-   int amount;
-   string *types;
-
+   string amount_str = sizeof(args) > 0 ? args[0] : nil;
+   string type = sizeof(args) > 1 ? args[1] : nil;
    if (!amount_str)
    {
-      foreach (denomination, amount in money)
-      {
-         this_body()->add_money(denomination, amount);
-      }
+      foreach (string denomination, int amount in money)
+         this_body()->add_money(denomination, to_float(amount));
       this_body()->simple_action("$N $vtake the pile of money.");
       remove();
       return "";
    }
-   else
+   if (type == "coin" || type == "coins")
    {
-      if (type == "coins" || type == "coin")
+      string *types = query_money();
+      if (sizeof(types) != 1)
       {
-         types = query_money();
-         if (sizeof(types) == 1)
-         {
-            amount = to_int(amount_str);
-            split_money(amount, types[0]);
-         }
-         else
-            write("Which type of money do you want to get?\n");
+         write("Which type of money do you want to get?\n");
+         return;
       }
-      else if (!money[type])
-         write("There are no money of that type here.\n");
-      else
-      {
-         if (amount_str == "all")
-            split_money(money[type], type);
-         else
-            split_money(to_int(amount_str), type);
-      }
+      type = types[0];
    }
+   else
+      type = MONEY_D->singular_name(type);
+
+   int available = query_amt_money(type);
+   if (available <= 0)
+   {
+      write("There are no money of that type here.\n");
+      return;
+   }
+   int amount = amount_str == "all" ? available : to_int(amount_str);
+   split_money(amount, type);
 }
 
 void merge_money(int amount, string type)
 {
+   type = MONEY_D->singular_name(type);
    this_object()->add_id(type);
-   money[type] += amount;
+   money[type] = query_amt_money(type) + amount;
 }
 
 void setup(int amount, string type)
 {
    amount = to_int(amount);
+   type = MONEY_D->singular_name(type);
    money[type] = amount;
    set_id("money", type, "coins", "pile", "pile of money");
    add_adj(type);
    set_in_room_desc("A pile of money");
    set_proper_name("money");
-   set_long(( : long_descr:));
+   set_long(long_descr);
    set_gettable(1);
    set_plural(1);
 }
