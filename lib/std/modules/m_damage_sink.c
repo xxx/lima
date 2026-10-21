@@ -4,6 +4,7 @@
 // 05-98: Iizuka added support for multiple resistances.
 
 #include <armour.h>
+#include <combat_modules.h>
 
 inherit CLASS_EVENT_INFO;
 
@@ -42,11 +43,19 @@ mapping query_weaknesses()
 
 class event_info sink_modify_event(class event_info evt)
 {
-   int reduced = evt.data[1];
+   int reduced;
    // TBUG(event_to_str(evt));
    if (stringp(evt.data))
       return evt;
 
+#if BLOW_STYLE == BLOW_SIMPLE
+   reduced = evt.data;
+   evt.data -= ((armour_class / 2) + random(armour_class / 2));
+   if (evt.data < 0)
+      evt.data = 0;
+   reduced -= evt.data;
+#else
+   reduced = evt.data[1];
    if (arrayp(evt.data[0]))
    {
       foreach (string dmgtype in evt.data[0])
@@ -69,6 +78,7 @@ class event_info sink_modify_event(class event_info evt)
       evt.data[1] = 0;
 
    reduced -= evt.data[1];
+#endif
    if (reduced && evt.weapon)
    {
       this_object()->decrease_durability(reduced);

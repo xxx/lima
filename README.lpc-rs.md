@@ -1141,6 +1141,43 @@ inventory stays the last measured 1021/1182.
 See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-simple-blow-composition-audit).
 Evidence: /tmp/lima-simple-blows-audit-20261020-qhp14j3x. The port remains in progress.
 
+## Core simple-blow adaptation
+
+The 21 October adapter follows audit notes committed as Lima 24e28fd1 / native
+9dc47924. Three library files adapt the optional core scalar-damage path:
+string limb fields and diagnostic formatting, scalar natural-armour reduction,
+and the sink's existing untyped armour calculation. Action strings are checked
+before damage indexing. Selected typed calculations and real durability rules
+remain; production stays on BLOW_TYPES with limb health/equipment.
+
+Run the maintained regression after building lpc-rs:
+
+```sh
+python3 tests/simple_blows/test_simple_blows.py
+```
+
+It passes **22 compiler checks / 65 runtime assertions** in 2.080s, using typed
+and simple selectors in temporary libraries, both with distinct nil/preserved
+player/4000ms. Real producers, modifiers, sink, dispatch and M_DURABILITY cover
+field checks, formatting, damage/clamping, actions and armour/weapon wear. The
+receiving health callback records damage; fixtures are not complete equipment
+objects or characters. Four negative controls detect each removed core fix.
+
+Body-stat regressions pass **18 compiler checks / 240 assertions**, 3.649s.
+The wound runner's 14 compiler checks pass, but its listener cannot start under
+environment permissions; its runtime assertions were not rerun. No Cargo build
+or service activation is performed for the adapter.
+
+A fresh inventory remains **1021/1182**, 161 failures, with unchanged membership,
+zero gains/regressions/timeouts/crashes in 36.234s. Exactly three of 1549 library
+files change; profile, release binaries, production selectors and original Lima
+stay unchanged. Type-specific special weapons/spells and complete simple combat,
+death, wearing and saves remain unqualified.
+
+See [tests/simple_blows/README.md](tests/simple_blows/README.md) and the
+[native notes](../lpc-rs/doc/driver-comparison.md#lima-core-simple-blow-adaptation).
+Evidence: /tmp/lima-simple-blows-runtime-20261021-ahiz0bal. The port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3

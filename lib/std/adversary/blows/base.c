@@ -143,9 +143,15 @@ class event_info health_modify_event(class event_info evt)
 
    if (natural_armour)
    {
+#if BLOW_STYLE == BLOW_SIMPLE
+      evt.data -= random(natural_armour);
+      if (evt.data < 0)
+         evt.data = 0;
+#else
       evt.data[1] -= random(natural_armour);
       if (evt.data[1] < 0)
          evt.data[1] = 0;
+#endif
    }
 
    return evt;
