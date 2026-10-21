@@ -1282,6 +1282,38 @@ or inventory changes; all 1549 library hashes match the last measured 1021/1182.
 See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-alternate-formula-audit).
 Evidence: /tmp/lima-formula-audit-20261021-n5ojd592. The port remains in progress.
 
+## Vaporizing-death audit
+
+The 21 October audit follows formula-note commits Lima b8519d58 / native 5c6de539.
+Only a disposable library selects DEATH_VAPORIZE; current heartbeat, skills, typed
+damage, limb providers, LIMA stats, advancement, USE_MASS and distinct nil/preserved
+player/4000ms stay. Production retains DEATH_CORPSES.
+
+Complete hosts compile, but the registered legacy callback returns a function
+instead of removing the NPC. An invoking-callback prototype removes it while
+losing worn armour: remove_it is absent, movement is refused and remaining-contents
+cleanup destroys it. A second prototype uses the current do_remove API; the
+tested worn armour survives in the room with its worn flag cleared.
+
+The player path is separate: body death calls drop_corpse, while the selected
+loot path also performs ghost relocation. Vaporize's empty hook omits that path.
+No player death is exercised. Combat remains registered during the original
+one-second NPC delay; no stop/effects policy is changed by these prototypes.
+
+There are **29 compiler checks**, including nine fixture checks: 27 passes/two
+expected partial-module rejections. Three CLI runs verify **43 assertions** in
+actual NPC/container/stock-armour objects. Delayed setup is cancelled and callbacks
+are consumed/invoked explicitly in one transaction. These do not qualify elapsed
+scheduling, health/rewards/party, player ghost, effects or saves.
+
+Recommend an NPC callback/unwear adapter, retaining delay and corpse-free
+inventory transfer. Keep player vaporization integration-required and corpse
+death selected. No new driver API, production source/profile/binary or inventory
+change. All 1549 library hashes match the last measured 1021/1182.
+
+See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-vaporizing-death-audit).
+Evidence: /tmp/lima-vaporize-audit-20261021-16wwbivy. The port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
