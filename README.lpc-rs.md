@@ -21,6 +21,7 @@ combined modes pass 59/59. Source inventory and runtime results retain distinct 
 | Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Per-suite-first is the operator recipe; the current direct-cold recheck is below. |
 | Whole-source inventory | 1021/1182 compile; 161 standalone failures | Fresh sweep after the optional NNTP adapter; one gain, no regressions/timeouts/crashes, target constructors omitted. |
 | Optional NNTP client | Six compiler checks and 463 offline assertions | Actual source with recording transport; no service activation or live-server claim. |
+| Selected HTTP input | Complete-header baseline works; fragmented requests need a fix | Offline recordings reproduce lost request prefixes and premature header completion; HTTP stays disabled. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
 
 Of the inventory's failures, 113 documented fragments have currently compiling
@@ -823,6 +824,36 @@ remain selected. The recording suite does not newly qualify the real provider's
 privilege, ownership, backpressure or native event behavior. No real socket,
 listener, driver session or NNTP endpoint is used. Profile, release binaries and
 original Lima are unchanged. The port remains in progress.
+
+## HTTP input compatibility audit
+
+The older contrib/http_connection expects a binary user port and a different
+master/input/output contract. It remains unselected. Native connect receives the
+peer address/port, and process_input handles command lines; the selected HTTP_D
+already uses the binary SOCKET provider. No new binary login-port compatibility
+or transport API is established as necessary.
+
+Nine compiler controls give three reference passes and six retained rejections.
+Parenthesized assignments or if/else remove the old syntax error; native bytes
+and explicit text/file conversions still leave its receive output unresolved.
+Ten pure-expression checks also cover GET scanning and its reversed CGI suffix
+range. No legacy service adapter is adopted.
+
+A recording interface exposes a concrete gap in the selected HTTP daemon,
+whose earlier qualification covered complete headers only. The complete-header
+baseline serves the static fixture. A split after GET-space loses the request
+prefix and yields no response. A chunk ending at the request-line newline can
+instead dispatch before the blank header terminator, including when CR and LF
+arrive separately. Eight observations confirm that baseline and those defects;
+they are not successful fragmented-request support. The disposable source changes
+only its SOCKET constructor path. See the
+[native audit](../lpc-rs/doc/driver-comparison.md#lima-http-input-compatibility-audit).
+
+Next fix retained input and header/body boundaries in the selected daemon with
+maintained offline regressions, preserving its API and disabled preload. No
+production source/profile/binary, real socket/listener, endpoint, driver session
+or service activation changes in this audit. Inventory remains the measured
+**1021/1182** without another sweep. The port remains in progress.
 
 ## Remaining scope
 
