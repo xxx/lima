@@ -1384,6 +1384,38 @@ Six pinned public source responses match clean original; no other driver execute
 See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-multiple-slot-wielding-audit).
 Evidence: /tmp/lima-wield-multiple-audit-20261021-pg0toblw. Port remains in progress.
 
+## Complex armour-slot audit
+
+Reviewed 21 October after multiple-wield audit notes Lima **a0351b5e** / native
+**6e2b378d**. Keep ARMOUR_LIMBS. ARMOUR_COMPLEX_SLOTS needs integration with
+current size, health and equipment contracts; no library change is adopted and
+no driver API is indicated. Default equipment qualification stays closed.
+
+**29 compiler checks** give 17 passes/12 expected rejections. Temporary class-dot
+fields, nil returns/filtering and an event argument compile actual adversary,
+body, human, trainer, troll, master and the standalone provider. The signature
+accepts but does not use the combat event; compilation is not full integration.
+
+Two successful CLI runs pass **26 assertions** with actual NPC/container/armour
+constructors. Stock mass armour has no size getter and silently bypasses the
+limit. A controlled legacy getter isolates fitting/oversized/capacity checks.
+Actual wear/remove and damage sinks show one-item selection from multi-item
+slots, duplicate wear entries, orphaned worn flags on reset, unrelated-target
+protection and protection from a non-armour slot. A grouped arms target is not a
+health limb and fails the actual damage path. query_armours is also absent for
+current equipment inspection. Size under USE_MASS, target mapping, coverage and
+reconfiguration require deliberate mudlib choices.
+
+Delayed setup is cancelled; fixtures run synchronously with explicit destruction.
+No parser/connected-player command, full attack/death loop, progression, elapsed
+scheduler, hook refusal/reentrancy, general equipment removal or save behavior is
+qualified. Seven public pinned sources match original; no other driver executes.
+All 1549 library hashes/profile/binaries match the last **1021/1182** inventory.
+No sweep/unrelated regression suite/Cargo build/listener/service runs. Original,
+selected providers, distinct nil/preserved player/4000ms remain unchanged.
+See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-complex-armour-slot-audit).
+Evidence: /tmp/lima-complex-armour-audit-20261021-l79b3x7k. Port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
