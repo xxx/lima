@@ -19,10 +19,6 @@ private class finger finger_info() {
     return new(class finger, visname: "Alice", level: "wizard", title: "%^RED%^Captain%^RESET%^",
         last_login: 1700000000, idle: 0, plan: "Line one\nLine two\n");
 }
-private mixed *mud_data(string library, int status, string email) {
-    return ({status, "mud.invalid", 7777, 0, 0, "Lima 1", library,
-        "lpc-rs", "LP", "Open", email});
-}
 void create() {
     object docs = load_object("/WWW/cgi/autodoc");
     string index = docs->main();
@@ -65,33 +61,6 @@ void create() {
     verify_cgi(has(out, "<h3>Base Objects</h3>") && has(out, "<h3>Modules</h3>")
         && has(out, "CGI_PROBE") && has(out, "M_MESSAGES"), "autodoc actual directory overview");
     verify_cgi(nilp(docs->main("unknown")), "autodoc unknown route result");
-
-    object router = load_object(IMUD_D);
-    object mud = load_object("/WWW/cgi/mudinfo");
-    router->set_fixture(([]));
-    verify_cgi(mud->main() == "<h3>No muds out of 0 match your pattern.<h3>", "mudinfo empty router list");
-    router->set_fixture((["Beta Realm": mud_data("Lima", -1, "unknown"),
-        "AlphaMud": mud_data("Nightmare", 0, "admin@example.invalid"),
-        "Café": mud_data("Other", -1, "unknown")]));
-    out = mud->main();
-    verify_cgi(has(out, "Which of the following muds") && has(out, "Beta+Realm") && has(out, "Café"), "mudinfo omitted query lists choices");
-    verify_cgi(strindex(out, "AlphaMud") < strindex(out, "Beta+Realm"), "mudinfo sorted choices");
-    verify_cgi(mud->main("") == out && mud->main("=") == out, "mudinfo empty query forms");
-    verify_cgi(mud->main("not-a-mud") == "<h3>No muds out of 3 match your pattern.<h3>", "mudinfo no match count");
-    out = mud->main("=bETA+realm");
-    verify_cgi(has(out, "telnet://mud.invalid:7777>Beta Realm</a>") && has(out, "<TD>Connected</TD>"), "mudinfo case and query-space normalization");
-    verify_cgi(has(out, "limamudlib.dev:7881>Lima</a>") && !has(out, "mailto:"), "mudinfo Lima and unknown-email fields");
-    out = mud->main("alpha*");
-    verify_cgi(has(out, "Nightmare") && has(out, "<TD>Not connected</TD>")
-        && has(out, "mailto:admin@example.invalid"), "mudinfo glob and offline fields");
-    out = mud->main("CAFÉ");
-    verify_cgi(has(out, "Café") && has(out, "Other"), "mudinfo Unicode case matching");
-    foreach (string library in ({"Discworld", "Tmi-2", "DGD"})) {
-        router->set_fixture((["One": mud_data(library, -1, "unknown")]));
-        out = mud->main("one");
-        verify_cgi(has(out, library), "mudinfo library branch " + library);
-    }
-    verify_cgi(sizeof(router->query_mudlist()) == 1, "mudinfo preserves provider mapping");
 
     object finger = load_object(FINGER_D);
     object who = load_object("/WWW/cgi/who");

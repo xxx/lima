@@ -1,7 +1,8 @@
 # Lima for lpc-rs
 
-This is the working port of Lima based on upstream
-`eefaff66adcae9b01e16059574c925b0d63e70a1`, with mudlib sources in `lib/`.
+This is the working port of Lima incorporating upstream release tag **`1.1a4`**,
+at [`733f2d05b339472262619ea55509fefcab65b04f`](https://github.com/limalib/lima/tree/733f2d05b339472262619ea55509fefcab65b04f),
+with mudlib sources in `lib/`. The release update was checked on 21 October 2026.
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
@@ -22,7 +23,8 @@ shipped suites pass 26/16/7/5/5, then normal and quiet combined commands each pa
 | NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default stat-menu qualification follows. |
 | Trainer stat menu | Four source targets compile; 43 runtime checks pass | Adopted source with default strength/agility options; prices, payments, point exhaustion and cleanup verified. |
 | Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Recorded acceptance driver; per-suite commands first, no manual program loads. Per-suite-first is the operator recipe; the current direct-cold recheck is below. |
-| Whole-source inventory | 1021/1182 compile; 161 standalone failures | Fresh 21 October sweep after handoff EOF cleanup; 44.567s, no gains/regressions/timeouts/crashes, target constructors omitted. |
+| Whole-source inventory at `1.1a4` | 1020/1181 compile; 161 standalone failures | Fresh 21 October sweep; 38.621s, no retained-target status/diagnostic changes, timeouts or crashes; target constructors omitted. |
+| Release regression checks, 21 October | Six maintained runners pass 3,401 LPC assertions | CGI, body statistics, collections, non-heartbeat combat, HTTP framing and NNTP; controlled providers, no live services or new login/restart acceptance. |
 | Optional NNTP client | Six compiler checks and 463 offline assertions | Actual source with recording transport; no service activation or live-server claim. |
 | Selected HTTP input | Seven compiler checks and 2,582 offline assertions | Retained header/body fragments, all ordinary GET/POST split positions and exact output; HTTP stays disabled. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
@@ -40,6 +42,43 @@ upstream), wizard 81/81, guild 4/4 and verbs 90/90.
 
 Fixed parameter defaults follow the native
 [trailing-default rule](../lpc-rs/doc/lpc/anatomy_of_a_program.md#parameter-defaults).
+
+## Upstream release tracking
+
+Upstream now uses `main` for releases and `develop` for integration, with
+`develop` as its default branch. This port retains its own `lpc-rs-port` branch
+and incorporates the exact `1.1a4` tag, rather than `develop`'s newer development
+version. The tag is `1.1a4`; there is no `1.14a` tag.
+
+The merge preserves the existing port commits. It adopts upstream build/docs,
+PCRE2 flag definitions and removal of the demo-site CGI page and advertised demo
+address. The troll description already uses valid native string syntax, so that
+adaptation is retained. Upstream's FluffOS build instructions and flags header
+do not replace `lpc-rs.env` or imply native PCRE support. No lpc-rs code change
+is needed for this update.
+
+The fresh inventory has one fewer target and success because upstream removed
+`WWW/cgi/mudinfo.c`: the preceding result was 1021/1182. Every retained target
+has identical status and diagnostics. All 47 complete hosts still compile;
+the same 113 host fragments and 48 optional follow-ups remain classified.
+
+CGI and body-stat runners passed before and after the merge. The updated CGI
+runner covers the two remaining helpers with 42 assertions, retiring the deleted
+page's 13 assertions and IMUD fixture. The other five passing runners cover
+240 body-stat, 37 collection, 37 non-heartbeat, 2,582 HTTP and 463 NNTP assertions:
+
+```sh
+python3 tests/cgi/test_cgi.py
+python3 tests/body_stats/test_body_stats.py
+python3 tests/collections/test_collections.py
+python3 tests/non_heartbeat/test_non_heartbeat.py
+python3 tests/http/test_http.py
+python3 tests/nntp/test_nntp.py
+```
+
+The distinct-nil profile and release binaries are unchanged. These offline
+checks do not repeat the dated full-driver lifecycle and shipped-suite acceptance
+above. Earlier dated records below retain their original source base and counts.
 
 ## Build, check and start
 
@@ -212,12 +251,12 @@ preload failures occur. Evidence: /tmp/lima-port-acceptance-20261019.
 
 ## CGI helper regression tests
 
-The three `WWW/cgi` helpers now compile and pass 55 isolated runtime assertions.
+The two retained `WWW/cgi` helpers compile and pass 42 isolated runtime assertions.
 `autodoc.c` uses ordinary HTML string literals, distinct nil routing and bare
-callbacks for its indexes and inheritance tree. `mudinfo.c` uses native array,
-mapping-filter and regex-result forms. `who.c` supplies the four required colour
-wrapper arguments and handles omitted query/form names. Empty queries are
-handled before indexing.
+callbacks for its indexes and inheritance tree. `who.c` supplies the four required
+colour wrapper arguments and handles omitted query/form names. Empty queries
+are handled before indexing. Upstream `1.1a4` removed `mudinfo.c`; its 13 checks
+and IMUD fixture were retired with that source.
 
 Run the permanent regression test from this checkout:
 
@@ -227,16 +266,11 @@ python3 tests/cgi/test_cgi.py
 
 The [test guide](tests/cgi/README.md) explains compiler selection and fixture
 scope. The runner copies current sources into a temporary library, uses the
-existing profile, and exercises generated documentation, mud filtering, colour
-stripping, finger fields and the HTTP form's data-plus-headers call. The real
-class definitions, grammar, glob and ANSI providers remain in use; IMUD and
-finger records are controlled fixtures. This qualifies helper output without
-starting an HTTP service or contacting a router.
-
-The full sweep immediately after the CGI adaptations measured **1008/1182 compile, 174 fail**, with
-zero regressions/timeouts/crashes. All three gains are these CGI helpers; 113
-hosted fragments and 61 other consumers remain. This is compilation coverage,
-not another full lifecycle or live-service qualification.
+existing profile, and exercises generated documentation, colour stripping,
+finger fields and the HTTP form's data-plus-headers call. The real class
+definitions, grammar, glob and ANSI providers remain in use; finger records are
+a controlled fixture. This qualifies helper output without starting an HTTP
+service or contacting a router.
 
 ## Queue and stack regression tests
 

@@ -61,7 +61,6 @@ class CgiTests(unittest.TestCase):
             for source, target in {
                 "master.c": "secure/master.c",
                 "finger_d.c": "secure/daemons/finger_d.c",
-                "imud_d.c": "daemons/imud_d.c",
             }.items():
                 shutil.copy2(FIXTURES / source, library / target)
             for name, text in DOCUMENTS.items():
@@ -74,7 +73,7 @@ class CgiTests(unittest.TestCase):
             profile.write_text(settings.replace(
                 "LPC_LIB_DIR=lib\n", f"LPC_LIB_DIR={library}\n"
             ), encoding="utf-8")
-            for name in ("autodoc.c", "mudinfo.c", "who.c"):
+            for name in ("autodoc.c", "who.c"):
                 with self.subTest(source=name):
                     self.run_compiler(profile, library / "WWW/cgi" / name)
             self.run_compiler(profile, library / "secure/master.c")
@@ -82,10 +81,10 @@ class CgiTests(unittest.TestCase):
                 profile, library / "secure/master.c", execute=True
             )
             lines = output.splitlines()
-            self.assertEqual(lines[-1], "CGI_TOTAL: 55", output)
+            self.assertEqual(lines[-1], "CGI_TOTAL: 42", output)
             checks = lines[:-1]
-            self.assertEqual(len(checks), 55, output)
-            self.assertEqual(len(set(checks)), 55, output)
+            self.assertEqual(len(checks), 42, output)
+            self.assertEqual(len(set(checks)), 42, output)
             self.assertTrue(all(line.startswith("CGI_OK: ") for line in checks), output)
 
 
