@@ -1483,6 +1483,48 @@ listener or service runs. Distinct nil/preserved player/4000ms stay.
 See the [native notes](../lpc-rs/doc/driver-comparison.md#lima-rifts-advancement-compatibility-adaptation).
 Evidence: /tmp/lima-rifts-advancement-runtime-20261021-ls6pv3ji. Port remains in progress.
 
+## Current remaining-source ledger
+
+Reviewed 21 October after Rifts adapter/tests commits Lima **c6e323d0** / native
+**6cec6767**. The latest full inventory remains **1021/1182**, with 161 standalone
+failures, no timeouts/crashes/regressions, **39.030s**. All 1549 library hashes,
+profile and binaries match it; no sweep is repeated. All failures are accounted
+for: 113 host-dependent sources have 47 actual complete hosts passing in that
+inventory, and 48 residual files have explicit decisions.
+
+| Current residual disposition | Files |
+|---|---:|
+| Qualified optional complete-host compositions | 3 |
+| Alternative providers with bounded adaptations | 7 |
+| Alternative combat providers needing integration | 7 |
+| Retained older provider choices | 6 |
+| Unselected board packages | 10 |
+| Contributed body/schema/shared-state integration | 6 |
+| Unfinished subsystems/dependent examples | 5 |
+| Deferred or upstream-disabled commands | 2 |
+| Unselected incomplete legacy backends | 2 |
+| Total | 48 |
+
+The 7/7/6 split refines the old 20-provider category; adopted NNTP has left the
+old 49-file residual set. All source/diagnostic records are current. Existing
+host/runtime qualifications keep their limits; no new host proof or runtime
+qualification is added. Optional adapters do not establish complete alternative
+rulesets, player vaporization or all scalar-blow consumers.
+
+The agreed port target is the configured profile; the remaining optional features
+are follow-up work. Those 48 residual files are outside the current target and
+no longer an automatic audit queue. Future expansion should name its feature/model
+and acceptance contract. No new integration is selected, and no closed default
+gameplay/equipment/trainer/wallet work is reopened. The retained configured-profile
+qualifications support handoff/review; they do not prove every optional feature works.
+
+One compile-only selector control passes; no runtime suite/Cargo build/listener/
+service runs. Production source/profile/binaries and original remain unchanged;
+distinct nil, preserved player, USE_MASS and 4000ms stay. Existing-world import
+remains unselected; inherited-signature/cache design and original HP bookkeeping
+remain separate. See the [native ledger](../lpc-rs/doc/driver-comparison.md#lima-current-remaining-source-ledger).
+Evidence: /tmp/lima-remaining-work-review-20261021-rfsfkq_k. Port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
