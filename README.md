@@ -1,6 +1,6 @@
 # Lima for lpc-rs
 
-The `lpc-rs-port` branch in this fork contains the Lima port for lpc-rs.
+The `lpc-rs-port` branch in this fork contains the Lima port for [lpc-rs](https://github.com/xxx/lpc-rs).
 See [the port guide](README.lpc-rs.md) for the supported configuration, build,
 startup and regression checks. The upstream FluffOS instructions follow below.
 
