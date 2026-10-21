@@ -1210,6 +1210,45 @@ match the latest inventory; its measured 1021/1182 count remains unchanged.
 See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-non-heartbeat-pulse-audit).
 Evidence: /tmp/lima-non-heartbeat-audit-20261021-3n676z85. The port remains in progress.
 
+## Non-heartbeat pulse adaptation
+
+The 21 October adapter follows audit commits Lima ccb986d2 / native ac577893.
+The optional module owns one private timer ID, uses an invoking callback and
+guards against duplicate arming. Stop/manual entry cancels only that pulse.
+The callback establishes the actor as player and restores incoming context on
+success/error; immediate swings retain incoming context. Removing the obsolete
+remove override restores normal object cleanup and native timer destruction.
+
+Manual target/swing/flag rules, default interval, jitter and penalty stay.
+A nonzero interval change keeps a pending deadline; an active manual-to-automatic
+transition rearms once. Production remains heartbeat/typed blows/limb health,
+distinct nil/preserved player/4000ms and USE_MASS.
+
+Run the maintained listener-free regression after building lpc-rs:
+
+```sh
+python3 tests/non_heartbeat/test_non_heartbeat.py
+```
+
+It passes **14 compiler checks / 37 assertions**, 1.911s, including real OBJ
+construction/removal, single-timer lifecycle, context restoration and native
+destruction cleanup. Six negative controls detect each removed lifecycle/context
+fix. Simple-damage regressions pass **22 compiler checks / 65 assertions**, 2.526s.
+
+Callbacks are explicitly consumed/invoked in one CLI transaction and all timers
+are cancelled or destroyed before commit. These do not qualify elapsed scheduler
+timing, fresh callback transactions, uncaught failure/retry, full body/adversary
+combat, death or saves. No listener, Cargo build or new retry policy is added.
+
+Fresh inventory: **1021/1182**, 161 failures, identical membership and no
+gains/regressions/timeouts/crashes in 39.918s. Only the optional pulse changes among
+1549 library files; profile, headers, driver binaries and original stay unchanged.
+Its standalone diagnostic now identifies expected receiving methods.
+
+See [tests/non_heartbeat/README.md](tests/non_heartbeat/README.md) and the
+[native notes](../lpc-rs/doc/driver-comparison.md#lima-non-heartbeat-pulse-adaptation).
+Evidence: /tmp/lima-non-heartbeat-runtime-20261021-du4dg3od. The port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
