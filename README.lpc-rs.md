@@ -964,6 +964,39 @@ selected-profile fragment proofs. No runtime session or full sweep runs. See the
 [native audit](../lpc-rs/doc/driver-comparison.md#lima-alternative-body-stat-compilation).
 Evidence: /tmp/lima-body-stats-audit-20261020-xmr0gy3q. The port remains in progress.
 
+## Alternative body-stat adaptation
+
+The runtime qualification following the compile audit (Lima afc94b54 / native
+a42a55ca) is now adopted. DND and Rifts protect CLASS_STATMODS inheritance so
+race overrides can name their return class. Rifts delegates absent stat/modifier
+queries and increments to the shared base; both alternatives use modifier queries
+for spare points. This preserves native visibility and distinct-nil behavior.
+The dice formulas, class schema and existing racial-adjustment policy are unchanged.
+
+Run the maintained regression with:
+
+```sh
+python3 tests/body_stats/test_body_stats.py
+```
+
+It passes **18 compiler checks and 240 runtime assertions** (Lima/DND/Rifts:
+124/56/60) in about 4.6s. The real menu discovers all advertised races and actual
+race/body constructors run. Checks include missing defaults, pre-roll spare
+points, repeated initialization and roll bounds, modifiers, class overrides,
+display, copied data, real bonus hooks, resets and cleanup. Five negative controls
+reproduce the original failures, including silent menu omission of failed race
+loads. A visibility fix alone left the distinct-nil failures unresolved.
+
+The CLI runner uses a temporary library, fixture master and small constructor
+caller at USER_OB. It does not exercise authentication, account registration,
+game entry, deferred callbacks or save/restart. Only the two unselected providers
+change in the library; production remains BODY_STATS_LIMA with distinct nil,
+preserved players, 4000ms, USE_MASS and the same combat/simple-advancement modules.
+Introductions and other alternate modules remain separate. No driver change or
+new inventory gain is claimed. See the
+[native adaptation notes](../lpc-rs/doc/driver-comparison.md#lima-alternative-body-stat-adaptation).
+Evidence: /tmp/lima-body-stats-runtime-20261020-ujvuh9pb.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3

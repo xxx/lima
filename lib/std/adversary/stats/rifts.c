@@ -10,7 +10,7 @@
 #include <hooks.h>
 
 inherit "/std/adversary/stats/base";
-private
+protected
 inherit CLASS_STATMODS;
 inherit CLASS_WEAR_INFO;
 
@@ -28,12 +28,12 @@ mapping query_stats()
 
 nomask int query_stat_pure(string stat)
 {
-   return stats["stat_" + stat];
+   return ::query_stat_pure(stat);
 }
 
 nomask int query_stat(string stat)
 {
-   return stats["cur_" + stat];
+   return ::query_stat(stat);
 }
 
 void set_mod_stat(string stat, int s)
@@ -43,19 +43,19 @@ void set_mod_stat(string stat, int s)
 
 int query_mod_stat(string stat)
 {
-   return stats["mod_" + stat];
+   return ::query_mod_stat(stat);
 }
 
 void inc_mod_stat(string stat)
 {
-   stats["mod_" + stat]++;
+   ::inc_mod_stat(stat);
 }
 
 int spare_points()
 {
    int total_pts = (this_object()->query_level() / 4) * 2;
-   total_pts -= stats["mod_iq"] + stats["mod_me"] + stats["mod_ma"] + stats["mod_ps"] + stats["mod_pp"] +
-                stats["mod_pe"] + stats["mod_pb"] + stats["mod_spd"];
+   total_pts -= query_mod_stat("iq") + query_mod_stat("me") + query_mod_stat("ma") + query_mod_stat("ps") +
+                query_mod_stat("pp") + query_mod_stat("pe") + query_mod_stat("pb") + query_mod_stat("spd");
    return total_pts;
 }
 

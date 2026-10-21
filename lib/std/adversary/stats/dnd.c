@@ -8,7 +8,7 @@
 #define USE_4D6DL
 
 inherit "/std/adversary/stats/base";
-private
+protected
 inherit CLASS_STATMODS;
 inherit CLASS_WEAR_INFO;
 
@@ -20,8 +20,8 @@ class wear_info find_wi(string s);
 int spare_points()
 {
    int total_pts = (this_object()->query_level() / 4) * 2;
-   total_pts -=
-       stats["mod_str"] + stats["mod_dex"] + stats["mod_con"] + stats["mod_int"] + stats["mod_wis"] + stats["mod_cha"];
+   total_pts -= query_mod_stat("str") + query_mod_stat("dex") + query_mod_stat("con") + query_mod_stat("int") +
+                query_mod_stat("wis") + query_mod_stat("cha");
    return total_pts;
 }
 
