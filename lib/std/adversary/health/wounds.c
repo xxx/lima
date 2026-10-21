@@ -25,13 +25,29 @@ string number_of(int, string);
  */
 private
 mapping wounds = ([]);
+private nosave int health_call_out;
+
+void health_periodic();
+
+private void cancel_health_periodic()
+{
+   if (health_call_out)
+      remove_call_out(health_call_out);
+   health_call_out = 0;
+}
+
+private void schedule_health_periodic()
+{
+   if (!health_call_out)
+      health_call_out = call_out(health_periodic, 15);
+}
 
 void set_max_limb_health(string limb, int x)
 {
    ::set_max_limb_health(limb, x);
    m_delete(wounds, limb);
    if (!sizeof(wounds))
-      remove_call_out("health_periodic");
+      cancel_health_periodic();
 }
 
 void disable_limb(string limb)
@@ -39,7 +55,7 @@ void disable_limb(string limb)
    ::disable_limb(limb);
    m_delete(wounds, limb);
    if (!sizeof(wounds))
-      remove_call_out("health_periodic");
+      cancel_health_periodic();
 }
 
 varargs int hurt_us(int x, string limb)
@@ -56,7 +72,7 @@ varargs int hurt_us(int x, string limb)
    if (ret && query_health(limb))
    {
       if (!sizeof(wounds))
-         call_out("health_periodic", 15);
+         schedule_health_periodic();
 
       if (wounds[limb])
       {
@@ -108,6 +124,9 @@ void heal_limb(string limb, int x)
    else
       m_delete(wounds, limb);
 
+   if (!sizeof(wounds))
+      cancel_health_periodic();
+
    /* i == number of wounds healed; n == total number before */
    if (i)
    {
@@ -123,19 +142,21 @@ void heal_limb(string limb, int x)
 
 void heal_all()
 {
+   cancel_health_periodic();
    wounds = ([]);
    ::heal_all();
 }
 
 void kill_us()
 {
-   remove_call_out("health_periodic");
+   cancel_health_periodic();
    ::kill_us();
 }
 
 // Unfortunately this can't be done lazily since it has side effects
 void health_periodic()
 {
+   cancel_health_periodic();
    string limb;
    mixed *w;
    int i, n, severity, delta;
@@ -154,7 +175,7 @@ void health_periodic()
    severity = w[i];
    delta = fuzzy_divide(random(2 * severity + 1) - severity, 5);
 
-   call_out("health_periodic", 15);
+   schedule_health_periodic();
 
    if (delta == 0)
       return;
@@ -211,7 +232,7 @@ int *query_wounds(string limb)
    return wounds[limb];
 }
 
-string diagnose_msg(string limb)
+private string diagnose_wound(string limb)
 {
    class diagnosis stuff = new (class diagnosis);
    int *my_wounds = query_wounds(limb);
@@ -266,10 +287,10 @@ string diagnose_msg(string limb)
    if (stuff.mutilations)
       types += ({number_of(stuff.mutilations, "mutilation")});
 
-   return "$P " + limb + " has sustained " + format_list(types, 0) + ".\n";
+   return "$P " + limb + " has sustained " + format_list(types, nil) + ".\n";
 }
 
-varargs string diagnose(string limb)
+string diagnose_wounds(string limb = nil)
 {
    string *limbs = query_limbs();
    string ret = "";
@@ -277,10 +298,15 @@ varargs string diagnose(string limb)
    if (!limb)
    {
       foreach (string s in limbs)
-         ret += diagnose_msg(s);
+         ret += diagnose_wound(s);
    }
    else
-      ret += diagnose_msg(limb);
+      ret += diagnose_wound(limb);
 
    return ret;
+}
+
+string diagnose()
+{
+   return diagnose_wounds();
 }

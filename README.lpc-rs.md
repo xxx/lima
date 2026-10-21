@@ -21,7 +21,7 @@ shipped suites pass 26/16/7/5/5, then normal and quiet combined commands each pa
 | NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default stat-menu qualification follows. |
 | Trainer stat menu | Four source targets compile; 43 runtime checks pass | Adopted source with default strength/agility options; prices, payments, point exhaustion and cleanup verified. |
 | Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Per-suite-first is the operator recipe; the current direct-cold recheck is below. |
-| Whole-source inventory | 1021/1182 compile; 161 standalone failures | Fresh sweep after the HTTP framing fix; no gains/regressions/timeouts/crashes, target constructors omitted. |
+| Whole-source inventory | 1021/1182 compile; 161 standalone failures | Fresh sweep after the wound adapter/compiler fix; no gains/regressions/timeouts/crashes, target constructors omitted. |
 | Optional NNTP client | Six compiler checks and 463 offline assertions | Actual source with recording transport; no service activation or live-server claim. |
 | Selected HTTP input | Seven compiler checks and 2,582 offline assertions | Retained header/body fragments, all ordinary GET/POST split positions and exact output; HTTP stays disabled. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
@@ -1026,6 +1026,59 @@ hashes, profile and release binaries remain unchanged. Inventory stays last
 measured 1021/1182, without a sweep or new selected-profile proof. See the
 [native audit](../lpc-rs/doc/driver-comparison.md#lima-wound-health-compilation-audit).
 Evidence: /tmp/lima-wounds-audit-20261020-eea1jaz8. The port remains in progress.
+
+## Wound-health runtime adaptation
+
+The adapter following the compilation audit (Lima 6f575c2a / native 427d4363) is
+now adopted. It preserves `diagnose()`, adds optional/named-limb `diagnose_wounds`,
+separates the wound formatter from inherited integer diagnosis, and uses native
+function callbacks with one nosave timer ID and explicit cancellation/rearming.
+The absent `format_list` separator is nil. Production stays HEALTH_LIMBS and
+BODY_STATS_LIMA with distinct nil, preserved player, 4000ms and USE_MASS.
+
+Rebuild the adjacent lpc-rs release binaries before running:
+
+```sh
+python3 tests/wounds/test_wounds.py
+```
+
+Runtime checks uncovered a native compiler bug: indexed compound assignment
+could evaluate its receiver/index twice, sending merged wound damage to a
+different element. The compiler now captures those values once. This corrects
+the driver while retaining the existing wound model and random formulas.
+
+The actual driver passes **46 assertions in 15.533s**, including a real
+fifteen-second callback, one pending timer, firing/rearming, cancellation and
+player context. Damage totals, wound coalescing, diagnosis, partial/full healing,
+limb resets/disables, manual updates, the death cancellation boundary and cleanup
+pass. Two negative controls detect missing cancellation. The maintained runner
+also checks four selected-health and ten wound-health/fixture compile targets.
+
+Fixtures use actual human/body/limb/wound sources, a local permissive master and
+USER_OB constructor caller. A leaf wrapper records callbacks and stops parent
+death handling after its state/cancellation boundary. Natural elapsed healing
+is held at zero; explicit healing and the original random wound updates run.
+Login, saved-data migration, corpse/reward processing and full combat rules are
+outside this qualification. Only an ephemeral loopback listener runs, without
+connections or external requests. See the
+[native notes](../lpc-rs/doc/driver-comparison.md#lima-wound-health-runtime-adaptation).
+Evidence: /tmp/lima-wounds-runtime-20261020-qz1cfddk.
+
+The adopted checkout's maintained runner passes all **14 compiler checks and 46
+assertions in 18.278s** with the final release binaries. The body-stat regression
+also passes 18 compiler checks and 240 assertions. Native verification passes ten
+new regressions, all 19 compiled workspace test executables serially (5198 tests,
+two ignored), ten doctests, workspace build, warning-free Clippy/docs and format.
+An initial concurrent run missed a warning in an unchanged command-timeout test;
+that test passes alone and in the full serial replay.
+
+A fresh inventory measures **1021/1182 compiling, 161 failures in 53.977s**, with
+unchanged success/failure membership and no timeouts or crashes. Standalone
+wounds is the only changed diagnostic, now exposing its receiving-object
+requirements. The same 113 selected-profile fragments and 48 other source
+dispositions remain separate. Profile and original Lima stay unchanged; this
+bounded qualification is not a new login/account acceptance run or whole-port
+completion claim.
 
 ## Remaining scope
 
