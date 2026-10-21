@@ -1,5 +1,7 @@
 /* Do not remove the headers from this file! see /USAGE for more info. */
 
+#include <flags.h>
+
 inherit __DIR__ "death_messages";
 
 void remove();
@@ -16,7 +18,8 @@ nomask string query_default_death_message()
 void vaporize()
 {
    simple_action(query_death_message());
-   filter(all_inventory(this_object()), ( : $1->is_armour() :))->remove_it();
+   filter(all_inventory(this_object()),
+          (: $1->is_armour() && $1->test_flag(F_WORN) :))->do_remove();
    all_inventory(this_object())->move(environment());
    remove();
 }
@@ -24,7 +27,7 @@ void vaporize()
 protected
 void die()
 {
-   call_out(( : vaporize:), 1);
+   call_out(vaporize, 1);
 }
 
 void drop_corpse()

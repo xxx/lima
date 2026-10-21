@@ -1314,6 +1314,42 @@ change. All 1549 library hashes match the last measured 1021/1182.
 See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-vaporizing-death-audit).
 Evidence: /tmp/lima-vaporize-audit-20261021-16wwbivy. The port remains in progress.
 
+## NPC vaporize adaptation
+
+The 21 October adapter follows audit commits Lima e3d3a378 / native c8b9bbaf.
+The optional provider now schedules an invoking vaporize callback and calls the
+current do_remove method only for worn armour before transferring inventory.
+Worn gear survives and unworn armour is left alone. Delay, messages, combat/effect
+policy and the empty player drop_corpse hook remain; production stays on corpses.
+
+Run the maintained listener-free regression after building lpc-rs:
+
+```sh
+python3 tests/vaporize/test_vaporize.py
+```
+
+It passes **17 compiler checks / 22 assertions**, 2.835s, using actual NPC/container
+constructors, stock armour behavior with call counting, ordinary inventory and
+an empty NPC. Three negative controls detect the return-only callback, obsolete
+unwear API and unwearing unworn armour. Items survive in the room with correct
+worn state; NPC removal cancels its timers and creates no corpse.
+
+Only a temporary copy selects DEATH_VAPORIZE, retaining distinct nil/preserved
+player/4000ms, USE_MASS and other current providers. Delayed setup is cancelled
+and the callback is consumed/invoked explicitly in one transaction. No elapsed
+scheduler, health/rewards/party, effects, player ghost, user messaging, arbitrary
+transfer-refusal or save qualification is claimed. Player routing remains
+integration-required; this adapter does not complete the global death option.
+
+Fresh inventory: **1021/1182**, 161 failures, identical membership/diagnostics,
+no gains/regressions/timeouts/crashes in 40.407s. Only the optional provider changes
+among 1549 library files; profile, headers, driver binaries and original stay.
+No Cargo build, listener, new driver API or generic destruction change.
+
+See [tests/vaporize/README.md](tests/vaporize/README.md) and the
+[native notes](../lpc-rs/doc/driver-comparison.md#lima-npc-vaporize-adaptation).
+Evidence: /tmp/lima-vaporize-runtime-20261021-bo0zn2op. The port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
