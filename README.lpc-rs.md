@@ -19,11 +19,12 @@ combined modes pass 59/59. Source inventory and runtime results retain distinct 
 | NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default stat-menu qualification follows. |
 | Trainer stat menu | Four source targets compile; 43 runtime checks pass | Adopted source with default strength/agility options; prices, payments, point exhaustion and cleanup verified. |
 | Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Per-suite-first is the operator recipe; the current direct-cold recheck is below. |
-| Whole-source inventory | 1020/1182 compile; 162 standalone failures | Fresh sweep after the optional legacy money adapter; one gain, no regressions/timeouts/crashes, target constructors omitted. |
+| Whole-source inventory | 1021/1182 compile; 161 standalone failures | Fresh sweep after the optional NNTP adapter; one gain, no regressions/timeouts/crashes, target constructors omitted. |
+| Optional NNTP client | Six compiler checks and 463 offline assertions | Actual source with recording transport; no service activation or live-server claim. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
 
 Of the inventory's failures, 113 documented fragments have currently compiling
-shipped hosts. **The other 49 standalone failures comprise remaining porting work
+shipped hosts. **The other 48 standalone failures comprise remaining porting work
 and recorded integration/provider/incomplete-feature decisions.** Optional or
 unselected code is not finished merely because it is absent
 from the configured boot. These are not counts of missing driver features.
@@ -719,11 +720,10 @@ combat providers, USE_MASS and unselected USE_MONEY; no alternate build is run.
 
 The incomplete service group is contrib/http_connection, contrib/nntp and
 obj/secure/old_socket. Keep the HTTP/master replacement unselected and the
-deprecated backend retired. NNTP still depends on that backend and has no
-completed focused port. The next bounded work is a source-only NNTP interface
-audit against the already ported SOCKET, without endpoint contact, service
-activation or transport reimplementation. Default local news/mail and previous
-TCP/service qualifications retain their scopes. See the
+deprecated backend retired. At that reconciliation, NNTP still depended on that
+backend; its subsequent audit, offline prototype and source adoption follow
+below. Default local news/mail and previous TCP/service qualifications retain
+their scopes. See the
 [native reconciliation](../lpc-rs/doc/driver-comparison.md#lima-remaining-source-disposition-reconciliation).
 
 This is a disposition inventory, not whole-port completion or proof that
@@ -780,17 +780,49 @@ two-digit date format and its century ambiguity remain. Raw ARTICLE arrays and
 POST/IHAVE continuation/final status callbacks remain. XHDR still reports not
 implemented, now in request order without sending the unsupported command.
 
-**This proposal is not adopted yet.** Runtime tests substitute only the SOCKET
+**At this prototype milestone, the proposal was not adopted.** Runtime tests
+substitute only the SOCKET
 constructor path with a recording transport; the unsubstituted proposal is also
 compiled. They exercise no real socket/listener, driver session, endpoint or
 service activation, and do not newly qualify the provider's privilege, ownership
 or native event behavior. See the
 [native qualification](../lpc-rs/doc/driver-comparison.md#lima-offline-nntp-prototype).
 
-Next adopt optional contrib/nntp with maintained offline tests, then measure
-actual-source compilation. NNTP_OB, local NEWS_D/newsreader, production library,
-profile and release binaries remain unchanged. Last measured inventory stays
-**1020/1182**, without a new sweep or inferred gain. The port remains in progress.
+At that milestone the last measured inventory stayed **1020/1182**; the following
+adoption measures compilation of the actual source. The port remains in progress.
+
+## NNTP adapter adoption
+
+The optional contrib/nntp adapter is now adopted with maintained offline tests:
+
+```sh
+python3 tests/nntp/test_nntp.py
+```
+
+**Six compiler checks and 463 LPC assertions pass in 1.051s.** The suite reads
+actual library source, substitutes only its transport constructor path in a
+disposable runtime copy, and checks framing, commands/callbacks, upload ordering
+and bounded output, terminal cleanup and UTC dates. No separately maintained
+client implementation or production test API is added. Original public function
+documentation annotations are retained. See [test details](tests/nntp/README.md)
+and the [native adoption notes](../lpc-rs/doc/driver-comparison.md#lima-nntp-adapter-adoption).
+
+Only contrib/nntp changes in the production library. It uses selected SOCKET and
+bare callbacks while retaining raw ARTICLE arrays and upload continuation/final
+status callbacks. XHDR remains explicitly unimplemented and reports its result
+in request order without sending a command. The UTC helper retains the legacy
+two-digit date format and century ambiguity. Files are read into memory; encoded
+output is produced in bounded pieces. No native API or time-policy change.
+
+A fresh sweep measures **1021/1182 compiling, 161 failures in 42.431s**, with
+NNTP as the sole gain and zero regressions/timeouts/crashes. All 113 existing
+fragment proofs retain passing hosts; 48 other standalone consumers retain their
+dispositions and unchanged diagnostics. This is source support without service
+activation: NNTP_OB still names the absent installed path and local NEWS_D/reader
+remain selected. The recording suite does not newly qualify the real provider's
+privilege, ownership, backpressure or native event behavior. No real socket,
+listener, driver session or NNTP endpoint is used. Profile, release binaries and
+original Lima are unchanged. The port remains in progress.
 
 ## Remaining scope
 

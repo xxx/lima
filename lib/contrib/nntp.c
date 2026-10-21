@@ -1,401 +1,398 @@
 /* Do not remove the headers from this file! see /USAGE for more info. */
 
-// An NNTP client object.   (RFC 977: Network News Transfer Protocol)
+// An NNTP client object. (RFC 977: Network News Transfer Protocol)
 // Protocol by Brian Kantor and Phil Lapsley.
 // Created: May 4, 1995 by John Viega (rust@virginia.edu)
 // More user friendly date handling added Aug 8. by Edward Kmett (Harmless)
-// ARTICLE reponse code, well um.. removed by Edward Kmett
+// ARTICLE response handling was removed by Edward Kmett.
 
-#include <driver/localtime.h>
+//: MODULE
+// Optional text NNTP client with ordered response callbacks.
+
 #include <mudlib.h>
 #include <socket.h>
 
-#define NNTP_PORT "119"
+#define NNTP_PORT 119
 #define MAX_PORT 32000
+#define BODY_CHUNK_CHARACTERS 1024
 
-//: MODULE
-// interface to an external nntp server.
+private class request {
+   string kind;
+   string wire;
+   int success;
+   int multiline;
+   string *body;
+};
 
-private
-object news_socket;
-private
-string news_host;
-private
-string news_port;
-private
-string *expected_responses = ({"WELCOME"});
-private
-string *post_queue = ({});
-private
-function response_callback;
-private
-string *long_response;
-private
-int long_response_code;
-private
-int can_post = 1; // assume you can until we get the WELCOME
-                  // screen.  This SHOULD be known in advance...
+private object news_socket;
+private function response_callback;
+private class request *pending = ({});
+private class request active;
+private string incoming = "";
+private string *reply;
+private int greeted;
+private int can_post;
+private int closed;
+private int quitting;
+private int notifying;
+private int body_offset;
+private int body_part;
+private int body_sending;
+private int body_started;
 
-private
-int waiting_for_end_of_long_response = 0;
-
-private
-string *long_responses = ({100, 215, 220, 221, 222, 230, 231});
-private
-string CRLF = "\r\n";
-
-private
-nomask void handle_response(int code, mixed response)
+private void close_connection()
 {
-   string this_response = expected_responses[0];
-   int count, first, last;
-   string name;
-   int i;
-   mixed id, nr, tmp;
+   object socket = news_socket;
+   closed = 1;
+   news_socket = nil;
+   pending = ({});
+   active = nil;
+   incoming = "";
+   reply = nil;
+   body_sending = body_started = body_offset = body_part = 0;
+   if (socket) catch(socket->remove());
+}
 
-   if (sizeof(expected_responses) > 1)
-      expected_responses = expected_responses[1.. < 1];
-   else
-      expected_responses = ({});
+private int report(mixed *arguments)
+{
+   notifying++;
+   mixed failure = catch(evaluate(response_callback, arguments...));
+   notifying--;
+   if (failure) close_connection();
+   return !failure && !closed;
+}
 
-   switch (this_response)
-   {
-   case "WELCOME":
-      if (code == 200)
-         can_post = 1;
-      else
-         can_post = 0;
-      return;
-   case "LIST":
-      if (code != 215)
-      {
-         evaluate(response_callback, "nntp error: unexpected reply: " + code);
-         return;
-      }
-      evaluate(response_callback, map(response[1..], ( : explode($1, " ") :)));
-      return;
-   case "GROUP":
-      if (code != 211)
-      {
-         evaluate(response_callback, "nntp error: unexpected reply: " + code);
-         return;
-      }
-      response = explode(response, " ");
-      i = sizeof(response);
-      if (i > 1)
-      {
-         count = response[1];
-         if (i > 2)
-         {
-            first = response[2];
-            if (i > 3)
-            {
-               last = response[3];
-               if (i > 4)
-               {
-                  name = response[4];
-               }
-            }
-         }
-      }
-      evaluate(response_callback, code, count, first, last, name);
-      return;
-   case "STAT_NEXT_OR_LAST":
-      if ((code - 22) % 100)
-      {
-         evaluate(response_callback, "nntp error: unexpected reply:" + code);
-         return;
-      }
-      response = explode(response, " ");
-      id = "";
-      i = sizeof(response);
-      if (i > 1)
-      {
-         nr = response[1];
-         if (i > 2)
-            id = response[2];
-      }
-      evaluate(response_callback, code, nr, id);
-      return;
-   case "ARTICLE_OF_CLOTHING":
-      if ((code - 20) % 100)
-      {
-         evaluate(response_callback, "nntp error: unexpected reply: " + code);
-         return;
-      }
-      tmp = explode(response, " ");
-      id = "";
-      i = sizeof(tmp);
-      if (i > 1)
-      {
-         nr = tmp[1];
-         if (i > 2)
-            id = tmp[2];
-      }
-      if (sizeof(response) > 1)
-         response = response[1..];
-      else
-         response = ({});
-      evaluate(response_callback, nr, id, response);
-      return;
+private void fail(string message)
+{
+   if (closed) return;
+   close_connection();
+   report(({"nntp error: " + message}));
+}
 
-   case "XHDR":
-      evaluate(response_callback, "nntp error: not implemented yet.");
-      return;
+private int send(string text)
+{
+   if (catch(news_socket->send(text))) {
+      fail("write failed.");
+      return 0;
+   }
+   return 1;
+}
 
-   case "QUIT":
-      evaluate(response_callback, response);
-      news_socket->remove();
-      return;
-
-   // Urg, don't send IHAVE and something else in the same execution thread.
-   // I'll add a workaround in a day or 2.
-   case "IHAVE":
-      if (code < 300 || code > 399)
-      {
-         evaluate(response_callback, "nntp error: unexpected reply.");
-         return;
+private void start_next()
+{
+   while (!closed && greeted && !notifying && !active && sizeof(pending)) {
+      active = pending[0];
+      pending = pending[1..];
+      if (active.kind == "XHDR") {
+         active = nil;
+         report(({"nntp error: not implemented yet."}));
+         continue;
       }
-      expected_responses += ({"IHAVE_CONFIRMATION"});
-      tmp = post_queue[0];
-      if (sizeof(post_queue) > 1)
-         post_queue = post_queue[1..];
-      else
-         post_queue = ({});
-      for (i = 0; i < sizeof(tmp); i++)
-      {
-         if (tmp[i] == ".")
-            tmp[i] = "..";
-         news_socket->send(tmp[i] + CRLF);
+      if ((active.kind == "POST" || active.kind == "IHAVE") && !can_post) {
+         active = nil;
+         report(({"nntp error: not confirmed for posting."}));
+         continue;
       }
-      news_socket->send("." + CRLF);
-      evaluate(response_callback, response);
-      return;
-
-   default:
-      evaluate(response_callback, response);
-      return;
+      body_started = 0;
+      send(active.wire + "\r\n");
    }
 }
 
-private
-nomask void nntp_read_callback(object socket, string data)
+private void enqueue(string kind, string command, int success, int multiline, string *body)
 {
-   int num_lines, i, response_code;
-   string *lines_read;
-   string response;
+   if (closed || !news_socket) error("nntp: connection is closed.");
+   if (quitting) error("nntp: QUIT is already queued.");
+   if (kind == "QUIT") quitting = 1;
+   pending += ({new(class request, kind: kind, wire: command, success: success,
+                    multiline: multiline, body: body)});
+   start_next();
+}
 
-   BBUG("Reading: " + data);
-   lines_read = explode(data, "\n");
-   num_lines = sizeof(lines_read);
+private string next_body_chunk(object socket)
+{
+   if (closed || socket != news_socket || !body_sending) return nil;
+   string chunk = "";
+   while (sizeof(chunk) < BODY_CHUNK_CHARACTERS && body_part < sizeof(active.body)) {
+      string part = active.body[body_part];
+      int count = BODY_CHUNK_CHARACTERS - sizeof(chunk);
+      if (count > sizeof(part) - body_offset) count = sizeof(part) - body_offset;
+      if (count) chunk += part[body_offset..body_offset + count - 1];
+      body_offset += count;
+      if (body_offset == sizeof(part)) { body_part++; body_offset = 0; }
+   }
+   if (body_part == sizeof(active.body)) {
+      body_sending = 0;
+      active.body = nil;
+   }
+   return sizeof(chunk) ? chunk : nil;
+}
 
-   for (i = 0; i < num_lines; i++)
-   {
-      if (waiting_for_end_of_long_response)
-      {
-         if (trim(lines_read[i]) == ".")
-         {
-            waiting_for_end_of_long_response = 0;
-            handle_response(long_response_code, long_response);
-            continue;
+private void complete(mixed *arguments)
+{
+   active = nil;
+   reply = nil;
+   body_started = body_sending = body_offset = body_part = 0;
+   if (report(arguments)) start_next();
+}
+
+private int digits(string text)
+{
+   if (!sizeof(text)) return 0;
+   foreach (int character in text)
+      if (character < '0' || character > '9') return 0;
+   return 1;
+}
+
+private void finish_reply()
+{
+   if (active.kind == "LIST") {
+      mixed *groups = ({});
+      foreach (string group in reply[1..]) groups += ({explode(group, " ")});
+      complete(({groups}));
+   } else complete(({reply}));
+}
+
+private void status_line(string line)
+{
+   if (sizeof(line) < 3 || !digits(line[0..2]) ||
+       (sizeof(line) > 3 && line[3] != ' ')) {
+      fail("invalid response: " + line + ".");
+      return;
+   }
+   int code = to_int(line[0..2]);
+   if (!greeted) {
+      if (code != 200 && code != 201) {
+         fail("unexpected greeting: " + line);
+         return;
+      }
+      greeted = 1;
+      can_post = code == 200;
+      start_next();
+      return;
+   }
+   if (code == 400) {
+      fail("server closed connection: " + line);
+      return;
+   }
+   if (!active) {
+      fail("unsolicited response: " + line);
+      return;
+   }
+   if (active.kind == "POST" || active.kind == "IHAVE") {
+      int continuation = active.kind == "POST" ? 340 : 335;
+      if (!body_started && code == continuation) {
+         body_started = body_sending = 1;
+         body_offset = body_part = 0;
+         if (send(next_body_chunk(news_socket))) report(({line}));
+         return;
+      }
+      if (body_sending || (code < 400 && (!body_started || code != active.success))) {
+         fail("unexpected article response: " + line);
+         return;
+      }
+      complete(({line}));
+      return;
+   }
+   if (code != active.success && code < 400) {
+      fail("unexpected reply: " + line);
+      return;
+   }
+   if (code == active.success && active.multiline) {
+      reply = ({line});
+      return;
+   }
+   if (active.kind == "QUIT") {
+      close_connection();
+      report(({line}));
+      return;
+   }
+   string kind = active.kind;
+   if (kind == "GROUP" || kind == "STAT") {
+      if (code != active.success) {
+         complete(({"nntp error: unexpected reply: " + code}));
+         return;
+      }
+      string *fields = filter(explode(line, " "), (: sizeof($1) :));
+      if (kind == "GROUP") {
+         if (sizeof(fields) < 5 || !digits(fields[1]) ||
+             !digits(fields[2]) || !digits(fields[3])) {
+            fail("invalid GROUP response: " + line);
+            return;
          }
-         long_response += ({lines_read[i]});
-         continue;
+         complete(({code, to_int(fields[1]), to_int(fields[2]), to_int(fields[3]), fields[4]}));
+      } else {
+         if (sizeof(fields) < 3 || !digits(fields[1])) {
+            fail("invalid article number: " + line);
+            return;
+         }
+         complete(({code, to_int(fields[1]), fields[2]}));
       }
-      if (sscanf(lines_read[i], "%d %s", response_code, response) != 2)
-      {
-         evaluate(response_callback, "nntp error: invalid response : " + lines_read[i] + ".");
-         continue;
-      }
+      return;
+   }
+   if (kind == "LIST" && code != 215)
+      complete(({"nntp error: unexpected reply: " + code}));
+   else complete(({line}));
+}
 
-      if (member_array(response_code, long_responses) != -1)
-      {
-         waiting_for_end_of_long_response = 1;
-         long_response_code = response_code;
-         long_response = ({lines_read[i]});
-         continue;
-      }
-      handle_response(response_code, lines_read[i]);
+private void read_data(string data)
+{
+   incoming += data;
+   int end;
+   while (!closed && (end = strindex(incoming, "\r\n")) >= 0) {
+      string line = end ? incoming[0..end - 1] : "";
+      incoming = incoming[end + 2..];
+      if (reply != nil) {
+         if (line == ".") finish_reply();
+         else {
+            if (sizeof(line) && line[0] == '.') line = line[1..];
+            reply += ({line});
+         }
+      } else status_line(line);
    }
 }
 
-private
-nomask void nntp_close_callback(object socket)
+private void nntp_read_callback(object socket, string data)
 {
+   if (closed || socket != news_socket || data == nil) return;
+   if (catch(read_data(data))) fail("could not process response.");
+}
+
+private void nntp_close_callback(object socket)
+{
+   if (socket == news_socket && !closed) fail("connection closed before QUIT reply.");
 }
 
 varargs void create(function callback, string host, mixed port)
 {
-   if (!callback && !host && !port)
-      return;
-   if (!functionp(callback))
-      error("bad type arg 1 to create an NNTP object.");
+   if (!callback && !host && !port) return;
+   if (!functionp(callback) || !stringp(host) || !sizeof(host))
+      error("nntp: expected a response callback and host.");
+   if (!port) port = NNTP_PORT;
+   if (stringp(port) && digits(port)) port = to_int(port);
+   if (!intp(port) || port < 1 || port > MAX_PORT)
+      error("nntp: invalid port.");
    response_callback = callback;
-   if (!host || !stringp(host))
-      error("bad type arg 2 to create NNTP.");
-   if (!stringp(port))
-   {
-      if (!port)
-      {
-         port = NNTP_PORT;
-      }
-      else
-      {
-         if (intp(port) && port > 0 && port <= MAX_PORT)
-         {
-            port = sprintf("%d", port);
-         }
-         else
-         {
-            error("Bad type argument 3 to create an NNTP object.");
-         }
-      }
+   news_socket = clone_object(SOCKET, SKT_STYLE_CONNECT, host + " " + port,
+                              nntp_read_callback, nntp_close_callback);
+   if (catch(news_socket->set_write_callback(next_body_chunk))) {
+      close_connection();
+      error("nntp: could not configure output callback.");
    }
-   news_host = host;
-   news_port = port;
-   news_socket = clone_object (OLD_SOCKET, SKT_STYLE_CONNECT, host + " " + port,
-                      (
-                          : nntp_read_callback:),
-                      (
-                          : nntp_close_callback:));
 }
 
-private
-mapping remap = (["Jan":"01",
-                  "Feb":"02", "Mar":"03", "Apr":"04", "May":"05", "Jun":"06", "Jul":"07", "Aug":"08", "Sep":"09",
-                  "Oct":"10", "Nov":"11", "Dec":"12"]);
-
-//: FUNCTION dt_stamp
-// Return an nntp compatible yymmdd hhmmss string
-
-string dt_stamp(int time)
+private int leap_year(int year)
 {
-   string s;
-   int *tmp;
-   tmp = localtime(time);
-   s = ctime(time + tmp[LT_GMTOFF]);
-   if (s[8] == ' ')
-      return s[22..] + remap[s[4..6]] + "0" + s[9..12] + s[14..15] + s[17..18];
-   else
-      return s[22..] + remap[s[4..6]] + s[8..12] + s[14..15] + s[17..18];
+   return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
+}
+
+// Gregorian calendars repeat every 146097 days, including before the epoch.
+//: FUNCTION dt_stamp
+// Return a UTC yymmdd hhmmss date for NEWGROUPS and NEWNEWS.
+
+string dt_stamp(int timestamp)
+{
+   int day = timestamp / 86400;
+   int seconds = timestamp % 86400;
+   if (seconds < 0) { day--; seconds += 86400; }
+   int era = day / 146097;
+   day %= 146097;
+   if (day < 0) { era--; day += 146097; }
+   int year = 1970 + era * 400;
+   while (day >= 365 + leap_year(year)) {
+      day -= 365 + leap_year(year);
+      year++;
+   }
+   int *months = ({31, 28 + leap_year(year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31});
+   int month;
+   while (day >= months[month]) { day -= months[month]; month++; }
+   return sprintf("%02d%02d%02d %02d%02d%02d", (year % 100 + 100) % 100,
+                  month + 1, day + 1, seconds / 3600, seconds % 3600 / 60, seconds % 60);
 }
 
 //: FUNCTION newgroups
 // Send an nntp NEWGROUPS command.
 
-void newgroups(int datetime)
-{
-
-   expected_responses += ({"NEWGROUPS"});
-   news_socket->send("NEWGROUPS " + dt_stamp(datetime) + " GMT" + CRLF);
-}
+void newgroups(int datetime) { enqueue("NEWGROUPS", "NEWGROUPS " + dt_stamp(datetime) + " GMT", 231, 1, nil); }
 
 //: FUNCTION newnews
 // Send an nntp NEWNEWS command.
 
-void newnews(string group, int datetime)
-{
-   expected_responses += ({"NEWNEWS"});
-   news_socket->send("NEWNEWS " + group + " " + dt_stamp(datetime) + " GMT" + CRLF);
-}
+void newnews(string group, int datetime) { enqueue("NEWNEWS", "NEWNEWS " + group + " " + dt_stamp(datetime) + " GMT", 230, 1, nil); }
 
 //: FUNCTION list
 // Send an nntp LIST command.
 
-void list()
-{
-   expected_responses += ({"LIST"});
-   news_socket->send("LIST" + CRLF);
-}
+void list() { enqueue("LIST", "LIST", 215, 1, nil); }
 
 //: FUNCTION group
 // Send an nntp GROUP command.
 
-void group(string name)
-{
-   expected_responses += ({"GROUP"});
-   news_socket->send("GROUP " + name + CRLF);
-}
+void group(string name) { enqueue("GROUP", "GROUP " + name, 211, 0, nil); }
 
 //: FUNCTION help
 // Send an nntp HELP command.
 
-void help()
-{
-   expected_responses += ({"HELP"});
-   news_socket->send("HELP" + CRLF);
-}
+void help() { enqueue("HELP", "HELP", 100, 1, nil); }
 
 //: FUNCTION stat
 // Send an nntp STAT command.
 
-void stat(string id)
-{
-   expected_responses += ({"STAT_NEXT_OR_LAST"});
-   news_socket->send("STAT " + id + CRLF);
-}
+void stat(string id) { enqueue("STAT", "STAT " + id, 223, 0, nil); }
 
 //: FUNCTION next
 // Send an nntp NEXT command.
 
-void next()
-{
-   expected_responses += ({"STAT_NEXT_OR_LAST"});
-   news_socket->send("NEXT" + CRLF);
-}
+void next() { enqueue("STAT", "NEXT", 223, 0, nil); }
 
 //: FUNCTION last
 // Send an nntp LAST command.
 
-void last()
-{
-   expected_responses += ({"STAT_NEXT_OR_LAST"});
-   news_socket->send("LAST" + CRLF);
-}
+void last() { enqueue("STAT", "LAST", 223, 0, nil); }
 
 //: FUNCTION head
 // Send an nntp HEAD command.
 
-varargs void head(string id)
-{
-   expected_responses += ({"ARTICLE"});
-   if (!id)
-      news_socket->send("HEAD" + CRLF);
-   else
-      news_socket->send("HEAD " + id + CRLF);
-}
+varargs void head(string id) { enqueue("HEAD", id ? "HEAD " + id : "HEAD", 221, 1, nil); }
 
 //: FUNCTION body
 // Send an nntp BODY command.
 
-varargs void body(string id)
-{
-   expected_responses += ({"ARTICLE"});
-   if (!id)
-      news_socket->send("BODY" + CRLF);
-   else
-      news_socket->send("BODY " + id + CRLF);
-}
+varargs void body(string id) { enqueue("BODY", id ? "BODY " + id : "BODY", 222, 1, nil); }
 
 //: FUNCTION article
 // Send an nntp ARTICLE command.
 
-varargs void article(string id)
-{
-   expected_responses += ({"ARTICLE"});
-   if (!id)
-      news_socket->send("ARTICLE" + CRLF);
-   else
-      news_socket->send("ARTICLE " + id + CRLF);
-}
+varargs void article(string id) { enqueue("ARTICLE", id ? "ARTICLE " + id : "ARTICLE", 220, 1, nil); }
 
 //: FUNCTION xhdr
-// Send an nntp XHDR command.
+// Report that XHDR is not implemented.
 
-void xhdr(string hdr, string str)
+void xhdr(string hdr, string str) { enqueue("XHDR", "", 0, 0, nil); }
+
+//: FUNCTION slave
+// Send an nntp SLAVE command.
+
+void slave() { enqueue("SLAVE", "SLAVE", 202, 0, nil); }
+
+//: FUNCTION quit
+// Send an nntp QUIT command, and clean up.
+
+void quit() { enqueue("QUIT", "QUIT", 205, 0, nil); }
+
+private string *article_body(mixed file)
 {
-   expected_responses += ({"XHDR"});
-   news_socket->send("XHDR " + hdr + " " + str + CRLF);
+   if (!stringp(file)) error("nntp: expected a local filename.");
+   string contents = read_file(file);
+   if (contents == nil) error("nntp: missing local file.");
+   contents = replace_string(contents, "\r\n", "\n");
+   string *lines = sizeof(contents) ? explode(contents, "\n") : ({});
+   if (sizeof(lines) && lines[<1] == "") lines = lines[..<2];
+   string *parts = ({});
+   foreach (string line in lines) {
+      if (sizeof(line) && line[0] == '.') parts += ({"."});
+      parts += ({line, "\r\n"});
+   }
+   return parts + ({".\r\n"});
 }
 
 //: FUNCTION post
@@ -403,37 +400,12 @@ void xhdr(string hdr, string str)
 
 void post(string file)
 {
-   mixed contents;
-   int i;
-   if (can_post != 1)
-   {
-      evaluate(response_callback, "nntp error: not confirmed for posting.");
+   string *body;
+   if (catch(body = article_body(file))) {
+      report(({"nntp error: couldn't find local file."}));
       return;
    }
-   if (catch (contents = explode(read_file(file), "\n")))
-   {
-      evaluate(response_callback, "nntp error: couldn't find local file.");
-      return;
-   }
-   expected_responses += ({"POST"});
-   post_queue += ({file});
-   news_socket->send("POST" + CRLF);
-   for (; i < sizeof(contents); i++)
-   {
-      if (contents[i] == ".")
-         contents[i] = "..";
-      news_socket->send(contents[i] + CRLF);
-   }
-   news_socket->send("." + CRLF);
-}
-
-//: FUNCTION slave
-// Send an nntp SLAVE command.
-
-void slave()
-{
-   expected_responses += ({"SLAVE"});
-   news_socket->send("SLAVE" + CRLF);
+   enqueue("POST", "POST", 240, 0, body);
 }
 
 //: FUNCTION ihave
@@ -441,32 +413,12 @@ void slave()
 
 void ihave(string id, mixed file)
 {
-   if (can_post != 1)
-   {
-      evaluate(response_callback, "nntp error: not confirmed for posting.");
+   string *body;
+   if (catch(body = article_body(file))) {
+      report(({"nntp error: couldn't find local file."}));
       return;
    }
-   if (catch (file = explode(read_file(file), "\n")))
-   {
-      evaluate(response_callback, "nntp error: couldn't find local file.");
-      return;
-   }
-   expected_responses += ({"IHAVE"});
-   post_queue += ({file});
-   news_socket->send("IHAVE " + id + CRLF);
+   enqueue("IHAVE", "IHAVE " + id, 235, 0, body);
 }
 
-//: FUNCTION quit
-// Send an nntp QUIT command, and clean up.
-
-void quit()
-{
-   expected_responses += ({"QUIT"});
-   news_socket->send("QUIT" + CRLF);
-}
-
-void remove()
-{
-   if (news_socket && objectp(news_socket))
-      catch (news_socket->remove());
-}
+void remove() { close_connection(); }
