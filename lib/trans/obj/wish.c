@@ -319,4 +319,3 @@ nomask string query_save_path(string userid)
 {
    return WSHELL_PATH(userid);
 }
-

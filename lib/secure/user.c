@@ -123,4 +123,3 @@ nomask void net_dead()
       remove();
    }
 }
-

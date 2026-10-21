@@ -5,8 +5,9 @@ This is the working port of Lima based on upstream
 Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
-**The port remains in progress.** The configured fresh-account lifecycle was
-refreshed on **20 October 2026** at Lima **e5c79c04** and native **16aedb39**:
+**The configured profile is the agreed port target.** Remaining optional features
+are explicit follow-ups. The fresh-account lifecycle qualification was recorded
+on **20 October 2026** at Lima **e5c79c04** and native **16aedb39**:
 30 lifecycle checkpoints and 69 coin/parser/native-save checks in 137.15 seconds,
 including character creation, ordinary commands, saved-password login and restored
 wallet balances. Both boots have 151 clean preloads and exit normally. The five
@@ -15,24 +16,25 @@ shipped suites pass 26/16/7/5/5, then normal and quiet combined commands each pa
 
 | Qualification | Result | Scope |
 |---|---|---|
-| Current port acceptance | 30 checks across two clean driver processes | First administrator; actual saved-password authentication and character identity/state verified after restart. |
+| Configured lifecycle, 20 October | 30 checks across two clean driver processes | First administrator; actual saved-password authentication and character identity/state verified after restart. |
 | Coin command integration | 69 command/state/save checks | Fourteen real shell/parser commands, configured denominations, value conservation and native wallet persistence/cleanup after restart. |
 | Ordinary-player lifecycle | 57 checks across two clean driver processes | AUTO_WIZ disabled in the disposable runtime; real player shell, commands, saved-password login, quit location and alias restoration. |
 | NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default stat-menu qualification follows. |
 | Trainer stat menu | Four source targets compile; 43 runtime checks pass | Adopted source with default strength/agility options; prices, payments, point exhaustion and cleanup verified. |
-| Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Per-suite-first is the operator recipe; the current direct-cold recheck is below. |
-| Whole-source inventory | 1021/1182 compile; 161 standalone failures | Fresh sweep after the wound adapter/compiler fix; no gains/regressions/timeouts/crashes, target constructors omitted. |
+| Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Recorded acceptance driver; per-suite commands first, no manual program loads. Per-suite-first is the operator recipe; the current direct-cold recheck is below. |
+| Whole-source inventory | 1021/1182 compile; 161 standalone failures | Fresh 21 October sweep after handoff EOF cleanup; 44.567s, no gains/regressions/timeouts/crashes, target constructors omitted. |
 | Optional NNTP client | Six compiler checks and 463 offline assertions | Actual source with recording transport; no service activation or live-server claim. |
 | Selected HTTP input | Seven compiler checks and 2,582 offline assertions | Retained header/body fragments, all ordinary GET/POST split positions and exact output; HTTP stays disabled. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
 
-Of the inventory's failures, 113 documented fragments have currently compiling
-shipped hosts. **The other 48 standalone failures comprise remaining porting work
-and recorded integration/provider/incomplete-feature decisions.** Optional or
-unselected code is not finished merely because it is absent
-from the configured boot. These are not counts of missing driver features.
-The contributed drunkenness example also retains its older body-API integration
-requirement despite compiling; see below.
+The 113 host-dependent sources have 47 complete shipped hosts passing in that
+inventory. **The other 48 standalone failures are explicit follow-ups outside the
+configured-profile target**, with their integration/provider/incomplete-feature
+limits recorded in the [remaining-source ledger](#current-remaining-source-ledger).
+Every failure has a disposition; these are not counts of missing driver features
+or a claim that all optional features work. The optional contributed drunkenness
+example retains its older body-API integration requirement despite compiling;
+see below.
 Command compilation remains player 65/67 (random2 deferred; suicide disabled
 upstream), wizard 81/81, guild 4/4 and verbs 90/90.
 
@@ -1524,6 +1526,34 @@ distinct nil, preserved player, USE_MASS and 4000ms stay. Existing-world import
 remains unselected; inherited-signature/cache design and original HP bookkeeping
 remain separate. See the [native ledger](../lpc-rs/doc/driver-comparison.md#lima-current-remaining-source-ledger).
 Evidence: /tmp/lima-remaining-work-review-20261021-rfsfkq_k. Port remains in progress.
+
+## Configured-profile review handoff
+
+Reviewed 21 October after scope commits Lima **81548fcc** / native **9e6777e2**.
+The handoff keeps the agreed configured profile and explicit optional follow-ups.
+Only one final empty line is removed from secure/user.c and trans/obj/wish.c;
+all earlier bytes and upstream line-ending styles are preserved. Both complete
+hosts retain their existing composition.
+
+Fresh inventory: **1021/1182**, 161 failures, **44.567s**, identical membership
+and failure messages, no regressions/timeouts/crashes. The 113 host-dependent
+sources/47 passing hosts and 48 residual follow-ups remain. This fresh compile
+result is separate from the dated lifecycle/runtime qualifications above.
+
+Current native implementation/manifests/tests are unchanged since c0c7fe8b's
+recorded 5198 passing serial workspace tests/two ignores, ten doctests and
+build/Clippy/docs/fmt. Release binary hashes match that qualification. No Cargo
+or runtime suite, listener/service session or endpoint test is repeated here.
+Native branch whitespace passes; Lima's branch check passes while preserving
+upstream CRLF endings. No normalization or gameplay/API change is made.
+
+The review handoff includes source maps, validation provenance, a local proposed
+PR description and granular commit exports. GitHub PR #124 is verified open/draft
+at 2109d59c, with 45 later commits in the local native branch; no push or PR edit
+is made. The port checkout retains upstream Lima as its remote. Publication of
+the paired review branch remains a delivery task, not another optional-feature
+audit. See the [native handoff notes](../lpc-rs/doc/driver-comparison.md#lima-configured-profile-review-handoff).
+Evidence: /tmp/lima-configured-profile-handoff-20261021-71k1q2a2.
 
 ## Remaining scope
 
