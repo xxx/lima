@@ -1350,6 +1350,40 @@ See [tests/vaporize/README.md](tests/vaporize/README.md) and the
 [native notes](../lpc-rs/doc/driver-comparison.md#lima-npc-vaporize-adaptation).
 Evidence: /tmp/lima-vaporize-runtime-20261021-bo0zn2op. The port remains in progress.
 
+## Multiple-slot wielding audit
+
+Reviewed 21 October after NPC vaporize commits Lima **15fadbf4** / native
+**53613260**. Keep selected WIELD_LIMBS. The independent WIELD_MULTIPLE provider
+needs current weapon-marker, command and slot/limb integration; no driver API is
+justified and this audit adopts no library change.
+
+**21 compiler checks** give 14 passes/seven expected rejections. Temporary
+mapping/nil/marker changes compile actual adversary/body/human/trainer/troll and
+master; the standalone fragment still needs its host's simple_action. This
+compilation does not settle command or health policy.
+
+Two successful CLI runs pass **24 assertions** with actual NPC/container and
+stock weapon constructors. The legacy scalar marker is treated as multiple limbs
+and formatted as character codes; clearing stores integer zero. Array markers
+and nil fix that interface, but full slots report success, unknown names add slots,
+and slot replacement orphans wielded items. Hand slots mismatch health arm names;
+matching arm slots can unwield on disable but still permit rewielding. Current
+commands need absent helpers, and two-handed requests become single-slot use.
+
+The optional provider remains integration-required. Explicitly choosing independent
+slots or health-bound limbs, safe reconfiguration and two-handed policy is separate
+from porting the API spellings. Default equipment qualification stays closed.
+No parser/connected-player command, attack/death, progression, hook reentrancy,
+elapsed scheduler, production equipment removal or save behavior is qualified.
+Delayed setup is cancelled and owned fixtures destructed synchronously.
+
+All 1549 library hashes/profile/release binaries match the last **1021/1182**
+inventory; no sweep/unrelated regression suite/Cargo build/listener runs. Original
+and selected providers stay unchanged, with distinct nil/preserved player/4000ms.
+Six pinned public source responses match clean original; no other driver executes.
+See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-multiple-slot-wielding-audit).
+Evidence: /tmp/lima-wield-multiple-audit-20261021-pg0toblw. Port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
