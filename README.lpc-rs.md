@@ -997,6 +997,36 @@ new inventory gain is claimed. See the
 [native adaptation notes](../lpc-rs/doc/driver-comparison.md#lima-alternative-body-stat-adaptation).
 Evidence: /tmp/lima-body-stats-runtime-20261020-ujvuh9pb.
 
+## Wound-health compilation audit
+
+The 20 October audit follows the body-stat fixes committed as Lima d2b156e0 /
+native 4f5b1ca2. A disposable library changes only HEALTH_STYLE from limb health
+to wound health. Production remains HEALTH_LIMBS and BODY_STATS_LIMA, with the
+same armour/wielding/advancement choices, distinct nil, preserved players, 4000ms,
+USE_MASS and disabled shields.
+
+The wound provider changes inherited `diagnose()` to accept a limb argument,
+which the native compiler rejects. A temporary adapter preserves zero-argument
+`diagnose()` and exposes `diagnose_wounds(string limb = nil)`. Its private wound
+formatter gets a separate name, retaining inherited integer `diagnose_msg`.
+Native function callbacks/stored timer IDs replace legacy string timers, and
+`format_list` receives nil for its absent separator. No driver change is needed.
+
+All **54 compile controls** match: **41 pass and 13 reject as expected**. The
+proposal compiles actual adversary/body/human/trainer hosts and a receiver using
+both diagnosis forms and the inherited generic formatter. Standalone wounds still
+needs receiving-object functions; those are not missing efuns. Successful
+user/menu/master controls do not load dynamic bodies, and the greeter's LIVING
+inheritance does not exercise the health provider.
+
+No proposal is adopted. Next qualify actual damage/healing, diagnosis, one
+pending periodic timer, firing/rearming, cancellation and cleanup. This audit
+omits target constructors and proves no runtime wound behavior. All 1549 library
+hashes, profile and release binaries remain unchanged. Inventory stays last
+measured 1021/1182, without a sweep or new selected-profile proof. See the
+[native audit](../lpc-rs/doc/driver-comparison.md#lima-wound-health-compilation-audit).
+Evidence: /tmp/lima-wounds-audit-20261020-eea1jaz8. The port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
