@@ -124,7 +124,7 @@ qualification also checks existing prototype identities, player/inventory state
 and cleanup, then saves, logs out and verifies the account and character after
 a fresh-process restart. Manual totals alone do not repeat those observations.
 
-The [current direct-cold recheck](../lpc-rs/doc/driver-comparison.md#lima-current-cold-combined-checks)
+The [current direct-cold recheck](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-current-cold-combined-checks)
 passes both modes from fresh drivers without per-suite warmup or manual loads.
 Normal-first returns the prompt in 2.330s and quiet-first in 2.542s; each following
 other mode also passes 59/59, at 0.185s/0.189s. Both boots have 151 clean preloads,
@@ -150,14 +150,14 @@ code generation; its ordinary disabled/enabled controls pass both modes at
 59/59. The restored uninstrumented driver also passes a fresh cold run. These
 passes do not establish cold reliability or a speedup. The deadline, source
 and cache policies are unchanged. Details are in the native
-[compiler profile](../lpc-rs/doc/driver-comparison.md#lima-cold-compilation-profile).
-The [cached-macro copy audit](../lpc-rs/doc/driver-comparison.md#lima-cached-macro-copy-audit)
+[compiler profile](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-cold-compilation-profile).
+The [cached-macro copy audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-cached-macro-copy-audit)
 keeps the current storage: its isolated replay does not establish a worthwhile
 whole-compiler gain. A subsequent
-[lexer token-text audit](../lpc-rs/doc/driver-comparison.md#lima-lexer-token-text-copy-audit)
+[lexer token-text audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-lexer-token-text-copy-audit)
 finds 8.7–10.6% lower raw-lexer time after removing a redundant text buffer, with
 3,984 matching token/error/span comparisons. The small native
-[buffer removal](../lpc-rs/doc/driver-comparison.md#lima-lexer-buffer-removal)
+[buffer removal](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-lexer-buffer-removal)
 is now applied. Eight fresh driver sessions pass the combined or per-suite test
 sequences with state/cleanup checks, real saves and logout. Actual compiler and
 cold-command timings remain noisy; no whole-compiler gain or cold-timeout fix is
@@ -167,12 +167,12 @@ Clippy and format check pass. The ordinary release workspace rebuilds after
 testing, and its driver/CLI hashes match the measured executables exactly.
 
 The subsequent
-[include resolution audit](../lpc-rs/doc/driver-comparison.md#lima-include-path-resolution-audit)
+[include resolution audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-include-path-resolution-audit)
 finds that at least 94% of observed metadata checks cannot change the selected
 header path. A small resolver short-circuit preserves the tested search and
 callback behavior and substantially reduces isolated resolution time. It is
 now adopted in the native
-[resolver](../lpc-rs/doc/driver-comparison.md#lima-include-resolution-short-circuit):
+[resolver](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-include-resolution-short-circuit):
 actual preprocessing metadata calls fall from 13,088 to 785, with unchanged
 header reads and callback order. Eight fresh driver sessions pass; sampled cold
 command and CLI medians improve 2.5% and 14.6%, respectively. The samples do not
@@ -199,11 +199,11 @@ login restores identity, role, race, capacity, empty inventory, command path,
 alias and the saved Example Room quit location. Existing channel compiler
 warnings remain; there are no runtime errors or failed preloads. This requires
 no port source fix and does not change this checkout's development setting.
-The [native qualification](../lpc-rs/doc/driver-comparison.md#lima-ordinary-player-lifecycle)
+The [native qualification](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-ordinary-player-lifecycle)
 records scope; local evidence is /tmp/lima-mortal-entry-20261019. It does not
 repeat the shipped suites, full gameplay coverage, foreign saves or live services.
 
-The [current acceptance record](../lpc-rs/doc/driver-comparison.md#lima-port-acceptance)
+The [current acceptance record](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-port-acceptance)
 reuses the documented per-suite-first recipe on this checkout, with preserved
 player/world state, zero manual target loads, completed documentation scanning
 and real saved-password authentication. Sources, profile and release binaries
@@ -305,7 +305,7 @@ peak RSS to 0.011s/22.8 MiB. Full-file and tail controls improve too; a separate
 1 GiB sparse-input range read passes under a 512 MiB address-space cap. These
 figures describe native API controls, not whole-mudlib speedups. The actual tar
 runner is requalified on the rebuilt release driver with all 21 assertions and
-six archives passing. See the [native range-read notes](../lpc-rs/doc/driver-comparison.md#lima-byte-range-reads).
+six archives passing. See the [native range-read notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-byte-range-reads).
 
 At tar adoption, the full standalone sweep measured **1011/1182 compiling,
 171 fail**, with zero regressions/timeouts/crashes. Its only gain was this helper;
@@ -345,7 +345,7 @@ player healing/stun or command-execution checks. The runner retains the distinct
 nil/preserved-player/4000ms profile and real simuls/includes, with a temporary
 permissive master and loopback driver. See the
 [test scope](tests/transient_effects/README.md) and
-[native adapter notes](../lpc-rs/doc/driver-comparison.md#lima-contributed-transient-effect-adapter).
+[native adapter notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-contributed-transient-effect-adapter).
 
 At contributed-effect adoption, the whole-source sweep measured **1013/1182 compiling, 169 failures** in
 **39.723s**, with zero regressions/timeouts/crashes. Only the two contributed files
@@ -381,7 +381,7 @@ body/shell roles and modal input are fixtures. Logged-in inputsys/full-shell
 routing, permission policy, pager/completion, live weather output, logout and
 arbitrary input validation remain outside this focused test. See the
 [test guide](tests/roommaker/README.md) and
-[native adapter notes](../lpc-rs/doc/driver-comparison.md#lima-contributed-room-maker-adapter).
+[native adapter notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-contributed-room-maker-adapter).
 
 At room-maker adoption, the full sweep measured **1014/1182 compiling, 168 failures** in **43.180s**,
 with zero regressions/timeouts/crashes. Only the command gains; the menu already
@@ -412,7 +412,7 @@ subsets with exact titles/descriptions/exit paths, and clone cleanup. The runner
 retains distinct nil, preserved player, USE_MASS and 4000ms, real simuls/includes,
 a permissive temporary master and a typed weighted fixture item. See the
 [test guide](tests/attic_examples/README.md) and
-[native adapter notes](../lpc-rs/doc/driver-comparison.md#lima-attic-table-and-town-room-adapter).
+[native adapter notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-attic-table-and-town-room-adapter).
 
 The attic supplies no town destination directory and town.c is TODO; helper/path
 checks do not qualify traversal or add world content. Real parser/player get/put/go
@@ -449,7 +449,7 @@ policy, admin-specific and malformed-form flows remain unqualified. HTTP stays
 disabled in the configured preload, and no HTTP request or external connection
 is used by the runner. The profile stays distinct nil/preserved player/4000ms.
 See the [test guide](tests/web_editor/README.md) and
-[native adapter notes](../lpc-rs/doc/driver-comparison.md#lima-web-editor-backend-adapter).
+[native adapter notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-web-editor-backend-adapter).
 
 The fresh full sweep measures **1017/1182 compiling, 165 failures** in **42.281s**,
 with zero regressions/timeouts/crashes. Only this backend gains. All **113 hosted
@@ -476,7 +476,7 @@ providers and mark the kit **integration-required**: working support needs its
 omitted body/accessor/save work and a merge preserving current account/finger
 behavior. No core replacement, new native alias, class relaxation or spouse
 feature activation is adopted by this audit. See the
-[native audit notes](../lpc-rs/doc/driver-comparison.md#lima-contributed-marriage-integration-audit).
+[native audit notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-contributed-marriage-integration-audit).
 
 Production source/profile/binaries stay unchanged. The last inventory remains
 **1017/1182**, without a new sweep or inferred source gain. The port remains in
@@ -515,7 +515,7 @@ Python independently checks the retained draft and mail-save files. This does
 not qualify parser dispatch, live login, concurrent players, real-master path
 policy, remote mail or account save/restart; news save calls are counted.
 See [test details](tests/boards/README.md) and the
-[native adaptation notes](../lpc-rs/doc/driver-comparison.md#lima-portable-board-adaptation).
+[native adaptation notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-portable-board-adaptation).
 
 The fresh source sweep measures **1019/1182 compiling, 163 failures** in 46.217s,
 with **zero regressions/timeouts/crashes** and exactly the two board-file gains.
@@ -553,7 +553,7 @@ callbacks, unread/group switching, post/followup result handling and reply
 integration; the existing user-mailer ownership and NEWSREADER-only sender
 restriction still apply. Keep selected NEWS_D/current user state and other board
 packages unselected. See the
-[native audit notes](../lpc-rs/doc/driver-comparison.md#lima-contributed-board-provider-interface-audit).
+[native audit notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-contributed-board-provider-interface-audit).
 The last measured inventory stays **1017/1182**, with no new sweep or inferred
 gain. The port remains in progress.
 
@@ -584,7 +584,7 @@ needs an explicit host/lifecycle contract plus consistent storage, keys, hooks
 and descriptions. Do not replace the selected providers or relax method checks
 to silence the files. The existing door/sibling implementation retains its
 previous qualification. See the
-[native audit notes](../lpc-rs/doc/driver-comparison.md#lima-attic-openable-and-lockable-wrappers).
+[native audit notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-attic-openable-and-lockable-wrappers).
 No library/profile/binary change or new inventory sweep is made; the last
 measured inventory remains **1019/1182**, and synthetic hosts do not increase
 the documented shipped-fragment tally. The port remains in progress.
@@ -618,7 +618,7 @@ of seeded piles: new/existing and mixed currencies, aliases, partial/whole/all,
 fractions, decimal repetition, refusals and a caught pre-mutation merge error.
 Parser dispatch, real login, concurrency, account restart and callbacks that
 mutate before failing are outside this suite. See [test details](tests/coins/README.md)
-and the [native adaptation notes](../lpc-rs/doc/driver-comparison.md#lima-selected-coin-denomination-adaptation).
+and the [native adaptation notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-selected-coin-denomination-adaptation).
 
 The fresh sweep remains **1019/1182 compiling, 163 failures**, with no gains,
 regressions, timeouts or crashes in 43.474s. This fixes runtime behavior in already
@@ -652,7 +652,7 @@ components run with an OBJ actor and permissive fixture master. These checks
 reproduce the failures; they do not qualify the affected denomination workflows
 as correct. No parser dispatch, real login, concurrent players or account
 save/restart is established. See the
-[native audit notes](../lpc-rs/doc/driver-comparison.md#lima-legacy-money-and-selected-coin-interfaces).
+[native audit notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-legacy-money-and-selected-coin-interfaces).
 
 The recommended next fix is the bounded selected coin/get/drop unit boundary:
 store base-currency values, initialize missing balances and translate denomination
@@ -691,7 +691,7 @@ source rejects the fixed get override. The fixture rejects USE_MONEY, so these
 results do not qualify alternate-profile drop or mixed-provider drop/merge
 integration. Parser routing, login, concurrency and account restart are outside
 this suite. See [test details](tests/legacy_money/README.md) and the
-[native notes](../lpc-rs/doc/driver-comparison.md#lima-optional-legacy-money-adaptation).
+[native notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-optional-legacy-money-adaptation).
 
 The fresh sweep measures **1020/1182 compiling, 162 failures** in 41.625s, with
 std/money as the sole gain and no regressions/timeouts/crashes. All 113 existing
@@ -729,7 +729,7 @@ deprecated backend retired. At that reconciliation, NNTP still depended on that
 backend; its subsequent audit, offline prototype and source adoption follow
 below. Default local news/mail and previous TCP/service qualifications retain
 their scopes. See the
-[native reconciliation](../lpc-rs/doc/driver-comparison.md#lima-remaining-source-disposition-reconciliation).
+[native reconciliation](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-remaining-source-disposition-reconciliation).
 
 This is a disposition inventory, not whole-port completion or proof that
 arbitrary user-selected paths cannot load a file. No production library/profile/
@@ -761,7 +761,7 @@ The included FluffOS time header expects GMT offset at index 8, but native
 localtime has the DST flag there. strftime formats local time and offers no UTC
 selector. The client needs an explicit library UTC formatter with fixed date/zone
 vectors, rather than another assumed header layout or invented native argument.
-See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-nntp-source-interface-audit).
+See the [native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-nntp-source-interface-audit).
 
 Next qualify a temporary adapter offline with a recording transport before
 adoption or any NNTP_OB path change. This audit invokes no client constructor,
@@ -791,7 +791,7 @@ constructor path with a recording transport; the unsubstituted proposal is also
 compiled. They exercise no real socket/listener, driver session, endpoint or
 service activation, and do not newly qualify the provider's privilege, ownership
 or native event behavior. See the
-[native qualification](../lpc-rs/doc/driver-comparison.md#lima-offline-nntp-prototype).
+[native qualification](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-offline-nntp-prototype).
 
 At that milestone the last measured inventory stayed **1020/1182**; the following
 adoption measures compilation of the actual source. The port remains in progress.
@@ -810,7 +810,7 @@ disposable runtime copy, and checks framing, commands/callbacks, upload ordering
 and bounded output, terminal cleanup and UTC dates. No separately maintained
 client implementation or production test API is added. Original public function
 documentation annotations are retained. See [test details](tests/nntp/README.md)
-and the [native adoption notes](../lpc-rs/doc/driver-comparison.md#lima-nntp-adapter-adoption).
+and the [native adoption notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-nntp-adapter-adoption).
 
 Only contrib/nntp changes in the production library. It uses selected SOCKET and
 bare callbacks while retaining raw ARTICLE arrays and upload continuation/final
@@ -851,7 +851,7 @@ instead dispatch before the blank header terminator, including when CR and LF
 arrive separately. Eight observations confirm that baseline and those defects;
 they are not successful fragmented-request support. The disposable source changes
 only its SOCKET constructor path. See the
-[native audit](../lpc-rs/doc/driver-comparison.md#lima-http-input-compatibility-audit).
+[native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-http-input-compatibility-audit).
 
 The audit left production source/profile/binaries unchanged. Its recommended
 framing correction is adopted below, retaining the disabled preload and existing
@@ -881,7 +881,7 @@ aggregate headers and a thousand-field form exercise fragment assembly while
 individual values retain existing limits. Static binary bytes, UTF-8 CGI byte
 length/CRLF conversion, form/header arguments and the existing body-only POST
 reply are checked. See [test details](tests/http/README.md) and the
-[native qualification](../lpc-rs/doc/driver-comparison.md#lima-http-request-framing-fix).
+[native qualification](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-http-request-framing-fix).
 
 Only secure/daemons/http_d changes in the production library. Tests use that
 actual source with only its SOCKET constructor path substituted by a recorder
@@ -927,7 +927,7 @@ only the established loopback router/OOB substitutions. HTTP/FTP/RCP remain
 disabled and no external service is contacted. Existing channel/autodoc warnings
 match the prior run; there are no accepted runtime/apply/evaluation errors or
 forced kills. See the
-[native acceptance notes](../lpc-rs/doc/driver-comparison.md#lima-configured-acceptance-and-coin-parser-integration).
+[native acceptance notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-configured-acceptance-and-coin-parser-integration).
 
 All 1549 persistent library files, profile and release binaries remain unchanged.
 The last measured inventory stays **1021/1182**, without a new sweep or inferred
@@ -963,7 +963,7 @@ USE_INTRODUCTIONS and other combat/advancement choices remain unqualified.
 All 1549 library hashes, profile and release binaries remain unchanged. Inventory
 stays the last measured 1021/1182; these alternative hosts do not add to the 113
 selected-profile fragment proofs. No runtime session or full sweep runs. See the
-[native audit](../lpc-rs/doc/driver-comparison.md#lima-alternative-body-stat-compilation).
+[native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-alternative-body-stat-compilation).
 Evidence: /tmp/lima-body-stats-audit-20261020-xmr0gy3q. The port remains in progress.
 
 ## Alternative body-stat adaptation
@@ -996,7 +996,7 @@ change in the library; production remains BODY_STATS_LIMA with distinct nil,
 preserved players, 4000ms, USE_MASS and the same combat/simple-advancement modules.
 Introductions and other alternate modules remain separate. No driver change or
 new inventory gain is claimed. See the
-[native adaptation notes](../lpc-rs/doc/driver-comparison.md#lima-alternative-body-stat-adaptation).
+[native adaptation notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-alternative-body-stat-adaptation).
 Evidence: /tmp/lima-body-stats-runtime-20261020-ujvuh9pb.
 
 ## Wound-health compilation audit
@@ -1026,7 +1026,7 @@ pending periodic timer, firing/rearming, cancellation and cleanup. This audit
 omits target constructors and proves no runtime wound behavior. All 1549 library
 hashes, profile and release binaries remain unchanged. Inventory stays last
 measured 1021/1182, without a sweep or new selected-profile proof. See the
-[native audit](../lpc-rs/doc/driver-comparison.md#lima-wound-health-compilation-audit).
+[native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-wound-health-compilation-audit).
 Evidence: /tmp/lima-wounds-audit-20261020-eea1jaz8. The port remains in progress.
 
 ## Wound-health runtime adaptation
@@ -1063,7 +1063,7 @@ is held at zero; explicit healing and the original random wound updates run.
 Login, saved-data migration, corpse/reward processing and full combat rules are
 outside this qualification. Only an ephemeral loopback listener runs, without
 connections or external requests. See the
-[native notes](../lpc-rs/doc/driver-comparison.md#lima-wound-health-runtime-adaptation).
+[native notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-wound-health-runtime-adaptation).
 Evidence: /tmp/lima-wounds-runtime-20261020-qz1cfddk.
 
 The adopted checkout's maintained runner passes all **14 compiler checks and 46
@@ -1109,7 +1109,7 @@ Keep this optional composition **integration-required** until its mudlib health,
 condition and equipment interfaces are coherent. No new driver API is demonstrated.
 Continue independent combat-selector audits while retaining selected limb health;
 empty/zero gameplay shims would not qualify this alternate character model. See the
-[native audit](../lpc-rs/doc/driver-comparison.md#lima-hit-point-health-composition-audit).
+[native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-hit-point-health-composition-audit).
 Evidence: /tmp/lima-hitpoints-audit-20261020-ijou5ia1. The port remains in progress.
 
 ## Simple-blow composition audit
@@ -1140,7 +1140,7 @@ API or type relaxation is established. No production source/profile/binary
 changes or full inventory run; all 1549 library hashes remain unchanged and
 inventory stays the last measured 1021/1182.
 
-See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-simple-blow-composition-audit).
+See the [native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-simple-blow-composition-audit).
 Evidence: /tmp/lima-simple-blows-audit-20261020-qhp14j3x. The port remains in progress.
 
 ## Core simple-blow adaptation
@@ -1177,7 +1177,7 @@ stay unchanged. Type-specific special weapons/spells and complete simple combat,
 death, wearing and saves remain unqualified.
 
 See [tests/simple_blows/README.md](tests/simple_blows/README.md) and the
-[native notes](../lpc-rs/doc/driver-comparison.md#lima-core-simple-blow-adaptation).
+[native notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-core-simple-blow-adaptation).
 Evidence: /tmp/lima-simple-blows-runtime-20261021-ahiz0bal. The port remains in progress.
 
 ## Non-heartbeat pulse audit
@@ -1209,7 +1209,7 @@ against the selected heartbeat wrapper. No new driver API is demonstrated.
 No production source/profile/binary or inventory changes. All 1549 library hashes
 match the latest inventory; its measured 1021/1182 count remains unchanged.
 
-See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-non-heartbeat-pulse-audit).
+See the [native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-non-heartbeat-pulse-audit).
 Evidence: /tmp/lima-non-heartbeat-audit-20261021-3n676z85. The port remains in progress.
 
 ## Non-heartbeat pulse adaptation
@@ -1248,7 +1248,7 @@ gains/regressions/timeouts/crashes in 39.918s. Only the optional pulse changes a
 Its standalone diagnostic now identifies expected receiving methods.
 
 See [tests/non_heartbeat/README.md](tests/non_heartbeat/README.md) and the
-[native notes](../lpc-rs/doc/driver-comparison.md#lima-non-heartbeat-pulse-adaptation).
+[native notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-non-heartbeat-pulse-adaptation).
 Evidence: /tmp/lima-non-heartbeat-runtime-20261021-du4dg3od. The port remains in progress.
 
 ## Alternate-formula audit
@@ -1281,7 +1281,7 @@ skill-cap and legacy weapon-result contracts need mudlib integration; no native
 gameplay API or type relaxation is justified. No production source/profile/binary
 or inventory changes; all 1549 library hashes match the last measured 1021/1182.
 
-See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-alternate-formula-audit).
+See the [native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-alternate-formula-audit).
 Evidence: /tmp/lima-formula-audit-20261021-n5ojd592. The port remains in progress.
 
 ## Vaporizing-death audit
@@ -1313,7 +1313,7 @@ inventory transfer. Keep player vaporization integration-required and corpse
 death selected. No new driver API, production source/profile/binary or inventory
 change. All 1549 library hashes match the last measured 1021/1182.
 
-See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-vaporizing-death-audit).
+See the [native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-vaporizing-death-audit).
 Evidence: /tmp/lima-vaporize-audit-20261021-16wwbivy. The port remains in progress.
 
 ## NPC vaporize adaptation
@@ -1349,7 +1349,7 @@ among 1549 library files; profile, headers, driver binaries and original stay.
 No Cargo build, listener, new driver API or generic destruction change.
 
 See [tests/vaporize/README.md](tests/vaporize/README.md) and the
-[native notes](../lpc-rs/doc/driver-comparison.md#lima-npc-vaporize-adaptation).
+[native notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-npc-vaporize-adaptation).
 Evidence: /tmp/lima-vaporize-runtime-20261021-bo0zn2op. The port remains in progress.
 
 ## Multiple-slot wielding audit
@@ -1383,7 +1383,7 @@ All 1549 library hashes/profile/release binaries match the last **1021/1182**
 inventory; no sweep/unrelated regression suite/Cargo build/listener runs. Original
 and selected providers stay unchanged, with distinct nil/preserved player/4000ms.
 Six pinned public source responses match clean original; no other driver executes.
-See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-multiple-slot-wielding-audit).
+See the [native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-multiple-slot-wielding-audit).
 Evidence: /tmp/lima-wield-multiple-audit-20261021-pg0toblw. Port remains in progress.
 
 ## Complex armour-slot audit
@@ -1415,7 +1415,7 @@ qualified. Seven public pinned sources match original; no other driver executes.
 All 1549 library hashes/profile/binaries match the last **1021/1182** inventory.
 No sweep/unrelated regression suite/Cargo build/listener/service runs. Original,
 selected providers, distinct nil/preserved player/4000ms remain unchanged.
-See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-complex-armour-slot-audit).
+See the [native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-complex-armour-slot-audit).
 Evidence: /tmp/lima-complex-armour-audit-20261021-l79b3x7k. Port remains in progress.
 
 ## Rifts advancement audit
@@ -1447,7 +1447,7 @@ LIMB_SHIELDS remains disabled. Five pinned public sources match original; no
 other driver runs. All 1549 library hashes/profile/binaries match the last
 **1021/1182** inventory; no sweep/unrelated suite/Cargo build/listener/service
 runs. Original, selected providers, distinct nil/preserved player/4000ms remain.
-See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-rifts-advancement-audit).
+See the [native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-rifts-advancement-audit).
 Evidence: /tmp/lima-rifts-advancement-audit-20261021-vvcxp28d. Port remains in progress.
 
 ## Rifts advancement compatibility adaptation
@@ -1482,7 +1482,7 @@ its six adapted diagnostics; three real receiving-method errors remain. Other
 failure messages stay. One of 1549 library files changes; headers/profile/native
 implementation/binaries/original remain. No unrelated suite, Cargo build,
 listener or service runs. Distinct nil/preserved player/4000ms stay.
-See the [native notes](../lpc-rs/doc/driver-comparison.md#lima-rifts-advancement-compatibility-adaptation).
+See the [native notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-rifts-advancement-compatibility-adaptation).
 Evidence: /tmp/lima-rifts-advancement-runtime-20261021-ls6pv3ji. Port remains in progress.
 
 ## Current remaining-source ledger
@@ -1524,7 +1524,7 @@ One compile-only selector control passes; no runtime suite/Cargo build/listener/
 service runs. Production source/profile/binaries and original remain unchanged;
 distinct nil, preserved player, USE_MASS and 4000ms stay. Existing-world import
 remains unselected; inherited-signature/cache design and original HP bookkeeping
-remain separate. See the [native ledger](../lpc-rs/doc/driver-comparison.md#lima-current-remaining-source-ledger).
+remain separate. See the [native ledger](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-current-remaining-source-ledger).
 Evidence: /tmp/lima-remaining-work-review-20261021-rfsfkq_k. Port remains in progress.
 
 ## Configured-profile review handoff
@@ -1552,7 +1552,7 @@ PR description and granular commit exports. GitHub PR #124 is verified open/draf
 at 2109d59c, with 45 later commits in the local native branch; no push or PR edit
 is made. The port checkout retains upstream Lima as its remote. Publication of
 the paired review branch remains a delivery task, not another optional-feature
-audit. See the [native handoff notes](../lpc-rs/doc/driver-comparison.md#lima-configured-profile-review-handoff).
+audit. See the [native handoff notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-configured-profile-review-handoff).
 Evidence: /tmp/lima-configured-profile-handoff-20261021-71k1q2a2.
 
 ## Remaining scope
@@ -1577,8 +1577,8 @@ retain these decisions:
 
 These are recorded scope decisions, not a queue of missing driver features.
 
-The [NPC sample-chain audit](../lpc-rs/doc/driver-comparison.md#lima-npc-sample-chain-audit)
-now has [aggression/trainer adapters](../lpc-rs/doc/driver-comparison.md#lima-aggression-and-trainer-adapters)
+The [NPC sample-chain audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-npc-sample-chain-audit)
+now has [aggression/trainer adapters](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-aggression-and-trainer-adapters)
 and focused runtime qualification. Aggression binds targets into function values;
 the trainer uses native class fields and a mapping restriction contract. Both
 complete hosts compile. All 48 earlier runtime checks pass for inherited timers
@@ -1586,7 +1586,7 @@ and skill conversations, with state restoration, cleanup and normal saves/logout
 The timer fixture records attempts; combat damage is outside that check.
 
 Tara's default stat-menu gap is now resolved by the four-line
-[trainer adaptation](../lpc-rs/doc/driver-comparison.md#lima-trainer-stat-menu-adoption).
+[trainer adaptation](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-trainer-stat-menu-adoption).
 It uses the body's existing `stat_abrev()`, `query_stat()` and `inc_mod_stat()`,
 and binds the selected stat in its menu callback. Four source targets compile;
 the adopted checkout's source passes the same 43 runtime checks as the audit,
@@ -1600,12 +1600,12 @@ The attic reaction examples retain their upstream placeholder; their missing
 script API stays deferred. The dated 999/1182 inventory is not rerun. Alternate
 stat models and configuration flags retain their separate scope.
 
-The [remaining-source triage](../lpc-rs/doc/driver-comparison.md#lima-remaining-source-implementation-triage)
+The [remaining-source triage](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-remaining-source-implementation-triage)
 reviews the 16 files with no identified configured caller as one batch. Temporary
 adapters compile three optional examples; other entries need hosts, integration,
 dependencies or unfinished feature work. No source change or new efun is added.
 The audit also reproduced a compiler input difference, corrected in the
-[relative-inherit follow-up](../lpc-rs/doc/driver-comparison.md#lima-relative-inherit-inputs):
+[relative-inherit follow-up](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-relative-inherit-inputs):
 host-file and in-game inputs now use the source directory. All 12 CLI cases and
 both reordered behavior-example forms pass. Evidence: /tmp/lima-relative-inherits-20261019.
 The behavior example now places its inherit before its global declaration and
@@ -1616,14 +1616,14 @@ inheritance check, without gameplay or a new whole-library inventory. Contrib's
 drunk effect retains its parent's heartbeat adaptation gap.
 Evidence: /tmp/lima-behaviour-example-20261019.
 
-The optional [navigation passage example](../lpc-rs/doc/driver-comparison.md#lima-navigation-passage-example)
+The optional [navigation passage example](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-navigation-passage-example)
 now passes an explicit float mass to the existing API. Four compile checks and
 12 checks with real clone construction pass, covering mass, IDs, attachment,
 descriptions, independent state and cleanup. The isolated fixture uses the shipped
 providers/simuls and a temporary master; configured gameplay remains unqualified.
 The profile and native binaries are unchanged. Evidence: /tmp/lima-navigation-passage-20261019.
 
-The optional [Logical Genius adapter](../lpc-rs/doc/driver-comparison.md#lima-logical-genius-and-trigger-defaults)
+The optional [Logical Genius adapter](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-logical-genius-and-trigger-defaults)
 uses native typed closures and nil rule references. The trigger APIs now default
 omitted rule references to nil while retaining the numeric listen mask and strict
 checks on explicit zero. Eight complete-consumer/fixture compiles and 40 runtime
@@ -1632,7 +1632,7 @@ Response commands are captured in the fixture; delayed speech/player gameplay is
 not newly qualified. The profile and native binaries are unchanged.
 Evidence: /tmp/lima-logical-genius-20261019.
 
-The optional [test dummy adapter](../lpc-rs/doc/driver-comparison.md#lima-test-dummy-example)
+The optional [test dummy adapter](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-test-dummy-example)
 uses native event fields/callbacks, nil formatter separators and the inherited
 give-checker signature. Six compile checks and 25 runtime checks pass with real
 dummy/equipment clones, arrival hooks, damage diagnostics, armour reduction and
@@ -1640,7 +1640,7 @@ cleanup. The registered stand-up callback is invoked directly and cancelled;
 elapsed timer delivery and player gameplay are not tested. The profile and native
 binaries are unchanged. Evidence: /tmp/lima-test-dummy-20261019.
 
-The optional [character-mode key-binding helper](../lpc-rs/doc/driver-comparison.md#lima-character-mode-key-bindings)
+The optional [character-mode key-binding helper](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-character-mode-key-bindings)
 now iterates characters directly and registers a bare input callback. Four compile
 checks and 31 runtime checks pass through a temporary wizard-shell composition
 and the real input provider, with a recording user at the modal boundary. Matching,
@@ -1648,7 +1648,7 @@ Escape/control tokens, dynamic bindings and Unicode are covered; owned-shell
 startup, the real user stack and network input are outside this check. No configured
 caller is identified or enabled. Evidence: /tmp/lima-key-bindings-20261019.
 
-The optional [flow room module](../lpc-rs/doc/driver-comparison.md#lima-flow-room-module)
+The optional [flow room module](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-flow-room-module)
 now retains one named arrival callback. Five compile checks and 27 runtime checks
 pass with temporary room compositions, real movement and message providers.
 Repeated configuration, conditional flow, inventories and delayed captures/guards
@@ -1656,7 +1656,7 @@ are covered. Delayed callbacks are invoked directly and cancelled; elapsed timer
 delivery is not tested. No configured caller is enabled; the profile and native
 binaries are unchanged. Evidence: /tmp/lima-flow-room-20261019.
 
-The unchanged [boss module](../lpc-rs/doc/driver-comparison.md#lima-boss-module-host-contract)
+The unchanged [boss module](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-boss-module-host-contract)
 passes five compile checks and 17 runtime checks in temporary ADVERSARY hosts,
 with fixture actors and a recording loot daemon. Host methods, eligibility/history
 and handoff arguments work without a port fix. Its existing unused loot flag and
@@ -1664,7 +1664,7 @@ unrefreshed expiry timestamp remain documented policy gaps. Controlled dead-stat
 and timestamp fixtures do not qualify actual boss combat or generation; no caller
 is enabled. Evidence: /tmp/lima-boss-integration-20261019.
 
-The [legacy exit integration review](../lpc-rs/doc/driver-comparison.md#lima-legacy-exit-integration-decision)
+The [legacy exit integration review](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-legacy-exit-integration-decision)
 retains BASE_ROOM/M_EXIT and EXIT_OBJ/M_COMPLEX_EXIT. Six compiler passes, four
 expected rejections and ten runtime checks show that the unselected older helpers
 need more than argument-count edits: destination lookup, callbacks and movement
@@ -1672,7 +1672,7 @@ records have different contracts. The fixture records movement arguments; it
 does not move a body. No diagnostic adapter or library change is adopted.
 Evidence: /tmp/lima-exit-integration-20261019.
 
-The current native [driver comparison](../lpc-rs/doc/driver-comparison.md#lima-port-readiness)
+The [Lima porting guide](../lpc-rs/doc/mudlibs/lima.md#recorded-validation)
 centralizes driver differences and qualification scope. The records below retain
 the detailed local evidence, including nonpassing controls; temporary `/tmp/`
 paths are evidence locations on the development machine, not installed tooling.
@@ -4373,6 +4373,6 @@ Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
 Current compatibility and handoff notes are in the neighboring lpc-rs checkout:
-`doc/driver-comparison.md` and `local/lima/compatibility.md`. Temporary test
+`doc/mudlibs/lima.md` and `local/lima/compatibility.md`. Temporary test
 harnesses and execution logs belong in `/tmp/`. Continue source changes in this
 checkout rather than making another source copy under `local/`.
