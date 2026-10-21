@@ -6,15 +6,17 @@ Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
 checkout on `lima-support`.
 
 **The port remains in progress.** The configured fresh-account lifecycle was
-qualified on **19 October 2026** at Lima **8a26d8c7** and native **ded2bc3a**:
-30 lifecycle checkpoints in 136.54 seconds, including character creation, ordinary
-commands, native saves and saved login after restart. Both boots have 151 clean
-preloads and exit normally. The five shipped suites pass 26/16/7/5/5, then both
-combined modes pass 59/59. Source inventory and runtime results retain distinct scope.
+refreshed on **20 October 2026** at Lima **e5c79c04** and native **16aedb39**:
+30 lifecycle checkpoints and 69 coin/parser/native-save checks in 137.15 seconds,
+including character creation, ordinary commands, saved-password login and restored
+wallet balances. Both boots have 151 clean preloads and exit normally. The five
+shipped suites pass 26/16/7/5/5, then normal and quiet combined commands each pass
+59/59. Source inventory and runtime results retain distinct scope.
 
 | Qualification | Result | Scope |
 |---|---|---|
 | Current port acceptance | 30 checks across two clean driver processes | First administrator; actual saved-password authentication and character identity/state verified after restart. |
+| Coin command integration | 69 command/state/save checks | Fourteen real shell/parser commands, configured denominations, value conservation and native wallet persistence/cleanup after restart. |
 | Ordinary-player lifecycle | 57 checks across two clean driver processes | AUTO_WIZ disabled in the disposable runtime; real player shell, commands, saved-password login, quit location and alias restoration. |
 | NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default stat-menu qualification follows. |
 | Trainer stat menu | Four source targets compile; 43 runtime checks pass | Adopted source with default strength/agility options; prices, payments, point exhaustion and cleanup verified. |
@@ -893,6 +895,43 @@ disabled, and the older connection/master replacement remains unselected. No
 real socket/listener, endpoint, driver session or service activation occurs.
 Profile, native code/binaries and original Lima are unchanged. The port remains
 in progress; full HTTP conformance and live interoperability are not established.
+
+## Current configured acceptance and coin commands
+
+The 20 October refresh passes **30 lifecycle checkpoints and 69 coin/parser/
+native-save checks in 137.15s**, with two clean 151-preload boots and exit-zero
+shutdowns. Actual saved-password login restores account/character identity,
+room/inventory/material state and both seeded wallet balances. The gold/credit
+seed is removed before final logout. The normal documentation scan finishes
+before shutdown; its wait accounts for 116.396s of the run.
+
+The unchanged per-suite-first sequence passes 26/16/7/5/5, then normal and quiet
+combined commands each pass 59/59. Existing prototypes, player/world state and
+cleanup are checked with no manual target loads. Coin integration runs afterward,
+using fourteen command strings through the actual shell/parser and configured
+silver/halo denominations. Partial pickup, new/existing and mixed piles, whole
+pickup, refusal and both balance totals pass; no direct verb call or fixture
+actor substitutes for that route.
+
+Actual command routing differs from the direct generic helper: `get coins` and
+`get all coins` select whole-object pickup and collect every currency in a pile.
+`get all silver` follows the named-denomination path and leaves other currencies
+behind. The first harness expected generic-helper ambiguity for `get all coins`;
+that incorrect expectation is retained as a control and corrected without a
+mudlib change. The accepted run needs no additional implementation fix.
+
+The normal master/login/body/shell/providers run from one disposable copy with
+only the established loopback router/OOB substitutions. HTTP/FTP/RCP remain
+disabled and no external service is contacted. Existing channel/autodoc warnings
+match the prior run; there are no accepted runtime/apply/evaluation errors or
+forced kills. See the
+[native acceptance notes](../lpc-rs/doc/driver-comparison.md#lima-configured-acceptance-and-coin-parser-integration).
+
+All 1549 persistent library files, profile and release binaries remain unchanged.
+The last measured inventory stays **1021/1182**, without a new sweep or inferred
+gain. This establishes the current configured administrator/native-save milestone,
+not alternate builds, foreign saved-data import or whole-port completion. The
+port remains in progress and the existing residual-source decisions remain.
 
 ## Remaining scope
 
