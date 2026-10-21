@@ -119,12 +119,12 @@ void remove_experience(int x)
    if (level != old_level)
    {
       tell(this_object(), "\n>>>>> %^B_RED%^LEVEL LOST!%^RESET%^ You're now just level " + level + "! <<<<<\n");
-      do_game_command("pout");
+      this_object()->do_game_command("pout");
    }
 #endif
 
    if (this_object()->query_link())
-      save_me();
+      this_object()->save_me();
 }
 
 void add_experience(int x)
@@ -140,12 +140,12 @@ void add_experience(int x)
    if (level != old_level)
    {
       tell(this_object(), "\n>>>>> %^B_GREEN%^LEVEL UP!%^RESET%^ You're now level " + level + "! <<<<<\n");
-      do_game_command("flex");
+      this_object()->do_game_command("flex");
    }
 #endif
 
    if (this_object()->query_link())
-      save_me();
+      this_object()->save_me();
 }
 
 int skill_xp_plus()
@@ -284,10 +284,10 @@ void set_karma(int k)
 // Returns the new karma. Karma is between -1000 and 1000.
 int modify_karma(int modifier)
 {
-   float karma_mod = 0;
+   float karma_mod = 0.0;
    modifier = clamp(modifier, -5, 5);
    karma_mod = modifier * ((1100 / (200.0 + abs(karma))));
-   karma = karma + karma_mod;
+   karma = to_int(karma + karma_mod);
 
    karma = clamp(karma, -1000, 1000);
    return karma;

@@ -1448,6 +1448,41 @@ runs. Original, selected providers, distinct nil/preserved player/4000ms remain.
 See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-rifts-advancement-audit).
 Evidence: /tmp/lima-rifts-advancement-audit-20261021-vvcxp28d. Port remains in progress.
 
+## Rifts advancement compatibility adaptation
+
+The 21 October adaptation follows audit commits Lima **467db3d5** / native
+**a6b5dc29**. Only six lines change in the optional advancement provider: float
+karma initialization, complete-sum integer conversion and receiver command/save
+calls matching the existing simple provider. No native API or host stub is added.
+
+Run the maintained regression after building lpc-rs:
+
+```sh
+python3 tests/rifts_advancement/test_rifts_advancement.py
+```
+
+It passes **25 compiler checks / 34 runtime assertions**, **3.552s**, with actual
+NPC/human constructors, stat initialization, karma, XP/level and limb-health
+methods. Five negative controls detect the old compile failures and increment-only
+karma conversion. Four default-simple hosts compile before temporary Rifts
+advancement checks under Lima and Rifts stats. Production remains simple/Lima.
+
+PE pairing and original inclusive HP-cache behavior are explicit in the audit
+and [test README](tests/rifts_advancement/README.md). No HP/XP/SDC, cache or ambient
+setter/command/save policy changes. Delayed setup is cancelled; synchronous native
+fixture destruction does not qualify full XP-command/linked-save, account/login/
+logout, persistence, combat/rewards, elapsed scheduling, retries, concurrent players
+or complete Rifts rules. LIMB_SHIELDS remains disabled.
+
+Fresh inventory: **1021/1182**, 161 failures, identical membership and no
+gains/regressions/timeouts/crashes in **39.030s**. Only the Rifts fragment loses
+its six adapted diagnostics; three real receiving-method errors remain. Other
+failure messages stay. One of 1549 library files changes; headers/profile/native
+implementation/binaries/original remain. No unrelated suite, Cargo build,
+listener or service runs. Distinct nil/preserved player/4000ms stay.
+See the [native notes](../lpc-rs/doc/driver-comparison.md#lima-rifts-advancement-compatibility-adaptation).
+Evidence: /tmp/lima-rifts-advancement-runtime-20261021-ls6pv3ji. Port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
