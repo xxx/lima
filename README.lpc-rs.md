@@ -1249,6 +1249,39 @@ See [tests/non_heartbeat/README.md](tests/non_heartbeat/README.md) and the
 [native notes](../lpc-rs/doc/driver-comparison.md#lima-non-heartbeat-pulse-adaptation).
 Evidence: /tmp/lima-non-heartbeat-runtime-20261021-du4dg3od. The port remains in progress.
 
+## Alternate-formula audit
+
+The 21 October audit follows pulse commits Lima 33466547 / native f50eb5da.
+Only a disposable library selects FORMULA_SIMPLE or FORMULA_STATS; current LIMA
+stats, typed blows, heartbeat, limb providers, skills subsystem and advancement,
+distinct nil/preserved player/4000ms and USE_MASS remain. Production retains
+FORMULA_SKILLS.
+
+Both alternatives lack defend_chance used by current combat main and
+should_cap_skill used by health/condition code. Throwing diagnostic definitions
+make adversary/body hosts compile without implementing those policies. Dynamic
+callers also depend on level_skill_cap from the selected skills formula.
+
+The legacy one-argument weapon chance method used by both providers is absent
+from a constructed stock weapon, producing integer-plus-nil arithmetic. Controlled
+legacy receivers work, and weapon-class damage calculation works with the stock
+weapon. Simple's separate nil-weapon branch differs from stats; current limb
+wielding uses the actor itself for unarmed combat.
+
+There are **40 compiler checks**: 24 passes/16 expected rejections, including
+ten diagnostic/component probes. Two CLI runs verify **28 assertions**, including
+reproductions of the unsupported calls. These test formula arithmetic and
+interfaces, not complete alternate combat or body construction. Five public
+pinned sources match original Lima; upstream execution is unchecked.
+
+Keep both optional configurations integration-required. Shared active-defense,
+skill-cap and legacy weapon-result contracts need mudlib integration; no native
+gameplay API or type relaxation is justified. No production source/profile/binary
+or inventory changes; all 1549 library hashes match the last measured 1021/1182.
+
+See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-alternate-formula-audit).
+Evidence: /tmp/lima-formula-audit-20261021-n5ojd592. The port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
