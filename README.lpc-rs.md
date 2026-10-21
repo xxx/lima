@@ -933,6 +933,37 @@ gain. This establishes the current configured administrator/native-save mileston
 not alternate builds, foreign saved-data import or whole-port completion. The
 port remains in progress and the existing residual-source decisions remain.
 
+## Alternative body-stat compilation
+
+The 20 October compile-only audit selects the existing Lima, DND and Rifts
+body-stat providers in disposable copies. Production stays `BODY_STATS_LIMA`.
+All retain distinct nil, preserved call-out players, 4000ms, USE_MASS and the
+selected combat/simple-advancement modules; these are not full alternative
+rulesets. Complete adversary/body, user/menu and representative consumers compile
+under every selector.
+
+DND human/elf and Rifts human/dragon fail to see `stat_roll_mods`: the alternative
+providers privately inherit CLASS_STATMODS, while their races override a method
+returning that class. The default Lima provider uses protected inheritance.
+Temporary protected imports in the two alternatives make every advertised race
+compile and preserve native class visibility. Compiling usermenu alone does not
+execute its dynamic race discovery.
+
+All **54 compiler controls** match: **47 pass and seven reject as expected**.
+Three rejections are standalone stat providers missing the host's `call_hooks`;
+the other four reproduce the original race failures. No production source or
+driver changes are adopted. Next qualify stat initialization/rolling, missing
+stat/modifier defaults and race creation with the temporary visibility change.
+The alternatives' `init_stats()` methods do not consume `query_roll_mods()`;
+this audit does not define new racial-adjustment policy. Alternate saves,
+USE_INTRODUCTIONS and other combat/advancement choices remain unqualified.
+
+All 1549 library hashes, profile and release binaries remain unchanged. Inventory
+stays the last measured 1021/1182; these alternative hosts do not add to the 113
+selected-profile fragment proofs. No runtime session or full sweep runs. See the
+[native audit](../lpc-rs/doc/driver-comparison.md#lima-alternative-body-stat-compilation).
+Evidence: /tmp/lima-body-stats-audit-20261020-xmr0gy3q. The port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
