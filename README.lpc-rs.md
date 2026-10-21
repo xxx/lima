@@ -1178,6 +1178,38 @@ See [tests/simple_blows/README.md](tests/simple_blows/README.md) and the
 [native notes](../lpc-rs/doc/driver-comparison.md#lima-core-simple-blow-adaptation).
 Evidence: /tmp/lima-simple-blows-runtime-20261021-ahiz0bal. The port remains in progress.
 
+## Non-heartbeat pulse audit
+
+The 21 October audit follows core simple-damage commits Lima 4a583f3e / native
+dc7d742a. Only a disposable library selects PULSE_NON_HEART_BEAT; typed blows,
+limb providers, stats/formulas/advancement, distinct nil, preserved player, 4000ms
+and USE_MASS stay fixed. Production retains PULSE_HEART_BEAT.
+
+The optional module rejects native compilation at zero-argument remove_call_out.
+A throwing cancellation marker allows real adversary/body/human/trainer to
+compile, without implementing cleanup. Legacy timer callbacks return a function
+instead of invoking it. Bare callbacks expose further lifecycle issues:
+continuation and stop/restart can duplicate chains; a stopped timer can attack
+after switching to manual mode. The pulse removal override also omits inherited
+object cleanup, while native destruction already cancels owned timers.
+
+There are **42 compiler checks**, including two fixture checks: 34 passes/eight
+expected rejections. Two CLI runs verify **40 assertions** by inspecting pending
+registrations and explicitly consuming/invoking callbacks in one transaction.
+All fixture timers are cancelled before commit. No scheduler, listener, complete
+host or elapsed timing/context/destruction test runs; a caught synchronous error
+does not qualify scheduled errors.
+
+Recommend a private owned timer ID, invoking callback and single-arming guard,
+cancellation on stop/manual transition, and normal inherited removal. Preserve
+existing manual target/swing, jitter and penalty policy; review actor context
+against the selected heartbeat wrapper. No new driver API is demonstrated.
+No production source/profile/binary or inventory changes. All 1549 library hashes
+match the latest inventory; its measured 1021/1182 count remains unchanged.
+
+See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-non-heartbeat-pulse-audit).
+Evidence: /tmp/lima-non-heartbeat-audit-20261021-3n676z85. The port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
