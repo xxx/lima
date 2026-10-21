@@ -43,6 +43,38 @@ upstream), wizard 81/81, guild 4/4 and verbs 90/90.
 Fixed parameter defaults follow the native
 [trailing-default rule](../lpc-rs/doc/lpc/anatomy_of_a_program.md#parameter-defaults).
 
+## Repository and remotes
+
+The port lives in [xxx/lima](https://github.com/xxx/lima), on `lpc-rs-port`.
+The local `lima-lpc-rs` directory is an independent clone with its own `.git`
+directory; it does not depend on the original `lima` checkout.
+
+| Remote | Repository | Purpose |
+|---|---|---|
+| `origin` | `git@github.com:xxx/lima.git` | Publish and fetch the port fork. |
+| `upstream` | `https://github.com/limalib/lima` | Fetch upstream releases and development. |
+
+From this checkout, publish the port branch and establish its tracking branch:
+
+```sh
+git push -u origin lpc-rs-port
+```
+
+GitHub's branch selector must show `lpc-rs-port` to display the ported sources;
+the fork initially inherits upstream's `develop` default. Once the port branch
+is published, it can be selected as the fork's default in repository settings.
+
+For a future release update, stay on `lpc-rs-port`, fetch upstream's tags and
+merge the chosen release without rebasing the port's published commits:
+
+```sh
+git fetch --prune --tags upstream
+git merge <release-tag>
+```
+
+Then run the checks below before pushing. The current release is `1.1a4`.
+Upstream changes fetched in this clone do not change the original checkout.
+
 ## Upstream release tracking
 
 Upstream now uses `main` for releases and `develop` for integration, with
