@@ -1416,6 +1416,38 @@ selected providers, distinct nil/preserved player/4000ms remain unchanged.
 See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-complex-armour-slot-audit).
 Evidence: /tmp/lima-complex-armour-audit-20261021-l79b3x7k. Port remains in progress.
 
+## Rifts advancement audit
+
+Reviewed 21 October after complex-armour notes Lima **680ee6a1** / native
+**e20fbaac**. A bounded six-line prototype applies the existing simple-provider
+karma conversions and dynamic receiver command/save calls to ADVANCEMENT_RIFTS.
+It compiles real hosts without fake host methods or a new driver API. No source
+is adopted yet; production remains simple advancement and Lima stats.
+
+**36 compiler checks** give 24 passes/12 expected rejections, including real
+hosts with Lima stats and paired Rifts stats. Two successful CLI runs pass
+**34 assertions** using actual NPC/human constructors, stat initialization,
+level/XP, karma and limb-health refresh. Rifts supplies PE; Lima returns zero for
+that absent stat. First HP rolls use PE plus d6, later ones d6. XP and the actual
+limb HP multiplier remain unchanged.
+
+An existing cache issue is explicit: after storing four HP rolls, requesting
+level one sums the first two through the inclusive slice. Actual set_level(1)
+applies the extra roll to limb health; reset plus body refresh returns to one.
+Recommend the compatibility adapter with maintained regressions; document the
+cache behavior for a separate decision. No HP curve/cache, SDC, XP, ambient
+set_experience or command/save policy change is included.
+
+Delayed setup is cancelled; native fixture destruction occurs synchronously.
+No complete XP-command/linked-save path, account/login/logout, persistence,
+combat/rewards, elapsed scheduling or concurrent-player qualification is claimed.
+LIMB_SHIELDS remains disabled. Five pinned public sources match original; no
+other driver runs. All 1549 library hashes/profile/binaries match the last
+**1021/1182** inventory; no sweep/unrelated suite/Cargo build/listener/service
+runs. Original, selected providers, distinct nil/preserved player/4000ms remain.
+See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-rifts-advancement-audit).
+Evidence: /tmp/lima-rifts-advancement-audit-20261021-vvcxp28d. Port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
