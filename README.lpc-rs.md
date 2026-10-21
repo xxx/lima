@@ -1080,6 +1080,36 @@ dispositions remain separate. Profile and original Lima stay unchanged; this
 bounded qualification is not a new login/account acceptance run or whole-port
 completion claim.
 
+## Hit-point health composition audit
+
+The 20 October source audit follows the wound/native fixes committed as Lima
+545562fe / native c0c7fe8b. A disposable library selects HEALTH_HITPOINTS,
+WIELD_SINGLE and ARMOUR_SIMPLE_SLOTS, retaining BODY_STATS_LIMA, other selected
+providers, distinct nil, preserved player, 4000ms and USE_MASS. Production stays
+on limb health/equipment.
+
+Small provider adaptations use nil for absent values and ordinary mapping
+literals for fixed armour slots. These compile simple slots and an isolated HP
+receiver with its expected host methods. Full adversary/body/human/trainer still
+need nine missing methods for condition/limb classification, monster health
+refresh and body-shape/advancement state. Single `do_unwield()` also conflicts
+with callers passing a limb/weapon; simple `event_get_armours()` conflicts with
+the blow handler's event argument. Dynamic prompt/spell/climbing reflex-resource
+calls need further integration too.
+
+The audit runs **30 direct source/configuration checks and 18 diagnostic probes**.
+Receivers with throwing method/ABI markers identify interfaces and are not working
+implementations. No production source is adopted and no constructor, runtime,
+service, Cargo build or full inventory runs. All 1549 library hashes, profile and
+binaries remain unchanged; inventory stays the latest measured 1021/1182.
+
+Keep this optional composition **integration-required** until its mudlib health,
+condition and equipment interfaces are coherent. No new driver API is demonstrated.
+Continue independent combat-selector audits while retaining selected limb health;
+empty/zero gameplay shims would not qualify this alternate character model. See the
+[native audit](../lpc-rs/doc/driver-comparison.md#lima-hit-point-health-composition-audit).
+Evidence: /tmp/lima-hitpoints-audit-20261020-ijou5ia1. The port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
