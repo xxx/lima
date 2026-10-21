@@ -1110,6 +1110,37 @@ empty/zero gameplay shims would not qualify this alternate character model. See 
 [native audit](../lpc-rs/doc/driver-comparison.md#lima-hit-point-health-composition-audit).
 Evidence: /tmp/lima-hitpoints-audit-20261020-ijou5ia1. The port remains in progress.
 
+## Simple-blow composition audit
+
+The 20 October audit follows HP notes committed as Lima 782bfd8a / native 105ef5ee.
+Only a disposable library selects BLOW_SIMPLE; current limb health/equipment,
+stats/formulas/advancement, distinct nil, preserved player, 4000ms and USE_MASS
+stay fixed. Production retains BLOW_TYPES.
+
+The simple event class declares its limb field as object. A temporary string
+correction lets real adversary/body/human/trainer/dummy compile and fixes event
+construction with limb-name strings. Simple damage remains scalar: its helper
+and ordinary health dispatch work, but shared natural armour and the armour
+sink index it as an array and fail. Shield also lacks the simple formatter;
+type-specific special weapons and spells have further array assumptions.
+
+There are **48 compiler checks**, including nine fixture/interface probes:
+36 pass and 12 reject as expected. Six isolated runtime processes verify
+30 component assertions and two producer scenarios, including caught failures
+that reproduce incompatibilities. These do not qualify full combat or effects.
+An initial fixture's incorrect nil expectation for catch success was corrected
+to native zero; the failure remains recorded with the audit.
+
+Recommend a bounded mudlib adapter for the simple class/formatter, shared natural
+armour and sink, preserving scalar damage and selected typed behavior. Keep
+type-specific callbacks explicitly unqualified until integrated. No new driver
+API or type relaxation is established. No production source/profile/binary
+changes or full inventory run; all 1549 library hashes remain unchanged and
+inventory stays the last measured 1021/1182.
+
+See the [native audit](../lpc-rs/doc/driver-comparison.md#lima-simple-blow-composition-audit).
+Evidence: /tmp/lima-simple-blows-audit-20261020-qhp14j3x. The port remains in progress.
+
 ## Remaining scope
 
 Original-FluffOS saved-data/password import, alternate build options, live I3
