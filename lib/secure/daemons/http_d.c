@@ -46,6 +46,8 @@ class client_request
    int reached_end_of_headers;
    mapping headers;
    string content;
+   string *header_parts;
+   string *body_parts;
    string http_version;
    string method;
    string request;
@@ -413,6 +415,8 @@ class client_request alloc_request(object socket)
    req.end_of_input = 0;
    req.remaining_content_length = 0;
    req.content = "";
+   req.header_parts = ({});
+   req.body_parts = ({});
    requests[socket] = req;
    return req;
 }
@@ -450,127 +454,71 @@ nomask void handle_request(object socket)
 
 void add_text_to_request(string text, object socket)
 {
-   class client_request req;
-
-   req = requests[socket];
-
-   req.remaining_content_length -= strlen(text);
-   req.content += text;
-
-   if (req.remaining_content_length < 0)
+   class client_request req = requests[socket];
+   if (!req || req.end_of_input) return;
+   int count = sizeof(text);
+   if (count > req.remaining_content_length) count = req.remaining_content_length;
+   if (count) req.body_parts += ({text[0..count - 1]});
+   req.remaining_content_length -= count;
+   if (!req.remaining_content_length)
    {
-      req.content = req.content[0.. < (-(req.remaining_content_length)) + 1];
-   }
-   if (req.remaining_content_length <= 0)
-   {
+      req.content = implode(req.body_parts, "");
+      req.body_parts = ({});
       handle_request(socket);
    }
 }
 
 void look_for_useful_header_info(object socket)
 {
-   class client_request req;
-
-   req = requests[socket];
-
-   if (!req.keepalive)
-   {
-      string connection_type;
-
-      connection_type = req.headers["connection"];
-      if (connection_type && lower_case(connection_type) == "keep-alive")
-      {
-         req.keepalive = -1;
-      }
-   }
-   if (req.keepalive)
-   {
-      string content_length_header;
-      content_length_header = req.headers["content-length"];
-      if (content_length_header)
-      {
-         req.remaining_content_length = to_int(content_length_header);
-      }
-   }
+   class client_request req = requests[socket];
+   string connection = req.headers["connection"];
+   req.keepalive = connection && lower_case(connection) == "keep-alive" ? -1 : 0;
+   string length = req.headers["content-length"];
+   req.remaining_content_length = length ? to_int(length) : 0;
+   if (req.remaining_content_length < 0) error("http: negative content length");
 }
 
 string parse_headers(string text, object socket)
 {
-   class client_request req;
-   string header_name, header_value;
-   string *lines;
-   int i = 0;
-
-   req = requests[socket];
-   lines = explode(text, "\n");
-   if (!req.any_input_yet_p)
+   class client_request req = requests[socket];
+   string *lines = explode(text, "\n");
+   for (int i = 0; i + 1 < sizeof(lines); i++)
    {
-      string *request_line = explode(lines[0], " ");
-      request_line -= ({"\r"});
-      if (sizeof(request_line) < 3)
-         return nil;
-      req.method = request_line[0];
-      req.request = request_line[1];
-      req.http_version = request_line[2][0.. < 2];
-      i = 1;
-      req.any_input_yet_p = 1;
-   }
-   for (; i < sizeof(lines); i++)
-   {
-      string line = trim(lines[i]);
-      int colon_index;
-
-      if (!strlen(line))
+      string line = implode(req.header_parts + ({lines[i]}), "");
+      req.header_parts = ({});
+      if (sizeof(line) && line[<1] == '\r') line = line[0..<2];
+      if (!req.any_input_yet_p)
+      {
+         string *request_line = explode(line, " ");
+         if (sizeof(request_line) < 3) error("http: incomplete request line");
+         req.method = request_line[0];
+         req.request = request_line[1];
+         req.http_version = request_line[2];
+         req.any_input_yet_p = 1;
+         continue;
+      }
+      if (!sizeof(trim(line)))
       {
          look_for_useful_header_info(socket);
          req.reached_end_of_headers = 1;
-         if (sizeof(lines) != i + 1)
-         {
-            return implode(lines[i + 1..], "\n");
-         }
-         else
-         {
-            return nil;
-         }
+         return implode(lines[i + 1..], "\n");
       }
-      colon_index = strsrch(lines[i], ':');
-      header_name = lower_case(trim(lines[i][0..(colon_index - 1)]));
-      header_value = trim(lines[i][colon_index + 1..]);
-      req.headers[header_name] = header_value;
+      int colon = strindex(line, ':');
+      if (colon < 1) error("http: invalid header line");
+      req.headers[lower_case(trim(line[0..colon - 1]))] = trim(line[colon + 1..]);
    }
-   look_for_useful_header_info(socket);
-   /*
-   if (!req.keepalive)
-   {
-   req.reached_end_of_headers = 1;
-   }
-   */
+   if (sizeof(lines[<1])) req.header_parts += ({lines[<1]});
    return nil;
 }
 
 private
 nomask void add_to_request(object socket, string text)
 {
-   class client_request req;
-
-   req = requests[socket];
-   if (!req)
-   {
-      req = alloc_request(socket);
-   }
-   // We haven't gotten to the end of headers yet.
-   if (!(req.reached_end_of_headers))
-   {
-      text = parse_headers(text, socket);
-   }
-   if (text)
-   {
-      add_text_to_request(text, socket);
-   }
-   if (req.remaining_content_length <= 0 && req.reached_end_of_headers)
-   {
-      handle_request(socket);
-   }
+   class client_request req = requests[socket];
+   if (!req) req = alloc_request(socket);
+   if (req.end_of_input) return;
+   if (!req.reached_end_of_headers) text = parse_headers(text, socket);
+   if (req.reached_end_of_headers) add_text_to_request(text, socket);
 }
 
 private
@@ -585,13 +533,19 @@ nomask void http_read(object socket, bytes data)
    if (!request)
       return;
 
-   add_to_request(socket, request);
+   if (catch(add_to_request(socket, request)))
+   {
+      m_delete(requests, socket);
+      m_delete(sending, socket);
+      socket->remove();
+   }
 }
 
 private
 nomask void http_close(object socket)
 {
-   // add logging or something later
+   m_delete(requests, socket);
+   m_delete(sending, socket);
 }
 
 nomask void remove()

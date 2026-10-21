@@ -19,9 +19,9 @@ combined modes pass 59/59. Source inventory and runtime results retain distinct 
 | NPC adapters | Both complete hosts compile; 48 focused runtime checks pass | Aggression timers and trainer skill conversations; default stat-menu qualification follows. |
 | Trainer stat menu | Four source targets compile; 43 runtime checks pass | Adopted source with default strength/agility options; prices, payments, point exhaustion and cleanup verified. |
 | Shipped tests | Five suites pass 26/16/7/5/5, then both combined modes pass 59/59 | Current release driver; per-suite commands first, no manual program loads. Per-suite-first is the operator recipe; the current direct-cold recheck is below. |
-| Whole-source inventory | 1021/1182 compile; 161 standalone failures | Fresh sweep after the optional NNTP adapter; one gain, no regressions/timeouts/crashes, target constructors omitted. |
+| Whole-source inventory | 1021/1182 compile; 161 standalone failures | Fresh sweep after the HTTP framing fix; no gains/regressions/timeouts/crashes, target constructors omitted. |
 | Optional NNTP client | Six compiler checks and 463 offline assertions | Actual source with recording transport; no service activation or live-server claim. |
-| Selected HTTP input | Complete-header baseline works; fragmented requests need a fix | Offline recordings reproduce lost request prefixes and premature header completion; HTTP stays disabled. |
+| Selected HTTP input | Seven compiler checks and 2,582 offline assertions | Retained header/body fragments, all ordinary GET/POST split positions and exact output; HTTP stays disabled. |
 | Stone/sword sample | Eight scoped targets compile; two-player behavior passes | On-demand sample, including refusal, extraction/return and cleanup. |
 
 Of the inventory's failures, 113 documented fragments have currently compiling
@@ -849,11 +849,50 @@ they are not successful fragmented-request support. The disposable source change
 only its SOCKET constructor path. See the
 [native audit](../lpc-rs/doc/driver-comparison.md#lima-http-input-compatibility-audit).
 
-Next fix retained input and header/body boundaries in the selected daemon with
-maintained offline regressions, preserving its API and disabled preload. No
-production source/profile/binary, real socket/listener, endpoint, driver session
-or service activation changes in this audit. Inventory remains the measured
-**1021/1182** without another sweep. The port remains in progress.
+The audit left production source/profile/binaries unchanged. Its recommended
+framing correction is adopted below, retaining the disabled preload and existing
+provider/API. No real socket/listener, endpoint, driver session or service
+activation occurred in that audit.
+
+## HTTP request framing fix
+
+The selected daemon now retains incomplete request/header lines, waits for the
+blank line ending headers, and accumulates exactly the declared body length.
+Content-Length applies independently of Connection and is set once, so body
+chunks do not reset the remaining count. Separate fragments avoid repeatedly
+concatenating the whole request. EOF clears pending bookkeeping; read-handler
+failures close the connection instead of leaving a stalled request.
+
+Run the maintained offline regressions:
+
+```sh
+python3 tests/http/test_http.py
+```
+
+**Seven compiler checks and 2,582 LPC assertions pass in three CLI executions,
+0.780s total.** The preceding daemon fails all three runtime fixtures. Cases cover
+every ordinary GET/POST split position, byte-by-byte/CRLF input, LF compatibility,
+coalesced headers/body, exact/empty bodies, interleaved peers and EOF. Large
+aggregate headers and a thousand-field form exercise fragment assembly while
+individual values retain existing limits. Static binary bytes, UTF-8 CGI byte
+length/CRLF conversion, form/header arguments and the existing body-only POST
+reply are checked. See [test details](tests/http/README.md) and the
+[native qualification](../lpc-rs/doc/driver-comparison.md#lima-http-request-framing-fix).
+
+Only secure/daemons/http_d changes in the production library. Tests use that
+actual source with only its SOCKET constructor path substituted by a recorder
+in a disposable copy. No production test API or separate HTTP implementation is
+added. The daemon retains one-request/close behavior, CGI signatures and output
+conventions; keep-alive request headers do not enable persistent connections.
+
+The fresh inventory stays **1021/1182 compiling, 161 failures in 44.630s**, with
+no gains, regressions, timeouts/crashes or changed remaining diagnostics. All 113
+fragment proofs retain passing hosts; the same 48 other consumers retain their
+dispositions. This is a runtime fix in an already compiling source. HTTP stays
+disabled, and the older connection/master replacement remains unselected. No
+real socket/listener, endpoint, driver session or service activation occurs.
+Profile, native code/binaries and original Lima are unchanged. The port remains
+in progress; full HTTP conformance and live interoperability are not established.
 
 ## Remaining scope
 
