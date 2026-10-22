@@ -3,8 +3,8 @@
 This is the working port of Lima incorporating upstream release tag **`1.1a4`**,
 at [`733f2d05b339472262619ea55509fefcab65b04f`](https://github.com/limalib/lima/tree/733f2d05b339472262619ea55509fefcab65b04f),
 with mudlib sources in `lib/`. The release update was checked on 21 October 2026.
-Use this dedicated checkout on `lpc-rs-port` alongside the native `lpc-rs`
-checkout on `lima-support`.
+Use this dedicated checkout on `lpc-rs-port` alongside the native
+[lpc-rs driver](https://github.com/xxx/lpc-rs) checkout on `lima-support`.
 
 **The configured profile is the agreed port target.** Remaining optional features
 are explicit follow-ups. The fresh-account lifecycle qualification was recorded
@@ -41,7 +41,7 @@ Command compilation remains player 65/67 (random2 deferred; suicide disabled
 upstream), wizard 81/81, guild 4/4 and verbs 90/90.
 
 Fixed parameter defaults follow the native
-[trailing-default rule](../lpc-rs/doc/lpc/anatomy_of_a_program.md#parameter-defaults).
+[trailing-default rule](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/lpc/anatomy_of_a_program.md#parameter-defaults).
 
 ## Repository and remotes
 
@@ -165,8 +165,8 @@ disconnects; reconnect to check saved account/body restoration. The administrato
 command `shutdown <reason>` stops the driver normally.
 
 Startup writes saves, generated help and logs below `lib/`. Keep those runtime
-files with the instance; use a disposable `/tmp/` copy for throwaway checks
-rather than replacing or repeatedly copying the persistent port source.
+files with the instance. For throwaway checks, create a separate temporary
+runtime copy.
 
 ## Run the shipped tests
 
@@ -195,13 +195,12 @@ qualification also checks existing prototype identities, player/inventory state
 and cleanup, then saves, logs out and verifies the account and character after
 a fresh-process restart. Manual totals alone do not repeat those observations.
 
-The [current direct-cold recheck](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-current-cold-combined-checks)
+The [current direct-cold recheck](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-current-cold-combined-checks)
 passes both modes from fresh drivers without per-suite warmup or manual loads.
 Normal-first returns the prompt in 2.330s and quiet-first in 2.542s; each following
 other mode also passes 59/59, at 0.185s/0.189s. Both boots have 151 clean preloads,
 preserved player/world/prototype state, normal saves/logout and exit-zero shutdown.
 The 4000ms budget and source/profile/binaries are unchanged.
-Evidence: /tmp/lima-cold-current-20261019.
 
 The earlier timeouts predate the lexer/include optimizations. Those attempts spend
 about 3847/3867ms compiling and 155/152ms evaluating, with zero conflicts. Their
@@ -221,14 +220,14 @@ code generation; its ordinary disabled/enabled controls pass both modes at
 59/59. The restored uninstrumented driver also passes a fresh cold run. These
 passes do not establish cold reliability or a speedup. The deadline, source
 and cache policies are unchanged. Details are in the native
-[compiler profile](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-cold-compilation-profile).
-The [cached-macro copy audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-cached-macro-copy-audit)
+[compiler profile](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-cold-compilation-profile).
+The [cached-macro copy audit](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-cached-macro-copy-audit)
 keeps the current storage: its isolated replay does not establish a worthwhile
 whole-compiler gain. A subsequent
-[lexer token-text audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-lexer-token-text-copy-audit)
+[lexer token-text audit](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-lexer-token-text-copy-audit)
 finds 8.7–10.6% lower raw-lexer time after removing a redundant text buffer, with
 3,984 matching token/error/span comparisons. The small native
-[buffer removal](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-lexer-buffer-removal)
+[buffer removal](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-lexer-buffer-removal)
 is now applied. Eight fresh driver sessions pass the combined or per-suite test
 sequences with state/cleanup checks, real saves and logout. Actual compiler and
 cold-command timings remain noisy; no whole-compiler gain or cold-timeout fix is
@@ -238,12 +237,12 @@ Clippy and format check pass. The ordinary release workspace rebuilds after
 testing, and its driver/CLI hashes match the measured executables exactly.
 
 The subsequent
-[include resolution audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-include-path-resolution-audit)
+[include resolution audit](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-include-path-resolution-audit)
 finds that at least 94% of observed metadata checks cannot change the selected
 header path. A small resolver short-circuit preserves the tested search and
 callback behavior and substantially reduces isolated resolution time. It is
 now adopted in the native
-[resolver](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-include-resolution-short-circuit):
+[resolver](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-include-resolution-short-circuit):
 actual preprocessing metadata calls fall from 13,088 to 785, with unchanged
 header reads and callback order. Eight fresh driver sessions pass; sampled cold
 command and CLI medians improve 2.5% and 14.6%, respectively. The samples do not
@@ -270,16 +269,16 @@ login restores identity, role, race, capacity, empty inventory, command path,
 alias and the saved Example Room quit location. Existing channel compiler
 warnings remain; there are no runtime errors or failed preloads. This requires
 no port source fix and does not change this checkout's development setting.
-The [native qualification](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-ordinary-player-lifecycle)
-records scope; local evidence is /tmp/lima-mortal-entry-20261019. It does not
-repeat the shipped suites, full gameplay coverage, foreign saves or live services.
+The [native qualification](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-ordinary-player-lifecycle)
+records the scope. It does not repeat the shipped suites, full gameplay coverage,
+foreign saves or live services.
 
-The [current acceptance record](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-port-acceptance)
+The [current acceptance record](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-port-acceptance)
 reuses the documented per-suite-first recipe on this checkout, with preserved
 player/world state, zero manual target loads, completed documentation scanning
 and real saved-password authentication. Sources, profile and release binaries
 are unchanged. Existing channel/header warnings remain; no runtime errors or
-preload failures occur. Evidence: /tmp/lima-port-acceptance-20261019.
+preload failures occur.
 
 ## CGI helper regression tests
 
@@ -371,7 +370,7 @@ peak RSS to 0.011s/22.8 MiB. Full-file and tail controls improve too; a separate
 1 GiB sparse-input range read passes under a 512 MiB address-space cap. These
 figures describe native API controls, not whole-mudlib speedups. The actual tar
 runner is requalified on the rebuilt release driver with all 21 assertions and
-six archives passing. See the [native range-read notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-byte-range-reads).
+six archives passing. See the [native range-read notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-byte-range-reads).
 
 At tar adoption, the full standalone sweep measured **1011/1182 compiling,
 171 fail**, with zero regressions/timeouts/crashes. Its only gain was this helper;
@@ -411,7 +410,7 @@ player healing/stun or command-execution checks. The runner retains the distinct
 nil/preserved-player/4000ms profile and real simuls/includes, with a temporary
 permissive master and loopback driver. See the
 [test scope](tests/transient_effects/README.md) and
-[native adapter notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-contributed-transient-effect-adapter).
+[native adapter notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-contributed-transient-effect-adapter).
 
 At contributed-effect adoption, the whole-source sweep measured **1013/1182 compiling, 169 failures** in
 **39.723s**, with zero regressions/timeouts/crashes. Only the two contributed files
@@ -447,7 +446,7 @@ body/shell roles and modal input are fixtures. Logged-in inputsys/full-shell
 routing, permission policy, pager/completion, live weather output, logout and
 arbitrary input validation remain outside this focused test. See the
 [test guide](tests/roommaker/README.md) and
-[native adapter notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-contributed-room-maker-adapter).
+[native adapter notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-contributed-room-maker-adapter).
 
 At room-maker adoption, the full sweep measured **1014/1182 compiling, 168 failures** in **43.180s**,
 with zero regressions/timeouts/crashes. Only the command gains; the menu already
@@ -478,7 +477,7 @@ subsets with exact titles/descriptions/exit paths, and clone cleanup. The runner
 retains distinct nil, preserved player, USE_MASS and 4000ms, real simuls/includes,
 a permissive temporary master and a typed weighted fixture item. See the
 [test guide](tests/attic_examples/README.md) and
-[native adapter notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-attic-table-and-town-room-adapter).
+[native adapter notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-attic-table-and-town-room-adapter).
 
 The attic supplies no town destination directory and town.c is TODO; helper/path
 checks do not qualify traversal or add world content. Real parser/player get/put/go
@@ -515,7 +514,7 @@ policy, admin-specific and malformed-form flows remain unqualified. HTTP stays
 disabled in the configured preload, and no HTTP request or external connection
 is used by the runner. The profile stays distinct nil/preserved player/4000ms.
 See the [test guide](tests/web_editor/README.md) and
-[native adapter notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-web-editor-backend-adapter).
+[native adapter notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-web-editor-backend-adapter).
 
 The fresh full sweep measures **1017/1182 compiling, 165 failures** in **42.281s**,
 with zero regressions/timeouts/crashes. Only this backend gains. All **113 hosted
@@ -542,7 +541,7 @@ providers and mark the kit **integration-required**: working support needs its
 omitted body/accessor/save work and a merge preserving current account/finger
 behavior. No core replacement, new native alias, class relaxation or spouse
 feature activation is adopted by this audit. See the
-[native audit notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-contributed-marriage-integration-audit).
+[native audit notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-contributed-marriage-integration-audit).
 
 Production source/profile/binaries stay unchanged. The last inventory remains
 **1017/1182**, without a new sweep or inferred source gain. The port remains in
@@ -581,7 +580,7 @@ Python independently checks the retained draft and mail-save files. This does
 not qualify parser dispatch, live login, concurrent players, real-master path
 policy, remote mail or account save/restart; news save calls are counted.
 See [test details](tests/boards/README.md) and the
-[native adaptation notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-portable-board-adaptation).
+[native adaptation notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-portable-board-adaptation).
 
 The fresh source sweep measures **1019/1182 compiling, 163 failures** in 46.217s,
 with **zero regressions/timeouts/crashes** and exactly the two board-file gains.
@@ -619,7 +618,7 @@ callbacks, unread/group switching, post/followup result handling and reply
 integration; the existing user-mailer ownership and NEWSREADER-only sender
 restriction still apply. Keep selected NEWS_D/current user state and other board
 packages unselected. See the
-[native audit notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-contributed-board-provider-interface-audit).
+[native audit notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-contributed-board-provider-interface-audit).
 The last measured inventory stays **1017/1182**, with no new sweep or inferred
 gain. The port remains in progress.
 
@@ -650,7 +649,7 @@ needs an explicit host/lifecycle contract plus consistent storage, keys, hooks
 and descriptions. Do not replace the selected providers or relax method checks
 to silence the files. The existing door/sibling implementation retains its
 previous qualification. See the
-[native audit notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-attic-openable-and-lockable-wrappers).
+[native audit notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-attic-openable-and-lockable-wrappers).
 No library/profile/binary change or new inventory sweep is made; the last
 measured inventory remains **1019/1182**, and synthetic hosts do not increase
 the documented shipped-fragment tally. The port remains in progress.
@@ -684,7 +683,7 @@ of seeded piles: new/existing and mixed currencies, aliases, partial/whole/all,
 fractions, decimal repetition, refusals and a caught pre-mutation merge error.
 Parser dispatch, real login, concurrency, account restart and callbacks that
 mutate before failing are outside this suite. See [test details](tests/coins/README.md)
-and the [native adaptation notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-selected-coin-denomination-adaptation).
+and the [native adaptation notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-selected-coin-denomination-adaptation).
 
 The fresh sweep remains **1019/1182 compiling, 163 failures**, with no gains,
 regressions, timeouts or crashes in 43.474s. This fixes runtime behavior in already
@@ -718,7 +717,7 @@ components run with an OBJ actor and permissive fixture master. These checks
 reproduce the failures; they do not qualify the affected denomination workflows
 as correct. No parser dispatch, real login, concurrent players or account
 save/restart is established. See the
-[native audit notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-legacy-money-and-selected-coin-interfaces).
+[native audit notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-legacy-money-and-selected-coin-interfaces).
 
 The recommended next fix is the bounded selected coin/get/drop unit boundary:
 store base-currency values, initialize missing balances and translate denomination
@@ -757,7 +756,7 @@ source rejects the fixed get override. The fixture rejects USE_MONEY, so these
 results do not qualify alternate-profile drop or mixed-provider drop/merge
 integration. Parser routing, login, concurrency and account restart are outside
 this suite. See [test details](tests/legacy_money/README.md) and the
-[native notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-optional-legacy-money-adaptation).
+[native notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-optional-legacy-money-adaptation).
 
 The fresh sweep measures **1020/1182 compiling, 162 failures** in 41.625s, with
 std/money as the sole gain and no regressions/timeouts/crashes. All 113 existing
@@ -795,7 +794,7 @@ deprecated backend retired. At that reconciliation, NNTP still depended on that
 backend; its subsequent audit, offline prototype and source adoption follow
 below. Default local news/mail and previous TCP/service qualifications retain
 their scopes. See the
-[native reconciliation](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-remaining-source-disposition-reconciliation).
+[native reconciliation](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-remaining-source-disposition-reconciliation).
 
 This is a disposition inventory, not whole-port completion or proof that
 arbitrary user-selected paths cannot load a file. No production library/profile/
@@ -827,7 +826,7 @@ The included FluffOS time header expects GMT offset at index 8, but native
 localtime has the DST flag there. strftime formats local time and offers no UTC
 selector. The client needs an explicit library UTC formatter with fixed date/zone
 vectors, rather than another assumed header layout or invented native argument.
-See the [native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-nntp-source-interface-audit).
+See the [native audit](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-nntp-source-interface-audit).
 
 Next qualify a temporary adapter offline with a recording transport before
 adoption or any NNTP_OB path change. This audit invokes no client constructor,
@@ -857,7 +856,7 @@ constructor path with a recording transport; the unsubstituted proposal is also
 compiled. They exercise no real socket/listener, driver session, endpoint or
 service activation, and do not newly qualify the provider's privilege, ownership
 or native event behavior. See the
-[native qualification](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-offline-nntp-prototype).
+[native qualification](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-offline-nntp-prototype).
 
 At that milestone the last measured inventory stayed **1020/1182**; the following
 adoption measures compilation of the actual source. The port remains in progress.
@@ -876,7 +875,7 @@ disposable runtime copy, and checks framing, commands/callbacks, upload ordering
 and bounded output, terminal cleanup and UTC dates. No separately maintained
 client implementation or production test API is added. Original public function
 documentation annotations are retained. See [test details](tests/nntp/README.md)
-and the [native adoption notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-nntp-adapter-adoption).
+and the [native adoption notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-nntp-adapter-adoption).
 
 Only contrib/nntp changes in the production library. It uses selected SOCKET and
 bare callbacks while retaining raw ARTICLE arrays and upload continuation/final
@@ -917,7 +916,7 @@ instead dispatch before the blank header terminator, including when CR and LF
 arrive separately. Eight observations confirm that baseline and those defects;
 they are not successful fragmented-request support. The disposable source changes
 only its SOCKET constructor path. See the
-[native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-http-input-compatibility-audit).
+[native audit](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-http-input-compatibility-audit).
 
 The audit left production source/profile/binaries unchanged. Its recommended
 framing correction is adopted below, retaining the disabled preload and existing
@@ -947,7 +946,7 @@ aggregate headers and a thousand-field form exercise fragment assembly while
 individual values retain existing limits. Static binary bytes, UTF-8 CGI byte
 length/CRLF conversion, form/header arguments and the existing body-only POST
 reply are checked. See [test details](tests/http/README.md) and the
-[native qualification](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-http-request-framing-fix).
+[native qualification](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-http-request-framing-fix).
 
 Only secure/daemons/http_d changes in the production library. Tests use that
 actual source with only its SOCKET constructor path substituted by a recorder
@@ -993,7 +992,7 @@ only the established loopback router/OOB substitutions. HTTP/FTP/RCP remain
 disabled and no external service is contacted. Existing channel/autodoc warnings
 match the prior run; there are no accepted runtime/apply/evaluation errors or
 forced kills. See the
-[native acceptance notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-configured-acceptance-and-coin-parser-integration).
+[native acceptance notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-configured-acceptance-and-coin-parser-integration).
 
 All 1549 persistent library files, profile and release binaries remain unchanged.
 The last measured inventory stays **1021/1182**, without a new sweep or inferred
@@ -1029,8 +1028,8 @@ USE_INTRODUCTIONS and other combat/advancement choices remain unqualified.
 All 1549 library hashes, profile and release binaries remain unchanged. Inventory
 stays the last measured 1021/1182; these alternative hosts do not add to the 113
 selected-profile fragment proofs. No runtime session or full sweep runs. See the
-[native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-alternative-body-stat-compilation).
-Evidence: /tmp/lima-body-stats-audit-20261020-xmr0gy3q. The port remains in progress.
+[native audit](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-alternative-body-stat-compilation).
+The port remains in progress.
 
 ## Alternative body-stat adaptation
 
@@ -1062,8 +1061,7 @@ change in the library; production remains BODY_STATS_LIMA with distinct nil,
 preserved players, 4000ms, USE_MASS and the same combat/simple-advancement modules.
 Introductions and other alternate modules remain separate. No driver change or
 new inventory gain is claimed. See the
-[native adaptation notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-alternative-body-stat-adaptation).
-Evidence: /tmp/lima-body-stats-runtime-20261020-ujvuh9pb.
+[native adaptation notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-alternative-body-stat-adaptation).
 
 ## Wound-health compilation audit
 
@@ -1092,8 +1090,8 @@ pending periodic timer, firing/rearming, cancellation and cleanup. This audit
 omits target constructors and proves no runtime wound behavior. All 1549 library
 hashes, profile and release binaries remain unchanged. Inventory stays last
 measured 1021/1182, without a sweep or new selected-profile proof. See the
-[native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-wound-health-compilation-audit).
-Evidence: /tmp/lima-wounds-audit-20261020-eea1jaz8. The port remains in progress.
+[native audit](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-wound-health-compilation-audit).
+The port remains in progress.
 
 ## Wound-health runtime adaptation
 
@@ -1129,8 +1127,7 @@ is held at zero; explicit healing and the original random wound updates run.
 Login, saved-data migration, corpse/reward processing and full combat rules are
 outside this qualification. Only an ephemeral loopback listener runs, without
 connections or external requests. See the
-[native notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-wound-health-runtime-adaptation).
-Evidence: /tmp/lima-wounds-runtime-20261020-qz1cfddk.
+[native notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-wound-health-runtime-adaptation).
 
 The adopted checkout's maintained runner passes all **14 compiler checks and 46
 assertions in 18.278s** with the final release binaries. The body-stat regression
@@ -1175,8 +1172,8 @@ Keep this optional composition **integration-required** until its mudlib health,
 condition and equipment interfaces are coherent. No new driver API is demonstrated.
 Continue independent combat-selector audits while retaining selected limb health;
 empty/zero gameplay shims would not qualify this alternate character model. See the
-[native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-hit-point-health-composition-audit).
-Evidence: /tmp/lima-hitpoints-audit-20261020-ijou5ia1. The port remains in progress.
+[native audit](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-hit-point-health-composition-audit).
+The port remains in progress.
 
 ## Simple-blow composition audit
 
@@ -1206,8 +1203,8 @@ API or type relaxation is established. No production source/profile/binary
 changes or full inventory run; all 1549 library hashes remain unchanged and
 inventory stays the last measured 1021/1182.
 
-See the [native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-simple-blow-composition-audit).
-Evidence: /tmp/lima-simple-blows-audit-20261020-qhp14j3x. The port remains in progress.
+See the [native audit](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-simple-blow-composition-audit).
+The port remains in progress.
 
 ## Core simple-blow adaptation
 
@@ -1243,8 +1240,8 @@ stay unchanged. Type-specific special weapons/spells and complete simple combat,
 death, wearing and saves remain unqualified.
 
 See [tests/simple_blows/README.md](tests/simple_blows/README.md) and the
-[native notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-core-simple-blow-adaptation).
-Evidence: /tmp/lima-simple-blows-runtime-20261021-ahiz0bal. The port remains in progress.
+[native notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-core-simple-blow-adaptation).
+The port remains in progress.
 
 ## Non-heartbeat pulse audit
 
@@ -1275,8 +1272,8 @@ against the selected heartbeat wrapper. No new driver API is demonstrated.
 No production source/profile/binary or inventory changes. All 1549 library hashes
 match the latest inventory; its measured 1021/1182 count remains unchanged.
 
-See the [native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-non-heartbeat-pulse-audit).
-Evidence: /tmp/lima-non-heartbeat-audit-20261021-3n676z85. The port remains in progress.
+See the [native audit](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-non-heartbeat-pulse-audit).
+The port remains in progress.
 
 ## Non-heartbeat pulse adaptation
 
@@ -1314,8 +1311,8 @@ gains/regressions/timeouts/crashes in 39.918s. Only the optional pulse changes a
 Its standalone diagnostic now identifies expected receiving methods.
 
 See [tests/non_heartbeat/README.md](tests/non_heartbeat/README.md) and the
-[native notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-non-heartbeat-pulse-adaptation).
-Evidence: /tmp/lima-non-heartbeat-runtime-20261021-du4dg3od. The port remains in progress.
+[native notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-non-heartbeat-pulse-adaptation).
+The port remains in progress.
 
 ## Alternate-formula audit
 
@@ -1347,8 +1344,8 @@ skill-cap and legacy weapon-result contracts need mudlib integration; no native
 gameplay API or type relaxation is justified. No production source/profile/binary
 or inventory changes; all 1549 library hashes match the last measured 1021/1182.
 
-See the [native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-alternate-formula-audit).
-Evidence: /tmp/lima-formula-audit-20261021-n5ojd592. The port remains in progress.
+See the [native audit](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-alternate-formula-audit).
+The port remains in progress.
 
 ## Vaporizing-death audit
 
@@ -1379,8 +1376,8 @@ inventory transfer. Keep player vaporization integration-required and corpse
 death selected. No new driver API, production source/profile/binary or inventory
 change. All 1549 library hashes match the last measured 1021/1182.
 
-See the [native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-vaporizing-death-audit).
-Evidence: /tmp/lima-vaporize-audit-20261021-16wwbivy. The port remains in progress.
+See the [native audit](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-vaporizing-death-audit).
+The port remains in progress.
 
 ## NPC vaporize adaptation
 
@@ -1415,8 +1412,8 @@ among 1549 library files; profile, headers, driver binaries and original stay.
 No Cargo build, listener, new driver API or generic destruction change.
 
 See [tests/vaporize/README.md](tests/vaporize/README.md) and the
-[native notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-npc-vaporize-adaptation).
-Evidence: /tmp/lima-vaporize-runtime-20261021-bo0zn2op. The port remains in progress.
+[native notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-npc-vaporize-adaptation).
+The port remains in progress.
 
 ## Multiple-slot wielding audit
 
@@ -1449,8 +1446,8 @@ All 1549 library hashes/profile/release binaries match the last **1021/1182**
 inventory; no sweep/unrelated regression suite/Cargo build/listener runs. Original
 and selected providers stay unchanged, with distinct nil/preserved player/4000ms.
 Six pinned public source responses match clean original; no other driver executes.
-See the [native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-multiple-slot-wielding-audit).
-Evidence: /tmp/lima-wield-multiple-audit-20261021-pg0toblw. Port remains in progress.
+See the [native audit](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-multiple-slot-wielding-audit).
+Port remains in progress.
 
 ## Complex armour-slot audit
 
@@ -1481,8 +1478,8 @@ qualified. Seven public pinned sources match original; no other driver executes.
 All 1549 library hashes/profile/binaries match the last **1021/1182** inventory.
 No sweep/unrelated regression suite/Cargo build/listener/service runs. Original,
 selected providers, distinct nil/preserved player/4000ms remain unchanged.
-See the [native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-complex-armour-slot-audit).
-Evidence: /tmp/lima-complex-armour-audit-20261021-l79b3x7k. Port remains in progress.
+See the [native audit](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-complex-armour-slot-audit).
+Port remains in progress.
 
 ## Rifts advancement audit
 
@@ -1513,8 +1510,8 @@ LIMB_SHIELDS remains disabled. Five pinned public sources match original; no
 other driver runs. All 1549 library hashes/profile/binaries match the last
 **1021/1182** inventory; no sweep/unrelated suite/Cargo build/listener/service
 runs. Original, selected providers, distinct nil/preserved player/4000ms remain.
-See the [native audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-rifts-advancement-audit).
-Evidence: /tmp/lima-rifts-advancement-audit-20261021-vvcxp28d. Port remains in progress.
+See the [native audit](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-rifts-advancement-audit).
+Port remains in progress.
 
 ## Rifts advancement compatibility adaptation
 
@@ -1548,8 +1545,8 @@ its six adapted diagnostics; three real receiving-method errors remain. Other
 failure messages stay. One of 1549 library files changes; headers/profile/native
 implementation/binaries/original remain. No unrelated suite, Cargo build,
 listener or service runs. Distinct nil/preserved player/4000ms stay.
-See the [native notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-rifts-advancement-compatibility-adaptation).
-Evidence: /tmp/lima-rifts-advancement-runtime-20261021-ls6pv3ji. Port remains in progress.
+See the [native notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-rifts-advancement-compatibility-adaptation).
+Port remains in progress.
 
 ## Current remaining-source ledger
 
@@ -1590,8 +1587,8 @@ One compile-only selector control passes; no runtime suite/Cargo build/listener/
 service runs. Production source/profile/binaries and original remain unchanged;
 distinct nil, preserved player, USE_MASS and 4000ms stay. Existing-world import
 remains unselected; inherited-signature/cache design and original HP bookkeeping
-remain separate. See the [native ledger](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-current-remaining-source-ledger).
-Evidence: /tmp/lima-remaining-work-review-20261021-rfsfkq_k. Port remains in progress.
+remain separate. See the [native ledger](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-current-remaining-source-ledger).
+Port remains in progress.
 
 ## Configured-profile review handoff
 
@@ -1618,8 +1615,7 @@ PR description and granular commit exports. GitHub PR #124 is verified open/draf
 at 2109d59c, with 45 later commits in the local native branch; no push or PR edit
 is made. The port checkout retains upstream Lima as its remote. Publication of
 the paired review branch remains a delivery task, not another optional-feature
-audit. See the [native handoff notes](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-configured-profile-review-handoff).
-Evidence: /tmp/lima-configured-profile-handoff-20261021-71k1q2a2.
+audit. See the [native handoff notes](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-configured-profile-review-handoff).
 
 ## Remaining scope
 
@@ -1643,8 +1639,8 @@ retain these decisions:
 
 These are recorded scope decisions, not a queue of missing driver features.
 
-The [NPC sample-chain audit](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-npc-sample-chain-audit)
-now has [aggression/trainer adapters](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-aggression-and-trainer-adapters)
+The [NPC sample-chain audit](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-npc-sample-chain-audit)
+now has [aggression/trainer adapters](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-aggression-and-trainer-adapters)
 and focused runtime qualification. Aggression binds targets into function values;
 the trainer uses native class fields and a mapping restriction contract. Both
 complete hosts compile. All 48 earlier runtime checks pass for inherited timers
@@ -1652,7 +1648,7 @@ and skill conversations, with state restoration, cleanup and normal saves/logout
 The timer fixture records attempts; combat damage is outside that check.
 
 Tara's default stat-menu gap is now resolved by the four-line
-[trainer adaptation](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-trainer-stat-menu-adoption).
+[trainer adaptation](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-trainer-stat-menu-adoption).
 It uses the body's existing `stat_abrev()`, `query_stat()` and `inc_mod_stat()`,
 and binds the selected stat in its menu callback. Four source targets compile;
 the adopted checkout's source passes the same 43 runtime checks as the audit,
@@ -1660,88 +1656,85 @@ with default stat options enabled and no module substitution. Prices, refusals,
 exact payments, repeated strength/agility gains, point exhaustion, reopened menus,
 state restoration and normal saves/logout/shutdown pass with 151 clean preloads.
 No new body/driver API, payment cast or sample configuration change is needed.
-Evidence: /tmp/lima-trainer-stats-adoption-20261019.
 
 The attic reaction examples retain their upstream placeholder; their missing
 script API stays deferred. The dated 999/1182 inventory is not rerun. Alternate
 stat models and configuration flags retain their separate scope.
 
-The [remaining-source triage](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-remaining-source-implementation-triage)
+The [remaining-source triage](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-remaining-source-implementation-triage)
 reviews the 16 files with no identified configured caller as one batch. Temporary
 adapters compile three optional examples; other entries need hosts, integration,
 dependencies or unfinished feature work. No source change or new efun is added.
 The audit also reproduced a compiler input difference, corrected in the
-[relative-inherit follow-up](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-relative-inherit-inputs):
+[relative-inherit follow-up](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-relative-inherit-inputs):
 host-file and in-game inputs now use the source directory. All 12 CLI cases and
-both reordered behavior-example forms pass. Evidence: /tmp/lima-relative-inherits-20261019.
+both reordered behavior-example forms pass.
 The behavior example now places its inherit before its global declaration and
 retains the relative sibling path. Both actual sources and a child consumer
 compile; four constructor checks cover the inherited global and class fields.
 The class provider and profile are unchanged. This is an optional example's
 inheritance check, without gameplay or a new whole-library inventory. Contrib's
 drunk effect retains its parent's heartbeat adaptation gap.
-Evidence: /tmp/lima-behaviour-example-20261019.
 
-The optional [navigation passage example](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-navigation-passage-example)
+The optional [navigation passage example](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-navigation-passage-example)
 now passes an explicit float mass to the existing API. Four compile checks and
 12 checks with real clone construction pass, covering mass, IDs, attachment,
 descriptions, independent state and cleanup. The isolated fixture uses the shipped
 providers/simuls and a temporary master; configured gameplay remains unqualified.
-The profile and native binaries are unchanged. Evidence: /tmp/lima-navigation-passage-20261019.
+The profile and native binaries are unchanged.
 
-The optional [Logical Genius adapter](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-logical-genius-and-trigger-defaults)
+The optional [Logical Genius adapter](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-logical-genius-and-trigger-defaults)
 uses native typed closures and nil rule references. The trigger APIs now default
 omitted rule references to nil while retaining the numeric listen mask and strict
 checks on explicit zero. Eight complete-consumer/fixture compiles and 40 runtime
 checks pass, including predicates, captures, message matching and real clone setup.
 Response commands are captured in the fixture; delayed speech/player gameplay is
 not newly qualified. The profile and native binaries are unchanged.
-Evidence: /tmp/lima-logical-genius-20261019.
 
-The optional [test dummy adapter](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-test-dummy-example)
+The optional [test dummy adapter](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-test-dummy-example)
 uses native event fields/callbacks, nil formatter separators and the inherited
 give-checker signature. Six compile checks and 25 runtime checks pass with real
 dummy/equipment clones, arrival hooks, damage diagnostics, armour reduction and
 cleanup. The registered stand-up callback is invoked directly and cancelled;
 elapsed timer delivery and player gameplay are not tested. The profile and native
-binaries are unchanged. Evidence: /tmp/lima-test-dummy-20261019.
+binaries are unchanged.
 
-The optional [character-mode key-binding helper](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-character-mode-key-bindings)
+The optional [character-mode key-binding helper](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-character-mode-key-bindings)
 now iterates characters directly and registers a bare input callback. Four compile
 checks and 31 runtime checks pass through a temporary wizard-shell composition
 and the real input provider, with a recording user at the modal boundary. Matching,
 Escape/control tokens, dynamic bindings and Unicode are covered; owned-shell
 startup, the real user stack and network input are outside this check. No configured
-caller is identified or enabled. Evidence: /tmp/lima-key-bindings-20261019.
+caller is identified or enabled.
 
-The optional [flow room module](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-flow-room-module)
+The optional [flow room module](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-flow-room-module)
 now retains one named arrival callback. Five compile checks and 27 runtime checks
 pass with temporary room compositions, real movement and message providers.
 Repeated configuration, conditional flow, inventories and delayed captures/guards
 are covered. Delayed callbacks are invoked directly and cancelled; elapsed timer
 delivery is not tested. No configured caller is enabled; the profile and native
-binaries are unchanged. Evidence: /tmp/lima-flow-room-20261019.
+binaries are unchanged.
 
-The unchanged [boss module](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-boss-module-host-contract)
+The unchanged [boss module](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-boss-module-host-contract)
 passes five compile checks and 17 runtime checks in temporary ADVERSARY hosts,
 with fixture actors and a recording loot daemon. Host methods, eligibility/history
 and handoff arguments work without a port fix. Its existing unused loot flag and
 unrefreshed expiry timestamp remain documented policy gaps. Controlled dead-state
 and timestamp fixtures do not qualify actual boss combat or generation; no caller
-is enabled. Evidence: /tmp/lima-boss-integration-20261019.
+is enabled.
 
-The [legacy exit integration review](../lpc-rs/doc/mudlibs/lima-port-history.md#lima-legacy-exit-integration-decision)
+The [legacy exit integration review](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md#lima-legacy-exit-integration-decision)
 retains BASE_ROOM/M_EXIT and EXIT_OBJ/M_COMPLEX_EXIT. Six compiler passes, four
 expected rejections and ten runtime checks show that the unselected older helpers
 need more than argument-count edits: destination lookup, callbacks and movement
 records have different contracts. The fixture records movement arguments; it
 does not move a body. No diagnostic adapter or library change is adopted.
-Evidence: /tmp/lima-exit-integration-20261019.
 
-The [Lima porting guide](../lpc-rs/doc/mudlibs/lima.md#recorded-validation)
-centralizes driver differences and qualification scope. The records below retain
-the detailed local evidence, including nonpassing controls; temporary `/tmp/`
-paths are evidence locations on the development machine, not installed tooling.
+The [Lima porting guide](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima.md#recorded-validation)
+centralizes driver differences and qualification scope. The records below summarize
+historical checks, including nonpassing controls. Use the documented commands and
+maintained `tests/` runners to reproduce shipped checks; raw development logs and
+one-off diagnostic harnesses are not distributed.
 
 ## Historical qualification notes
 
@@ -1767,7 +1760,6 @@ there are no runtime errors or preload failures. The two existing loopback
 IMUD substitutions and fixed local router frames retain their limited scope.
 This first-administrator/native-save result does not qualify original-driver
 save import, live services, cold combined reliability or mortal-only behavior.
-Evidence: /tmp/lima-release-lifecycle-20261018.
 
 ### Release inventory after trailing-default validation
 
@@ -1788,7 +1780,6 @@ nil/preserved-player/4000ms profile remain. All 1549 library files and binaries
 stay unchanged during the run. Target constructors do not run. The baseline used
 target/debug and this sweep uses target/release; timing is not a performance
 comparison. Earlier gameplay and suite results retain their separate scope.
-Evidence: /tmp/lima-source-inventory-defaults-20261018.
 
 ### Colour-helper parameter defaults
 
@@ -1807,7 +1798,7 @@ finish normal saves/logout/shutdown with 151 clean preloads. Only those two
 parameter defaults change; native code and the 4000ms profile are unchanged.
 The compiler's non-trailing-default issue remains separate. The observer's first
 unescaped-colour JSON run and policy-blocked CLI attempts remain failed controls.
-Evidence: /tmp/lima-parameter-defaults-20261018; the source inventory is not rerun.
+The source inventory is not rerun.
 
 ### Earlier qualification records
 
@@ -1830,8 +1821,7 @@ Maximum two CLI processes, two Tokio workers each, 4 GiB/40s per target and the
 normal 4000ms/distinct-nil/preserved-player profile remain. All 1,549 library files,
 configuration and compiler binary stay unchanged during the run. This is not a
 performance benchmark, Rust gate or gameplay rerun. Prior 2367+10 full replay and
-later focused runtime checks retain their scopes. Evidence:
-/tmp/lima-source-inventory-refresh-20261017; prior /tmp/lima-source-inventory-20261017.
+later focused runtime checks retain their scopes.
 
 The digging audit and source adoption below record the nested prompt repair and
 its production replay. HOLE resolves to `/std/hole`, not the failing duplicate in
@@ -2006,7 +1996,7 @@ controller; cancellation does not qualify them. Next audit that concrete depende
 Hidden installed modules, previous-owner hook policy and board slice/absent-leader
 behavior remain original source behavior. No native feature is recommended. The
 whole-source count remains its measured inventory. Equipment/TCP, native observations
-and reserved discussions stay separate. Evidence: /tmp/lima-guild-artefact-20261016.
+and reserved discussions stay separate.
 
 
 Mission-controller audit notes are committed in **75324c55**. The two source files
@@ -2030,7 +2020,6 @@ clears XP while the cache remains; these source issues are not native gaps.
 Purchase accounting, sustained/restored favours, full rewards and autonomous expiry
 remain unqualified. Next review bounded favour expiry/controller-ownership
 corrections. Broader game policy and native observations retain their scope.
-Evidence: /tmp/lima-mission-controller-20261016.
 
 
 Controller/give support is committed in **6816385f**. Two further LPC corrections
@@ -2053,8 +2042,7 @@ The eager restore diagnostic's four-second limit remains unchanged; deferred
 controller lookup removes the unnecessary room/NPC construction. Broad native
 compiler performance is not claimed resolved. Next audit mission completion and
 autonomous expiry; broader reward/stacking/cancellation policy stays separate.
-The 957/1182 whole-source inventory remains its preceding sweep. Evidence:
-/tmp/lima-favour-lifecycle-20261016.
+The 957/1182 whole-source inventory remains its preceding sweep.
 
 
 Mission-expiry audit notes are committed in **cd678206**. The reviewed single
@@ -2077,7 +2065,7 @@ Multiple-contributor/offline rewards, other recipes, overlap/repeat-end and broa
 policy remain separate; cleanup explicitly flushes diagnostic logs, so autonomous
 delayed-log persistence is not newly qualified. Next audit the remaining Yakitori
 uniform, cashier/shop and delivery-boy consumers. The 957/1182 whole-source count
-remains its preceding sweep. Evidence: /tmp/lima-mission-expiry-20261016.
+remains its preceding sweep.
 
 Playerless guild logging is committed as **9e2f5a31** (native notes **b0274b98**).
 The subsequent Yakitori uniform/cashier/shop/delivery-boy audit leaves a **five-file
@@ -2105,8 +2093,7 @@ replay and 957/1182 whole-source sweep retain their measured scopes without repl
 or additive count here. Broader original-game policy/native observations and
 reserved inheritance/cache work stay separate. An earlier run passed all 75 gameplay
 inputs but hit 4000ms during second-boot compilation; failure evidence remains and
-no limit increase/native performance fix is claimed. Evidence:
-/tmp/lima-yakitori-shop-audit-20261016.
+no limit increase/native performance fix is claimed.
 
 Yakitori outfit/shop audit notes are committed in **7c07095e** (native **ab29ded1**).
 The five source adapters are adopted with one indentation-only cleanup; all other
@@ -2132,8 +2119,7 @@ restoration. Same six fixtures/two address overrides, distinct nil/preserved pla
 4000ms; no new helper/body/grant. Earlier cold-preload timeout evidence remains; no
 native performance fix is claimed. Next commit this adoption and refresh the source
 inventory before selecting the next complete-object family. The 957/1182 sweep
-retains its measured scope without additive estimates. Evidence:
-/tmp/lima-yakitori-shop-20261016.
+retains its measured scope without additive estimates.
 
 Yakitori support is committed as **65ce9796** (native notes **b03a0811**).
 The subsequent inventory checks all **1182 sources**: **966 compile, 216 fail,
@@ -2157,7 +2143,6 @@ ending review is retained. Distinct nil/preserved player/4000ms and source/confi
 binaries remain unchanged; this checkpoint changes notes only. No new gameplay or
 Rust gate; preceding **1871 inputs + 10 restored-favour / 413.0s** full replay,
 30 checkpoints/two clean 151-preload boots and saved login/bank retain their scopes.
-Evidence: /tmp/lima-guild-source-inventory-20261016.
 
 Inventory notes are committed as **92098d7c** (native **dab12c75**). The next
 slow-healing/consumable audit leaves a **five-file temporary proposal**. Slowheal
@@ -2180,7 +2165,7 @@ Dedicated LPC/native source remains unchanged; only audit notes are pending.
 Same six fixtures/two address overrides, no new helper/body/host/grant. Next adopt
 with retained full replay before saved-favour preparation. Prior 1871 + 10 restored-
 favour replay and 966/1182 inventory retain their scopes; no Rust gate or native
-feature change. Evidence: /tmp/lima-consumables-audit-20261016.
+feature change.
 
 Consumable audit notes are committed as **3dab1202** (native **026c4c82**).
 The five LPC adapters now match the audited proposal exactly: numeric/parser fixes,
@@ -2202,7 +2187,7 @@ expiry/favour setup and restoration. Same six fixtures/two address overrides.
 Implementation/updated notes are pending. Next audit camera/button/picture after
 committing this adoption; inspect actual constructors/press/photo delivery. The
 966/1182 sweep retains its measured scope without additive counts. No Rust gate or
-native performance fix is claimed. Evidence: /tmp/lima-consumables-20261016.
+native performance fix is claimed.
 
 Consumable support is committed as **109b22a0** (native notes **9c0eaf32**).
 The next camera audit leaves a **one-file temporary button proposal**: explicit
@@ -2222,7 +2207,7 @@ Only audit notes are pending; dedicated LPC/native implementation stays unchange
 Same six fixtures/two address overrides, distinct nil/preserved player/4000ms,
 no new LPC helper/body/host/grant. Prior 1989 + 10 restored-favour replay and 966/1182
 sweep retain their measured scopes. Next adopt with retained full replay after
-consumables and before saved-favour setup. Evidence: /tmp/lima-camera-audit-20261016.
+consumables and before saved-favour setup.
 
 Camera audit notes are committed as **61122c8e** (native **3740cd3c**). The one
 button-file change now exactly matches the audited proposal: explicit mass conversion
@@ -2247,7 +2232,7 @@ Same six fixtures/two address overrides, distinct nil/preserved player/4000ms; n
 LPC helper/body/host/grant. Implementation/updated notes are pending. Next audit the
 writable-paper example/M_WRITING_SURFACE hook boundary after committing this change.
 WIP burnable std/paper.c stays separate. The 966/1182 sweep retains measured scope;
-no Rust gate or native performance fix. Evidence: /tmp/lima-camera-20261016.
+no Rust gate or native performance fix.
 
 Camera support is committed as **c9ec2f52** (native notes **d5fc3fb4**).
 The writable-paper audit isolates a string/function hook boundary already present
@@ -2268,8 +2253,7 @@ actual master/simuls/user/body/parser; distinct nil/preserved player/4000ms stay
 No new LPC helper/body/host/grant or native change. Next adopt with retained full
 replay after camera cleanup and before mission/expiry/favour setup. Prior
 2028 + 10 restored-favour / 413.38s replay and 966/1182 sweep retain measured scope.
-The separate WIP burnable std/paper.c remains outside this audit. Evidence:
-/tmp/lima-writing-audit-20261016.
+The separate WIP burnable std/paper.c remains outside this audit.
 
 Writable-paper audit notes are committed as **0034b8dd** (native **31b43d61**).
 The one M_WRITING_SURFACE change now exactly matches the audited proposal: a private
@@ -2296,7 +2280,6 @@ mailbox/leaflet room props, separate from the completed user-mail system. The
 966/1182 sweep retains measured scope; no native performance fix is claimed.
 The retained first replay hit the existing 4000ms cold-load budget before paper;
 source/helpers/limits stayed unchanged for the retry.
-Evidence: /tmp/lima-writing-20261016.
 
 Paper support is committed as **0bceb674** (native notes **99d7faf3**). The new
 physical mailbox/leaflet audit is separate from the user-mail system. A two-file
@@ -2323,7 +2306,6 @@ Prop restart persistence is not qualified. Same six fixtures/two address overrid
 distinct nil/preserved player/4000ms and actual master/simuls/user/body/parser remain.
 Prior 2082 + 10 restored-favour / 426.29s replay and 966/1182 sweep keep measured scope.
 Next adopt with retained full replay after writing and before mission/expiry/favour.
-Evidence: /tmp/lima-mailbox-props-audit-20261016.
 
 The mailbox/leaflet source still exactly matches the audited two mass conversions;
 implementation and notes are pending commit. All **83 prior compile checks** are
@@ -2336,16 +2318,15 @@ Input callback resolution exceeded 4000ms with **zero compilation time**. GC the
 reported reclaiming **2,272,887 variables**, and a live-snapshot reply found its
 receiver cancelled. Callback snapshot acquisition shares the evaluation deadline;
 GC executes atomically in the committer. GC/snapshot waiting is suspected, not
-isolated or fixed. This differs from the earlier cold-preload failures, preserved
-under /tmp/lima-mailbox-props-20261016. Source/helpers/fixtures/limits are unchanged;
+isolated or fixed. This differs from the earlier cold-preload failures.
+Source/helpers/fixtures/limits are unchanged;
 no native change or current full-replay success is claimed.
 
 Same six fixtures/two address overrides, distinct nil/preserved player/4000ms and
 actual master/simuls/user/body/parser; no new LPC helper/body/host/grant. Prior
 2082 + 10 restored-favour / 426.29s replay and 966/1182 sweep keep measured scope.
 Next investigate the native snapshot/GC deadline before another full qualification
-or the next container-example audit. Evidence:
-/tmp/lima-mailbox-props-retry-20261016.
+or the next container-example audit.
 
 Mailbox source/validation notes are committed as **4c15b53b** (native **8561a764**).
 The native timeout audit now has two passing paused-clock tests: snapshot queue
@@ -2359,8 +2340,7 @@ contract. Debug scalar-world and optimized map-only fixtures favor reconstructio
 when nearly everything is garbage; unconditional reconstruction was slower for
 mostly-live maps. These are not an end-to-end Lima speedup. Temporary profiling
 code is excluded from the shared change. Full replay qualification remains pending;
-all 62 mailbox inputs passed the preceding retry. Evidence:
-/tmp/lpc-gc-snapshot-audit-20261016.
+all 62 mailbox inputs passed the preceding retry.
 
 The subsequent native collector change selects reconstruction from traced cell
 IDs and protected identities when their conservative survivor bound is at most
@@ -2378,8 +2358,7 @@ timeout or cancelled snapshot reply is reported. Account/body/bank/favour state
 restores. The separate original-collector measurement used a smaller world and
 is not a matched native speed comparison. Earlier compile checks remain prior
 83/83 evidence, not rerun for the GC-only change. Cold-compilation investigation
-stays separate; next audit is the standard table/treasure-chest consumers. Evidence:
-/tmp/lpc-gc-sweep-20261017.
+stays separate; next audit is the standard table/treasure-chest consumers.
 
 The subsequent GC parallelism investigation leaves driver code, dependencies,
 storage and Lima source/configuration unchanged. The same 596-command measurement
@@ -2395,11 +2374,10 @@ Arc payloads. This unpublished API is not integrated into the driver and the res
 is not a native speedup. A bounded native prototype with dependency API support
 and transaction/GC validation is the recommended next performance investigation.
 All temporary timing code is removed and debug/release production binaries rebuilt;
-atomic GC and the existing timeout/mode contracts remain. Evidence:
-/tmp/lpc-gc-parallel-20261017.
+atomic GC and the existing timeout/mode contracts remain.
 
-The subsequent native worker prototype lives only in the detached checkout at
-/tmp/lpc-gc-native-20261017/checkout (native d2a2c28b). Its unpublished imbl
+The subsequent native worker prototype was an isolated experiment at native
+revision d2a2c28b. Its unpublished imbl
 owned-branch API and Rayon dependency do not change production code, storage or
 Lima source/configuration. Two lazy workers finish retired-map disposal inside
 atomic GC; small maps remain serial and worker creation failure falls back.
@@ -2420,7 +2398,7 @@ range from **8.2% faster to 2.5% slower**, with overlapping ranges. Zero overhea
 is not established. Results support the approach, but adoption needs a maintained
 dependency API strategy; the temporary path and measurement control remain isolated.
 Native timeout/mode contracts, prior 83/83 compile evidence and 966/1182 inventory
-keep their measured scope. Evidence: /tmp/lpc-gc-native-20261017.
+keep their measured scope.
 
 The subsequent published-API research tests the unmodified registry imbl 7.0.2
 with the native allocator version. All 700 measured container trials pass, covering
@@ -2439,7 +2417,6 @@ alternate pointers show no convincing owned-payload GC gain. The uncommitted ven
 proposal is withdrawn and preserved in its prior evidence package. Main native
 code/Cargo settings are restored to the original registry dependency; workspace
 build passes. No native storage change or new full Lima replay is claimed.
-Evidence: /tmp/lpc-gc-public-api-20261017.
 
 A further matched container comparison uses one executable, identical 32-byte
 payloads/survivor IDs/hash seed/allocator and two workers. Seven balanced rotations
@@ -2450,7 +2427,6 @@ Four maps reach 78.8ms in the larger owned case, with more handle-copy overhead.
 The partition algorithm calls unchanged public methods; both cases link the local
 API extension solely to control the dependency build. Main native source and
 registry configuration remain unchanged; native validation is recorded below.
-Evidence: /tmp/lpc-gc-matched-20261017.
 
 The native follow-up supports **two maps without a fork/vendor**. With the same
 596-command prefix and normal 300-second GC interval, optimized total pauses are
@@ -2467,7 +2443,7 @@ do not persist; two-map recheck medians range from 2.0% faster to 2.5% slower,
 with overlapping ranges. Two maps remain a viable alternative under one snapshot,
 version and committer, with synchronous worker completion. That prototype remains
 isolated and original public executables were restored after the comparison. This does not add a full replay or inventory
-qualification. Evidence: /tmp/lpc-gc-world-native-20261017.
+qualification.
 
 The selected delivery uses the existing single world map and a direct Git pin to
 [the imbl fork](https://github.com/xxx/imbl/commit/5fa322d043faee90d32c63430b51a52be3ad121d).
@@ -2477,7 +2453,7 @@ fork records how to replay the feature onto reviewed upstream releases. No vendo
 copy, root patch override or preparation tool is required by Git/path consumers.
 Existing dependency versions and feature selection remain unchanged. That change
 prepared the dependency API without enabling workers. Lima source, configuration
-and qualification scope were unchanged. Evidence: /tmp/lpc-imbl-fork-20261017.
+and qualification scope were unchanged.
 
 The native collector now disposes of large rebuilt maps using a lazy two-worker
 pool through the pinned owned-branch API. Small/shared/direct cases and worker
@@ -2494,7 +2470,6 @@ player, 4,000 ms and normal 300-second GC stay unchanged. Collection reduces
 154.1ms and total collector service is 201.3ms. This is one measurement, not a
 controlled comparison with earlier samples or a new full replay/inventory
 qualification. No Lima source or configuration changes are needed.
-Evidence: /tmp/lpc-gc-workers-20261017.
 
 The integrated driver subsequently passes the unchanged full retained gameplay
 run: **2,160 gameplay inputs + 10 restored-favour inputs**, all **30 lifecycle
@@ -2519,8 +2494,7 @@ scanning caused a background-task failure and committer-closed worker panic; a
 repeat passed all object checks but hit two cold-compilation preload timeouts at
 the unchanged 4,000ms limit. These driver findings are not fixed by the container
 patch. The final optimized run waits for ordinary RST completion before shutdown
-and has no Apply failure or worker panic. Evidence:
-/tmp/lima-container-consumers-20261017.
+and has no Apply failure or worker panic.
 
 The whiskey bottle spawned by Pinto's shadowy swamp now passes `2.0` to the
 float-weight API. Its value range, bonuses, skill and salvage settings are retained.
@@ -2531,8 +2505,7 @@ spawn, look/get/wield/unwield/drop, integer values in 10..19 and reset restockin
 without duplicate floor stock. The same six fixtures and two address substitutions
 are used; no native code, configuration, framework or authorization changes.
 Combat damage and fresh-driver weapon restoration are not tested. The full replay
-and whole-source inventory above retain their earlier scopes. Evidence:
-/tmp/lima-whiskey-bottle-20261017.
+and whole-source inventory above retain their earlier scopes.
 
 The weather daemon used by the example Weather Room now retains its timer ID,
 cancels by ID and schedules the named callback. The **120-second period**, weather
@@ -2544,8 +2517,7 @@ cancels old schedules and leaves one timer; a natural firing after 120 seconds
 schedules one replacement. This sample remains foggy and emits no change notice;
 changing natural ticks, all states and multiple recipients remain untested. No
 native API, framework, configuration, authorization or fixture change is needed.
-The full replay and source inventory retain their preceding scopes. Evidence:
-/tmp/lima-weather-20261017.
+The full replay and source inventory retain their preceding scopes.
 
 The shared gettable module now registers its actual get/drop check functions.
 Nested get validation keeps a container's gettable state separate from its
@@ -2571,7 +2543,6 @@ Earlier failed attempts and temporary diagnostics are retained as unqualified.
 The standalone gettable module still requires its composition's `add_hook`;
 no prototype extension is needed. Beek conversation and fresh-driver prop
 persistence remain outside the check; the 966/1182 inventory is not repeated.
-Evidence: /tmp/lima-workroom-20261017.
 
 The loot chest matches inherited parser signatures, schedules its named expiry
 callback and handles ownerless expiry. Explicit opening/get aliases and the
@@ -2595,7 +2566,7 @@ No native code/configuration or fixture changes. Loot-daemon generation and
 placement, the death pipeline and fresh-driver loot persistence are outside this
 run; the preceding full replay and 966/1182 inventory retain their measured scopes.
 The next audit is the daemon that creates these chests. Failed controls remain
-unqualified. Evidence: /tmp/lima-loot-chest-20261017.
+unqualified.
 
 The following loot-generation audit leaves source unchanged after commit
 **ed33a625** (native notes **1e5f394a**). Of six targets, daemon/chest/coins compile;
@@ -2621,7 +2592,6 @@ changing unused boss policy is separate work. No actual boss combat, random
 distribution or loot persistence qualification is claimed. Native source/config,
 fixtures, distinct nil/preserved player/4000ms and 300-second GC are unchanged.
 The preceding full replay and 966/1182 inventory retain their measured scopes.
-Evidence: /tmp/lima-loot-generation-audit-20261017.
 
 The audited three-file repair is applied after notes commit **0dfba629** (native
 **72802a4f**). Gem/art query their inherited value getters, adapt return/value
@@ -2648,7 +2618,6 @@ chest-expiry notices arrive naturally at 15/30/45 seconds. Actual boss combat,
 random distributions and loot persistence remain outside this run. The earlier
 full replay and 966/1182 inventory retain their measured scopes. The inventory above now measures
 these leaf ports and selects the next complete consumer.
-Evidence: /tmp/lima-loot-generation-20261017.
 
 Inventory notes are committed as **2ffc14ad** (native **f96aedc2**). The following
 Rocky Beach repair changes two LPC files: debris converts its unchanged mass 5000
@@ -2670,7 +2639,7 @@ The existing ocean hook starts the pirate quest; full quest completion/combat
 are outside this check. Seven unchanged helpers retain the generator/container/
 bottle/workroom/weather/gettable/chest assertions, including natural weather and
 all three chest-expiry notices. Previous full replay and 985/1182 inventory retain
-their scopes; no additive recount. Evidence: /tmp/lima-rocky-beach-20261017.
+their scopes; no additive recount.
 
 Rocky Beach support is committed as **7d47e4af** (native **684e8a1a**). The next
 guild-guard adapter changes only `std/guild_guard.c`: use the existing block-action
@@ -2690,7 +2659,7 @@ one removed guard, with stale hooks pruned normally. Memberships, shell path,
 temporary catalog entries and props restore. Eight unchanged helpers retain all
 previous generator/beach/container/bottle/workroom/weather/gettable/chest checks.
 No combat or saved-guard restoration claim; prior full replay and 985/1182 inventory
-keep their measured scopes. Evidence: /tmp/lima-guild-guard-20261017.
+keep their measured scopes.
 
 Guild-guard source/notes are committed as Lima **686d0a4d**, native **9f1ea8b2**.
 The constructor coverage map now accounts for all **34 standard-room sources**:
@@ -2702,7 +2671,7 @@ already loaded during startup. **67 focused inputs**, **151 clean preloads**, no
 RST scanning, account/body saves and clean shutdown pass in **153.59s**.
 No LPC/native/configuration/fixture changes. Construction coverage does not qualify
 all gameplay/exits; the prior full replay and 985/1182 inventory keep their scopes.
-Evidence: /tmp/lima-room-construction-20261017. Constructor notes are committed as
+Constructor notes are committed as
 Lima **46327624**, native **2ac8e2ea**; do not repeat the completed constructors.
 
 The Lava Room audit is committed as Lima **4313c3b3**, native **320664db**.
@@ -2717,8 +2686,7 @@ and ordinary `drop` remove rocks without extra timers/leftovers. Natural five-se
 burns deal 5 damage and reschedule; departure consumes the pending timer without
 more damage. A ridden Camaro protects its rider; existing cosmetic vehicle burns
 and quick-reentry duplicate timers are preserved. Health/healing, path and props
-restore; the fixed callback remains installed. Evidence:
-/tmp/lima-lava-room-20261017. Prior audit, constructor/full replay and source
+restore; the fixed callback remains installed. Prior audit, constructor/full replay and source
 inventory retain their scopes; there is no additive recount or repeated Rust gate.
 
 Book audit notes are committed as Lima **f61c59cd**, native **e9d53ae7**.
@@ -2734,7 +2702,7 @@ and normal RST/saves/logout/shutdown complete in **133.69s**. Core book commands
 contents/page removal and fallback, append beyond page ten, empty-book append and
 resident callable-page reading pass without diagnostic source or hook controls.
 A real book-owned callback resolves the prior audit's invalid callback-owner probe.
-Props and path restore. Evidence: /tmp/lima-book-20261017.
+Props and path restore.
 
 Book source/notes are committed as Lima **a5efeef1**, native **c2895b85**; routing
 audit notes as Lima **d0063df1**, native **1d138a6d**. Only the read/turn rule arrays
@@ -2747,12 +2715,10 @@ in **140.45s**, with **151 clean preloads**, normal RST/saves/logout/shutdown.
 Actual registry order, qualified about in/from reads, the four ordinary turn error
 messages, valid turns, page preservation and cleanup pass. Numeric/alias/empty/
 resident-callback book coverage remains green. No runtime rule or hook control.
-Evidence: /tmp/lima-command-routing-20261017.
 
 Rejected trailing-direction turns retain the missing-noun diagnostic tie; valid
 trailing turns and refusal state preservation pass. Native/parser, shared-readable,
-book, master, configuration and fixtures are unchanged. Previous temporary audit:
-/tmp/lima-command-routing-audit-20261017. Prior inventory/full replay/constructor
+book, master, configuration and fixtures are unchanged. Prior inventory/full replay/constructor
 counts retain their scopes. Read/turn source and notes are committed as Lima
 **d234149d**, native **b47b39ed**.
 
@@ -2768,8 +2734,7 @@ size/type/custom-mass restoration through no-argument and recursive inventory lo
 zero/positive salvage paths, real loot/corpse placement and collection pass. Positive
 yield is bounded rather than fixed; no probability claim. Shared save/object/loot/
 crafting/corpse, native/configuration and six existing fixtures are unchanged.
-Evidence: /tmp/lima-pelt-20261017. Prior diagnostic audit and incomplete attempts:
-/tmp/lima-pelt-audit-20261017. No fresh-driver pelt restore or alternate-size claim.
+No fresh-driver pelt restore or alternate-size claim.
 Previous inventory/full replay counts retain scope. Pelt source and notes are
 committed as Lima **fd952bd6**, native **c047e1a0**.
 
@@ -2790,7 +2755,6 @@ explicit public setup reset, actual state-daemon decay through removal and stock
 badger meat collection/eating pass. No forced loot selection or probability claim.
 Poison is only checked as saved data and cleared before eating. Shared/native/
 configuration and six fixtures are unchanged. CRLF/no-final-newline format remains.
-Evidence: /tmp/lima-meat-20261017; previous audit /tmp/lima-meat-audit-20261017.
 No fresh-driver meat restoration or alternate build claim; previous inventory/full
 replay counts retain scope. Meat source/notes are committed as Lima **b24a3d7a**,
 native **59fb3ec6**.
@@ -2805,8 +2769,7 @@ source/hook controls or expected failures. Actual climb/ascend/descend movement,
 two-way relative and one-way object/string destinations, singular identity,
 attachment, relocation base, get refusal and unconfigured defaults pass. Props,
 path and variables restore; stock stairs remain. No shared/native/config/fixture
-change. Evidence: /tmp/lima-ladder-20261017; prior audit:
-/tmp/lima-ladder-audit-20261017. Prior room/navigation, inventory and full replay
+change. Prior room/navigation, inventory and full replay
 scopes remain. Ladder source/notes are committed as Lima **fb1de80e**, native
 **860a3950**.
 
@@ -2825,8 +2788,7 @@ No source controls or constructor-failure fixture; the six prior fixtures suffic
 Parsed go up/down object forms retain the outer go verb's refusal. The class's go
 alias is separately tested through direct calls and follows the same reflex policy;
 no parsed-go travel is claimed. Shared/native/configuration behavior is unchanged.
-Evidence: /tmp/lima-climb-challenge-20261017; prior diagnostic audit:
-/tmp/lima-climb-challenge-audit-20261017. The refreshed source inventory is recorded
+The refreshed source inventory is recorded
 above, preserving earlier functional scopes and host classifications.
 
 The digging audit at native **ad86b192** and Lima **01bc51ad** reproduces a nested
@@ -2847,7 +2809,7 @@ quest prerequisite prevents reward; positive reward/full quest remain separate.
 The existing omitted tool argument is unused by both targets and is not the
 observed lifecycle failure. Prior setup/capture/ID mistakes and a discarded
 modal_remove proposal are retained as harness history, not final qualification.
-Evidence and proposed patch: /tmp/lima-digging-audit-20261017. Recommend adopting
+Recommend adopting
 these two callers with retained replay, then the button/secret-door/quest chain.
 Eight unchanged complete compile passes are retained from the matched inventory;
 no fresh source recount, Rust gate, native API or dedicated-source change is claimed.
@@ -2868,7 +2830,7 @@ Same six fixtures and two loopback-address substitutions; no native/config/binar
 change, new Rust gate, whole-source inventory or room-construction rerun.
 
 Chest construction and positive pirate-quest reward remain separate; the unused
-tool argument stays. Evidence: /tmp/lima-digging-20261017. After committing this
+tool argument stays. After committing this
 adoption, audit the Navigation Room button, linked secret doors and remaining
 pirate milestone integration.
 
@@ -2896,7 +2858,7 @@ Dedicated source is unchanged pending adoption. Six fixtures and two loopback
 address substitutions remain; the only proposal source replacement is rock_wall.c.
 The stale constructor destination in Small_Dock is unused; actual door destinations
 are reciprocal, so it is not changed. No Rust/full-inventory/room/framework rerun.
-Evidence and one-line patch: /tmp/lima-pirate-passage-audit-20261017. Adopt and replay
+Adopt and replay
 that callback change, then verify completed quest restoration. Chest creation stays
 outside the repair.
 
@@ -2914,8 +2876,7 @@ the character finishes with 25 points/250 XP and normal saving completes. A fres
 process quest restore is not yet checked. Cleanup retains the preceding audit scope.
 
 Same six fixtures, two address substitutions and configuration; no native/binary
-change, Rust gate, full source sweep or continuous cave route rerun. Evidence:
-/tmp/lima-pirate-passage-20261017. Commit this repair, then verify saved quest state
+change, Rust gate, full source sweep or continuous cave route rerun. Commit this repair, then verify saved quest state
 and points/XP after restart. Chest construction remains outside this fix.
 
 The passage repair is committed as Lima **a4ef8318**, native **62a4b21e**.
@@ -2936,7 +2897,7 @@ only on explicit save/logout was incomplete. Existing policy is unchanged. No sa
 file or quest progress is injected. The prior continuous route and timer results
 retain their scopes, with earning used only as restoration setup. First RST scan
 and its cached restart watermark are preserved; no scan-cleanup fixture is added.
-Evidence: /tmp/lima-quest-restoration-20261017. Pirate passage/quest work is closed;
+Pirate passage/quest work is closed;
 return to the classified source backlog and actual consumers. No new Rust gate,
 full inventory, chest implementation or native/configuration/binary change.
 
@@ -2957,7 +2918,7 @@ That review selected obj/mudlib/aliasmenu.c. Both configured shells inherit SHEL
 the normal alias command loads this file for bare alias and alias-name display.
 Its inline function syntax still fails compilation. The secure/cgi/webed wrapper
 also reaches failing obj/secure/webed, without a new HTTP execution claim.
-Evidence: /tmp/lima-compile-classification-20261017. No source, native API, binary,
+No source, native API, binary,
 profile or fixture changes; completed pirate/quest/equipment/framework work stays
 closed. The audit below now covers the selected shell/API/persistence path.
 
@@ -2973,7 +2934,7 @@ defaults and xverb flags survive authentic save/login/restart and are cleaned up
 Two unresolved findings are explicitly asserted: body.quit's blind modal_pop on
 !quit leaves an editor clone, and M_ALIAS's obsolete sizeof(class) != 4 migration
 resets global defaults to personal aliases in saves. This is not a clean lifecycle
-pass. Evidence: /tmp/lima-alias-menu-audit-20261017.
+pass.
 
 The adoption below covers the menu adapter and obsolete migration; quit notification
 remains separate. That audit changed no persistent mudlib/native source, profile,
@@ -2992,7 +2953,7 @@ Runtime uses the dedicated sources without alias proposal overrides; the same si
 fixtures and two existing loopback address substitutions remain. Normal command
 lines match the audit, with stronger save/metadata assertions. The known !quit editor
 leak was the sole remaining finding; the focused cleanup below resolves it.
-Evidence: /tmp/lima-alias-menu-20261017. No native/config/binary/format/API change,
+No native/config/binary/format/API change,
 new full-source count, stock data rewrite or clean-cancellation claim is made.
 
 Alias source/notes are committed as Lima **bcd959bf**, native **0ad959a1**.
@@ -3005,7 +2966,7 @@ clean 151-preload boots and authentic save/login/restart. Pending and nested edi
 are destroyed; repeated quit/re-entry returns to one shell handler. Existing alias
 classes/defaults/xverbs/global flags remain intact, six save checkpoints preserve
 the filter, and no caught cancellation error occurs. This closes the known alias
-quit leak. Evidence: /tmp/lima-quit-input-20261017. No native/profile/binary/format
+quit leak. No native/profile/binary/format
 change, new fixture, broad handler qualification or whole-source recount is made.
 
 Quit source/notes are committed as Lima **55deab9c**, native **e4a6c18c**.
@@ -3021,7 +2982,7 @@ compile examples verify macro causality and the unselected USE_MONEY branch.
 An initial reference scan of 28 remaining source/host cases finds MONEY unselected
 and netstat inspecting already-loaded legacy sockets. Negative reference matches
 do not establish inactivity; relative inheritance and object-stock review are next.
-Evidence: /tmp/lima-web-editor-audit-20261017. Source/config/binaries remain unchanged;
+Source/config/binaries remain unchanged;
 no runtime/HTTP test, service activation or new whole-source count is made.
 
 Optional-editor notes are committed as Lima **a22e3aed**, native **5343469c**.
@@ -3037,8 +2998,7 @@ registered clone helpers prefix /domains/std/. The last weapon inherits the
 special-weapon mixin. Parent providers and the suite/daemon/command compile, but
 this source review does not execute or qualify the suite's callbacks. Next audit
 that invocation/clone boundary and those leaf adapters, preserving established
-equipment APIs and previous gameplay coverage. Evidence:
-/tmp/lima-consumer-classification-20261017. Sources/config/binaries stay unchanged;
+equipment APIs and previous gameplay coverage. Sources/config/binaries stay unchanged;
 no new full-source count, gameplay result or native requirement is established.
 
 Consumer-classification notes are committed as Lima **54555bda**, native **b831bdfb**.
@@ -3057,7 +3017,7 @@ and four known rejections before/after. This is not a complete item-suite pass.
 Remaining clones are baseball_bat, rapier and special_longsword (compile failures),
 plus stick, whose typed colour constructor is called without fixture data and logs
 an expected init-program error. Next adapt the three weapon sources/mixin and give
-the stick fixture a valid colour. Evidence: /tmp/lima-item-suite-audit-20261017.
+the stick fixture a valid colour.
 The original control also retains a later, corrected harness pwd assertion; its
 source-failure observations are not relabelled as a clean run. No native/profile/
 binary/privilege change, new fixture, full inventory or broad gameplay claim.
@@ -3077,7 +3037,7 @@ pass; a blue stick retains its constructor data. Both controls remove themselves
 dedicated-source copy uses the prior six fixtures/two loopback substitutions plus
 one temporary event helper, with no proposal source override. This prepared-runtime
 result adds no cold-performance, full-source or other-suite/all/all quiet claim.
-Evidence: /tmp/lima-item-construction-20261017. Native/profile/binaries stay unchanged.
+Native/profile/binaries stay unchanged.
 
 The item construction changes are committed as Lima **f3a16824**, native **dc40cf01**.
 The bundled liquids suite passes its first six assertions, then direct actor
@@ -3092,7 +3052,7 @@ pass. The temporary runtime switches only the suite source, then those tested by
 are adopted exactly. The prior six fixtures/two loopback substitutions remain.
 Player/lab/clone state returns to baseline; no unexpected error or residue remains.
 Other suites/all/all quiet and cold-suite performance retain their prior scope.
-Evidence: /tmp/lima-liquids-suite-20261017. Native/profile/binaries stay unchanged.
+Native/profile/binaries stay unchanged.
 
 The liquids-suite fix is committed as Lima **23f6497e**, native **5e62be06**.
 The race suite loads shared blueprints; its original cleanup is refused for all
@@ -3107,8 +3067,7 @@ and no unexpected errors pass. The tested source bytes are adopted exactly after
 the disposable run. The prior six fixtures/two loopback substitutions remain;
 its temporary shell identity marker is removed. Master, race content, assertions,
 framework and native/profile/binaries remain unchanged. Limbs, salvage, all/all quiet
-and cold-suite performance retain their prior scope. Evidence:
-/tmp/lima-race-suite-20261018.
+and cold-suite performance retain their prior scope.
 
 The race-suite fix is committed as Lima **d39f288c**, native **66bd5b52**. The limbs
 suite needs three local adaptations: test objects remove themselves, the wield
@@ -3128,8 +3087,7 @@ original and ownership-only suite checks also pass. **22 inputs / 139.25s**,
 The diagnostic run and its non-green results remain separately recorded. Tested
 final bytes are adopted exactly afterward. The prior six fixtures/two loopback
 substitutions remain; no new helper or native/profile/binary change is introduced.
-Salvage, all/all quiet and cold-suite performance retain their prior scope. Evidence:
-/tmp/lima-limbs-suite-20261018.
+Salvage, all/all quiet and cold-suite performance retain their prior scope.
 
 The limbs-suite fix is committed as Lima **c325475f**, native **f87b40af**. The
 salvage suite now checks actual sword removal, tracks only base-material clones
@@ -3152,7 +3110,7 @@ bytes are adopted exactly afterward. The prior six fixtures/two loopback substit
 remain; no new helper or native/profile/binary change is introduced. All five shipped
 suites have individual results; all/all quiet still needs combined qualification.
 Material probabilities, arbitrary recipe yields, player-pouch credit and cold-suite
-performance retain their prior scope. Evidence: /tmp/lima-salvage-suite-20261018.
+performance retain their prior scope.
 
 The salvage-suite fix is committed as Lima **52271b44**, native **70f1812e**. Both
 combined commands now pass **59/59** through the real command/daemon: `unittest all`
@@ -3166,8 +3124,7 @@ state remain unchanged. Identity markers are removed; following look/pwd work.
 saves/logout/shutdown pass without unexpected errors. No extra LPC fixture or gameplay
 replacement is installed; the two existing loopback substitutions remain. No further
 implementation/configuration/binary change is needed. This prepared-runtime result
-adds no cold-suite performance or full-source inventory claim. Evidence:
-/tmp/lima-bundled-tests-20261018. The next check is a fresh bounded source inventory
+adds no cold-suite performance or full-source inventory claim. The next check is a fresh bounded source inventory
 with existing host/optional/legacy classifications carried forward.
 
 The combined-test notes are committed as Lima **fb3ad0a9**, native **45648cfb**.
@@ -3186,7 +3143,7 @@ first errors now name their already-reviewed modal_simple provider; actual hosts
 Two bounded CLI processes compile without target constructors or driver/Cargo
 overlap. Source/configuration/binary guards pass; no implementation changes or new
 runtime claim are added. Combined normal/quiet 59/59 results retain their preceding
-scope. Evidence: /tmp/lima-source-inventory-20261018. The next concrete optional
+scope. The next concrete optional
 consumer is the on-demand stone/sword example, whose relative child retains its
 integer-mass blocker; constructor/get/release behavior needs its own audit.
 
@@ -3209,8 +3166,7 @@ preloads, both account/body saves and normal logout/shutdown pass without unexpe
 errors. Tracked player/inventory/pouch/lab/clone state restores. Tested child bytes
 are adopted exactly afterward; no new helper or native/profile/binary change.
 This sample is on-demand, with no selected stock/preload root established. No new
-full-source total or king-logout reselection claim. Evidence:
-/tmp/lima-stone-sword-20261018.
+full-source total or king-logout reselection claim.
 
 Other first blockers include typed nil/float/value adaptations, callbacks, override
 signatures and containing-object methods. A standalone failure is not automatically
@@ -3809,7 +3765,8 @@ expressions. Repeated calls preserve player context and support an optional
 include header.
 Evaluated strings, nil and other false results return the original text, as do
 caught expression errors; `eval("0")` returns integer zero. The generated source
-stays in `/tmp/eval.c` until the next call. The existing object-name shortcut
+stays in the mudlib's in-game `/tmp/eval.c` until the next call. The existing
+object-name shortcut
 returns text; use `find_object()` to look up an object.
 
 `which <command>` prints the first matching command in your shell's search
@@ -4438,7 +4395,6 @@ their separate scope; the same 21-recipe warmup and 4,000 ms budget remain.
 Full inventory, wizard/player-command and startup results retain their preceding
 scope.
 
-Current compatibility and handoff notes are in the neighboring lpc-rs checkout:
-`doc/mudlibs/lima.md` and `local/lima/compatibility.md`. Temporary test
-harnesses and execution logs belong in `/tmp/`. Continue source changes in this
-checkout rather than making another source copy under `local/`.
+For driver differences and recorded validation, see the
+[Lima porting guide](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima.md) and
+[port history](https://github.com/xxx/lpc-rs/blob/ed967c446504311cfb2688141d644009c9032961/doc/mudlibs/lima-port-history.md).
